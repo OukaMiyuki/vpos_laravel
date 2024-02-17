@@ -6,6 +6,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\DetailMarketing;
+use App\Models\InvitationCode;
 
 class Marketing extends Authenticatable {
     use HasApiTokens, HasFactory;
@@ -29,7 +30,11 @@ class Marketing extends Authenticatable {
     ];
 
     public function detail(){
-        return $this->hasOne(Marketing::class, 'id_marketing', 'id');
+        return $this->hasOne(DetailMarketing::class, 'id_marketing', 'id');
+    }
+
+    public function invitationCode(){
+        return $this->hasMany(InvitationCode::class, 'id_marketing', 'id');
     }
 
     public function detailMarketingStore($model){

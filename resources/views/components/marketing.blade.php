@@ -1,72 +1,123 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ $title ?? 'Laravel 10 Tutorial' }}</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-</head>
-<body>
-
-    <nav class="navbar navbar-expand-lg bg-body-tertiary shadow sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">Marketing Navbar</a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url('/') }}">Home</a>
-                    </li>
-                    @guest('marketing')
-                    <li class="nav-item">
-                        <a class="nav-link fw-bold" href="{{ route('marketing.login') }}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link fw-bold" href="{{ route('marketing.register') }}">Register</a>
-                    </li>
-                    @else
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ Auth::guard('marketing')->user()->name }}
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <form method="POST" action="{{ route('marketing.logout') }}">
-                                    @csrf
-                                    <a
-                                        class="dropdown-item" href="{{ route('marketing.logout') }}"
-                                        onclick="event.preventDefault();
-                                        this.closest('form').submit();"
-                                    >
-                                        Log Out
-                                    </a>
-                                </form>
-                            </li>
-                        </ul>
-                      </div>
-                    @endguest
-                </ul>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>VPOS | Marketing - Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
+        <meta content="Coderthemes" name="author" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="{{ asset('assets/images/logo/Logo2.png') }}">
+        <link href="{{ asset('assets/libs/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/datatables.net-select-bs5/css//select.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+        <!-- Plugins css -->
+        <link href="{{ asset('assets/libs/fullcalendar/main.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
+        <!-- Bootstrap css -->
+        <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+        <!-- App css -->
+        <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-style"/>
+        <!-- icons -->
+        <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+        <!-- Head js -->
+        <script src="{{ asset('assets/js/head.js') }}"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" >
+    </head>
+    <!-- body start -->
+    <body data-layout-mode="default" data-theme="light" data-topbar-color="dark" data-menu-position="fixed" data-leftbar-color="light" data-leftbar-size='default' data-sidebar-user='false'>
+        <!-- Begin page -->
+        <div id="wrapper">
+            <!-- Topbar Start -->
+            @include('body.header')
+            <!-- end Topbar -->
+            <!-- ========== Left Sidebar Start ========== -->
+            @include('body.sidebar')
+            <!-- Left Sidebar End -->
+            <!-- ============================================================== -->
+            <!-- Start Page Content here -->
+            <!-- ============================================================== -->
+            <div class="content-page">
+                {{ $slot }}
+                <!-- content -->
+                <!-- Footer Start -->
+                @include('body.footer')
+                <!-- end Footer -->
             </div>
+            <!-- ============================================================== -->
+            <!-- End Page content -->
+            <!-- ============================================================== -->
         </div>
-    </nav>
+        <!-- END wrapper -->
+        <!-- Right Sidebar -->
+        @include('body.right-sidebar')
+        <!-- /Right-bar -->
+        <!-- Right bar overlay-->
+        <div class="rightbar-overlay"></div>
+        <!-- Vendor js -->
+        <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
+        <!-- Plugins js-->
+        <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/selectize/js/standalone/selectize.min.js') }}"></script>
+        <!-- Dashboar 1 init js-->
+        <script src="{{ asset('assets/js/pages/dashboard-1.init.js') }}"></script>
+        <!-- App js-->
+        <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.flash.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/datatables.net-buttons/js/buttons.print.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/datatables.net-keytable/js/dataTables.keyTable.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/datatables.net-select/js/dataTables.select.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/pdfmake/build/pdfmake.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/pdfmake/build/vfs_fonts.js') }}"></script>
+        <script src="{{ asset('assets/js/pages/datatables.init.js') }}"></script>
+        <script src="{{ asset('assets/libs/moment/min/moment.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/fullcalendar/main.min.js') }}"></script>
+        <script src="{{ asset('assets/js/pages/calendar.init.js') }}"></script>
+        <script src="{{ asset('assets/js/app.min.js') }}"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-    <div>
-        {{ $slot }}
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    {{ $scripts ?? '' }}
-
-</body>
+        <script>
+            @if(Session::has('message'))
+                var type = "{{ Session::get('alert-type','info') }}"
+                switch(type){
+                    case 'info':
+                    toastr.info(" {{ Session::get('message') }} ");
+                    break;
+                
+                    case 'success':
+                    toastr.success(" {{ Session::get('message') }} ");
+                    break;
+                
+                    case 'warning':
+                    toastr.warning(" {{ Session::get('message') }} ");
+                    break;
+                
+                    case 'error':
+                    toastr.error(" {{ Session::get('message') }} ");
+                    break; 
+                }
+            @endif 
+        </script>
+        <Script type="text/javascript">
+            $(document).ready(function(){
+                $('#image').change(function(e){
+                    var reader = new FileReader();
+                    reader.onload = function(e){
+                        $('#showImage').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(e.target.files['0']);
+                });
+            });
+        </Script>
+    </body>
 </html>

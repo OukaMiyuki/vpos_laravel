@@ -7,7 +7,20 @@
                 <a href="javascript: void(0);" class="text-dark dropdown-toggle h5 mt-2 mb-1 d-block" data-bs-toggle="dropdown">{{ auth()->user()->name }}</a>
                 <div class="dropdown-menu user-pro-dropdown">
                     <!-- item-->
-                    <a href="P{{ route('admin.profile') }}" class="dropdown-item notify-item">
+                    <a href="
+                        @auth('admin')
+                            {{ route('admin.profile') }}
+                        @endauth
+                        @auth('marketing')
+                            {{ route('marketing.profile') }}
+                        @endauth
+                        @auth('tenant')
+                           
+                        @endauth
+                        @auth('kasir')
+                            
+                        @endauth
+                    " class="dropdown-item notify-item">
                         <i class="fe-user me-1"></i>
                         <span>My Account</span>
                     </a>
@@ -17,15 +30,31 @@
                         <span>Settings</span>
                     </a>
                     <!-- item-->
-                    <a href="{{ route('admin.password') }}" class="dropdown-item notify-item">
+                    <a href="
+                        @auth('admin')
+                            {{ route('admin.password') }}
+                        @endauth
+                        @auth('marketing')
+                            {{ route('marketing.password') }}
+                        @endauth
+                        @auth('tenant')
+                           
+                        @endauth
+                        @auth('kasir')
+                            
+                        @endauth
+                    " class="dropdown-item notify-item">
                         <i class="fe-lock me-1"></i>
                         <span>Change Password</span>
                     </a>
                     <!-- item-->
-                    <a href="javascript:void(0);" class="dropdown-item notify-item">
-                        <i class="fe-log-out me-1"></i>
-                        <span>Logout</span>
-                    </a>
+                    <form method="POST" action="@auth('admin') {{ route('admin.logout') }} @endauth @auth('marketing') {{ route('marketing.logout') }} @endauth @auth('tenant') {{ route('tenant.logout') }} @endauth @auth('kasir') {{ route('kasir.logout') }} @endauth">
+                        @csrf
+                        <a class="dropdown-item notify-item" href="@auth('admin') {{ route('admin.logout') }} @endauth @auth('marketing') {{ route('marketing.logout') }} @endauth @auth('tenant') {{ route('tenant.logout') }} @endauth @auth('kasir') {{ route('kasir.logout') }} @endauth" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <i class="fe-log-out me-1"></i>
+                            <span>Logout</span>
+                        </a>
+                    </form>
                 </div>
             </div>
             <p class="text-muted">
@@ -48,14 +77,27 @@
             <ul id="side-menu">
                 <li class="menu-title">Navigation</li>
                 <li>
-                    <a href="">
+                    <a href="
+                    @auth('admin')
+                        {{ route('admin.dashboard') }}
+                    @endauth
+                    @auth('marketing')
+                        {{ route('marketing.dashboard') }}
+                    @endauth
+                    @auth('tenant')
+                        Tenant
+                    @endauth
+                    @auth('kasir')
+                        Kasir
+                    @endauth
+                    ">
                         <i class="mdi mdi-view-dashboard-outline"></i>
                         <span> Dashboards </span>
                     </a>
                 </li>
                 <li class="menu-title mt-2">Manager</li>
                 <li>
-                    <a href="">
+                    <a href="#">
                         <i class="mdi mdi-calendar"></i>
                         <span> Calendar </span>
                     </a>
@@ -70,10 +112,10 @@
                         <div class="collapse" id="marketing">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="">Dashboard</a>
+                                    <a href="{{ route('admin.dashboard.marketing') }}">Dashboard</a>
                                 </li>
                                 <li>
-                                    <a href="">Marketing Accounts</a>
+                                    <a href="#">Marketing Accounts</a>
                                 </li>
                             </ul>
                         </div>
@@ -123,13 +165,47 @@
                         <div class="collapse" id="marketing">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="">Invitation Code List</a>
+                                    <a href="{{ route('marketing.dashboard.invitationcode.list') }}">Invitation Code List</a>
                                 </li>
                                 <li>
                                     <a href="crm-contacts.html">Contacts</a>
                                 </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#sidebarCrm" data-bs-toggle="collapse">
+                            <i class="mdi mdi-storefront-outline"></i>
+                            <span> Merchant </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="sidebarCrm">
+                            <ul class="nav-second-level">
                                 <li>
-                                    <a href="">Marketing Accounts</a>
+                                    <a href="#">Tenant List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Merchant List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Data Penarikan</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#finance" data-bs-toggle="collapse">
+                            <i class="mdi mdi-cash-multiple"></i>
+                            <span> Finance </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="finance">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="crm-dashboard.html">Penarikan</a>
+                                </li>
+                                <li>
+                                    <a href="crm-customers.html">Total Saldo</a>
                                 </li>
                             </ul>
                         </div>

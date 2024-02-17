@@ -170,7 +170,20 @@
                         <h6 class="text-overflow m-0">Welcome !</h6>
                     </div>
                     <!-- item-->
-                    <a href="{{ route('admin.profile') }}" class="dropdown-item notify-item">
+                    <a href="
+                        @auth('admin')
+                            {{ route('admin.profile') }}
+                        @endauth
+                        @auth('marketing')
+                            {{ route('marketing.profile') }}
+                        @endauth
+                        @auth('tenant')
+                           
+                        @endauth
+                        @auth('kasir')
+                            
+                        @endauth
+                    " class="dropdown-item notify-item">
                         <i class="fe-user"></i>
                         <span>My Account</span>
                     </a>
@@ -180,16 +193,32 @@
                         <span>Settings</span>
                     </a>
                     <!-- item-->
-                    <a href="{{ route('admin.password') }}" class="dropdown-item notify-item">
+                    <a href="
+                        @auth('admin')
+                            {{ route('admin.password') }}
+                        @endauth
+                        @auth('marketing')
+                            {{ route('marketing.password') }}
+                        @endauth
+                        @auth('tenant')
+                           
+                        @endauth
+                        @auth('kasir')
+                            
+                        @endauth
+                    " class="dropdown-item notify-item">
                         <i class="fe-lock"></i>
                         <span>Change Password</span>
                     </a>
                     <div class="dropdown-divider"></div>
                     <!-- item-->
-                    <a href="" class="dropdown-item notify-item">
-                        <i class="fe-log-out"></i>
-                        <span>Logout</span>
-                    </a>
+                    <form method="POST" action="@auth('admin') {{ route('admin.logout') }} @endauth @auth('marketing') {{ route('marketing.logout') }} @endauth @auth('tenant') {{ route('tenant.logout') }} @endauth @auth('kasir') {{ route('kasir.logout') }} @endauth">
+                        @csrf
+                        <a class="dropdown-item notify-item" href="@auth('admin') {{ route('admin.logout') }} @endauth @auth('marketing') {{ route('marketing.logout') }} @endauth @auth('tenant') {{ route('tenant.logout') }} @endauth @auth('kasir') {{ route('kasir.logout') }} @endauth" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <i class="fe-log-out"></i>
+                            <span>Logout</span>
+                        </a>
+                    </form>
                 </div>
             </li>
             <li class="dropdown notification-list">
