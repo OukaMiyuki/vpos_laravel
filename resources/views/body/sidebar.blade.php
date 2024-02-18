@@ -167,9 +167,6 @@
                                 <li>
                                     <a href="{{ route('marketing.dashboard.invitationcode.list') }}">Invitation Code List</a>
                                 </li>
-                                <li>
-                                    <a href="crm-contacts.html">Contacts</a>
-                                </li>
                             </ul>
                         </div>
                     </li>
@@ -206,6 +203,107 @@
                                 </li>
                                 <li>
                                     <a href="crm-customers.html">Total Saldo</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                @endauth
+                @auth('tenant')
+                    <li>
+                        <a href="#toko" data-bs-toggle="collapse">
+                            <i class="mdi mdi-qrcode-scan"></i>
+                            <span> Menu Toko </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="toko">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">Supplier</a>
+                                </li>
+                                <li>
+                                    <a href="#">Barang</a>
+                                </li>
+                                <li>
+                                    <a href="#">Kategori</a>
+                                </li>
+                                <li>
+                                    <a href="#">Stock Manager</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#karyawan" data-bs-toggle="collapse">
+                            <i class="mdi mdi-qrcode-scan"></i>
+                            <span> Menu Karyawan </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="karyawan">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">Manager Kasir</a>
+                                </li>
+                                <li>
+                                    <a href="#">Absen Karywan</a>
+                                </li>
+                                <li>
+                                    <a href="#">Gaji Karyawan</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="menu-title mt-2">Finance Manager</li>
+                    <li>
+                        <a href="#finance" data-bs-toggle="collapse">
+                            <i class="mdi mdi-qrcode-scan"></i>
+                            <span> Finance </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="finance">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">Total Saldo</a>
+                                </li>
+                                <li>
+                                    <a href="#">History Penarikan</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#expense" data-bs-toggle="collapse">
+                            <i class="mdi mdi-qrcode-scan"></i>
+                            <span> Expense </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="expense">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">Today</a>
+                                </li>
+                                <li>
+                                    <a href="#">Monthly</a>
+                                </li>
+                                <li>
+                                    <a href="#">Yearly</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="menu-title mt-2">Other Menu</li>
+                    <li>
+                        <a href="#role" data-bs-toggle="collapse">
+                            <i class="mdi mdi-qrcode-scan"></i>
+                            <span> Role Manager </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="role">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">Pengatura hak akses</a>
+                                </li>
+                                <li>
+                                    <a href="#">Backup Database</a>
                                 </li>
                             </ul>
                         </div>

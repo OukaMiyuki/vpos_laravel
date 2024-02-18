@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
@@ -73,6 +73,8 @@ Route::middleware('auth:marketing')->prefix('marketing')->group( function () {
 
     Route::get('/dashboard/data/code/list', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeList'])->name('marketing.dashboard.invitationcode.list');
     Route::post('/dashboard/data/code/insert', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeInsert'])->name('marketing.dashboard.invitationcode.insert');
+    Route::get('/dashboard/data/code/cashout/info', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutList'])->name('marketing.dashboard.invitationcode.cashout.list');
+    Route::get('/dashboard/data/code/cashout/invoice', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutInvoice'])->name('marketing.dashboard.invitationcode.cashout.invoice');
 });
 
 Route::middleware('guest:tenant')->prefix('tenant')->group( function () {
@@ -80,6 +82,7 @@ Route::middleware('guest:tenant')->prefix('tenant')->group( function () {
     Route::get('login', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'create'])->name('tenant.login');
     Route::post('login', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'store']);
 
+    // Route::get('register', [App\Http\Controllers\Auth\Tenant\RegisterController::class, 'create'])->name('tenant.register');
     Route::get('register', [App\Http\Controllers\Auth\Tenant\RegisterController::class, 'create'])->name('tenant.register');
     Route::post('register', [App\Http\Controllers\Auth\Tenant\RegisterController::class, 'store']);
 

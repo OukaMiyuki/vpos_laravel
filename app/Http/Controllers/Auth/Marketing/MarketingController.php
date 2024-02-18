@@ -31,4 +31,12 @@ class MarketingController extends Controller {
         );
         return redirect()->back()->with($notification);
     }
+
+    public function invitationCodeCashoutList(){
+        return view('marketing.marketing_invitation_code_data_penarikan');
+    }
+
+    public function invitationCodeCashoutInvoice(){
+        return view('marketing.marketing_invitation_code_invoice');
+    }
 }
