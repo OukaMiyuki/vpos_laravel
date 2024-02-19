@@ -36,7 +36,7 @@ Route::middleware('guest:admin')->prefix('admin')->group( function () {
 
 });
 
-Route::middleware('auth:admin')->prefix('admin')->group( function () {
+Route::middleware(['auth:admin', 'throttle:global'])->prefix('admin')->group( function () {
     Route::post('logout', [App\Http\Controllers\Auth\Admin\LoginController::class, 'destroy'])->name('admin.logout');
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
 
@@ -61,7 +61,7 @@ Route::middleware('guest:marketing')->prefix('marketing')->group( function () {
 
 });
 
-Route::middleware('auth:marketing')->prefix('marketing')->group( function () {
+Route::middleware(['auth:marketing', 'verified'])->prefix('marketing')->group( function () {
     Route::post('logout', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'destroy'])->name('marketing.logout');
     Route::get('/dashboard', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'index'])->name('marketing.dashboard');
 
@@ -88,7 +88,7 @@ Route::middleware('guest:tenant')->prefix('tenant')->group( function () {
 
 });
 
-Route::middleware('auth:tenant')->prefix('tenant')->group( function () {
+Route::middleware(['auth:tenant', 'verified'])->prefix('tenant')->group( function () {
 
     Route::post('logout', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'destroy'])->name('tenant.logout');
 
@@ -106,7 +106,7 @@ Route::middleware('guest:kasir')->prefix('kasir')->group( function () {
 
 });
 
-Route::middleware('auth:kasir')->prefix('kasir')->group( function () {
+Route::middleware(['auth:kasir', 'verified'])->prefix('kasir')->group( function () {
 
     Route::post('logout', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'destroy'])->name('kasir.logout');
 

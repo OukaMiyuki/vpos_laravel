@@ -11,6 +11,8 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller {
+
+
     public function create(): View {
         return view('admin.auth.login');
     }
@@ -21,17 +23,16 @@ class LoginController extends Controller {
             'password' => ['required', 'string'],
         ]);
 
-        if(! Auth::guard('admin')->attempt($request->only('email', 'password'), $request->boolean('remember')))
-        {
+        if(! Auth::guard('admin')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
         }
-
         $request->session()->regenerate();
-
         return redirect()->intended(RouteServiceProvider::ADMIN_DASHBOARD);
     }
+
 
     public function destroy(Request $request): RedirectResponse
     {
