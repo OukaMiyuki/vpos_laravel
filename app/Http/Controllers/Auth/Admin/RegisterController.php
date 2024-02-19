@@ -13,6 +13,7 @@ use App\Models\DetailKasir;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -50,6 +51,8 @@ class RegisterController extends Controller {
         if(!is_null($admin)) {
             $admin->detailAdminStore($admin);
         }
+
+        event(new Registered($admin));
 
         $notification = array(
             'message' => 'Akun anda sukses dibuat!',

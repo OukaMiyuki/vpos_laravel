@@ -10,6 +10,7 @@ use App\Models\DetailAdmin;
 use App\Models\DetailMarketing;
 use App\Models\DetailTenant;
 use App\Models\DetailKasir;
+use App\Models\InvitationCode;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Providers\RouteServiceProvider;
@@ -17,6 +18,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rule;
+use Illuminate\Database\Query\Builder;
 
 class RegisterController extends Controller {
     
@@ -35,13 +38,19 @@ class RegisterController extends Controller {
             'tanggal_lahir' => ['required'],
             'alamat' => ['required', 'string', 'max:255'],
             'password' => ['required', 'confirmed', 'min:8'],
+            'inv_code' => ['required', Rule::exists('invitation_codes')->where(function ($query) {
+                            return $query->where('inv_code', request()->get('inv_code'));
+                        })],
         ]);
+
+        $invitationcodeid = InvitationCode::where('inv_code', $request->inv_code)->first();
 
         $tenant = Tenant::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
+            'id_inv_code' => $invitationcodeid->id
         ]);
 
         // Auth::guard('tenant')->login($tenant);
@@ -50,6 +59,7 @@ class RegisterController extends Controller {
 
         if(!is_null($tenant)) {
             $tenant->detailTenantStore($tenant);
+            $tenant->storeInsert($tenant);
         }
 
         $notification = array(

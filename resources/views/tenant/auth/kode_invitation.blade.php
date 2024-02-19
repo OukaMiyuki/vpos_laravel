@@ -40,14 +40,14 @@
                                     </div>
                                     <p class="text-muted mb-4 mt-3">Don't have an account? Create your account, it takes less than a minute</p>
                                 </div>
-                                <form method="POST" action="{{ route('tenant.register') }}">
+                                <form method="POST" action="{{ route('invcode.process') }}">
                                     @csrf
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
-                                                <label for="name" class="form-label">Kode Invitation</label>
-                                                <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" required value="{{ old('name') }}" placeholder="Masukkan invitation code">
-                                                @error('name')
+                                                <label for="inv_code" class="form-label">Kode Invitation</label>
+                                                <input type="text" class="form-control @error('inv_code') is-invalid @enderror" name="inv_code" id="inv_code" required value="{{ old('inv_code') }}" placeholder="Masukkan invitation code">
+                                                @error('inv_code')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>

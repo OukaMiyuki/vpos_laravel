@@ -37,6 +37,7 @@ class RegisterController extends Controller {
         ]);
 
         $kasir = Kasir::create([
+            'id_tenant' => auth()->user()->id,
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -52,10 +53,12 @@ class RegisterController extends Controller {
         }
 
         $notification = array(
-            'message' => 'Akun anda sukses dibuat!',
+            'message' => 'Akun kasir telah ditambahkan!',
             'alert-type' => 'info',
         );
 
-        return redirect(route('kasir.login'))->with($notification);
+        return redirect()->back()->with($notification);
+
+        // return redirect(route('kasir.login'))->with($notification);
     }
 }

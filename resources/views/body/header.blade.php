@@ -178,7 +178,7 @@
                             {{ route('marketing.profile') }}
                         @endauth
                         @auth('tenant')
-                           
+                            {{ route('tenant.profile') }}
                         @endauth
                         @auth('kasir')
                             
@@ -187,6 +187,12 @@
                         <i class="fe-user"></i>
                         <span>My Account</span>
                     </a>
+                    @auth('tenant')
+                        <a href="{{ route('tenant.store.profile') }}" class="dropdown-item notify-item">
+                            <i class="fe-settings"></i>
+                            <span>Store Settings</span>
+                        </a>
+                    @endauth
                     <!-- item-->
                     <a href="javascript:void(0);" class="dropdown-item notify-item">
                         <i class="fe-settings"></i>
@@ -201,7 +207,7 @@
                             {{ route('marketing.password') }}
                         @endauth
                         @auth('tenant')
-                           
+                            {{ route('tenant.password') }}
                         @endauth
                         @auth('kasir')
                             

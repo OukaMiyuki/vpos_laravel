@@ -34,14 +34,10 @@ class LoginController extends Controller {
     }
 
 
-    public function destroy(Request $request): RedirectResponse
-    {
+    public function destroy(Request $request): RedirectResponse {
         Auth::guard('admin')->logout();
-
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
-
         return redirect('/admin/login');
     }
 }

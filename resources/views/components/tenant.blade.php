@@ -117,6 +117,34 @@
                     }
                     reader.readAsDataURL(e.target.files['0']);
                 });
+
+                $(document).on("click", "#detailsupplier", function() {
+                    var nama_supplier = $(this).data('nama');
+                    var email_supplier = $(this).data('email');
+                    var phone_supplier = $(this).data('phone');
+                    var alamat_supplier = $(this).data('alamat');
+                    var keterangan = $(this).data('keterangan');
+                    $("#show #nama_supplier").val(nama_supplier);
+                    $("#show #phone").val(phone_supplier);
+                    $("#show #email").val(email_supplier);
+                    $("#show #alamat").val(alamat_supplier);
+                    $("#show #keterangan").val(keterangan);
+                });
+
+                $(document).on("click", "#editsupplier", function() {
+                    var id = $(this).data('id');
+                    var nama_supplier = $(this).data('nama');
+                    var email_supplier = $(this).data('email');
+                    var phone_supplier = $(this).data('phone');
+                    var alamat_supplier = $(this).data('alamat');
+                    var keterangan = $(this).data('keterangan');
+                    $("#show #id").val(id);
+                    $("#show #nama_supplier").val(nama_supplier);
+                    $("#show #phone").val(phone_supplier);
+                    $("#show #email").val(email_supplier);
+                    $("#show #alamat").val(alamat_supplier);
+                    $("#show #keterangan").val(keterangan);
+                });
             });
         </Script>
     </body>

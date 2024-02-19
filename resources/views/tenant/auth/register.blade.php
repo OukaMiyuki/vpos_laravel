@@ -146,6 +146,17 @@
                                         <label for="alamat" class="form-label">Alamat</label>
                                         <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! old('alamat') !!}</textarea>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="inv_code" class="form-label">Invitation Code</label>
+                                                <input type="text" class="form-control @error('inv_code') is-invalid @enderror" name="inv_code" id="inv_code" required value="{{ old('inv_code') }}" placeholder="Masukkan invitation code">
+                                                @error('inv_code')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
                                     {{-- <div class="mb-3">
                                         <div class="form-check">
                                             <input type="checkbox" class="form-check-input" id="checkbox-signup">

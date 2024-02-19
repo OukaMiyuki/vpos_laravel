@@ -4,12 +4,15 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\DetailTenant;
+use App\Models\StoreDetail;
+use App\Models\Supplier;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
-    use HasApiTokens, HasFactory;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $guard = 'tenant';
 
@@ -18,6 +21,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         'email',
         'phone',
         'password',
+        'id_inv_code'
     ];
 
     protected $hidden = [
@@ -26,11 +30,20 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
     ];
 
     protected $casts = [
+        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
     public function detail(){
         return $this->hasOne(DetailTenant::class, 'id_tenant', 'id');
+    }
+
+    public function storeDetail(){
+        return $this->hasOne(StoreDetail::class, 'id_tenant', 'id');
+    }
+
+    public function supplier(){
+        return $this->hasMany(Supplier::class, 'id_tenant', 'id');
     }
 
     public function detailTenantStore($model){
@@ -42,5 +55,11 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         $DetailTenant->jenis_kelamin = request()->jenis_kelamin;
         $DetailTenant->alamat = request()->alamat;
         $DetailTenant->save();
+    }
+
+    public function storeInsert($model){
+        $StoreDetail = new StoreDetail();
+        $StoreDetail->id_tenant = $model->id;
+        $StoreDetail->save();
     }
 }

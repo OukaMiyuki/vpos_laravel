@@ -18,25 +18,16 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
 
 Route::middleware('guest:admin')->prefix('admin')->group( function () {
     Route::get('login', [App\Http\Controllers\Auth\Admin\LoginController::class, 'create'])->name('admin.login');
     Route::post('login', [App\Http\Controllers\Auth\Admin\LoginController::class, 'store']);
-    Route::get('register', [App\Http\Controllers\Auth\Admin\RegisterController::class, 'create'])->name('admin.register');
-    Route::post('register', [App\Http\Controllers\Auth\Admin\RegisterController::class, 'store']);
+    // Route::get('register', [App\Http\Controllers\Auth\Admin\RegisterController::class, 'create'])->name('admin.register');
+    // Route::post('register', [App\Http\Controllers\Auth\Admin\RegisterController::class, 'store']);
 
 });
 
-Route::middleware(['auth:admin', 'throttle:global'])->prefix('admin')->group( function () {
+Route::middleware(['auth:admin'])->prefix('admin')->group( function () {
     Route::post('logout', [App\Http\Controllers\Auth\Admin\LoginController::class, 'destroy'])->name('admin.logout');
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
 
@@ -61,7 +52,7 @@ Route::middleware('guest:marketing')->prefix('marketing')->group( function () {
 
 });
 
-Route::middleware(['auth:marketing', 'verified'])->prefix('marketing')->group( function () {
+Route::middleware(['auth:marketing'])->prefix('marketing')->group( function () {
     Route::post('logout', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'destroy'])->name('marketing.logout');
     Route::get('/dashboard', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'index'])->name('marketing.dashboard');
 
@@ -82,18 +73,30 @@ Route::middleware('guest:tenant')->prefix('tenant')->group( function () {
     Route::get('login', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'create'])->name('tenant.login');
     Route::post('login', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'store']);
 
-    // Route::get('register', [App\Http\Controllers\Auth\Tenant\RegisterController::class, 'create'])->name('tenant.register');
     Route::get('register', [App\Http\Controllers\Auth\Tenant\RegisterController::class, 'create'])->name('tenant.register');
     Route::post('register', [App\Http\Controllers\Auth\Tenant\RegisterController::class, 'store']);
 
 });
 
-Route::middleware(['auth:tenant', 'verified'])->prefix('tenant')->group( function () {
+Route::middleware(['auth:tenant'])->prefix('tenant')->group( function () {
 
     Route::post('logout', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'destroy'])->name('tenant.logout');
 
     Route::view('/dashboard','tenant.dashboard');
+    Route::get('/dashboard/data/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');
+    Route::get('/dashboard/data/kasir/info/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirDetail'])->name('tenant.kasir.detail');
+    Route::post('/kasir/register', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirRegister'])->name('tenant.register.kasir');
+    Route::get('/dashboard/data/supplier/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierList'])->name('tenant.supplier.list');
+    Route::post('/dashboard/data/supplier/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierInsert'])->name('tenant.supplier.insert');
+    Route::post('/dashboard/data/supplier/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierUpdate'])->name('tenant.supplier.update');
 
+    Route::get('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettings'])->name('tenant.store.profile');
+    Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');
+    Route::get('settings/profile', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profile'])->name('tenant.profile');
+    Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profileAccountUpdate'])->name('tenant.profile.account.update');
+    Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profileInfoUpdate'])->name('tenant.profile.info.update');
+    Route::get('settings/password', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'password'])->name('tenant.password');
+    Route::post('settings/password/update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'passwordUpdate'])->name('tenant.password.update');
 });
 
 Route::middleware('guest:kasir')->prefix('kasir')->group( function () {
@@ -101,12 +104,12 @@ Route::middleware('guest:kasir')->prefix('kasir')->group( function () {
     Route::get('login', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'create'])->name('kasir.login');
     Route::post('login', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'store']);
 
-    Route::get('register', [App\Http\Controllers\Auth\Kasir\RegisterController::class, 'create'])->name('kasir.register');
-    Route::post('register', [App\Http\Controllers\Auth\Kasir\RegisterController::class, 'store']);
+    // Route::get('register', [App\Http\Controllers\Auth\Kasir\RegisterController::class, 'create'])->name('kasir.register');
+    // Route::post('register', [App\Http\Controllers\Auth\Kasir\RegisterController::class, 'store']);
 
 });
 
-Route::middleware(['auth:kasir', 'verified'])->prefix('kasir')->group( function () {
+Route::middleware(['auth:kasir'])->prefix('kasir')->group( function () {
 
     Route::post('logout', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'destroy'])->name('kasir.logout');
 

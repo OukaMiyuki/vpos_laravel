@@ -15,7 +15,7 @@
                             {{ route('marketing.profile') }}
                         @endauth
                         @auth('tenant')
-                           
+                            {{ route('tenant.profile') }}
                         @endauth
                         @auth('kasir')
                             
@@ -38,7 +38,7 @@
                             {{ route('marketing.password') }}
                         @endauth
                         @auth('tenant')
-                           
+                            {{ route('tenant.password') }}
                         @endauth
                         @auth('kasir')
                             
@@ -218,7 +218,7 @@
                         <div class="collapse" id="toko">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Supplier</a>
+                                    <a href="{{ route('tenant.supplier.list') }}">Supplier</a>
                                 </li>
                                 <li>
                                     <a href="#">Barang</a>
@@ -241,7 +241,7 @@
                         <div class="collapse" id="karyawan">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Manager Kasir</a>
+                                    <a href="{{ route('tenant.kasir.list') }}">Manager Kasir</a>
                                 </li>
                                 <li>
                                     <a href="#">Absen Karywan</a>
