@@ -131,6 +131,9 @@ Route::middleware(['auth:tenant', 'tenantemailverivied'])->prefix('tenant')->gro
     Route::post('/dashboard/data/product/category/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryUpdate'])->name('tenant.category.update');
     Route::get('/dashboard/data/product/category/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryDelete'])->name('tenant.category.delete');
 
+    Route::get('/dashboard/data/product/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productList'])->name('tenant.product.list');
+    Route::get('/dashboard/data/product/add', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productAdd'])->name('tenant.product.add');
+
     Route::get('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettings'])->name('tenant.store.profile');
     Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profile'])->name('tenant.profile');

@@ -227,7 +227,7 @@
                                     <a href="{{ route('tenant.category.list') }}">Kategori</a>
                                 </li>
                                 <li>
-                                    <a href="#">Barang</a>
+                                    <a href="{{ route('tenant.product.list') }}">Barang</a>
                                 </li>
                                 <li>
                                     <a href="#">Stock Manager</a>

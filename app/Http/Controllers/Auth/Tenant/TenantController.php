@@ -9,6 +9,7 @@ use App\Models\Kasir;
 use App\Models\Supplier;
 use App\Models\ProductCategory;
 use App\Models\Batch;
+use App\Models\Product;
 
 class TenantController extends Controller {
     public function kasirList(){
@@ -51,7 +52,7 @@ class TenantController extends Controller {
     }
     
     public function kasirDetail($id){
-        $kasir = Kasir::with('detail')->find($id);
+        $kasir = Kasir::where('id_tenant', auth()->user()->id)->with('detail')->find($id);
         return view('tenant.tenant_kasir_detail', compact('kasir'));
     }
 
@@ -202,5 +203,14 @@ class TenantController extends Controller {
         );
 
         return redirect()->back()->with($notification);
+    }
+
+    public function productList(){
+        $product = Product::where('id_tenant', auth()->user()->id)->latest()->get();
+        return view('tenant.tenant_product_list', compact('product'));
+    }
+
+    public function productAdd(){
+        return view('tenant.tenant_tambah_product');
     }
 }
