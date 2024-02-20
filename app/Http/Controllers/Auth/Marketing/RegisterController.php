@@ -13,6 +13,7 @@ use App\Models\DetailKasir;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -50,11 +51,17 @@ class RegisterController extends Controller {
             $marketing->detailMarketingStore($marketing);
         }
 
-        $notification = array(
-            'message' => 'Akun anda sukses dibuat!',
-            'alert-type' => 'info',
-        );
+        event(new Registered($marketing));
 
-        return redirect(route('marketing.login'))->with($notification);
+        Auth::guard('marketing')->login($marketing);
+
+        return redirect(RouteServiceProvider::MARKETING_DASHBOARD);
+
+        // $notification = array(
+        //     'message' => 'Akun anda sukses dibuat!',
+        //     'alert-type' => 'info',
+        // );
+
+        // return redirect(route('marketing.login'))->with($notification);
     }
 }

@@ -14,6 +14,7 @@ use App\Models\InvitationCode;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -62,11 +63,17 @@ class RegisterController extends Controller {
             $tenant->storeInsert($tenant);
         }
 
-        $notification = array(
-            'message' => 'Akun anda sukses dibuat!',
-            'alert-type' => 'info',
-        );
+        event(new Registered($tenant));
+                
+        Auth::guard('tenant')->login($tenant);
 
-        return redirect(route('tenant.login'))->with($notification);
+        return redirect(RouteServiceProvider::TENANT_DASHBOARD);
+
+        // $notification = array(
+        //     'message' => 'Akun anda sukses dibuat!',
+        //     'alert-type' => 'info',
+        // );
+
+        // return redirect(route('tenant.login'))->with($notification);
     }
 }

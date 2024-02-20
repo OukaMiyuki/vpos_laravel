@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Notifications\Tenant\EmailVerificationNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\DetailTenant;
 use App\Models\StoreDetail;
@@ -44,6 +45,10 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
 
     public function supplier(){
         return $this->hasMany(Supplier::class, 'id_tenant', 'id');
+    }
+
+    public function sendEmailVerificationNotification() {
+        $this->notify(new EmailVerificationNotification);
     }
 
     public function detailTenantStore($model){

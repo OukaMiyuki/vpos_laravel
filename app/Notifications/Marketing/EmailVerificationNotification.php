@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications\Admin;
+namespace App\Notifications\Marketing;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,10 +13,6 @@ use Illuminate\Support\Facades\URL;
 
 class EmailVerificationNotification extends Notification {
     use Queueable;
-
-    /**
-     * Create a new notification instance.
-     */
 
     public static $createUrlCallback;
     public static $toMailCallback;
@@ -37,14 +33,6 @@ class EmailVerificationNotification extends Notification {
     /**
      * Get the mail representation of the notification.
      */
-    // public function toMail(object $notifiable): MailMessage
-    // {
-    //     return (new MailMessage)
-    //                 ->line('The introduction to the notification.')
-    //                 ->action('Notification Action', url('/'))
-    //                 ->line('Thank you for using our application!');
-    // }
-
     public function toMail($notifiable) {
         $verificationUrl = $this->verificationUrl($notifiable);
 
@@ -57,7 +45,7 @@ class EmailVerificationNotification extends Notification {
 
     protected function buildMailMessage($url) {
         return (new MailMessage)
-            ->subject(Lang::get('Verify Email Addressssss'))
+            ->subject(Lang::get('Verify Email Addressssss Marketing'))
             ->line(Lang::get('Please click the TINBUT below to verify your email address.'))
             ->action(Lang::get('Verify Email Address'), $url)
             ->line(Lang::get('If you did not create an account, no further action is required.'));
@@ -69,7 +57,7 @@ class EmailVerificationNotification extends Notification {
         }
 
         return URL::temporarySignedRoute(
-            'admin.verification.verify',
+            'marketing.verification.verify',
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             [
                 'id' => $notifiable->getKey(),
@@ -91,8 +79,7 @@ class EmailVerificationNotification extends Notification {
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
-    {
+    public function toArray(object $notifiable): array {
         return [
             //
         ];

@@ -32,7 +32,6 @@ Route::middleware(['auth:admin'])->prefix('admin')->group( function () {
     Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Admin\VerifyEmailController::class, 'verificationProcess'])
                 ->middleware(['signed', 'throttle:6,1'])
                 ->name('admin.verification.verify');
-
     Route::post('email/verification-notification', [App\Http\Controllers\Auth\Admin\EmailVerificationNotificationController::class, 'store'])
                 ->middleware('throttle:6,1')
                 ->name('admin.verification.send');
@@ -43,6 +42,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->group( function () {
 
 Route::middleware(['auth:admin', 'adminemailverified'])->prefix('admin')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
+   
     Route::get('settings/profile', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profile'])->name('admin.profile');
     Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileAccountUpdate'])->name('admin.profile.account.update');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileInfoUpdate'])->name('admin.profile.info.update');
@@ -65,7 +65,18 @@ Route::middleware('guest:marketing')->prefix('marketing')->group( function () {
 });
 
 Route::middleware(['auth:marketing'])->prefix('marketing')->group( function () {
+    Route::get('/verify-email', [App\Http\Controllers\Auth\Marketing\EmailVerificationPromptController::class, 'emailVerificationView'])->name('marketing.verification.notice');
+    Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Marketing\VerifyEmailController::class, 'verificationProcess'])
+                ->middleware(['signed', 'throttle:6,1'])
+                ->name('marketing.verification.verify');
+    Route::post('email/verification-notification', [App\Http\Controllers\Auth\Marketing\EmailVerificationNotificationController::class, 'store'])
+                ->middleware('throttle:6,1')
+                ->name('marketing.verification.send');
+
     Route::post('logout', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'destroy'])->name('marketing.logout');
+});
+
+Route::middleware(['auth:marketing', 'marketingemailverified'])->prefix('marketing')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'index'])->name('marketing.dashboard');
 
     Route::get('settings/profile', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profile'])->name('marketing.profile');
@@ -91,9 +102,18 @@ Route::middleware('guest:tenant')->prefix('tenant')->group( function () {
 });
 
 Route::middleware(['auth:tenant'])->prefix('tenant')->group( function () {
+    Route::get('/verify-email', [App\Http\Controllers\Auth\Tenant\EmailVerificationPromptController::class, 'emailVerificationView'])->name('tenant.verification.notice');
+    Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Tenant\VerifyEmailController::class, 'verificationProcess'])
+                ->middleware(['signed', 'throttle:6,1'])
+                ->name('tenant.verification.verify');
+    Route::post('email/verification-notification', [App\Http\Controllers\Auth\Tenant\EmailVerificationNotificationController::class, 'store'])
+                ->middleware('throttle:6,1')
+                ->name('tenant.verification.send');
 
     Route::post('logout', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'destroy'])->name('tenant.logout');
+});
 
+Route::middleware(['auth:tenant', 'tenantemailverivied'])->prefix('tenant')->group( function () {
     Route::view('/dashboard','tenant.dashboard');
     Route::get('/dashboard/data/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');
     Route::get('/dashboard/data/kasir/info/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirDetail'])->name('tenant.kasir.detail');

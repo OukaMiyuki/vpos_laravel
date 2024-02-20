@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Notifications\Marketing\EmailVerificationNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\DetailMarketing;
 use App\Models\InvitationCode;
@@ -38,6 +39,10 @@ class Marketing extends Authenticatable implements MustVerifyEmail {
 
     public function invitationCode(){
         return $this->hasMany(InvitationCode::class, 'id_marketing', 'id');
+    }
+
+    public function sendEmailVerificationNotification() {
+        $this->notify(new EmailVerificationNotification);
     }
 
     public function detailMarketingStore($model){
