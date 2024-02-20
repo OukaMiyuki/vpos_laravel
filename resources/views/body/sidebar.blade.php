@@ -221,10 +221,13 @@
                                     <a href="{{ route('tenant.supplier.list') }}">Supplier</a>
                                 </li>
                                 <li>
-                                    <a href="#">Barang</a>
+                                    <a href="{{ route('tenant.batch.list') }}">Batch Code</a>
                                 </li>
                                 <li>
-                                    <a href="#">Kategori</a>
+                                    <a href="{{ route('tenant.category.list') }}">Kategori</a>
+                                </li>
+                                <li>
+                                    <a href="#">Barang</a>
                                 </li>
                                 <li>
                                     <a href="#">Stock Manager</a>
@@ -243,12 +246,6 @@
                                 <li>
                                     <a href="{{ route('tenant.kasir.list') }}">Manager Kasir</a>
                                 </li>
-                                <li>
-                                    <a href="#">Absen Karywan</a>
-                                </li>
-                                <li>
-                                    <a href="#">Gaji Karyawan</a>
-                                </li>
                             </ul>
                         </div>
                     </li>
@@ -266,26 +263,6 @@
                                 </li>
                                 <li>
                                     <a href="#">History Penarikan</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#expense" data-bs-toggle="collapse">
-                            <i class="mdi mdi-qrcode-scan"></i>
-                            <span> Expense </span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="collapse" id="expense">
-                            <ul class="nav-second-level">
-                                <li>
-                                    <a href="#">Today</a>
-                                </li>
-                                <li>
-                                    <a href="#">Monthly</a>
-                                </li>
-                                <li>
-                                    <a href="#">Yearly</a>
                                 </li>
                             </ul>
                         </div>

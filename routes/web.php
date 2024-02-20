@@ -121,6 +121,15 @@ Route::middleware(['auth:tenant', 'tenantemailverivied'])->prefix('tenant')->gro
     Route::get('/dashboard/data/supplier/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierList'])->name('tenant.supplier.list');
     Route::post('/dashboard/data/supplier/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierInsert'])->name('tenant.supplier.insert');
     Route::post('/dashboard/data/supplier/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierUpdate'])->name('tenant.supplier.update');
+    Route::get('/dashboard/data/supplier/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierDelete'])->name('tenant.supplier.delete');
+    Route::get('/dashboard/data/product/batch/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchList'])->name('tenant.batch.list');
+    Route::post('/dashboard/data/product/batch/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchInsert'])->name('tenant.batch.insert');
+    Route::post('/dashboard/data/product/batch/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchUpdate'])->name('tenant.batch.update');
+    Route::get('/dashboard/data/product/batch/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchDelete'])->name('tenant.batch.delete');
+    Route::get('/dashboard/data/product/category/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryList'])->name('tenant.category.list');
+    Route::post('/dashboard/data/product/category/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryInsert'])->name('tenant.category.insert');
+    Route::post('/dashboard/data/product/category/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryUpdate'])->name('tenant.category.update');
+    Route::get('/dashboard/data/product/category/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryDelete'])->name('tenant.category.delete');
 
     Route::get('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettings'])->name('tenant.store.profile');
     Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');

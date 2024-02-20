@@ -60,10 +60,13 @@
                                                 <td>{{ $supply->phone_supplier }}</td>
                                                 <td>
                                                     <a href="" id="detailsupplier" data-id="{{ $supply->id }}" data-nama="{{ $supply->nama_supplier }}" data-email="{{ $supply->email_supplier }}" data-phone="{{ $supply->phone_supplier }}" data-alamat="{{ $supply->alamat_supplier }}" data-keterangan="{{ $supply->keterangan }}" data-bs-toggle="modal" data-bs-target="#modaldetailsupplier">
-                                                        <button title="Lihat data kasir" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                        <button title="Lihat data supplier" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                     <a href="" id="editsupplier" data-id="{{ $supply->id }}" data-nama="{{ $supply->nama_supplier }}" data-email="{{ $supply->email_supplier }}" data-phone="{{ $supply->phone_supplier }}" data-alamat="{{ $supply->alamat_supplier }}" data-keterangan="{{ $supply->keterangan }}" data-bs-toggle="modal" data-bs-target="#modaleditsupplier">
-                                                        <button title="Lihat data kasir" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
+                                                        <button title="Edit data supplier" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
+                                                    </a>
+                                                    <a href="{{ route('tenant.supplier.delete', ['id' => $supply->id]) }}">
+                                                        <button title="Hapus data supplier" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                     </a>
                                                 </td>
                                             </tr>
@@ -122,13 +125,21 @@
                             </div>
                             <!-- end col -->
                         </div>
-                        <div class="mb-3">
-                            <label for="alamat" class="form-label">Alamat</label>
-                            <textarea placeholder="Masukkan alamat supplier" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! old('alamat') !!}</textarea>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="alamat" class="form-label">Alamat</label>
+                                    <textarea placeholder="Masukkan alamat supplier" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! old('alamat') !!}</textarea>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="keterangan" class="form-label">Keterangan</label>
-                            <textarea placeholder="Masukkan keterangan" class="form-control" id="keterangan" name="keterangan" rows="5" spellcheck="false" required>{!! old('keterangan') !!}</textarea>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="keterangan" class="form-label">Keterangan</label>
+                                    <textarea placeholder="Masukkan keterangan" class="form-control" id="keterangan" name="keterangan" rows="5" spellcheck="false" required>{!! old('keterangan') !!}</textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">

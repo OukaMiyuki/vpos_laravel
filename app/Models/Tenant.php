@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\DetailTenant;
 use App\Models\StoreDetail;
 use App\Models\Supplier;
+use App\Models\ProductCategory;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -45,6 +46,10 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
 
     public function supplier(){
         return $this->hasMany(Supplier::class, 'id_tenant', 'id');
+    }
+
+    public function productCategory(){
+        return $this->hasMany(ProductCategory::class, 'id_tenant', 'id');
     }
 
     public function sendEmailVerificationNotification() {

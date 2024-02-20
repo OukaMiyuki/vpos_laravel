@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Kasir;
 use App\Models\Supplier;
+use App\Models\ProductCategory;
+use App\Models\Batch;
 
 class TenantController extends Controller {
     public function kasirList(){
@@ -90,6 +92,112 @@ class TenantController extends Controller {
         
         $notification = array(
             'message' => 'Data berhasil ditambahkan!',
+            'alert-type' => 'info',
+        );
+
+        return redirect()->back()->with($notification);
+    }
+
+    public function supplierDelete($id){
+        $supplier = Supplier::find($id);
+        $supplier->delete();
+        $notification = array(
+            'message' => 'Data berhasil dihapus!',
+            'alert-type' => 'info',
+        );
+
+        return redirect()->back()->with($notification);
+    }
+
+    public function batchList(){
+        $batch = Batch::where('id_tenant', auth()->user()->id)->latest()->get();
+        return view('tenant.tenant_batch_list', compact('batch'));
+    }
+
+
+    public function batchInsert(Request $request){
+        Batch::create([
+            'id_tenant' => auth()->user()->id,
+            'batch_code' => $request->name,
+            'keterangan' => $request->keterangan
+        ]);
+
+        $notification = array(
+            'message' => 'Data berhasil ditambahkan!',
+            'alert-type' => 'info',
+        );
+
+        return redirect()->back()->with($notification);
+    }
+
+    public function batchUpdate(Request $request){
+        $batch = Batch::find($request->id);
+
+        $batch->update([
+            'batch_code' => $request->name,
+            'keterangan' => $request->keterangan
+        ]);
+
+        
+        $notification = array(
+            'message' => 'Data berhasil ditambahkan!',
+            'alert-type' => 'info',
+        );
+
+        return redirect()->back()->with($notification);
+    }
+
+    public function batchDelete($id){
+        $batch = Batch::find($id);
+        $batch->delete();
+        
+        $notification = array(
+            'message' => 'Data berhasil dihapus!',
+            'alert-type' => 'info',
+        );
+
+        return redirect()->back()->with($notification);
+    }
+
+    public function categoryList(){
+        $category = ProductCategory::where('id_tenant', auth()->user()->id)->latest()->get();
+        return view('tenant.tenant_category_list', compact('category'));
+    }
+
+    public function categoryInsert(Request $request) {
+        ProductCategory::create([
+            'id_tenant' => auth()->user()->id,
+            'name' => $request->category
+        ]);
+
+        $notification = array(
+            'message' => 'Data berhasil ditambahkan!',
+            'alert-type' => 'info',
+        );
+
+        return redirect()->back()->with($notification);
+    }
+
+    public function categoryUpdate(Request $request){
+        $category = ProductCategory::find($request->id);
+        $category->update([
+            'name'  => $request->category
+        ]);
+
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
+            'alert-type' => 'info',
+        );
+
+        return redirect()->back()->with($notification);
+    }
+
+    public function categoryDelete($id){
+        $category = ProductCategory::find($request->id);
+        $category->delete();
+
+        $notification = array(
+            'message' => 'Data berhasil dihapus!',
             'alert-type' => 'info',
         );
 

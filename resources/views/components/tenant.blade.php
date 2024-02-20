@@ -145,6 +145,22 @@
                     $("#show #alamat").val(alamat_supplier);
                     $("#show #keterangan").val(keterangan);
                 });
+
+                $(document).on("click", "#editkategori", function() {
+                    var id = $(this).data('id');
+                    var nama = $(this).data('nama');
+                    $("#show #id").val(id);
+                    $("#show #category").val(nama);
+                });
+
+                $(document).on("click", "#editbatch", function() {
+                    var id = $(this).data('id');
+                    var kode = $(this).data('kode');
+                    var keterangan = $(this).data('keterangan');
+                    $("#show #id").val(id);
+                    $("#show #name").val(kode);
+                    $("#show #keterangan").val(keterangan);
+                });
             });
         </Script>
     </body>
