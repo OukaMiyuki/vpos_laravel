@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\Admin\EmailVerificationNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\DetailAdmin;
@@ -33,6 +34,10 @@ class Admin extends Authenticatable implements MustVerifyEmail {
 
     public function detail(){
         return $this->hasOne(DetailAdmin::class, 'id_admin', 'id');
+    }
+
+    public function sendEmailVerificationNotification() {
+        $this->notify(new EmailVerificationNotification);
     }
 
     public function detailAdminStore($model){

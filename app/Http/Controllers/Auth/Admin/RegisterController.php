@@ -54,11 +54,15 @@ class RegisterController extends Controller {
 
         event(new Registered($admin));
 
-        $notification = array(
-            'message' => 'Akun anda sukses dibuat!',
-            'alert-type' => 'info',
-        );
+         Auth::guard('admin')->login($admin);
 
-        return redirect(route('admin.login'))->with($notification);
+        return redirect(RouteServiceProvider::ADMIN_DASHBOARD);
+
+        // $notification = array(
+        //     'message' => 'Akun anda sukses dibuat!',
+        //     'alert-type' => 'info',
+        // );
+
+        // return redirect(route('admin.login'))->with($notification);
     }
 }

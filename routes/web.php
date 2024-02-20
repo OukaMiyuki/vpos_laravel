@@ -22,15 +22,27 @@ Route::get('/', function () {
 Route::middleware('guest:admin')->prefix('admin')->group( function () {
     Route::get('login', [App\Http\Controllers\Auth\Admin\LoginController::class, 'create'])->name('admin.login');
     Route::post('login', [App\Http\Controllers\Auth\Admin\LoginController::class, 'store']);
-    // Route::get('register', [App\Http\Controllers\Auth\Admin\RegisterController::class, 'create'])->name('admin.register');
-    // Route::post('register', [App\Http\Controllers\Auth\Admin\RegisterController::class, 'store']);
+    Route::get('register', [App\Http\Controllers\Auth\Admin\RegisterController::class, 'create'])->name('admin.register');
+    Route::post('register', [App\Http\Controllers\Auth\Admin\RegisterController::class, 'store']);
 
 });
 
 Route::middleware(['auth:admin'])->prefix('admin')->group( function () {
-    Route::post('logout', [App\Http\Controllers\Auth\Admin\LoginController::class, 'destroy'])->name('admin.logout');
-    Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
+    Route::get('/verify-email', [App\Http\Controllers\Auth\Admin\EmailVerificationPromptController::class, 'emailVerificationView'])->name('admin.verification.notice');
+    Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Admin\VerifyEmailController::class, 'verificationProcess'])
+                ->middleware(['signed', 'throttle:6,1'])
+                ->name('admin.verification.verify');
 
+    Route::post('email/verification-notification', [App\Http\Controllers\Auth\Admin\EmailVerificationNotificationController::class, 'store'])
+                ->middleware('throttle:6,1')
+                ->name('admin.verification.send');
+
+
+    Route::post('logout', [App\Http\Controllers\Auth\Admin\LoginController::class, 'destroy'])->name('admin.logout');
+});
+
+Route::middleware(['auth:admin', 'adminemailverified'])->prefix('admin')->group( function () {
+    Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profile'])->name('admin.profile');
     Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileAccountUpdate'])->name('admin.profile.account.update');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileInfoUpdate'])->name('admin.profile.info.update');
