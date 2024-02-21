@@ -13,7 +13,7 @@
                                 <li class="breadcrumb-item active">Profile</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Tambah produk baru</h4>
+                        <h4 class="page-title">Detail produk baru</h4>
                     </div>
                 </div>
             </div>
@@ -24,14 +24,20 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <form method="post" action="{{ route('tenant.product.batch.insert') }}" enctype="multipart/form-data">
+                                <form method="post" action="" enctype="multipart/form-data">
                                     @csrf
-                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Modify Account</h5>
+                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Product Detail</h5>
                                     <div class="row">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="p_code" class="form-label">Product Code</label>
+                                                <input readonly type="text" class="form-control" name="p_code" id="p_code" required value="{{ $product->product_code }}" placeholder="Masukkan product code">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="p_name" class="form-label">Product Name</label>
-                                                <input type="text" class="form-control" name="p_name" id="p_name" required value="{{ old('p_name') }}" placeholder="Masukkan nama produk">
+                                                <input readonly type="text" class="form-control" name="p_name" id="p_name" required value="{{ $product->product_name }}" placeholder="Masukkan nama produk">
                                             </div>
                                         </div>
                                     </div>
@@ -39,10 +45,10 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="batch" class="form-label">Batch ID</label>
-                                                <select class="form-select @error('batch') is-invalid @enderror" id="batch" name="batch" required>
+                                                <select disabled class="form-select @error('batch') is-invalid @enderror" id="batch" name="batch" required>
                                                     <option value="">- Pilih Batch ID -</option>
                                                     @foreach (App\Models\Batch::where('id_tenant', auth()->user()->id)->latest()->get() as $batch)
-                                                        <option value="{{ $batch->id }}"@if (old('batch') == $batch->id) selected="selected" @endif>{{ $batch->batch_code }} -  {{ $batch->keterangan }}</option>
+                                                        <option value="{{ $batch->id }}"@if ($product->id_batch == $batch->id) selected="selected" @endif>{{ $batch->batch_code }} -  {{ $batch->keterangan }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -50,10 +56,10 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="supplier" class="form-label">Supplier</label>
-                                                <select class="form-select @error('supplier') is-invalid @enderror" id="supplier" name="supplier" required>
+                                                <select disabled class="form-select @error('supplier') is-invalid @enderror" id="supplier" name="supplier" required>
                                                     <option value="">- Pilih Supplier -</option>
                                                     @foreach (App\Models\Supplier::where('id_tenant', auth()->user()->id)->latest()->get() as $sup)
-                                                        <option value="{{ $sup->id }}"@if (old('supplier') == $sup->id) selected="selected" @endif>{{ $sup->nama_supplier }}</option>
+                                                        <option value="{{ $sup->id }}"@if ($product->id_supplier == $sup->id) selected="selected" @endif>{{ $sup->nama_supplier }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -63,13 +69,13 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="gudang" class="form-label">Nomor Gudang (Opsional)</label>
-                                                <input type="text" class="form-control" name="gudang" id="gudang" value="{{ old('gudang') }}" placeholder="Masukkan nomor gudang">
+                                                <input readonly type="text" class="form-control" name="gudang" id="gudang" value="{{ $product->nomor_gudang }}" placeholder="Masukkan nomor gudang">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="rak" class="form-label">Nomor Rak (Opsional)</label>
-                                                <input type="text" class="form-control" name="rak" id="rak" value="{{ old('rak') }}" placeholder="Masukkan nomor rak">
+                                                <input readonly type="text" class="form-control" name="rak" id="rak" value="{{ $product->nomor_rak }}" placeholder="Masukkan nomor rak">
                                             </div>
                                         </div>
                                     </div>
@@ -77,13 +83,13 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="t_beli" class="form-label">Tanggal Beli</label>
-                                                <input type="date" class="form-control" name="t_beli" id="t_beli" required value="{{ old('t_beli') }}" placeholder="Masukkan tanggal beli">
+                                                <input readonly type="date" class="form-control" name="t_beli" id="t_beli" required value="{{ $product->tanggal_beli }}" placeholder="Masukkan tanggal beli">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="t_expired" class="form-label">Tanggal Expired (kosongi jika bukan peroduk makanan)</label>
-                                                <input type="date" class="form-control" name="t_expired" id="t_expired" value="{{ old('t_expired') }}" placeholder="Masukkan tanggal expired">
+                                                <input type="date" class="form-control" name="t_expired" id="t_expired" readonly value="{{ $product->tanggal_expired }}" placeholder="Masukkan tanggal expired">
                                             </div>
                                         </div>
                                     </div>
@@ -91,32 +97,31 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="h_beli" class="form-label">Harga beli <strong>(Rp.)</strong></label>
-                                                <input type="text" class="form-control" name="h_beli" id="h_beli" required value="{{ old('h_beli') }}" placeholder="Masukkan nominal harga beli">
+                                                <input type="text" class="form-control" name="h_beli" id="h_beli" readonly required value="{{ $product->harga_beli }}" placeholder="Masukkan nominal harga beli">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="h_jual" class="form-label">Harga jual <strong>(Rp.)</strong></label>
-                                                <input type="text" class="form-control" name="h_jual" id="h_jual" required value="{{ old('h_jual') }}" placeholder="Masukkan nominal harga jual">
+                                                <input type="text" class="form-control" name="h_jual" id="h_jual" readonly required value="{{ $product->harga_jual }}" placeholder="Masukkan nominal harga jual">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
-                                                <label for="photo" class="form-label">Upload Foto Product</label>
-                                                <input type="file" required id="image" class="form-control" name="photo" accept="image/*">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <label for="example-fileinput" class="form-label"></label>
-                                                <img id="showImage" src="{{ asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                                                <label for="stok" class="form-label">Jumlah stok tersedia</label>
+                                                <input type="text" class="form-control" name="stok" id="stok" readonly required value="{{ $product->stok }}" placeholder="Masukkan jumlah stok">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="text-end">
-                                        <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Tambah</button>
+                                    <div class="row text-center"                                                                                                                                                                                                >
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="example-fileinput" class="form-label"></label>
+                                                <img id="showImage" src="{{ !empty($product->photo) ? Storage::url('images/product/'.$product->photo) : asset('assets/images/blank_profile.png') }}" class="w-50 img-thumbnail" alt="profile-image">
+                                            </div>
+                                        </div>
                                     </div>
                                 </form>
                             </div>

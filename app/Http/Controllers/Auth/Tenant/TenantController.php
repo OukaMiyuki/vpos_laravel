@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth\Tenant;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Kasir;
@@ -12,6 +13,11 @@ use App\Models\Batch;
 use App\Models\Product;
 
 class TenantController extends Controller {
+
+    public function index(){
+        return view('tenant.dashboard');
+    }
+
     public function kasirList(){
         $kasir = Kasir::with('detail')->where('id_tenant', auth()->user()->id)->latest()->get();
         return view('tenant.tenant_kasir_list', compact('kasir'));
@@ -205,12 +211,147 @@ class TenantController extends Controller {
         return redirect()->back()->with($notification);
     }
 
-    public function productList(){
+    public function batchProductList(){
         $product = Product::where('id_tenant', auth()->user()->id)->latest()->get();
         return view('tenant.tenant_product_list', compact('product'));
     }
 
-    public function productAdd(){
+    public function batchProductAdd(){
         return view('tenant.tenant_tambah_product');
+    }
+
+    public function batchProductInsert(Request $request){
+        $file = $request->file('photo');
+        $namaFile = $request->p_name;
+        $storagePath = Storage::path('public/images/product');
+        $ext = $file->getClientOriginalExtension();
+        $filename = $namaFile.'-'.time().'.'.$ext;
+
+        try {
+            $file->move($storagePath, $filename);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+
+        Product::create([
+            'id_tenant' => auth()->user()->id,
+            'id_batch' => $request->batch,
+            'product_name' => $request->p_name,
+            'id_supplier' => $request->supplier,
+            'photo' => $filename,
+            'nomor_gudang' => $request->gudang,
+            'nomor_rak' => $request->rak,
+            'tanggal_beli' => $request->t_beli,
+            'tanggal_expired' => $request->t_expired,
+            'harga_beli' => $request->h_beli,
+            'harga_jual' => $request->h_jual
+        ]);
+
+        $notification = array(
+            'message' => 'Data produk berhasil ditambahkan!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('tenant.product.batch.list')->with($notification);
+    }
+
+    public function batchProductDetail($id){
+        $product = Product::where('id_tenant', auth()->user()->id)->find($id);
+        return view('tenant.tenant_product_detail', compact('product'));
+    }
+
+    public function batchProductEdit($id){
+        $product = Product::where('id_tenant', auth()->user()->id)->find($id);
+        return view('tenant.tenant_product_edit', compact('product'));
+    }
+
+    public function batchProductUpdate(Request $request){
+        $product = Product::find($request->id);
+
+        if($request->hasFile('photo')){
+            $file = $request->file('photo');
+            $namaFile = $product->p_name;
+            $storagePath = Storage::path('public/images/product');
+            $ext = $file->getClientOriginalExtension();
+            $filename = $namaFile.'-'.time().'.'.$ext;
+
+            if(empty($product->photo)){
+                try {
+                    $file->move($storagePath, $filename);
+                } catch (\Exception $e) {
+                    return $e->getMessage();
+                }
+            } else {
+                Storage::delete('public/images/product/'.$product->photo);
+                $file->move($storagePath, $filename);
+            }
+
+            $product->update([
+                'id_batch' => $request->batch,
+                'product_name' => $request->p_name,
+                'id_supplier' => $request->supplier,
+                'photo' => $filename,
+                'nomor_gudang' => $request->gudang,
+                'nomor_rak' => $request->rak,
+                'tanggal_beli' => $request->t_beli,
+                'tanggal_expired' => $request->t_expired,
+                'harga_beli' => $request->h_beli,
+                'harga_jual' => $request->h_jual
+            ]);
+
+            $notification = array(
+                'message' => 'Data produk berhasil diupdate!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('tenant.product.batch.list')->with($notification);
+
+        } else {
+            $product->update([
+                'id_batch' => $request->batch,
+                'product_name' => $request->p_name,
+                'id_supplier' => $request->supplier,
+                'nomor_gudang' => $request->gudang,
+                'nomor_rak' => $request->rak,
+                'tanggal_beli' => $request->t_beli,
+                'tanggal_expired' => $request->t_expired,
+                'harga_beli' => $request->h_beli,
+                'harga_jual' => $request->h_jual
+            ]);
+
+            $notification = array(
+                'message' => 'Data produk berhasil diupdate!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('tenant.product.batch.list')->with($notification);
+        }
+    }
+
+    public function batchProductDelete($id){
+        $product = Product::where('id_tenant', auth()->user()->id)->find($id);
+        $product->delete();
+        $notification = array(
+            'message' => 'Data produk berhasil dihapus!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('tenant.product.batch.list')->with($notification);
+    }
+
+    public function productList(){
+
+    }
+
+    public function productInsert(){
+        
+    }
+
+    public function productDetail($id){
+
+    }
+
+    public function productUpdate(Request $request){
+
+    }
+
+    public function productDelete($id) {
+
     }
 }

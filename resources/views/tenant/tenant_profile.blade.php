@@ -157,7 +157,6 @@
                                                     <img id="showImage" src="{{ asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
                                                 </div>
                                             </div>
-                                            <!-- end col -->
                                         </div>
                                         <div class="text-end">
                                             <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>

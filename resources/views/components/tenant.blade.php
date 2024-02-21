@@ -21,6 +21,12 @@
         <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- App css -->
         <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-style"/>
+       {{-- Custom Form CSS --}}
+       <link href="{{ asset('assets/libs/mohithg-switchery/switchery.min.css') }}" rel="stylesheet" type="text/css" />
+       <link href="{{ asset('assets/libs/multiselect/css/multi-select.css') }}" rel="stylesheet" type="text/css" />
+       <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+       <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
+       <link href="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- icons -->
         <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- Head js -->
@@ -85,6 +91,22 @@
         <script src="{{ asset('assets/js/pages/calendar.init.js') }}"></script>
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+        {{-- Custom Form JS --}}
+
+        <script src="{{ asset('assets/libs/selectize/js/standalone/selectize.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/mohithg-switchery/switchery.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/multiselect/js/jquery.multi-select.js') }}"></script>
+        <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/jquery-mockjax/jquery.mockjax.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/devbridge-autocomplete/jquery.autocomplete.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
+
+        <!-- Init js-->
+        <script src="{{ asset('assets/js/pages/form-advanced.init.js') }}"></script>
+
+        {{-- Custom FOrm JS --}}
 
         <script>
             @if(Session::has('message'))
@@ -160,6 +182,21 @@
                     $("#show #id").val(id);
                     $("#show #name").val(kode);
                     $("#show #keterangan").val(keterangan);
+                });
+
+                $(function(){
+                    var dtToday = new Date();
+                    
+                    var month = dtToday.getMonth() + 1;
+                    var day = dtToday.getDate();
+                    var year = dtToday.getFullYear();
+                    if(month < 10)
+                        month = '0' + month.toString();
+                    if(day < 10)
+                        day = '0' + day.toString();
+                    
+                    var maxDate = year + '-' + month + '-' + day;
+                    $('#t_beli').attr('max', maxDate);
                 });
             });
         </Script>

@@ -85,7 +85,7 @@
                         {{ route('marketing.dashboard') }}
                     @endauth
                     @auth('tenant')
-                        Tenant
+                        {{ route('tenant.dashboard') }}
                     @endauth
                     @auth('kasir')
                         Kasir
@@ -227,7 +227,7 @@
                                     <a href="{{ route('tenant.category.list') }}">Kategori</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('tenant.product.list') }}">Barang</a>
+                                    <a href="{{ route('tenant.product.batch.list') }}">Batch Product</a>
                                 </li>
                                 <li>
                                     <a href="#">Stock Manager</a>
