@@ -11,6 +11,7 @@ use App\Models\Supplier;
 use App\Models\ProductCategory;
 use App\Models\Batch;
 use App\Models\Product;
+use App\Models\ProductStock;
 
 class TenantController extends Controller {
 
@@ -236,6 +237,7 @@ class TenantController extends Controller {
         Product::create([
             'id_tenant' => auth()->user()->id,
             'id_batch' => $request->batch,
+            'id_category' => $request->category,
             'product_name' => $request->p_name,
             'id_supplier' => $request->supplier,
             'photo' => $filename,
@@ -256,7 +258,8 @@ class TenantController extends Controller {
 
     public function batchProductDetail($id){
         $product = Product::where('id_tenant', auth()->user()->id)->find($id);
-        return view('tenant.tenant_product_detail', compact('product'));
+        $stockList = ProductStock::with('product')->where('id_tenant', auth()->user()->id)->where('id_batch_product', $id)->latest()->get();
+        return view('tenant.tenant_product_detail', compact('product', 'stockList'));
     }
 
     public function batchProductEdit($id){
@@ -287,14 +290,12 @@ class TenantController extends Controller {
 
             $product->update([
                 'id_batch' => $request->batch,
+                'id_category' => $request->category,
                 'product_name' => $request->p_name,
                 'id_supplier' => $request->supplier,
                 'photo' => $filename,
                 'nomor_gudang' => $request->gudang,
                 'nomor_rak' => $request->rak,
-                'tanggal_beli' => $request->t_beli,
-                'tanggal_expired' => $request->t_expired,
-                'harga_beli' => $request->h_beli,
                 'harga_jual' => $request->h_jual
             ]);
 
@@ -307,13 +308,11 @@ class TenantController extends Controller {
         } else {
             $product->update([
                 'id_batch' => $request->batch,
+                'id_category' => $request->category,
                 'product_name' => $request->p_name,
                 'id_supplier' => $request->supplier,
                 'nomor_gudang' => $request->gudang,
                 'nomor_rak' => $request->rak,
-                'tanggal_beli' => $request->t_beli,
-                'tanggal_expired' => $request->t_expired,
-                'harga_beli' => $request->h_beli,
                 'harga_jual' => $request->h_jual
             ]);
 
@@ -335,23 +334,82 @@ class TenantController extends Controller {
         return redirect()->route('tenant.product.batch.list')->with($notification);
     }
 
-    public function productList(){
-
+    public function productStockList(){
+        $stock = ProductStock::with('product')->where('id_tenant', auth()->user()->id)->latest()->get();  
+        return view('tenant.tenant_stock_list', compact('stock'));
     }
 
-    public function productInsert(){
-        
+    public function productStockAdd(){
+        return view('tenant.tenant_stock_add');
     }
 
-    public function productDetail($id){
+    public function productStockInsert(Request $request){
+        $stokProduct = ProductStock::create([
+            'id_tenant' => auth()->user()->id,
+            'id_batch_product' => $request->id_batch_product,
+            'barcode' => $request->barcode,
+            'tanggal_beli' => $request->t_beli,
+            'tanggal_expired' => $request->t_expired,
+            'harga_beli' => $request->h_beli,
+            'stok' => $request->stok
+        ]);
 
+        if(!is_null($stokProduct)) {
+            $stokProduct->productStockInsert($stokProduct);
+        }
+
+        $notification = array(
+            'message' => 'Data produk berhasil ditambahkan!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('tenant.product.stock.list')->with($notification);
     }
 
-    public function productUpdate(Request $request){
-
+    public function productStockEdit($id){
+        $stock = ProductStock::with('product')->where('id_tenant', auth()->user()->id)->find($id);
+        return view('tenant.tenant_stock_edit', compact('stock'));
     }
 
-    public function productDelete($id) {
+    public function productStockUpdate(Request $request){
+        $stock = ProductStock::where('id_tenant', auth()->user()->id)->find($request->id);
+        $stock_temp = $stock->stok;
+        $stock->update([
+            'barcode' => $request->barcode,
+            'tanggal_beli' => $request->t_beli,
+            'tanggal_expired' => $request->t_expired,
+            'harga_beli' => $request->h_beli,
+            'stok' => $request->stok
+        ]);
 
+        if(!is_null($stock)) {
+            $stock->productStockUpdate($stock, $stock_temp);
+        }
+
+        // dd($stock_temp);
+
+        $notification = array(
+            'message' => 'Data produk berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('tenant.product.stock.list')->with($notification);
+    }
+
+    public function productStockDelete($id){
+        $stock = ProductStock::where('id_tenant', auth()->user()->id)->find($id);
+        $stock_temp = $stock->stok;
+
+        $stock->delete();
+
+        if(!is_null($stock)) {
+            $stock->productStockDelete($stock, $stock_temp);
+        }
+
+        // dd($stock_temp);
+
+        $notification = array(
+            'message' => 'Data produk berhasil dihapus!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('tenant.product.stock.list')->with($notification);
     }
 }

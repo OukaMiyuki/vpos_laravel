@@ -42,7 +42,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->group( function () {
 
 Route::middleware(['auth:admin', 'adminemailverified'])->prefix('admin')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
-   
+
     Route::get('settings/profile', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profile'])->name('admin.profile');
     Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileAccountUpdate'])->name('admin.profile.account.update');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileInfoUpdate'])->name('admin.profile.info.update');
@@ -139,11 +139,12 @@ Route::middleware(['auth:tenant', 'tenantemailverivied'])->prefix('tenant')->gro
     Route::post('/dashboard/data/batch/product/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductUpdate'])->name('tenant.product.batch.update');
     Route::get('/dashboard/data/batch/product/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductDelete'])->name('tenant.product.batch.delete');
 
-    Route::get('/dashboard/data/product/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productList'])->name('tenant.product.list');
-    Route::post('/dashboard/data/product/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productInsert'])->name('tenant.product.insert');
-    Route::get('/dashboard/data/product/detail/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productDetail'])->name('tenant.product.detail');
-    Route::post('/dashboard/data/product/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productUpdate'])->name('tenant.product.update');
-    Route::get('/dashboard/data/product/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productDelete'])->name('tenant.product.delete');
+    Route::get('/dashboard/data/batch/product/stock', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockList'])->name('tenant.product.stock.list');
+    Route::get('/dashboard/data/batch/product/stock/add', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockAdd'])->name('tenant.product.stock.add');
+    Route::post('/dashboard/data/batch/product/stock/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockInsert'])->name('tenant.product.stock.insert');
+    Route::get('/dashboard/data/batch/product/stock/edit/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockEdit'])->name('tenant.product.stock.edit');
+    Route::post('/dashboard/data/batch/product/stock/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockUpdate'])->name('tenant.product.stock.update');
+    Route::get('/dashboard/data/batch/product/stock/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockDelete'])->name('tenant.product.stock.delete');
 
     Route::get('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettings'])->name('tenant.store.profile');
     Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');

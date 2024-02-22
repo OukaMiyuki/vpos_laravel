@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Tenant;
+use App\Models\Product;
 
 class Supplier extends Model {
     use HasFactory;
@@ -20,5 +21,9 @@ class Supplier extends Model {
 
     public function tenant(){
         return $this->belongsTo(Tenant::class, 'id_tenant', 'id');
+    }
+
+    public function product() {
+        return $this->hasMany(Product::class, 'id_supplier', 'id');
     }
 }

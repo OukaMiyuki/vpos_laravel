@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->integer('stok')->after('harga_jual')->default(0);
+        Schema::table('category_products', function (Blueprint $table) {
+            Schema::dropIfExists('category_products');
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
+        Schema::table('category_products', function (Blueprint $table) {
             //
         });
     }

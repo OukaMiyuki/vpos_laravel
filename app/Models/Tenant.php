@@ -12,6 +12,8 @@ use App\Models\DetailTenant;
 use App\Models\StoreDetail;
 use App\Models\Supplier;
 use App\Models\ProductCategory;
+use App\Models\Product;
+use App\Models\ProductStock;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -50,6 +52,14 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
 
     public function productCategory(){
         return $this->hasMany(ProductCategory::class, 'id_tenant', 'id');
+    }
+
+    public function product(){
+        return $this->hasMany(Product::class, 'id_tenant', 'id');
+    }
+
+    public function productStock() {
+        return $this->hasMany(ProductStock::class, 'id_tenant', 'id');
     }
 
     public function sendEmailVerificationNotification() {

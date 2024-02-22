@@ -230,7 +230,7 @@
                                     <a href="{{ route('tenant.product.batch.list') }}">Batch Product</a>
                                 </li>
                                 <li>
-                                    <a href="#">Stock Manager</a>
+                                    <a href="{{ route('tenant.product.stock.list') }}">Stock Manager</a>
                                 </li>
                             </ul>
                         </div>

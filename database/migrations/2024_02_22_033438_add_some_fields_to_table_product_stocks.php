@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->integer('stok')->after('harga_jual')->default(0);
+        Schema::table('product_stocks', function (Blueprint $table) {
+            $table->date('tanggal_beli')->after('barcode')->nullable();
+            $table->date('tanggal_expired')->after('tanggal_beli')->nullable();
+            $table->string('harga_beli')->after('tanggal_expired')->nullable();
         });
     }
 
@@ -21,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
+        Schema::table('product_stocks', function (Blueprint $table) {
             //
         });
     }

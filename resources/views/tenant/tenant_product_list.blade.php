@@ -44,13 +44,15 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
+                                            <th>Action</th>
                                             <th>Photo</th>
                                             <th>Product Batch Code</th>
                                             <th>Product Name</th>
+                                            <th>Kategori</th>
+                                            <th>Total Stok</th>
                                             <th>Tanggal Beli</th>
                                             <th>Harga Beli Per-Piece (Rp.)</th>
                                             <th>Harga Jual Per-Piece (Rp.)</th>
-                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -59,14 +61,6 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>
-                                                    <img src="{{ !empty($product->photo) ? Storage::url('images/product/'.$product->photo) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" style="width:50px; height:40px;" alt="Product Photo">
-                                                </td>
-                                                <td>{{ $product->product_code }}</td>
-                                                <td>{{ $product->product_name }}</td>
-                                                <td>{{ $product->tanggal_beli }}</td>
-                                                <td>{{ $product->harga_beli }}</td>
-                                                <td>{{ $product->harga_jual }}</td>
-                                                <td>
                                                     <a href="{{ route('tenant.product.batch.detail', ['id' => $product->id]) }}">
                                                         <button title="Lihat detail produk" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
@@ -74,9 +68,19 @@
                                                         <button title="Edit data produk" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
                                                     </a>
                                                     <a href="{{ route('tenant.product.batch.delete', ['id' => $product->id]) }}">
-                                                        <button title="Haous produk" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                        <button title="Hapus produk" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                     </a>
                                                 </td>
+                                                <td>
+                                                    <img src="{{ !empty($product->photo) ? Storage::url('images/product/'.$product->photo) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" style="width:50px; height:40px;" alt="Product Photo">
+                                                </td>
+                                                <td>{{ $product->product_code }}</td>
+                                                <td>{{ $product->product_name }}</td>
+                                                <td>{{ $product->category->name }}</td>
+                                                <td>{{ $product->stok }}</td>
+                                                <td>{{ $product->tanggal_beli }}</td>
+                                                <td>{{ $product->harga_beli }}</td>
+                                                <td>{{ $product->harga_jual }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

@@ -28,16 +28,24 @@
                                     @csrf
                                     <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Product Detail</h5>
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="p_code" class="form-label">Product Code</label>
                                                 <input readonly type="text" class="form-control" name="p_code" id="p_code" required value="{{ $product->product_code }}" placeholder="Masukkan product code">
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="p_name" class="form-label">Product Name</label>
                                                 <input readonly type="text" class="form-control" name="p_name" id="p_name" required value="{{ $product->product_name }}" placeholder="Masukkan nama produk">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="category" class="form-label">Product Category</label>
+                                                <input readonly type="text" class="form-control" name="category" id="category" required value="{{ $product->category->name }}" placeholder="Masukkan product category">
                                             </div>
                                         </div>
                                     </div>
@@ -45,23 +53,13 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="batch" class="form-label">Batch ID</label>
-                                                <select disabled class="form-select @error('batch') is-invalid @enderror" id="batch" name="batch" required>
-                                                    <option value="">- Pilih Batch ID -</option>
-                                                    @foreach (App\Models\Batch::where('id_tenant', auth()->user()->id)->latest()->get() as $batch)
-                                                        <option value="{{ $batch->id }}"@if ($product->id_batch == $batch->id) selected="selected" @endif>{{ $batch->batch_code }} -  {{ $batch->keterangan }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <input readonly type="text" class="form-control" name="batch" id="batch" required value="{{ $product->batch->batch_code }} - {{ $product->batch->keterangan }}" placeholder="Masukkan batch id">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="supplier" class="form-label">Supplier</label>
-                                                <select disabled class="form-select @error('supplier') is-invalid @enderror" id="supplier" name="supplier" required>
-                                                    <option value="">- Pilih Supplier -</option>
-                                                    @foreach (App\Models\Supplier::where('id_tenant', auth()->user()->id)->latest()->get() as $sup)
-                                                        <option value="{{ $sup->id }}"@if ($product->id_supplier == $sup->id) selected="selected" @endif>{{ $sup->nama_supplier }}</option>
-                                                    @endforeach
-                                                </select>
+                                                <input readonly type="text" class="form-control" name="supplier" id="supplier" required value="{{ $product->supplier->nama_supplier }}" placeholder="Masukkan nama supplier">
                                             </div>
                                         </div>
                                     </div>
@@ -79,7 +77,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
+                                    {{-- <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="t_beli" class="form-label">Tanggal Beli</label>
@@ -92,15 +90,15 @@
                                                 <input type="date" class="form-control" name="t_expired" id="t_expired" readonly value="{{ $product->tanggal_expired }}" placeholder="Masukkan tanggal expired">
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        {{-- <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="h_beli" class="form-label">Harga beli <strong>(Rp.)</strong></label>
                                                 <input type="text" class="form-control" name="h_beli" id="h_beli" readonly required value="{{ $product->harga_beli }}" placeholder="Masukkan nominal harga beli">
                                             </div>
-                                        </div>
-                                        <div class="col-md-6">
+                                        </div> --}}
+                                        <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="h_jual" class="form-label">Harga jual <strong>(Rp.)</strong></label>
                                                 <input type="text" class="form-control" name="h_jual" id="h_jual" readonly required value="{{ $product->harga_jual }}" placeholder="Masukkan nominal harga jual">
@@ -124,6 +122,41 @@
                                         </div>
                                     </div>
                                 </form>
+                            </div>
+                            <div class="row">
+                                <h4 class="header-title mb-3">Daftar Stock Barang</h4>
+                                        
+                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Barcode</th>
+                                            <th>Tanggal beli</th>
+                                            <th>Tanggal Expired</th>
+                                            <th>Harga Beli per piece</th>
+                                            <th>Stok</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php $no=0; @endphp
+                                        @foreach($stockList as $stok)
+                                            <tr>
+                                                <td>{{ $no+=1 }}</td>
+                                                <td>{{ $stok->barcode }}</td>
+                                                <td>{{ $stok->tanggal_beli }}</td>
+                                                <td>{{ $stok->tanggal_expired }}</td>
+                                                <td>{{ $stok->harga_beli }}</td>
+                                                <td>{{ $stok->stok }}</td>
+                                                <td>
+                                                    <a href="">
+                                                        <button title="Lihat barcode" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-barcode-scan"></span></button>&nbsp;
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

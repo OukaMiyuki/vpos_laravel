@@ -17,16 +17,16 @@
         <link href="{{ asset('assets/libs/fullcalendar/main.min.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
+        {{-- Custom Form CSS --}}
+        <link href="{{ asset('assets/libs/mohithg-switchery/switchery.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/multiselect/css/multi-select.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- Bootstrap css -->
         <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- App css -->
         <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-style"/>
-       {{-- Custom Form CSS --}}
-       <link href="{{ asset('assets/libs/mohithg-switchery/switchery.min.css') }}" rel="stylesheet" type="text/css" />
-       <link href="{{ asset('assets/libs/multiselect/css/multi-select.css') }}" rel="stylesheet" type="text/css" />
-       <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
-       <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
-       <link href="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- icons -->
         <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- Head js -->
@@ -198,7 +198,81 @@
                     var maxDate = year + '-' + month + '-' + day;
                     $('#t_beli').attr('max', maxDate);
                 });
+
+
+                document.getElementById('enable_manual_batcode').onclick = function() {
+                    const barcode_txt = document.getElementById('barcode');
+                    if (barcode_txt.readOnly) {
+                        barcode_txt.readOnly = false;
+                        this.innerHTML = "Masukkan Barcode via Scanner";
+                        // console.log('✅ element is read-only');
+                    } else {
+                        // console.log('⛔️ element is not read-only');
+                        this.innerHTML = "Input Barcode Manual";
+                        barcode_txt.value = "";
+                        barcode_txt.readOnly = true;
+                    }
+                    // document.getElementById('myInput').readOnly = false;
+                };
+
+                // var barcode = "";
+                // var interval = "";
+
+                // document.addEventListener('keydown', function(evt){
+                //     if(interval)
+                //         clearInterval(interval);
+                //     if(evt.code == "Enter") {
+                //         if(barcode)
+                //             handleBarcode(barcode);
+                //         barcode = '';
+                //         return;
+                //     }
+                //     if(evt.key != 'Shift')
+                //         barcode += evt.key;
+                //     interval = setInterval( ()=> barcode = '', 20 );
+                // });
+
+                // function handleBarcode(scanned_barcode){
+                //     console.log(scanned_barcode);
+                // }
+
             });
+
+            // Author: Neel Bhanushali <neal.bhanushali@gmail.com>
+            document.addEventListener('keydown', function(e) {
+                // add scan property to window if it does not exist
+                if(!window.hasOwnProperty('scan')) {
+                    window.scan = []
+                }
+                
+                // if key stroke appears after 10 ms, empty scan array
+                if(window.scan.length > 0 && (e.timeStamp - window.scan.slice(-1)[0].timeStamp) > 10) {
+                    window.scan = []
+                }
+                
+                // if key store is enter and scan array contains keystrokes
+                // dispatch `scanComplete` with keystrokes in detail property
+                // empty scan array after dispatching event
+                if(e.key === "Enter" && window.scan.length > 0) {
+                    let scannedString = window.scan.reduce(function(scannedString, entry) {
+                        return scannedString + entry.key
+                    }, "")
+                    window.scan = []
+                    return document.dispatchEvent(new CustomEvent('scanComplete', {detail: scannedString}))
+                }
+                
+                // do not listen to shift event, since key for next keystroke already contains a capital letter
+                // or to be specific the letter that appears when that key is pressed with shift key
+                if(e.key !== "Shift") {
+                    // push `key`, `timeStamp` and calculated `timeStampDiff` to scan array
+                    let data = JSON.parse(JSON.stringify(e, ['key', 'timeStamp']))
+                    data.timeStampDiff = window.scan.length > 0 ? data.timeStamp - window.scan.slice(-1)[0].timeStamp : 0;
+
+                    window.scan.push(data)
+                }
+            })
+            // listen to `scanComplete` event on document
+            document.addEventListener('scanComplete', function(e) { console.log(e.detail) })
         </Script>
     </body>
 </html>

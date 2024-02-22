@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ProductCategory;
-use App\Models\category_product;
 use App\Models\Batch;
+use App\Models\ProductStock;
+use App\Models\Tenant;
+use App\Models\Supplier;
 
 class Product extends Model {
     use HasFactory;
@@ -14,6 +16,7 @@ class Product extends Model {
     protected $fillable = [
         'id_tenant',
         'id_batch',
+        'id_category',
         'index_number',
         'product_code',
         'product_name',
@@ -21,19 +24,29 @@ class Product extends Model {
         'photo',
         'nomor_gudang',
         'nomor_rak',
-        'tanggal_beli',
-        'tanggal_expired',
-        'harga_beli',
         'harga_jual',
         'stok'
     ];
 
-    public function category() {
-        return $this->belongsToMany(ProductCategory::class, 'product_id', 'category_id')->using(category_product::class)->withTimestamps();
+    public function tenant() {
+        return $this->belongsTo(Tenant::class, 'id_tenant', 'id');
+    }
+    
+    
+    public function supplier() {
+        return $this->belongsTo(Supplier::class, 'id_supplier', 'id');
     }
 
     public function batch() {
         return $this->belongsTo(Batch::class, 'id_batch', 'id');
+    }
+
+    public function category() {
+        return $this->belongsTo(ProductCategory::class, 'id_category', 'id');
+    }
+
+    public function productStock() {
+        return $this->hasMany(ProductStock::class, 'id_batch', 'id');
     }
 
     public static function boot(){

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tenant;
 use App\Models\Product;
-use App\Models\category_product;
 
 class ProductCategory extends Model {
     use HasFactory;
@@ -21,6 +20,6 @@ class ProductCategory extends Model {
     }
 
     public function product() {
-        return $this->belongsToMany(Product::class, 'category_id', 'product_id')->using(category_product::class)->withTimestamps();
+        return $this->hasMany(Product::class, 'id_category', 'id');
     }
 }

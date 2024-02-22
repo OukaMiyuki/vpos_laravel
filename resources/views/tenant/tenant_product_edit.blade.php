@@ -26,13 +26,24 @@
                             <div class="row">
                                 <form method="post" action="{{ route('tenant.product.batch.update') }}" enctype="multipart/form-data">
                                     @csrf
-                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Modify Account</h5>
+                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Modify Product</h5>
                                     <div class="row">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="p_name" class="form-label">Product Name</label>
                                                 <input type="hidden" class="form-control" name="id" id="id" required value="{{ $product->id }}" readonly>
                                                 <input type="text" class="form-control" name="p_name" id="p_name" required value="{{ $product->product_name }}" placeholder="Masukkan nama produk">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="category" class="form-label">Product Category</label>
+                                                <select class="form-select @error('category') is-invalid @enderror" id="category" name="category" required>
+                                                    <option value="">- Pilih Kategori Barang -</option>
+                                                    @foreach (App\Models\ProductCategory::where('id_tenant', auth()->user()->id)->latest()->get() as $cat)
+                                                        <option value="{{ $cat->id }}" @if ($product->id_category == $cat->id) selected="selected" @endif>{{ $cat->name }}</option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -74,7 +85,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
+                                    {{-- <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="t_beli" class="form-label">Tanggal Beli</label>
@@ -87,18 +98,18 @@
                                                 <input type="date" class="form-control" name="t_expired" id="t_expired" value="{{ $product->tanggal_expired }}" placeholder="Masukkan tanggal expired">
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        {{-- <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="h_beli" class="form-label">Harga beli <strong>(Rp.)</strong></label>
                                                 <input type="text" class="form-control" name="h_beli" id="h_beli" required value="{{ $product->harga_beli }}" placeholder="Masukkan nominal harga beli">
                                             </div>
-                                        </div>
-                                        <div class="col-md-6">
+                                        </div> --}}
+                                        <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="h_jual" class="form-label">Harga jual <strong>(Rp.)</strong></label>
-                                                <input type="text" class="form-control" name="h_jual" id="h_jual" required value="{{ $product->harga_jual }}" placeholder="Masukkan nominal harga jual">
+                                                <input type="number" class="form-control" name="h_jual" id="h_jual" required value="{{ $product->harga_jual }}" placeholder="Masukkan nominal harga jual">
                                             </div>
                                         </div>
                                     </div>
@@ -117,7 +128,7 @@
                                         </div>
                                     </div>
                                     <div class="text-end">
-                                        <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Tambah</button>
+                                        <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Update</button>
                                     </div>
                                 </form>
                             </div>
