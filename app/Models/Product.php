@@ -46,7 +46,7 @@ class Product extends Model {
     }
 
     public function productStock() {
-        return $this->hasMany(ProductStock::class, 'id_batch', 'id');
+        return $this->hasMany(ProductStock::class, 'id_batch_product', 'id');
     }
 
     public static function boot(){

@@ -95,6 +95,14 @@
                         <span> Dashboards </span>
                     </a>
                 </li>
+                @auth('kasir')
+                    <li>
+                        <a href="{{ route('kasir.pos') }}">
+                            <i class="mdi mdi-calendar"></i>
+                            <span> POS </span>
+                        </a>
+                    </li>
+                @endauth
                 <li class="menu-title mt-2">Manager</li>
                 <li>
                     <a href="#">

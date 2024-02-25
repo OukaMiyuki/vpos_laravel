@@ -170,6 +170,7 @@ Route::middleware(['auth:kasir'])->prefix('kasir')->group( function () {
     Route::post('logout', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'destroy'])->name('kasir.logout');
 
     Route::view('/dashboard','kasir.dashboard');
+    Route::get('/dashboard/kasir/pos', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'kasirPos'])->name('kasir.pos');
 
 });
 
