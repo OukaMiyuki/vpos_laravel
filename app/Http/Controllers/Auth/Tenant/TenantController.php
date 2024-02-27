@@ -412,4 +412,9 @@ class TenantController extends Controller {
         );
         return redirect()->route('tenant.product.stock.list')->with($notification);
     }
+
+    public function productStockBarcode($id){
+        $stok = ProductStock::where('id_tenant', auth()->user()->id)->find($id);
+        return view('tenant.tenant_barcode_show', compact('stok'));
+    }
 }

@@ -50,8 +50,6 @@
                                             <th>Product Name</th>
                                             <th>Kategori</th>
                                             <th>Total Stok</th>
-                                            <th>Tanggal Beli</th>
-                                            <th>Harga Beli Per-Piece (Rp.)</th>
                                             <th>Harga Jual Per-Piece (Rp.)</th>
                                         </tr>
                                     </thead>
@@ -78,8 +76,6 @@
                                                 <td>{{ $product->product_name }}</td>
                                                 <td>{{ $product->category->name }}</td>
                                                 <td>{{ $product->stok }}</td>
-                                                <td>{{ $product->tanggal_beli }}</td>
-                                                <td>{{ $product->harga_beli }}</td>
                                                 <td>{{ $product->harga_jual }}</td>
                                             </tr>
                                         @endforeach

@@ -103,6 +103,9 @@
         <script src="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js') }}"></script>
         <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
 
+        {{-- ON SCAN --}}
+        <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
+
         <!-- Init js-->
         <script src="{{ asset('assets/js/pages/form-advanced.init.js') }}"></script>
 
@@ -235,44 +238,48 @@
                 // function handleBarcode(scanned_barcode){
                 //     console.log(scanned_barcode);
                 // }
-
+                
+            });
+            $("#tunai_text").hide();
+            $("#nominal").attr("disabled", "disabled"); 
+            $("#kembalian").attr("disabled", "disabled");
+            $(document).ready(function(){
+                $('#pembayaran').on('change', function() {
+                    if ( this.value == 'Tunai') {
+                        $("#tunai_text").show();
+                        $("#nominal").removeAttr("disabled"); 
+                        $("#kembalian").removeAttr("disabled"); 
+                    }
+                    else {
+                        $("#tunai_text").hide();
+                        $("#nominal").val("");
+                        $("#nominal").attr("disabled", "disabled"); 
+                        $("#kembalian").attr("disabled", "disabled");
+                    }
+                });
             });
 
-            // Author: Neel Bhanushali <neal.bhanushali@gmail.com>
-            document.addEventListener('keydown', function(e) {
-                // add scan property to window if it does not exist
-                if(!window.hasOwnProperty('scan')) {
-                    window.scan = []
+            // Enable scan events for the entire document
+            onScan.attachTo(document, {
+                suffixKeyCodes: [13], // enter-key expected at the end of a scan
+                reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
+                onScan: function(sCode, iQty) { // Alternative to document.addEventListener('scan')
+                    alert('Scanned: ' + iQty + 'x ' + sCode); 
+                    // $("#nominal").val(sCode);
+                    $('#pos').DataTable().search(sCode).draw();
+                    var theTbl = document.getElementById('pos');
+                    var Cells = theTbl.getElementsByTagName("td");
+                    console.log(Cells[2].innerText);
+                    if(Cells[2].innerText == sCode){
+                        document.getElementById('cartForm').submit();
+                    }
+                },
+                onKeyDetect: function(iKeyCode){ // output all potentially relevant key events - great for debugging!
+                    console.log('Pressed: ' + iKeyCode);
                 }
-                
-                // if key stroke appears after 10 ms, empty scan array
-                if(window.scan.length > 0 && (e.timeStamp - window.scan.slice(-1)[0].timeStamp) > 10) {
-                    window.scan = []
-                }
-                
-                // if key store is enter and scan array contains keystrokes
-                // dispatch `scanComplete` with keystrokes in detail property
-                // empty scan array after dispatching event
-                if(e.key === "Enter" && window.scan.length > 0) {
-                    let scannedString = window.scan.reduce(function(scannedString, entry) {
-                        return scannedString + entry.key
-                    }, "")
-                    window.scan = []
-                    return document.dispatchEvent(new CustomEvent('scanComplete', {detail: scannedString}))
-                }
-                
-                // do not listen to shift event, since key for next keystroke already contains a capital letter
-                // or to be specific the letter that appears when that key is pressed with shift key
-                if(e.key !== "Shift") {
-                    // push `key`, `timeStamp` and calculated `timeStampDiff` to scan array
-                    let data = JSON.parse(JSON.stringify(e, ['key', 'timeStamp']))
-                    data.timeStampDiff = window.scan.length > 0 ? data.timeStamp - window.scan.slice(-1)[0].timeStamp : 0;
-
-                    window.scan.push(data)
-                }
-            })
-            // listen to `scanComplete` event on document
-            document.addEventListener('scanComplete', function(e) { console.log(e.detail) })
+            });
+            // Register event listener
+            // document.addEventListener('scan');
         </Script>
     </body>
 </html>

@@ -86,6 +86,19 @@ $(document).ready(function() {
         drawCallback: function() {
             $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
         }
+    }), $("#pos").DataTable({
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }, 
+    }), $('#pos_filter label input').on( 'focus', function () {
+        this.setAttribute( 'id', 'search-input-table' );
     }), $("#complex-header-datatable").DataTable({
         language: {
             paginate: {

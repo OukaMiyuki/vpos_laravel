@@ -145,6 +145,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied'])->prefix('tenant')->gro
     Route::get('/dashboard/data/batch/product/stock/edit/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockEdit'])->name('tenant.product.stock.edit');
     Route::post('/dashboard/data/batch/product/stock/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockUpdate'])->name('tenant.product.stock.update');
     Route::get('/dashboard/data/batch/product/stock/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockDelete'])->name('tenant.product.stock.delete');
+    Route::get('/dashboard/data/batch/product/stock/barcode/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockBarcode'])->name('tenant.product.stock.barcode.show');
 
     Route::get('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettings'])->name('tenant.store.profile');
     Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');
@@ -171,7 +172,12 @@ Route::middleware(['auth:kasir'])->prefix('kasir')->group( function () {
 
     Route::view('/dashboard','kasir.dashboard');
     Route::get('/dashboard/kasir/pos', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'kasirPos'])->name('kasir.pos');
-
+    Route::post('/dashboard/kasir/pos/addcart', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'addCart'])->name('kasir.pos.addCart');
+    Route::get('/dashboard/kasir/pos/allitem', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'allItem'])->name('kasir.pos.allitem');
+    Route::post('/dashboard/kasir/pos/update', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'updateCart'])->name('kasir.pos.updateCart');
+    Route::get('/dashboard/kasir/pos/delete/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'removeCart'])->name('kasir.pos.deleteCart');
+    Route::post('/dashboard/kasir/pos/transaction/save', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionSave'])->name('kasir.pos.transaction.save');
+    Route::get('/dashboard/carttest', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTest'])->name('kasir.pos.cartTest');
 });
 
 require __DIR__.'/auth.php';

@@ -55,12 +55,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @php $no=0; @endphp
+                                    @php 
+                                        $no=0; 
+                                    @endphp
                                     @foreach($stock as $stok)
                                         <tr>
                                             <td>{{ $no+=1 }}</td>
                                             <td>
-                                                <a href="">
+                                                <a href="{{ route('tenant.product.stock.barcode.show', ['id' => $stok->id]) }}">
                                                     <button title="Lihat barcode" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-barcode-scan"></span></button>&nbsp;
                                                 </a>
                                                 <a href="{{ route('tenant.product.stock.edit', ['id' => $stok->id]) }}">
