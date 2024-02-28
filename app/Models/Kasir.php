@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\DetailKasir;
+use App\Models\Invoice;
 
 class Kasir extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -34,6 +35,10 @@ class Kasir extends Authenticatable implements MustVerifyEmail {
 
     public function detail(){
         return $this->hasOne(DetailKasir::class, 'id_kasir', 'id');
+    }
+
+    public function invoice(){
+        return $this->hasMany(Invoice::class, 'id_kasir', 'id');
     }
 
     public function detailKasirStore($model){

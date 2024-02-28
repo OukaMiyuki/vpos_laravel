@@ -96,8 +96,12 @@ class KasirController extends Controller {
         return redirect()->back()->with($notification);
     }
 
-    public function cartTest(){
-        $cart = Cart::instance('cart-4')->restore(auth()->user()->id);
-        dd($cart);
+    public function transactionPending(){
+        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->where('status_pembayaran', 0)
+                            ->latest()
+                            ->get();
+        return view('kasir.kasir_invoice_pending', compact('invoice'));
     }
 }

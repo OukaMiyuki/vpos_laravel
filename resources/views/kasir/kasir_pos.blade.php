@@ -26,7 +26,7 @@
                                 <table class="table table-bordered mb-0">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
+                                          
                                             <th>Nama</th>
                                             <th width="25%">QTY</th>
                                             <th>Harga</th>
@@ -41,7 +41,7 @@
                                         @endphp
                                         @foreach ($allCart as $cart)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
+                                            
                                                 <td>{{ $cart->name }}</td>
                                                 <td>
                                                     <form id="qtyform" action="{{ route('kasir.pos.updateCart') }}" method="post">
@@ -141,6 +141,7 @@
                                                         <form id="cartForm" action="{{ route('kasir.pos.addCart') }}" method="post">
                                                             @csrf
                                                             <input readonly type="hidden" id="id" name="id" value="{{ $stok->id }}">
+                                                            <input readonly type="hidden" id="barcode" name="barcode" value="{{ $stok->barcode }}">
                                                             <input readonly type="hidden" id="name" name="name" value="{{ $stok->product->product_name }}">
                                                             <input readonly type="hidden" id="qty" name="qty" value="1">
                                                             <input readonly type="hidden" id="price" name="price" value="{{ $stok->product->harga_jual }}">

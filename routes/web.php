@@ -177,7 +177,8 @@ Route::middleware(['auth:kasir'])->prefix('kasir')->group( function () {
     Route::post('/dashboard/kasir/pos/update', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'updateCart'])->name('kasir.pos.updateCart');
     Route::get('/dashboard/kasir/pos/delete/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'removeCart'])->name('kasir.pos.deleteCart');
     Route::post('/dashboard/kasir/pos/transaction/save', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionSave'])->name('kasir.pos.transaction.save');
-    Route::get('/dashboard/carttest', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTest'])->name('kasir.pos.cartTest');
+
+    Route::get('/dashboard/kasir/transaction/pending', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPending'])->name('kasir.transaction.pending');
 });
 
 require __DIR__.'/auth.php';

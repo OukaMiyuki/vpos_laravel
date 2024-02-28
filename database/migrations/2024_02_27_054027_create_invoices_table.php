@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->date('tanggal_transaksi');
             $table->date('tanggal_pelunasan')->nullable();
             $table->string('jenis_pembayaran')->nullable();
-            $table->integer('status_pembayaran')->default(1);
+            $table->integer('status_pembayaran')->default(0);
             $table->string('nominal_bayar')->nullable();
             $table->string('kembalian')->nullable();
             $table->timestamps();
