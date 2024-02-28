@@ -84,6 +84,7 @@ class KasirController extends Controller {
             'id_tenant' => auth()->user()->id_tenant,
             'id_kasir' => auth()->user()->id,
             'nomor_invoice' => $string,
+            'jenis_pembayaran' => $request->pembayaran,
             'tanggal_transaksi' => Carbon::now()
         ]);
         if(!is_null($invoice)) {
