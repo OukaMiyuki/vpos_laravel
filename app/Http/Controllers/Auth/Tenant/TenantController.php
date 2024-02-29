@@ -12,6 +12,7 @@ use App\Models\ProductCategory;
 use App\Models\Batch;
 use App\Models\Product;
 use App\Models\ProductStock;
+use App\Models\Tax;
 use App\Models\Discount;
 
 class TenantController extends Controller {
@@ -58,7 +59,7 @@ class TenantController extends Controller {
 
         return redirect()->back()->with($notification);
     }
-    
+
     public function kasirDetail($id){
         $kasir = Kasir::where('id_tenant', auth()->user()->id)->with('detail')->find($id);
         return view('tenant.tenant_kasir_detail', compact('kasir'));
@@ -98,7 +99,7 @@ class TenantController extends Controller {
             'keterangan' => $request->keterangan
         ]);
 
-        
+
         $notification = array(
             'message' => 'Data berhasil ditambahkan!',
             'alert-type' => 'info',
@@ -147,7 +148,7 @@ class TenantController extends Controller {
             'keterangan' => $request->keterangan
         ]);
 
-        
+
         $notification = array(
             'message' => 'Data berhasil ditambahkan!',
             'alert-type' => 'info',
@@ -159,7 +160,7 @@ class TenantController extends Controller {
     public function batchDelete($id){
         $batch = Batch::find($id);
         $batch->delete();
-        
+
         $notification = array(
             'message' => 'Data berhasil dihapus!',
             'alert-type' => 'info',
@@ -336,7 +337,7 @@ class TenantController extends Controller {
     }
 
     public function productStockList(){
-        $stock = ProductStock::with('product')->where('id_tenant', auth()->user()->id)->latest()->get();  
+        $stock = ProductStock::with('product')->where('id_tenant', auth()->user()->id)->latest()->get();
         return view('tenant.tenant_stock_list', compact('stock'));
     }
 
@@ -419,12 +420,65 @@ class TenantController extends Controller {
         return view('tenant.tenant_barcode_show', compact('stok'));
     }
 
-    public function discountList(){
-        $diskon = Discount::where('id_tenant', auth()->user()->id);
-        return view('tenant.tenant_discount_list', compact('diskon')); 
+    public function discountModify(){
+        $diskon = Discount::where('id_tenant', auth()->user()->id)->first();
+        return view('tenant.tenant_discount_modify', compact('diskon'));
     }
 
-    public function discountAdd(){
-        return view('tenant.tenant_discount_add');
+    public function discountModifyInsert(Request $request){
+        $diskon = Discount::where('id_tenant', auth()->user()->id)->first();
+        if(empty($diskon)){
+            Discount::create([
+                'id_tenant' => auth()->user()->id,
+                'min_harga' => $request->min_harga,
+                'diskon' => $request->diskon,
+                'start_date' => $request->t_mulai,
+                'end_date' => $request->t_akhir,
+                'is_active' => $request->status
+            ]);
+        } else {
+            $diskon->update([
+                'min_harga' => $request->min_harga,
+                'diskon' => $request->diskon,
+                'start_date' => $request->t_mulai,
+                'end_date' => $request->t_akhir,
+                'is_active' => $request->status
+            ]);
+        }
+
+        $notification = array(
+            'message' => 'Data diskon berhasil dimodifikasi!',
+            'alert-type' => 'success',
+        );
+
+        return redirect()->back()->with($notification);
+    }
+
+    public function pajakModify(){
+        $tax = Tax::where('id_tenant', auth()->user()->id)->first();
+        return view('tenant.tenant_tax_modify', compact('tax'));
+    }
+
+    public function pajakModifyInsert(Request $request){
+        $tax = Tax::where('id_tenant', auth()->user()->id)->find($request->id);
+        if(empty($tax)){
+            Tax::create([
+                'id_tenant' => auth()->user()->id,
+                'pajak' => $request->pajak,
+                'is_active' => $request->status,
+            ]);
+        } else {
+            $tax->update([
+                'pajak' => $request->pajak,
+                'is_active' => $request->status,
+            ]);
+        }
+
+        $notification = array(
+            'message' => 'Data pajak berhasil dimodifikasi!',
+            'alert-type' => 'success',
+        );
+
+        return redirect()->back()->with($notification);
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tenant;
 
-class Discount extends Model {
+class Tax extends Model {
     use HasFactory;
 
     protected $guarded = [];

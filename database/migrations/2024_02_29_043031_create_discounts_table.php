@@ -13,16 +13,11 @@ return new class extends Migration
     {
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('id_marketing');
-            $table->string('name');
-            $table->string('product_name')->nullable();
-            $table->integer('qty_amount')->default(0);
-            $table->string('price_amount')->nullable();
-            $table->integer('discount')->nullable();
-            $table->integer('is_active')->default(1);
+            $table->bigInteger('id_tenant')->unique();
+            $table->integer('min_harga')->nullable();
+            $table->integer('diskon');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->string('keterangan')->nullable();
             $table->timestamps();
         });
     }

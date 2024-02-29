@@ -312,10 +312,10 @@
                         <div class="collapse" id="harga">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="{{ route('tenant.discount.list') }}">Pengaturan Diskon</a>
+                                    <a href="{{ route('tenant.discount.modify') }}">Pengaturan Diskon</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('tenant.batch.list') }}">Pengaturan Pajak</a>
+                                    <a href="{{ route('tenant.pajak.modify') }}">Pengaturan Pajak</a>
                                 </li>
                             </ul>
                         </div>

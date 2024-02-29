@@ -187,6 +187,11 @@
                     $("#show #keterangan").val(keterangan);
                 });
 
+                $(document).on("click", "#aktifkandiskon", function() {
+                    var id = $(this).data('id');
+                    $("#show #id").val(id);
+                });
+
                 $(function(){
                     var dtToday = new Date();
                     

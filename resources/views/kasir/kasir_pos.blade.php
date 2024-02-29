@@ -41,7 +41,6 @@
                                         @endphp
                                         @foreach ($allCart as $cart)
                                             <tr>
-                                            
                                                 <td>{{ $cart->name }}</td>
                                                 <td>
                                                     <form id="qtyform" action="{{ route('kasir.pos.updateCart') }}" method="post">
@@ -63,6 +62,7 @@
                                 <p style="font-size:18px; color:#FFF">Total Item Quantity : {{ Cart::count() }} </p>
                                 <p style="font-size:18px; color:#FFF">Sub Total : Rp. {{ Cart::subtotal() }}</p>
                                 <p style="font-size:18px; color:#FFF">Pajak (5%) : Rp. {{ Cart::tax() }}</p>
+                                <p style="font-size:18px; color:#FFF">Diskon (5%) : Rp. {{ Cart::discount() }}</p>
                                 <p><h2 class="text-white">Total Belanja</h2><h1 class="text-white">Rp. {{ Cart::total() }}</h1></p>
                             </div>
                             <br>

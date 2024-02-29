@@ -10,6 +10,8 @@ use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\ShoppingCart;
 use App\Models\Invoice;
+use App\Models\Discount;
+use App\Models\Tax;
 
 class KasirController extends Controller {
     public function kasirPos(){
@@ -27,6 +29,15 @@ class KasirController extends Controller {
     }
 
     public function addCart(Request $request){
+        $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
+                    ->where('is_active', 1)->first();
+        
+        $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
+                    ->where('is_active', 1)->first();
+        if(!empty($tax)){
+            Cart::setGlobalTax($tax->pajak);
+        }
+        Cart::setGlobalTax(21);
         Cart::add([
             'id' => $request->id,
             'name' => $request->name,
@@ -35,6 +46,14 @@ class KasirController extends Controller {
             'weight' => 20,
             'options' => ['size' => 'large']
         ]);
+
+        if(!empty($diskon)){
+            if(Cart::subtotal() >= $diskon->min_harga){
+                Cart::setGlobalDiscount($diskon->diskon);
+            } else {
+                Cart::setGlobalDiscount(0);
+            }
+        }
 
         $notification = array(
             'message' => 'Sukses ditambahkan!',
