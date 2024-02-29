@@ -52,20 +52,17 @@
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
-                                        @foreach($supplier as $supply)
+                                        @foreach($invoice as $invoice)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
-                                                <td>{{ $supply->nama_supplier }}</td>
-                                                <td>{{ $supply->email_supplier }}</td>
-                                                <td>{{ $supply->phone_supplier }}</td>
+                                                <td>{{ $invoice->nomor_invoice }}</td>
+                                                <td>{{ $invoice->tanggal_transaksi }}</td>
+                                                <td><span class="badge bg-soft-warning text-warning">Pending</span></td>
                                                 <td>
-                                                    <a href="" id="detailsupplier" data-id="{{ $supply->id }}" data-nama="{{ $supply->nama_supplier }}" data-email="{{ $supply->email_supplier }}" data-phone="{{ $supply->phone_supplier }}" data-alamat="{{ $supply->alamat_supplier }}" data-keterangan="{{ $supply->keterangan }}" data-bs-toggle="modal" data-bs-target="#modaldetailsupplier">
-                                                        <button title="Lihat data supplier" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                    <a href="{{ route('kasir.transaction.pending.restore', ['id' => $invoice->id ]) }}">
+                                                        <button title="Restor transaction" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
                                                     </a>
-                                                    <a href="" id="editsupplier" data-id="{{ $supply->id }}" data-nama="{{ $supply->nama_supplier }}" data-email="{{ $supply->email_supplier }}" data-phone="{{ $supply->phone_supplier }}" data-alamat="{{ $supply->alamat_supplier }}" data-keterangan="{{ $supply->keterangan }}" data-bs-toggle="modal" data-bs-target="#modaleditsupplier">
-                                                        <button title="Edit data supplier" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
-                                                    </a>
-                                                    <a href="{{ route('tenant.supplier.delete', ['id' => $supply->id]) }}">
+                                                    <a href="">
                                                         <button title="Hapus data supplier" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                     </a>
                                                 </td>

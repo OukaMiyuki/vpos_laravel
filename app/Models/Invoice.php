@@ -29,7 +29,6 @@ class Invoice extends Model {
     public function storeCart($model){
         $ShoppingCart = new ShoppingCart();
         $cartContent = Cart::content();
-        $data = array();
         foreach($cartContent as $cart){
             ShoppingCart::create([
                 'id_invoice' => $model->id,
@@ -41,7 +40,5 @@ class Invoice extends Model {
             ]);
         }
         session()->forget('cart'); 
-
-
     }
 }

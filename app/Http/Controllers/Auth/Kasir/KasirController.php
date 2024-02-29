@@ -8,19 +8,21 @@ use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Models\Product;
 use App\Models\ProductStock;
+use App\Models\ShoppingCart;
 use App\Models\Invoice;
 
 class KasirController extends Controller {
     public function kasirPos(){
+        // session()->forget('cart');
         // $stock = Product::with('productStock')->where('id_tenant', auth()->user()->id_tenant)
         //                     ->where(function ($query) {
         //                         $query->where('stok', '!=', 0);
-        //                     })->latest()->get();  
+        //                     })->latest()->get();
         // dd($stock);
         $stock = ProductStock::with('product')
                         ->where(function ($query) {
                                 $query->where('stok', '!=', 0);
-                        })->where('id_tenant', auth()->user()->id_tenant)->latest()->get(); 
+                        })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
         return view('kasir.kasir_pos', compact('stock'));
     }
 
@@ -97,6 +99,16 @@ class KasirController extends Controller {
         return redirect()->back()->with($notification);
     }
 
+    public function cartTransactionClear(Request $request){
+        session()->forget('cart');
+
+        $notification = array(
+            'message' => 'Transaction cleared!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
     public function transactionPending(){
         $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
                             ->where('id_kasir', auth()->user()->id)
@@ -105,4 +117,54 @@ class KasirController extends Controller {
                             ->get();
         return view('kasir.kasir_invoice_pending', compact('invoice'));
     }
+
+    public function transactionPendingRestore($id){
+        session()->forget('cart');
+        $invoice = Invoice::with('shoppingCart')
+                            ->where('id_tenant', auth()->user()->id_tenant)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->find($id);
+        
+        foreach($invoice->shoppingCart as $cart){
+            Cart::add([
+                'id' => $cart->id,
+                'name' => $cart->product_name,
+                'qty' => $cart->qty,
+                'price' => $cart->harga,
+                'weight' => 20,
+                'options' => ['size' => 'large']
+            ]);
+        }
+        // $stock = ProductStock::with('product')
+        //                 ->where(function ($query) {
+        //                         $query->where('stok', '!=', 0);
+        //                 })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
+        $notification = array(
+            'message' => 'Transaction restored!',
+            'alert-type' => 'success',
+        );
+        return view('kasir.kasir_transaction_restore')->with($notification);
+    }
+
+    // public function transactionPendingUpdate(Request $request){
+    //     $shoppingcart = ShoppingCart::where('id_invoice', $request->id)->delete();
+    //     $cartContent = Cart::content();
+    //     foreach($cartContent as $cart){
+    //         ShoppingCart::create([
+    //             'id_invoice' => $request->id,
+    //             'id_product' => $cart->id,
+    //             'product_name' => $cart->name,
+    //             'qty' =>$cart->qty,
+    //             'harga' => $cart->price,
+    //             'sub_total' => $cart->price*$cart->qty
+    //         ]);
+    //     }
+    //     session()->forget('cart');
+
+    //     $notification = array(
+    //         'message' => 'Transaction updated!',
+    //         'alert-type' => 'success',
+    //     );
+    //     return redirect()->route('kasir.transaction.pending')->with($notification);
+    // }
 }

@@ -147,6 +147,9 @@ Route::middleware(['auth:tenant', 'tenantemailverivied'])->prefix('tenant')->gro
     Route::get('/dashboard/data/batch/product/stock/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockDelete'])->name('tenant.product.stock.delete');
     Route::get('/dashboard/data/batch/product/stock/barcode/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockBarcode'])->name('tenant.product.stock.barcode.show');
 
+    Route::get('/dashboard/data/discount/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountList'])->name('tenant.discount.list');
+    Route::get('/dashboard/data/discount/add', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountAdd'])->name('tenant.discount.add');
+
     Route::get('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettings'])->name('tenant.store.profile');
     Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profile'])->name('tenant.profile');
@@ -177,8 +180,11 @@ Route::middleware(['auth:kasir'])->prefix('kasir')->group( function () {
     Route::post('/dashboard/kasir/pos/update', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'updateCart'])->name('kasir.pos.updateCart');
     Route::get('/dashboard/kasir/pos/delete/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'removeCart'])->name('kasir.pos.deleteCart');
     Route::post('/dashboard/kasir/pos/transaction/save', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionSave'])->name('kasir.pos.transaction.save');
+    Route::post('/dashboard/kasir/pos/transaction/clear', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionClear'])->name('kasir.pos.transaction.clear');
 
     Route::get('/dashboard/kasir/transaction/pending', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPending'])->name('kasir.transaction.pending');
+    Route::get('/dashboard/kasir/transaction/restore/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingRestore'])->name('kasir.transaction.pending.restore');
+    // Route::post('/dashboard/kasir/pos/transaction/update', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingUpdate'])->name('kasir.pos.transaction.pending.update');
 });
 
 require __DIR__.'/auth.php';

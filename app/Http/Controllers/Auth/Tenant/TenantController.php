@@ -12,6 +12,7 @@ use App\Models\ProductCategory;
 use App\Models\Batch;
 use App\Models\Product;
 use App\Models\ProductStock;
+use App\Models\Discount;
 
 class TenantController extends Controller {
 
@@ -416,5 +417,14 @@ class TenantController extends Controller {
     public function productStockBarcode($id){
         $stok = ProductStock::where('id_tenant', auth()->user()->id)->find($id);
         return view('tenant.tenant_barcode_show', compact('stok'));
+    }
+
+    public function discountList(){
+        $diskon = Discount::where('id_tenant', auth()->user()->id);
+        return view('tenant.tenant_discount_list', compact('diskon')); 
+    }
+
+    public function discountAdd(){
+        return view('tenant.tenant_discount_add');
     }
 }

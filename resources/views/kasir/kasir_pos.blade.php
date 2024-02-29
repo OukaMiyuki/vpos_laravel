@@ -82,8 +82,9 @@
                                 <div class="row" id="tunai_text">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="nominal" class="form-label">Nominal Bayar</label>
-                                            <input type="text" class="form-control" name="nominal" id="nominal" required value="" placeholder="Masukkan nominal bayar">
+                                            <label for="nominal" class="form-label" id="dengan-rupiah">Nominal Bayar</label>
+                                            {{-- <input type="text" id="rupiah" /> --}}
+                                            <input type="text" class="form-control rupiah" name="nominal" id="nominal" required value="" placeholder="Masukkan nominal bayar">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -97,7 +98,8 @@
                                     <div class="col-md-12">
                                         <div class="mb-3">
                                             <button class="btn btn-blue waves-effect waves-light">Create Invoice</button>&nbsp;&nbsp;
-                                            <button type="submit" formaction="{{ route('kasir.pos.transaction.save') }}" class="btn btn-blue waves-effect waves-light">Save Transaction</button>
+                                            <button type="submit" formaction="{{ route('kasir.pos.transaction.save') }}" class="btn btn-blue waves-effect waves-light">Save Transaction</button>&nbsp;&nbsp;
+                                            <button type="submit" formaction="{{ route('kasir.pos.transaction.clear') }}" class="btn btn-blue waves-effect waves-light">Clear Transaction</button>
                                         </div>
                                     </div>
                                     
@@ -181,4 +183,4 @@
         </div>
         <!-- container -->
     </div>
-</x-tenant-layout>
+</x-kasir-layout>

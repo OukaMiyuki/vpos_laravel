@@ -111,51 +111,51 @@
                     </a>
                 </li>
                 @auth('kasir')
-                <li class="menu-title mt-2">Transaction</li>
-                <li>
-                    <a href="#transaction" data-bs-toggle="collapse">
-                        <i class="mdi mdi-account-tie-voice"></i>
-                        <span> Transaction </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="transaction">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="{{ route('kasir.transaction.pending') }}">Pending</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <a href="#payment" data-bs-toggle="collapse">
-                        <i class="mdi mdi-account-tie-voice"></i>
-                        <span> Payment </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="payment">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="#">Pending</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="menu-title mt-2">Report</li>
-                <li>
-                    <a href="#report" data-bs-toggle="collapse">
-                        <i class="mdi mdi-account-tie-voice"></i>
-                        <span> Transaction </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="report">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a href="#">Report</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-            @endauth
+                    <li class="menu-title mt-2">Transaction</li>
+                    <li>
+                        <a href="#transaction" data-bs-toggle="collapse">
+                            <i class="mdi mdi-account-tie-voice"></i>
+                            <span> Transaction </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="transaction">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('kasir.transaction.pending') }}">Pending</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#payment" data-bs-toggle="collapse">
+                            <i class="mdi mdi-account-tie-voice"></i>
+                            <span> Payment </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="payment">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">Pending</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="menu-title mt-2">Report</li>
+                    <li>
+                        <a href="#report" data-bs-toggle="collapse">
+                            <i class="mdi mdi-account-tie-voice"></i>
+                            <span> Transaction </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="report">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">Report</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                @endauth
                 @auth('admin')
                     <li>
                         <a href="#marketing" data-bs-toggle="collapse">
@@ -299,6 +299,23 @@
                             <ul class="nav-second-level">
                                 <li>
                                     <a href="{{ route('tenant.kasir.list') }}">Manager Kasir</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#harga" data-bs-toggle="collapse">
+                            <i class="mdi mdi-qrcode-scan"></i>
+                            <span> Kelola Harga </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="harga">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('tenant.discount.list') }}">Pengaturan Diskon</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('tenant.batch.list') }}">Pengaturan Pajak</a>
                                 </li>
                             </ul>
                         </div>
