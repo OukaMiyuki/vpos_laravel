@@ -25,7 +25,7 @@
                             <div class="row g-0">
                                 <div class="col-6">
                                     <div class="table-responsive">
-                                        <table class="table table-bordered mb-0">
+                                        <table id="scroll-vertical-datatable" class="table table-bordered border-primary mb-0 w-100">
                                             <thead>
                                                 <tr>
                                                   
@@ -57,11 +57,26 @@
                                         </table>
                                     </div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="bg-primary pt-5 h-100 align-items-center">
+                                <div class="col-6 text-center">
+                                    @php
+                                        $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                                        $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                                    @endphp
+                                    <div class="bg-primary pt-5 pb-5 h-100 text-center">
                                         <p style="font-size:18px; color:#FFF">Total Item Quantity : {{ Cart::count() }} </p>
                                         <p style="font-size:18px; color:#FFF">Sub Total : Rp. {{ Cart::subtotal() }}</p>
-                                        <p style="font-size:18px; color:#FFF">Pajak (5%) : Rp. {{ Cart::tax() }}</p>
+                                        <p style="font-size:18px; color:#FFF">Pajak (
+                                            @if(!empty($pajak->pajak))
+                                                {{ $pajak->pajak }}%
+                                            @endif
+                                        ) : Rp. {{ Cart::tax() }}</p>
+                                        <p style="font-size:18px; color:#FFF">Diskon (
+                                            @if(!empty($diskon->diskon))
+                                                @if(Cart::subtotal()>=$diskon->diskon)
+                                                    {{ $diskon->diskon }}%
+                                                @endif
+                                             @endif
+                                        ) : Rp. {{ Cart::discount() }}</p>
                                         <p><h2 class="text-white">Total Belanja</h2><h1 class="text-white">Rp. {{ Cart::total() }}</h1></p>
                                     </div>
                                 </div>

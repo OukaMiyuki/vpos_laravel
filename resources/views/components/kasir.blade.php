@@ -203,20 +203,20 @@
                 });
 
 
-                document.getElementById('enable_manual_batcode').onclick = function() {
-                    const barcode_txt = document.getElementById('barcode');
-                    if (barcode_txt.readOnly) {
-                        barcode_txt.readOnly = false;
-                        this.innerHTML = "Masukkan Barcode via Scanner";
-                        // console.log('✅ element is read-only');
-                    } else {
-                        // console.log('⛔️ element is not read-only');
-                        this.innerHTML = "Input Barcode Manual";
-                        barcode_txt.value = "";
-                        barcode_txt.readOnly = true;
-                    }
-                    // document.getElementById('myInput').readOnly = false;
-                };
+                // document.getElementById('enable_manual_batcode').onclick = function() {
+                //     const barcode_txt = document.getElementById('barcode');
+                //     if (barcode_txt.readOnly) {
+                //         barcode_txt.readOnly = false;
+                //         this.innerHTML = "Masukkan Barcode via Scanner";
+                //         // console.log('✅ element is read-only');
+                //     } else {
+                //         // console.log('⛔️ element is not read-only');
+                //         this.innerHTML = "Input Barcode Manual";
+                //         barcode_txt.value = "";
+                //         barcode_txt.readOnly = true;
+                //     }
+                //     // document.getElementById('myInput').readOnly = false;
+                // };
 
                 // var barcode = "";
                 // var interval = "";
@@ -280,25 +280,45 @@
             });
             // Register event listener
             // document.addEventListener('scan');
-            var rupiah = document.getElementById("nominal");
-            rupiah.addEventListener("keyup", function(e) {
-                rupiah.value = formatRupiah(this.value, "Rp. ");
+            // var rupiah = document.getElementById("nominal");
+            // rupiah.addEventListener("keyup", function(e) {
+            //     rupiah.value = formatRupiah(this.value, "Rp. ");
+            // });
+
+            // var kembalian = document.getElementById("kembalian");
+            // kembalian.addEventListener("keyup", function(e) {
+            //     kembalian.value = formatRupiah(this.value, "Rp. ");
+            // });
+
+            // function formatRupiah(angka, prefix) {
+            // var number_string = angka.replace(/[^,\d]/g, "").toString(),
+            //     split = number_string.split(","),
+            //     sisa = split[0].length % 3,
+            //     rupiah = split[0].substr(0, sisa),
+            //     ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+            // if (ribuan) {
+            //     separator = sisa ? "." : "";
+            //     rupiah += separator + ribuan.join(".");
+            // }
+
+            //     rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+            //     return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
+            // }
+            
+            $(document).ready(function() {
+                $('#nominal').on("input", function() {
+                    let nominal = $('#nominal').val();
+                    let subttl = "{{ Cart::total() }}";
+                    let angka_sub_total = subttl.replace(/[^0-9.-]+/g,"");
+                    let subtotal = parseInt(angka_sub_total);
+                    let kembalian = nominal-subtotal;
+                    if (kembalian >= 0){
+                        $('#kembalian').val(kembalian);
+                    } else {
+                        $('#kembalian').val(0);
+                    }
+                });
             });
-
-            function formatRupiah(angka, prefix) {
-            var number_string = angka.replace(/[^,\d]/g, "").toString(),
-                split = number_string.split(","),
-                sisa = split[0].length % 3,
-                rupiah = split[0].substr(0, sisa),
-                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-            if (ribuan) {
-                separator = sisa ? "." : "";
-                rupiah += separator + ribuan.join(".");
-            }
-
-                rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-                return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
-            }
 
         </Script>
     </body>

@@ -23,15 +23,14 @@
                     <div class="card text-center">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered mb-0">
+                                <table id="scroll-vertical-datatable" class="table table-bordered border-primary mb-0 w-100">
                                     <thead>
                                         <tr>
-                                          
+                                            <th>Action</th>
                                             <th>Nama</th>
-                                            <th width="25%">QTY</th>
+                                            <th>QTY</th>
                                             <th>Harga</th>
                                             <th>Sub Total</th>
-                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -41,7 +40,8 @@
                                         @endphp
                                         @foreach ($allCart as $cart)
                                             <tr>
-                                                <td>{{ $cart->name }}</td>
+                                                <td><a href="{{ route('kasir.pos.deleteCart', ['id' => $cart->rowId]) }}" style="font-size: 20px;"><span class="mdi mdi-trash-can-outline"></span></a></td>
+                                                <td style="text-align: left;">{{ $cart->name }}</td>
                                                 <td>
                                                     <form id="qtyform" action="{{ route('kasir.pos.updateCart') }}" method="post">
                                                         @csrf
@@ -52,17 +52,30 @@
                                                 </td>
                                                 <td>{{ $cart->price }}</td>
                                                 <td>{{ $cart->price*$cart->qty }}</td>
-                                                <td><a href="{{ route('kasir.pos.deleteCart', ['id' => $cart->rowId]) }}" style="font-size: 20px;"><span class="mdi mdi-trash-can-outline"></span></a></td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div> <!-- end .table-responsive-->
                             <div class="bg-primary pt-3 pb-2">
+                                @php
+                                    $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                                    $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                                @endphp
                                 <p style="font-size:18px; color:#FFF">Total Item Quantity : {{ Cart::count() }} </p>
                                 <p style="font-size:18px; color:#FFF">Sub Total : Rp. {{ Cart::subtotal() }}</p>
-                                <p style="font-size:18px; color:#FFF">Pajak (5%) : Rp. {{ Cart::tax() }}</p>
-                                <p style="font-size:18px; color:#FFF">Diskon (5%) : Rp. {{ Cart::discount() }}</p>
+                                <p style="font-size:18px; color:#FFF">Pajak (
+                                    @if(!empty($pajak->pajak))
+                                        {{ $pajak->pajak }}%
+                                    @endif
+                                ) : Rp. {{ Cart::tax() }}</p>
+                                <p style="font-size:18px; color:#FFF">Diskon (
+                                    @if(!empty($diskon->diskon))
+                                        @if(Cart::subtotal()>=$diskon->diskon)
+                                            {{ $diskon->diskon }}%
+                                        @endif
+                                     @endif
+                                ) : Rp. {{ Cart::discount() }}</p>
                                 <p><h2 class="text-white">Total Belanja</h2><h1 class="text-white">Rp. {{ Cart::total() }}</h1></p>
                             </div>
                             <br>
@@ -84,7 +97,7 @@
                                         <div class="mb-3">
                                             <label for="nominal" class="form-label" id="dengan-rupiah">Nominal Bayar</label>
                                             {{-- <input type="text" id="rupiah" /> --}}
-                                            <input type="text" class="form-control rupiah" name="nominal" id="nominal" required value="" placeholder="Masukkan nominal bayar">
+                                            <input type="number" class="form-control rupiah" name="nominal" id="nominal" required value="" placeholder="Masukkan nominal bayar">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -102,7 +115,7 @@
                                             <button type="submit" formaction="{{ route('kasir.pos.transaction.clear') }}" class="btn btn-blue waves-effect waves-light">Clear Transaction</button>
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                             </form>
                         </div>

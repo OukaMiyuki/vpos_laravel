@@ -34,6 +34,7 @@ class KasirController extends Controller {
         
         $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
                     ->where('is_active', 1)->first();
+                    
         if(!empty($tax)){
             Cart::setGlobalTax($tax->pajak);
         }
@@ -143,6 +144,16 @@ class KasirController extends Controller {
                             ->where('id_tenant', auth()->user()->id_tenant)
                             ->where('id_kasir', auth()->user()->id)
                             ->find($id);
+        $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
+                            ->where('is_active', 1)->first();
+                
+        $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
+                    ->where('is_active', 1)->first();
+                            
+        if(!empty($tax)){
+            Cart::setGlobalTax($tax->pajak);
+        }
+        Cart::setGlobalTax(21);
         
         foreach($invoice->shoppingCart as $cart){
             Cart::add([
@@ -153,6 +164,14 @@ class KasirController extends Controller {
                 'weight' => 20,
                 'options' => ['size' => 'large']
             ]);
+
+            if(!empty($diskon)){
+                if(Cart::subtotal() >= $diskon->min_harga){
+                    Cart::setGlobalDiscount($diskon->diskon);
+                } else {
+                    Cart::setGlobalDiscount(0);
+                }
+            }
         }
         // $stock = ProductStock::with('product')
         //                 ->where(function ($query) {
