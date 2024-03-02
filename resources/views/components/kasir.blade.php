@@ -306,6 +306,7 @@
             // }
             
             $(document).ready(function() {
+                let kembaliantxt = document.getElementById("kembalian");
                 $('#nominal').on("input", function() {
                     let nominal = $('#nominal').val();
                     let subttl = "{{ Cart::total() }}";
@@ -313,9 +314,50 @@
                     let subtotal = parseInt(angka_sub_total);
                     let kembalian = nominal-subtotal;
                     if (kembalian >= 0){
-                        $('#kembalian').val(kembalian);
+                        // $('#kembalian').val(kembalian);
+                        kembaliantxt.value = formatRupiah(kembalian, "Rp. ");
                     } else {
                         $('#kembalian').val(0);
+                    }
+                });
+            });
+
+            function formatRupiah(angka, prefix) {
+                var number_string = angka.toString().replace(/[^,\d]/g, ""),
+                    split = number_string.split(","),
+                    sisa = split[0].length % 3,
+                    rupiah = split[0].substr(0, sisa),
+                    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+                if (ribuan) {
+                    separator = sisa ? "." : "";
+                    rupiah += separator + ribuan.join(".");
+                }
+
+                rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+                return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
+            }
+
+            $(document).ready(function() {
+                $("#pembayaran").on('change', function() {
+                    if ($(this).val() == ''){
+                        $("#formCheckout").attr('disabled',true);
+                    } else {
+                        $("#formCheckout").attr('disabled',false);
+                        $('#formCheckout').on('click', function(e){
+                            if($("#pembayaran").val() == 'Tunai'){
+                                if($("#nominal").val().length > 0 && $("#kembalian").val().length > 0){
+                                    $("#checkoutProcess #jenisPembayaran").val($("#pembayaran").val());
+                                    $("#checkoutProcess #nominalText").val($("#nominal").val());
+                                    $("#checkoutProcess #kembalianText").val($("#kembalian").val());
+                                    $('#processInvoice').modal('show');
+                                    e.preventDefault();
+                                }
+                            } else if($("#pembayaran").val() == 'Qris'){
+                                $("#checkoutProcess #jenisPembayaran").val($("#pembayaran").val());
+                                $('#processInvoice').modal('show');
+                                e.preventDefault();
+                            }
+                        });
                     }
                 });
             });

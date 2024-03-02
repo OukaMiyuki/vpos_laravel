@@ -79,12 +79,12 @@
                                 <p><h2 class="text-white">Total Belanja</h2><h1 class="text-white">Rp. {{ Cart::total() }}</h1></p>
                             </div>
                             <br>
-                            <form method="POST">
+                            <form>
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="mb-3">
-                                            <select class="form-select @error('pembayaran') is-invalid @enderror" id="pembayaran" name="pembayaran">
+                                            <select @if(Cart::subtotal()==0) disabled @endif class="form-select @error('pembayaran') is-invalid @enderror" id="pembayaran" name="pembayaran">
                                                 <option value="">- Pilih jenis pembayaran -</option>
                                                 <option value="Tunai">Tunai</option>
                                                 <option value="Qris">Qris</option>
@@ -97,25 +97,24 @@
                                         <div class="mb-3">
                                             <label for="nominal" class="form-label" id="dengan-rupiah">Nominal Bayar</label>
                                             {{-- <input type="text" id="rupiah" /> --}}
-                                            <input type="number" class="form-control rupiah" name="nominal" id="nominal" required value="" placeholder="Masukkan nominal bayar">
+                                            <input @if(Cart::subtotal()==0) disabled @endif type="number" class="form-control rupiah" name="nominal" id="nominal" required value="" placeholder="Masukkan nominal bayar">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="kembalian" class="form-label">Kembalian</label>
-                                            <input type="text" class="form-control" name="kembalian" id="kembalian" required value="" readonly>
+                                            <input @if(Cart::subtotal()==0) disabled @endif type="text" class="form-control" name="kembalian" id="kembalian" required value="" readonly>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="mb-3">
-                                            <button class="btn btn-blue waves-effect waves-light">Create Invoice</button>&nbsp;&nbsp;
-                                            <button type="submit" formaction="{{ route('kasir.pos.transaction.save') }}" class="btn btn-blue waves-effect waves-light">Save Transaction</button>&nbsp;&nbsp;
-                                            <button type="submit" formaction="{{ route('kasir.pos.transaction.clear') }}" class="btn btn-blue waves-effect waves-light">Clear Transaction</button>
+                                            <button @if(Cart::subtotal()==0) disabled @endif type="button" disabled id="formCheckout" class="btn btn-blue waves-effect waves-light">Create Invoice</button>&nbsp;&nbsp;
+                                            <button @if(Cart::subtotal()==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.save') }}" formmethod="post" class="btn btn-blue waves-effect waves-light">Save Transaction</button>&nbsp;&nbsp;
+                                            <button @if(Cart::subtotal()==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.clear') }}" formmethod="post" class="btn btn-blue waves-effect waves-light">Clear Transaction</button>
                                         </div>
                                     </div>
-
                                 </div>
                             </form>
                         </div>
@@ -195,5 +194,82 @@
             <!-- end row-->
         </div>
         <!-- container -->
+    </div>
+    <div class="modal fade" id="processInvoice" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Masukkan Informasi Transaksi (Opsional boleh dikosongi)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="px-3" action="" method="post">
+                    @csrf
+                    <div class="modal-body" id="checkoutProcess">
+                        <input hidden class="d-none" type="text" name="jenisPembayaran" id="jenisPembayaran">
+                        <input hidden class="d-none" type="text" name="nominalText" id="nominalText">
+                        <input hidden class="d-none" type="text" name="kembalianText" id="kembalianText">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Nama Customer</label>
+                                    <input type="text" class="form-control @error('category') is-invalid @enderror" name="category" id="category" required value="{{ old('category') }}" placeholder="Masukkan nama kategori">
+                                    @error('category')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">No Telp.</label>
+                                    <input type="text" class="form-control @error('category') is-invalid @enderror" name="category" id="category" required value="{{ old('category') }}" placeholder="Masukkan nama kategori">
+                                    @error('category')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Email</label>
+                                    <input type="text" class="form-control @error('category') is-invalid @enderror" name="category" id="category" required value="{{ old('category') }}" placeholder="Masukkan nama kategori">
+                                    @error('category')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Kota</label>
+                                    <input type="text" class="form-control @error('category') is-invalid @enderror" name="category" id="category" required value="{{ old('category') }}" placeholder="Masukkan nama kategori">
+                                    @error('category')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Alamat</label>
+                                    <input type="text" class="form-control @error('category') is-invalid @enderror" name="category" id="category" required value="{{ old('category') }}" placeholder="Masukkan nama kategori">
+                                    @error('category')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Proses Transaksi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </x-kasir-layout>

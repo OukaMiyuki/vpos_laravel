@@ -82,12 +82,12 @@
                                 </div>
                             </div>
                             <br>
-                            <form method="POST">
+                            <form>
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="mb-3">
-                                            <select class="form-select @error('pembayaran') is-invalid @enderror" id="pembayaran" name="pembayaran">
+                                            <select @if(Cart::subtotal()==0) disabled @endif class="form-select @error('pembayaran') is-invalid @enderror" id="pembayaran" name="pembayaran">
                                                 <option value="">- Pilih jenis pembayaran -</option>
                                                 <option value="Tunai">Tunai</option>
                                                 <option value="Qris">Qris</option>
@@ -98,24 +98,26 @@
                                 <div class="row" id="tunai_text">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label for="nominal" class="form-label">Nominal Bayar</label>
-                                            <input type="text" class="form-control" name="nominal" id="nominal" required value="" placeholder="Masukkan nominal bayar">
+                                            <label for="nominal" class="form-label" id="dengan-rupiah">Nominal Bayar</label>
+                                            {{-- <input type="text" id="rupiah" /> --}}
+                                            <input @if(Cart::subtotal()==0) disabled @endif type="number" class="form-control rupiah" name="nominal" id="nominal" required value="" placeholder="Masukkan nominal bayar">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="kembalian" class="form-label">Kembalian</label>
-                                            <input type="text" class="form-control" name="kembalian" id="kembalian" required value="" readonly>
+                                            <input @if(Cart::subtotal()==0) disabled @endif type="text" class="form-control" name="kembalian" id="kembalian" required value="" readonly>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="mb-3">
-                                            <button class="btn btn-blue waves-effect waves-light">Finish Transaction</button>&nbsp;&nbsp;
+                                            <button @if(Cart::subtotal()==0) disabled @endif type="button" disabled id="formCheckout" class="btn btn-blue waves-effect waves-light">Create Invoice</button>&nbsp;&nbsp;
+                                            {{-- <button @if(Cart::subtotal()==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.save') }}" formmethod="post" class="btn btn-blue waves-effect waves-light">Save Transaction</button>&nbsp;&nbsp;
+                                            <button @if(Cart::subtotal()==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.clear') }}" formmethod="post" class="btn btn-blue waves-effect waves-light">Clear Transaction</button> --}}
                                         </div>
                                     </div>
-                                    
                                 </div>
                             </form>
                         </div>
