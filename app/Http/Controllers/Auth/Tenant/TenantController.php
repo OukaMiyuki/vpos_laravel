@@ -14,6 +14,7 @@ use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\Tax;
 use App\Models\Discount;
+use App\Models\TenantField;
 
 class TenantController extends Controller {
 
@@ -476,6 +477,40 @@ class TenantController extends Controller {
 
         $notification = array(
             'message' => 'Data pajak berhasil dimodifikasi!',
+            'alert-type' => 'success',
+        );
+
+        return redirect()->back()->with($notification);
+    }
+
+    public function customField(){
+        $customField = TenantField::where('id_tenant', auth()->user()->id)->first();
+        return view('tenant.tenant_custom_field_list', compact('customField'));
+    }
+
+    public function customFieldInsert(Request $request) {
+        $customField = TenantField::where('id_tenant', auth()->user()->id)->find($request->id);
+        if(empty($customField)){
+            TenantField::create([
+                'id_tenant' => auth()->user()->id,
+                'baris1' => $request->baris1,
+                'baris2' => $request->baris2,
+                'baris3' => $request->baris3,
+                'baris4' => $request->baris4,
+                'baris5' => $request->baris5,
+            ]);
+        } else {
+            $customField->update([
+                'baris1' => $request->baris1,
+                'baris2' => $request->baris2,
+                'baris3' => $request->baris3,
+                'baris4' => $request->baris4,
+                'baris5' => $request->baris5,
+            ]);
+        }
+
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
             'alert-type' => 'success',
         );
 

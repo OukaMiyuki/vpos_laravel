@@ -23,7 +23,7 @@
                     <div class="card text-center">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="scroll-vertical-datatable" class="table table-bordered border-primary mb-0 w-100">
+                                <table id="pos-table" class="table table-bordered border-primary mb-0 w-100">
                                     <thead>
                                         <tr>
                                             <th>Action</th>

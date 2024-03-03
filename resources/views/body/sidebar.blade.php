@@ -306,7 +306,7 @@
                     <li>
                         <a href="#harga" data-bs-toggle="collapse">
                             <i class="mdi mdi-qrcode-scan"></i>
-                            <span> Kelola Harga </span>
+                            <span> Store Managament </span>
                             <span class="menu-arrow"></span>
                         </a>
                         <div class="collapse" id="harga">
@@ -316,6 +316,9 @@
                                 </li>
                                 <li>
                                     <a href="{{ route('tenant.pajak.modify') }}">Pengaturan Pajak</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('tenant.customField.modify') }}">Custom Fields</a>
                                 </li>
                             </ul>
                         </div>

@@ -17,6 +17,7 @@ use App\Models\ProductStock;
 use App\Models\Invoice;
 use App\Models\Tax;
 use App\Models\Discount;
+use App\Models\TenantField;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -75,6 +76,10 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
 
     public function discount(){
         return $this->hasOne(Discount::class, 'id_tenant', 'id');
+    }
+
+    public function tenantField(){
+        return $this->hasOne(TenantField::class, 'id_tenant', 'id');
     }
 
     public function sendEmailVerificationNotification() {

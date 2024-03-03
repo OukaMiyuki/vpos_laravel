@@ -68,6 +68,14 @@ $(document).ready(function() {
         "ordering": false,
         "info":     false,
         "searching": false
+    }), $("#pos-table").DataTable({
+        paging: false,
+        scrollCollapse: true,
+        scrollY: '40vh',
+        "ordering": false,
+        "info":     false,
+        "searching": false,
+        "paging" : false
     }), $("#inv_table_marketing_profile").DataTable({
         paging: true,
         scrollCollapse: true,
@@ -96,7 +104,7 @@ $(document).ready(function() {
         },
         drawCallback: function() {
             $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
-        }, 
+        },
     }), $('#pos_filter label input').on( 'focus', function () {
         this.setAttribute( 'id', 'search-input-table' );
     }), $("#complex-header-datatable").DataTable({
