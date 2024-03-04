@@ -187,6 +187,8 @@ Route::middleware(['auth:kasir'])->prefix('kasir')->group( function () {
     Route::get('/dashboard/kasir/pos/delete/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'removeCart'])->name('kasir.pos.deleteCart');
     Route::post('/dashboard/kasir/pos/transaction/save', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionSave'])->name('kasir.pos.transaction.save');
     Route::post('/dashboard/kasir/pos/transaction/clear', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionClear'])->name('kasir.pos.transaction.clear');
+    Route::post('/dashboard/kasir/pos/transaction/process', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionProcess'])->name('kasir.pos.transaction.process');
+    Route::get('/dashboard/kasir/pos/transaction/process/invoice/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionInvoice'])->name('kasir.pos.transaction.invoice');
 
     Route::get('/dashboard/kasir/transaction/pending', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPending'])->name('kasir.transaction.pending');
     Route::get('/dashboard/kasir/transaction/restore/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingRestore'])->name('kasir.transaction.pending.restore');

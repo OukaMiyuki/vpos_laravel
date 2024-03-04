@@ -8,6 +8,7 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Models\ShoppingCart;
 use App\Models\Kasir;
 use App\Models\Tenant;
+use App\Models\InvoiceField;
 
 class Invoice extends Model {
     use HasFactory;
@@ -26,6 +27,10 @@ class Invoice extends Model {
         return $this->hasMany(ShoppingCart::class, 'id_invoice', 'id');
     }
 
+    public function invoiceField() {
+        return $this->hasOne(InvoiceField::class, 'id_invoice', 'id');
+    }
+
     public function storeCart($model){
         $ShoppingCart = new ShoppingCart();
         $cartContent = Cart::content();
@@ -39,6 +44,18 @@ class Invoice extends Model {
                 'sub_total' => $cart->price*$cart->qty
             ]);
         }
-        session()->forget('cart'); 
+    }
+
+    public function fieldSave($model){
+        $InvoiceField = new InvoiceField();
+        $InvoiceField->id_invoice = $model->id;
+        $InvoiceField->id_kasir = auth()->user()->id;
+        $InvoiceField->id_custom_field = auth()->user()->tenant->tenantField->id;
+        $InvoiceField->content1 = request()->content1;
+        $InvoiceField->content2 = request()->content2;
+        $InvoiceField->content3 = request()->content3;
+        $InvoiceField->content4 = request()->content4;
+        $InvoiceField->content5 = request()->content5;
+        $InvoiceField->save();
     }
 }

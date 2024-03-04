@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tenant_fields', function (Blueprint $table) {
-            $table->bigInteger('id_tenant')->unique()->after('id');
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->string('sub_total')->after('status_pembayaran')->nullable();
+            $table->string('pajak')->after('sub_total')->nullable();
+            $table->string('diskon')->after('pajak')->nullable();
         });
     }
 
@@ -21,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tenant_fields', function (Blueprint $table) {
+        Schema::table('invoices', function (Blueprint $table) {
             //
         });
     }

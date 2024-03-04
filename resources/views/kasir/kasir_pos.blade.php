@@ -37,6 +37,7 @@
                                         @php
                                             $allCart = Cart::content();
                                             $no=0;
+                                            $total=0;
                                         @endphp
                                         @foreach ($allCart as $cart)
                                             <tr>
@@ -52,6 +53,9 @@
                                                 </td>
                                                 <td>{{ $cart->price }}</td>
                                                 <td>{{ $cart->price*$cart->qty }}</td>
+                                                @php
+                                                    $total+=$cart->price*$cart->qty;
+                                                @endphp
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -63,19 +67,22 @@
                                     $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
                                 @endphp
                                 <p style="font-size:18px; color:#FFF">Total Item Quantity : {{ Cart::count() }} </p>
+                                <p style="font-size:18px; color:#FFF">Diskon (
+                                    @php
+                                        $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
+                                    @endphp
+                                    @if(!empty($diskon->diskon))
+                                        @if($subtotal>=$diskon->diskon)
+                                            {{ $diskon->diskon }}%
+                                        @endif
+                                     @endif
+                                ) : Rp. {{ Cart::discount() }}</p>
                                 <p style="font-size:18px; color:#FFF">Sub Total : Rp. {{ Cart::subtotal() }}</p>
                                 <p style="font-size:18px; color:#FFF">Pajak (
                                     @if(!empty($pajak->pajak))
                                         {{ $pajak->pajak }}%
                                     @endif
                                 ) : Rp. {{ Cart::tax() }}</p>
-                                <p style="font-size:18px; color:#FFF">Diskon (
-                                    @if(!empty($diskon->diskon))
-                                        @if(Cart::subtotal()>=$diskon->diskon)
-                                            {{ $diskon->diskon }}%
-                                        @endif
-                                     @endif
-                                ) : Rp. {{ Cart::discount() }}</p>
                                 <p><h2 class="text-white">Total Belanja</h2><h1 class="text-white">Rp. {{ Cart::total() }}</h1></p>
                             </div>
                             <br>
@@ -202,7 +209,7 @@
                     <h5 class="modal-title" id="staticBackdropLabel">Masukkan Informasi Transaksi (Opsional boleh dikosongi)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form class="px-3" action="" method="post">
+                <form class="px-3" action="{{ route('kasir.pos.transaction.process') }}" method="post">
                     @csrf
                     <div class="modal-body" id="checkoutProcess">
                         <input hidden class="d-none" type="text" name="jenisPembayaran" id="jenisPembayaran">
@@ -211,9 +218,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="category" class="form-label">Nama Customer</label>
-                                    <input type="text" class="form-control @error('category') is-invalid @enderror" name="category" id="category" required value="{{ old('category') }}" placeholder="Masukkan nama kategori">
-                                    @error('category')
+                                    <label for="content1" class="form-label">{{$customField->baris1}}</label>
+                                    <input type="text" class="form-control @error('content1') is-invalid @enderror" name="content1" id="content1" value="{{ old('content1') }}" placeholder="Masukkan data {{$customField->baris1}}">
+                                    @error('content1')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -222,9 +229,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="category" class="form-label">No Telp.</label>
-                                    <input type="text" class="form-control @error('category') is-invalid @enderror" name="category" id="category" required value="{{ old('category') }}" placeholder="Masukkan nama kategori">
-                                    @error('category')
+                                    <label for="content2" class="form-label">{{$customField->baris2}}</label>
+                                    <input type="text" class="form-control @error('content2') is-invalid @enderror" name="content2" id="content2" value="{{ old('content2') }}" placeholder="Masukkan data {{$customField->baris2}}">
+                                    @error('content2')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -233,9 +240,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="category" class="form-label">Email</label>
-                                    <input type="text" class="form-control @error('category') is-invalid @enderror" name="category" id="category" required value="{{ old('category') }}" placeholder="Masukkan nama kategori">
-                                    @error('category')
+                                    <label for="content3" class="form-label">{{$customField->baris3}}</label>
+                                    <input type="text" class="form-control @error('content3') is-invalid @enderror" name="content3" id="content3" value="{{ old('content3') }}" placeholder="Masukkan data {{$customField->baris3}}">
+                                    @error('content3')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -244,9 +251,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="category" class="form-label">Kota</label>
-                                    <input type="text" class="form-control @error('category') is-invalid @enderror" name="category" id="category" required value="{{ old('category') }}" placeholder="Masukkan nama kategori">
-                                    @error('category')
+                                    <label for="content4" class="form-label">{{$customField->baris4}}</label>
+                                    <input type="text" class="form-control @error('content4') is-invalid @enderror" name="content4" id="content4" value="{{ old('content4') }}" placeholder="Masukkan data {{$customField->baris4}}">
+                                    @error('content4')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -255,9 +262,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="category" class="form-label">Alamat</label>
-                                    <input type="text" class="form-control @error('category') is-invalid @enderror" name="category" id="category" required value="{{ old('category') }}" placeholder="Masukkan nama kategori">
-                                    @error('category')
+                                    <label for="content5" class="form-label">{{$customField->baris5}}</label>
+                                    <input type="text" class="form-control @error('content5') is-invalid @enderror" name="content5" id="content5" value="{{ old('content5') }}" placeholder="Masukkan data {{$customField->baris5}}">
+                                    @error('content5')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>

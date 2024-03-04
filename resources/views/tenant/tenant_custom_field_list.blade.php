@@ -32,7 +32,7 @@
                                             <div class="mb-3">
                                                 <label for="baris1" class="form-label">Baris Pertama</label>
                                                 <input type="hidden" class="form-control" name="id" id="id" value="@if(!empty( $customField->id)){{$customField->id}}@endif">
-                                                <input type="text" class="form-control" name="baris1" id="baris1" value="@if(!empty( $customField->baris1)){{$customField->naris1}}@endif" placeholder="Masukkan nama baris pertama">
+                                                <input type="text" class="form-control" name="baris1" id="baris1" value="@if(!empty( $customField->baris1)){{$customField->baris1}}@endif" placeholder="Masukkan nama baris pertama">
                                             </div>
                                         </div>
                                     </div>

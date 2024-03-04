@@ -12,6 +12,8 @@ use App\Models\ShoppingCart;
 use App\Models\Invoice;
 use App\Models\Discount;
 use App\Models\Tax;
+use App\Models\TenantField;
+use Rawilk\Printing\Receipts\ReceiptPrinter;
 
 class KasirController extends Controller {
     public function kasirPos(){
@@ -25,16 +27,17 @@ class KasirController extends Controller {
                         ->where(function ($query) {
                                 $query->where('stok', '!=', 0);
                         })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
-        return view('kasir.kasir_pos', compact('stock'));
+        $customField = TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
+        return view('kasir.kasir_pos', compact('stock', 'customField'));
     }
 
     public function addCart(Request $request){
         $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
                     ->where('is_active', 1)->first();
-        
+
         $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
                     ->where('is_active', 1)->first();
-                    
+
         if(!empty($tax)){
             Cart::setGlobalTax($tax->pajak);
         }
@@ -47,9 +50,9 @@ class KasirController extends Controller {
             'weight' => 20,
             'options' => ['size' => 'large']
         ]);
-
+        $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
         if(!empty($diskon)){
-            if(Cart::subtotal() >= $diskon->min_harga){
+            if($subtotal >= $diskon->min_harga){
                 Cart::setGlobalDiscount($diskon->diskon);
             } else {
                 Cart::setGlobalDiscount(0);
@@ -72,6 +75,14 @@ class KasirController extends Controller {
     public function updateCart(Request $request){
         $rowId = $request->id;
         $qty = $request->qty;
+        $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
+        if(!empty($diskon)){
+            if($subtotal >= $diskon->min_harga){
+                Cart::setGlobalDiscount($diskon->diskon);
+            } else {
+                Cart::setGlobalDiscount(0);
+            }
+        }
         $update = Cart::update($rowId, $qty);
 
         $notification = array(
@@ -82,6 +93,14 @@ class KasirController extends Controller {
     }
 
     public function removeCart($id){
+        $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
+        if(!empty($diskon)){
+            if($subtotal >= $diskon->min_harga){
+                Cart::setGlobalDiscount($diskon->diskon);
+            } else {
+                Cart::setGlobalDiscount(0);
+            }
+        }
         $remove = Cart::remove($id);
 
         $notification = array(
@@ -111,6 +130,7 @@ class KasirController extends Controller {
         ]);
         if(!is_null($invoice)) {
             $invoice->storeCart($invoice);
+            session()->forget('cart');
         }
         $notification = array(
             'message' => 'Sukses disimpan!',
@@ -146,15 +166,15 @@ class KasirController extends Controller {
                             ->find($id);
         $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
                             ->where('is_active', 1)->first();
-                
+
         $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
                     ->where('is_active', 1)->first();
-                            
+
         if(!empty($tax)){
             Cart::setGlobalTax($tax->pajak);
         }
         Cart::setGlobalTax(21);
-        
+
         foreach($invoice->shoppingCart as $cart){
             Cart::add([
                 'id' => $cart->id,
@@ -165,8 +185,9 @@ class KasirController extends Controller {
                 'options' => ['size' => 'large']
             ]);
 
+            $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
             if(!empty($diskon)){
-                if(Cart::subtotal() >= $diskon->min_harga){
+                if($subtotal >= $diskon->min_harga){
                     Cart::setGlobalDiscount($diskon->diskon);
                 } else {
                     Cart::setGlobalDiscount(0);
@@ -184,25 +205,48 @@ class KasirController extends Controller {
         return view('kasir.kasir_transaction_restore')->with($notification);
     }
 
-    // public function transactionPendingUpdate(Request $request){
-    //     $shoppingcart = ShoppingCart::where('id_invoice', $request->id)->delete();
-    //     $cartContent = Cart::content();
-    //     foreach($cartContent as $cart){
-    //         ShoppingCart::create([
-    //             'id_invoice' => $request->id,
-    //             'id_product' => $cart->id,
-    //             'product_name' => $cart->name,
-    //             'qty' =>$cart->qty,
-    //             'harga' => $cart->price,
-    //             'sub_total' => $cart->price*$cart->qty
-    //         ]);
-    //     }
-    //     session()->forget('cart');
+    public function cartTransactionProcess(Request $request){
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $pin = mt_rand(1000000, 9999999)
+            . mt_rand(1000000, 9999999)
+            . $characters[rand(0, strlen($characters) - 1)];
+        $string = str_shuffle($pin);
+        $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
+        $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
+        $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
+        $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
+        $invoice = Invoice::create([
+            'id_tenant' => auth()->user()->id_tenant,
+            'id_kasir' => auth()->user()->id,
+            'nomor_invoice' => $string,
+            'jenis_pembayaran' => $request->jenisPembayaran,
+            'nominal_bayar' => $request->nominalText,
+            'kembalian' => $kembalian,
+            'status_pembayaran' => 1,
+            'sub_total' => $subtotal,
+            'pajak' => $tax,
+            'diskon' => $diskon,
+            'tanggal_pelunasan' => Carbon::now(),
+            'tanggal_transaksi' => Carbon::now()
+        ]);
 
-    //     $notification = array(
-    //         'message' => 'Transaction updated!',
-    //         'alert-type' => 'success',
-    //     );
-    //     return redirect()->route('kasir.transaction.pending')->with($notification);
-    // }
+        if(!is_null($invoice)) {
+            $invoice->storeCart($invoice);
+            $invoice->fieldSave($invoice);
+        }
+
+        session()->forget('cart');
+
+        $notification = array(
+            'message' => 'Transaksi berhasil diproses!',
+            'alert-type' => 'success',
+        );
+        // return view('kasir.kasir_invoice_preview', compact('invoice'))->with($notification);
+        return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
+    }
+
+    public function cartTransactionInvoice($id){
+        $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
+        return view('kasir.kasir_invoice_preview', compact('invoice'));
+    }
 }
