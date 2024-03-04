@@ -14,7 +14,7 @@
                         <h4 class="page-title">Invoice</h4>
                     </div>
                 </div>
-            </div>     
+            </div>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
@@ -28,7 +28,7 @@
                                                 <img src="{{ asset('assets/images/logo/large.png') }}" alt="" height="40">
                                             </span>
                                         </div>
-                    
+
                                         <div class="logo logo-light">
                                             <span class="logo-lg">
                                                 <img src="assets/images/logo-light.png" alt="" height="22">
@@ -110,7 +110,7 @@
                                         Email : {{ auth()->user()->email }}<br>
                                     </address>
                                 </div> <!-- end col -->
-                            </div> 
+                            </div>
                             <!-- end row -->
 
                             <div class="row">
@@ -183,7 +183,7 @@
 
                             <div class="mt-4 mb-1">
                                 <div class="text-end d-print-none">
-                                    <a href="javascript:window.print()" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print</a>
+                                    <a href="" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow','height=500,width=255,left=100,top=100,resizable=no,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a>
                                     <a href="#" class="btn btn-info waves-effect waves-light">Submit</a>
                                 </div>
                             </div>
@@ -191,8 +191,8 @@
                     </div> <!-- end card -->
                 </div> <!-- end col -->
             </div>
-            <!-- end row --> 
-            
+            <!-- end row -->
+
         </div>
     </div>
 </x-tenant-layout>

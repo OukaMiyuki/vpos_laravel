@@ -55,7 +55,7 @@
             table.harga { table-layout: fixed; }
         </style>
     </head>
-    <body class="struk" onload="printOut()">
+    <body class="struk">
         <section class="sheet">
         <?php
             echo '<table cellpadding="0" cellspacing="0" style="width:100%">

@@ -117,9 +117,9 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="mb-3">
-                                            <button @if(Cart::subtotal()==0) disabled @endif type="button" disabled id="formCheckout" class="btn btn-blue waves-effect waves-light">Create Invoice</button>&nbsp;&nbsp;
-                                            <button @if(Cart::subtotal()==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.save') }}" formmethod="post" class="btn btn-blue waves-effect waves-light">Save Transaction</button>&nbsp;&nbsp;
-                                            <button @if(Cart::subtotal()==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.clear') }}" formmethod="post" class="btn btn-blue waves-effect waves-light">Clear Transaction</button>
+                                            <button @if(Cart::subtotal()==0) disabled @endif type="button" disabled id="formCheckout" class="btn btn-blue waves-effect waves-light m-1">Create Invoice</button>&nbsp;&nbsp;
+                                            <button @if(Cart::subtotal()==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.save') }}" formmethod="post" class="btn m-1 btn-blue waves-effect waves-light">Save Transaction</button>&nbsp;&nbsp;
+                                            <button @if(Cart::subtotal()==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.clear') }}" formmethod="post" class="btn m-1 btn-blue waves-effect waves-light">Clear Transaction</button>
                                         </div>
                                     </div>
                                 </div>
