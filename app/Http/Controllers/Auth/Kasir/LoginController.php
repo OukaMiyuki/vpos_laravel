@@ -36,6 +36,8 @@ class LoginController extends Controller {
     public function destroy(Request $request): RedirectResponse {
         Auth::guard('kasir')->logout();
 
+        $request->session()->flush();
+
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
