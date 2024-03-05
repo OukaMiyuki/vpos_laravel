@@ -251,6 +251,7 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionInvoiceReceipt($id){
-        return view('kasir.printer');
+        $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
+        return view('kasir.printer', compact('invoice'));
     }
 }
