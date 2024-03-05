@@ -18,7 +18,7 @@
                             {{ route('tenant.profile') }}
                         @endauth
                         @auth('kasir')
-                            
+
                         @endauth
                     " class="dropdown-item notify-item">
                         <i class="fe-user me-1"></i>
@@ -41,20 +41,49 @@
                             {{ route('tenant.password') }}
                         @endauth
                         @auth('kasir')
-                            
+
                         @endauth
                     " class="dropdown-item notify-item">
                         <i class="fe-lock me-1"></i>
                         <span>Change Password</span>
                     </a>
                     <!-- item-->
-                    <form method="POST" action="@auth('admin') {{ route('admin.logout') }} @endauth @auth('marketing') {{ route('marketing.logout') }} @endauth @auth('tenant') {{ route('tenant.logout') }} @endauth @auth('kasir') {{ route('kasir.logout') }} @endauth">
-                        @csrf
-                        <a class="dropdown-item notify-item" href="@auth('admin') {{ route('admin.logout') }} @endauth @auth('marketing') {{ route('marketing.logout') }} @endauth @auth('tenant') {{ route('tenant.logout') }} @endauth @auth('kasir') {{ route('kasir.logout') }} @endauth" onclick="event.preventDefault(); this.closest('form').submit();">
-                            <i class="fe-log-out me-1"></i>
-                            <span>Logout</span>
-                        </a>
-                    </form>
+                    @auth('admin')
+                        <form method="POST" action="{{route('admin.logout')}}">
+                            @csrf
+                            <a class="dropdown-item notify-item" href="{{route('admin.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <i class="fe-log-out me-1"></i>
+                                <span>Logout</span>
+                            </a>
+                        </form>
+                    @endauth
+                    @auth('marketing')
+                        <form method="POST" action="{{route('marketing.logout')}}">
+                            @csrf
+                            <a class="dropdown-item notify-item" href="{{route('marketing.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <i class="fe-log-out me-1"></i>
+                                <span>Logout</span>
+                            </a>
+                        </form>
+                    @endauth
+                    @auth('tenant')
+                        <form method="POST" action="{{route('tenant.logout')}}">
+                            @csrf
+                            <a class="dropdown-item notify-item" href="{{route('tenant.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <i class="fe-log-out me-1"></i>
+                                <span>Logout</span>
+                            </a>
+                        </form>
+                    @endauth
+                    @auth('kasir')
+                        <form method="POST" action="{{route('kasir.logout')}}">
+                            @csrf
+                            <a class="dropdown-item notify-item" href="{{route('kasir.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <i class="fe-log-out me-1"></i>
+                                <span>Logout</span>
+                            </a>
+                        </form>
+                    @endauth
                 </div>
             </div>
             <p class="text-muted">
