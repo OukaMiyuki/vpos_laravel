@@ -41,7 +41,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->group( function () {
     Route::post('logout', [App\Http\Controllers\Auth\Admin\LoginController::class, 'destroy'])->name('admin.logout');
 });
 
-Route::middleware(['auth:admin', 'adminemailverified'])->prefix('admin')->group( function () {
+Route::middleware(['auth:admin'])->prefix('admin')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
 
     Route::get('settings/profile', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profile'])->name('admin.profile');
