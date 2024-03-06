@@ -18,6 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+// Temporarry commit because of error
 
 Route::middleware('guest:admin')->prefix('admin')->group( function () {
     Route::get('login', [App\Http\Controllers\Auth\Admin\LoginController::class, 'create'])->name('admin.login');
