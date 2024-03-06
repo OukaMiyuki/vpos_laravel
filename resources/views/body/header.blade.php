@@ -95,7 +95,7 @@
                         <!-- item-->
                         <a href="javascript:void(0);" class="dropdown-item notify-item active">
                             <div class="notify-icon">
-                                <img src="{{ asset('assets/images/users/user-1.jpg') }}" class="img-fluid rounded-circle" alt="" />
+                                <img src="{{ asset('assets/images/users/user-1.jpg') }}" class="img-fluid rounded-circle" alt="" /> 
                             </div>
                             <p class="notify-details">Cristina Pride</p>
                             <p class="text-muted mb-0 user-msg">
@@ -114,7 +114,7 @@
                         <!-- item-->
                         <a href="javascript:void(0);" class="dropdown-item notify-item">
                             <div class="notify-icon">
-                                <img src="{{ asset('assets/images/users/user-4.jpg') }}" class="img-fluid rounded-circle" alt="" />
+                                <img src="{{ asset('assets/images/users/user-4.jpg') }}" class="img-fluid rounded-circle" alt="" /> 
                             </div>
                             <p class="notify-details">Karen Robinson</p>
                             <p class="text-muted mb-0 user-msg">
@@ -161,7 +161,7 @@
                 <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     <img src="{{ !empty(auth()->user()->detail->photo) ? Storage::url('images/profile/'.auth()->user()->detail->photo) : asset('assets/images/blank_profile.png') }}" alt="user-image" class="rounded-circle">
                     <span class="pro-user-name ms-1">
-                        {{ auth()->user()->name }} <i class="mdi mdi-chevron-down"></i>
+                        {{ auth()->user()->name }} <i class="mdi mdi-chevron-down"></i> 
                     </span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end profile-dropdown ">
@@ -181,7 +181,7 @@
                             {{ route('tenant.profile') }}
                         @endauth
                         @auth('kasir')
-
+                            
                         @endauth
                     " class="dropdown-item notify-item">
                         <i class="fe-user"></i>
@@ -210,7 +210,7 @@
                             {{ route('tenant.password') }}
                         @endauth
                         @auth('kasir')
-
+                            
                         @endauth
                     " class="dropdown-item notify-item">
                         <i class="fe-lock"></i>
@@ -218,42 +218,13 @@
                     </a>
                     <div class="dropdown-divider"></div>
                     <!-- item-->
-                    @auth('admin')
-                        <form method="POST" action="{{route('admin.logout')}}">
-                            @csrf
-                            <a class="dropdown-item notify-item" href="{{route('admin.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
-                                <i class="fe-log-out"></i>
-                                <span>Logout</span>
-                            </a>
-                        </form>
-                    @endauth
-                    @auth('marketing')
-                        <form method="POST" action="{{route('marketing.logout')}}">
-                            @csrf
-                            <a class="dropdown-item notify-item" href="{{route('marketing.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
-                                <i class="fe-log-out"></i>
-                                <span>Logout</span>
-                            </a>
-                        </form>
-                    @endauth
-                    @auth('tenant')
-                        <form method="POST" action="{{route('tenant.logout')}}">
-                            @csrf
-                            <a class="dropdown-item notify-item" href="{{route('tenant.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
-                                <i class="fe-log-out"></i>
-                                <span>Logout</span>
-                            </a>
-                        </form>
-                    @endauth
-                    @auth('kasir')
-                        <form method="POST" action="{{route('kasir.logout')}}">
-                            @csrf
-                            <a class="dropdown-item notify-item" href="{{route('kasir.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
-                                <i class="fe-log-out"></i>
-                                <span>Logout</span>
-                            </a>
-                        </form>
-                    @endauth
+                    <form method="POST" action="@auth('admin') {{ route('admin.logout') }} @endauth @auth('marketing') {{ route('marketing.logout') }} @endauth @auth('tenant') {{ route('tenant.logout') }} @endauth @auth('kasir') {{ route('kasir.logout') }} @endauth">
+                        @csrf
+                        <a class="dropdown-item notify-item" href="@auth('admin') {{ route('admin.logout') }} @endauth @auth('marketing') {{ route('marketing.logout') }} @endauth @auth('tenant') {{ route('tenant.logout') }} @endauth @auth('kasir') {{ route('kasir.logout') }} @endauth" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <i class="fe-log-out"></i>
+                            <span>Logout</span>
+                        </a>
+                    </form>
                 </div>
             </li>
             <li class="dropdown notification-list">
@@ -303,7 +274,7 @@
             <li class="dropdown d-none d-xl-block">
                 <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     Quick Menu
-                    <i class="mdi mdi-chevron-down"></i>
+                    <i class="mdi mdi-chevron-down"></i> 
                 </a>
                 <div class="dropdown-menu">
                     @auth('admin')
@@ -337,7 +308,7 @@
             <li class="dropdown dropdown-mega d-none d-xl-block">
                 <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                 Mega Menu
-                <i class="mdi mdi-chevron-down"></i>
+                <i class="mdi mdi-chevron-down"></i> 
                 </a>
                 <div class="dropdown-menu dropdown-megamenu">
                     <div class="row">
