@@ -28,20 +28,21 @@ Route::middleware('guest:admin')->prefix('admin')->group( function () {
 
 });
 
+// Route::middleware(['auth:admin'])->prefix('admin')->group( function () {
+//     Route::get('/verify-email', [App\Http\Controllers\Auth\Admin\EmailVerificationPromptController::class, 'emailVerificationView'])->name('admin.verification.notice');
+//     Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Admin\VerifyEmailController::class, 'verificationProcess'])
+//                 ->middleware(['signed', 'throttle:6,1'])
+//                 ->name('admin.verification.verify');
+//     Route::post('email/verification-notification', [App\Http\Controllers\Auth\Admin\EmailVerificationNotificationController::class, 'store'])
+//                 ->middleware('throttle:6,1')
+//                 ->name('admin.verification.send');
+
+
+//     Route::post('logout', [App\Http\Controllers\Auth\Admin\LoginController::class, 'destroy'])->name('admin.logout');
+// });
+
 Route::middleware(['auth:admin'])->prefix('admin')->group( function () {
-    Route::get('/verify-email', [App\Http\Controllers\Auth\Admin\EmailVerificationPromptController::class, 'emailVerificationView'])->name('admin.verification.notice');
-    Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Admin\VerifyEmailController::class, 'verificationProcess'])
-                ->middleware(['signed', 'throttle:6,1'])
-                ->name('admin.verification.verify');
-    Route::post('email/verification-notification', [App\Http\Controllers\Auth\Admin\EmailVerificationNotificationController::class, 'store'])
-                ->middleware('throttle:6,1')
-                ->name('admin.verification.send');
-
-
     Route::post('logout', [App\Http\Controllers\Auth\Admin\LoginController::class, 'destroy'])->name('admin.logout');
-});
-
-Route::middleware(['auth:admin'])->prefix('admin')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
 
     Route::get('settings/profile', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profile'])->name('admin.profile');
