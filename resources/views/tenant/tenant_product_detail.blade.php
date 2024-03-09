@@ -13,7 +13,7 @@
                                 <li class="breadcrumb-item active">Profile</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Detail produk baru</h4>
+                        <h4 class="page-title">Detail produk</h4>
                     </div>
                 </div>
             </div>
@@ -108,8 +108,14 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
+                                                @php
+                                                    $stokBarang = 0;
+                                                    foreach (App\Models\ProductStock::where('id_batch_product', $product->id)->get() as $stock) {
+                                                        $stokBarang+=$stock->stok;
+                                                    }
+                                                @endphp
                                                 <label for="stok" class="form-label">Jumlah stok tersedia</label>
-                                                <input type="text" class="form-control" name="stok" id="stok" readonly required value="{{ $product->stok }}" placeholder="Masukkan jumlah stok">
+                                                <input type="text" class="form-control" name="stok" id="stok" readonly required value="{{ $stokBarang }}" placeholder="Masukkan jumlah stok">
                                             </div>
                                         </div>
                                     </div>

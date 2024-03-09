@@ -9,6 +9,8 @@ use App\Models\ShoppingCart;
 use App\Models\Kasir;
 use App\Models\Tenant;
 use App\Models\InvoiceField;
+use App\Models\Product;
+use App\Models\ProductStock;
 
 class Invoice extends Model {
     use HasFactory;
@@ -43,6 +45,16 @@ class Invoice extends Model {
                 'harga' => $cart->price,
                 'sub_total' => $cart->price*$cart->qty
             ]);
+            $stock = ProductStock::find($cart->id);
+            $updateStok = (int) $stock->stok - (int) $cart->qty;
+            $stock->update([
+                'stok' => $updateStok
+            ]);
+            // $stokProduct = ProductStock::with('product')->where('id_tenant', auth()->user()->id)->where('id', $cart->id)->get();
+            // $totalStok = ((int) $stokProduct->product - (int) $stok) + (int) $model->stok;
+            // $stokProduct->update([
+            //     'stok' => $totalStok
+            // ]);
         }
     }
 

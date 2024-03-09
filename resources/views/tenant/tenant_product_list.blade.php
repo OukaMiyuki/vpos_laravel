@@ -49,7 +49,7 @@
                                             <th>Product Batch Code</th>
                                             <th>Product Name</th>
                                             <th>Kategori</th>
-                                            <th>Total Stok</th>
+                                            {{-- <th>Total Stok</th> --}}
                                             <th>Harga Jual Per-Piece (Rp.)</th>
                                         </tr>
                                     </thead>
@@ -75,7 +75,7 @@
                                                 <td>{{ $product->product_code }}</td>
                                                 <td>{{ $product->product_name }}</td>
                                                 <td>{{ $product->category->name }}</td>
-                                                <td>{{ $product->stok }}</td>
+                                                {{-- <td>{{ $product->stok }}</td> --}}
                                                 <td>{{ $product->harga_jual }}</td>
                                             </tr>
                                         @endforeach

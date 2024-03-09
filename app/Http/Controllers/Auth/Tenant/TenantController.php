@@ -357,9 +357,9 @@ class TenantController extends Controller {
             'stok' => $request->stok
         ]);
 
-        if(!is_null($stokProduct)) {
-            $stokProduct->productStockInsert($stokProduct);
-        }
+        // if(!is_null($stokProduct)) {
+        //     $stokProduct->productStockInsert($stokProduct);
+        // }
 
         $notification = array(
             'message' => 'Data produk berhasil ditambahkan!',
@@ -384,9 +384,9 @@ class TenantController extends Controller {
             'stok' => $request->stok
         ]);
 
-        if(!is_null($stock)) {
-            $stock->productStockUpdate($stock, $stock_temp);
-        }
+        // if(!is_null($stock)) {
+        //     $stock->productStockUpdate($stock, $stock_temp);
+        // }
 
         // dd($stock_temp);
 
@@ -403,9 +403,9 @@ class TenantController extends Controller {
 
         $stock->delete();
 
-        if(!is_null($stock)) {
-            $stock->productStockDelete($stock, $stock_temp);
-        }
+        // if(!is_null($stock)) {
+        //     $stock->productStockDelete($stock, $stock_temp);
+        // }
 
         // dd($stock_temp);
 

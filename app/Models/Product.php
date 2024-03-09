@@ -25,7 +25,6 @@ class Product extends Model {
         'nomor_gudang',
         'nomor_rak',
         'harga_jual',
-        'stok'
     ];
 
     public function tenant() {
