@@ -14,10 +14,10 @@
                                     <i class="mdi mdi-calendar-range"></i>
                                     </span>
                                 </div>
-                                <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-2">
+                                <a href="#" class="btn btn-blue btn-sm ms-2">
                                 <i class="mdi mdi-autorenew"></i>
                                 </a>
-                                <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-1">
+                                <a href="#" class="btn btn-blue btn-sm ms-1">
                                 <i class="mdi mdi-filter-variant"></i>
                                 </a>
                             </form>

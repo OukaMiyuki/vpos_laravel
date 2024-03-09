@@ -25,7 +25,8 @@
         <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- Head js -->
         <script src="{{ asset('assets/js/head.js') }}"></script>
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" >
+        {{-- <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" > --}}
+        <link href="{{ asset('assets/libs/toastr/build/toastr.min.css') }}" rel="stylesheet" type="text/css" />
     </head>
     <!-- body start -->
     <body data-layout-mode="default" data-theme="light" data-topbar-color="dark" data-menu-position="fixed" data-leftbar-color="light" data-leftbar-size='default' data-sidebar-user='false'>
@@ -64,7 +65,7 @@
         <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
         <script src="{{ asset('assets/libs/selectize/js/standalone/selectize.min.js') }}"></script>
         <!-- Dashboar 1 init js-->
-        <script src="{{ asset('assets/js/pages/dashboard-1.init.js') }}"></script>
+        {{-- <script src="{{ asset('assets/js/pages/dashboard-1.init.js') }}"></script> --}}
         <!-- App js-->
         <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
         <script src="{{ asset('assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
@@ -82,10 +83,11 @@
         <script src="{{ asset('assets/js/pages/datatables.init.js') }}"></script>
         <script src="{{ asset('assets/libs/moment/min/moment.min.js') }}"></script>
         <script src="{{ asset('assets/libs/fullcalendar/main.min.js') }}"></script>
-        <script src="{{ asset('assets/js/pages/calendar.init.js') }}"></script>
+        {{-- <script src="{{ asset('assets/js/pages/calendar.init.js') }}"></script> --}}
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
+        {{-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script> --}}
+        <script src="{{ asset('assets/js/pages/admin.init.js') }}"></script>
+        <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
         <script>
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"
@@ -93,31 +95,20 @@
                     case 'info':
                     toastr.info(" {{ Session::get('message') }} ");
                     break;
-                
+
                     case 'success':
                     toastr.success(" {{ Session::get('message') }} ");
                     break;
-                
+
                     case 'warning':
                     toastr.warning(" {{ Session::get('message') }} ");
                     break;
-                
+
                     case 'error':
                     toastr.error(" {{ Session::get('message') }} ");
-                    break; 
+                    break;
                 }
-            @endif 
+            @endif
         </script>
-        <Script type="text/javascript">
-            $(document).ready(function(){
-                $('#image').change(function(e){
-                    var reader = new FileReader();
-                    reader.onload = function(e){
-                        $('#showImage').attr('src', e.target.result);
-                    }
-                    reader.readAsDataURL(e.target.files['0']);
-                });
-            });
-        </Script>
     </body>
 </html>

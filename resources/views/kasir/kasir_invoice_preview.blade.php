@@ -6,8 +6,8 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="javascript: void(0);">UBold</a></li>
-                                <li class="breadcrumb-item"><a href="javascript: void(0);">Extra Pages</a></li>
+                                <li class="breadcrumb-item"><a href="#">UBold</a></li>
+                                <li class="breadcrumb-item"><a href="#">Extra Pages</a></li>
                                 <li class="breadcrumb-item active">Invoice</li>
                             </ol>
                         </div>
@@ -119,11 +119,11 @@
                                         <table class="table mt-4 table-centered">
                                             <thead>
                                                 <tr>
-                                                    <th style="width: 5%">#</th>
-                                                    <th style="width: 30%">Nama</th>
-                                                    <th style="width: 10%">QTY</th>
-                                                    <th style="width: 25%">Harga</th>
-                                                    <th style="width: 25%">Sub Total</th>
+                                                    <th width="width:5%">#</th>
+                                                    <th width="width:25%">Nama</th>
+                                                    <th width="width:10%">QTY</th>
+                                                    <th width="width:25%">Harga Satuan</th>
+                                                    <th width="width:25%">Sub Total</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

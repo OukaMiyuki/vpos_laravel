@@ -16,17 +16,17 @@
                                 <h5 class="text-overflow mb-2">Found 22 results</h5>
                             </div>
                             <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <a href="#" class="dropdown-item notify-item">
                                 <i class="fe-home me-1"></i>
                                 <span>Analytics Report</span>
                             </a>
                             <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <a href="#" class="dropdown-item notify-item">
                                 <i class="fe-aperture me-1"></i>
                                 <span>How can I help you?</span>
                             </a>
                             <!-- item-->
-                            <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <a href="#" class="dropdown-item notify-item">
                                 <i class="fe-settings me-1"></i>
                                 <span>User profile settings</span>
                             </a>
@@ -36,7 +36,7 @@
                             </div>
                             <div class="notification-list">
                                 <!-- item-->
-                                <a href="javascript:void(0);" class="dropdown-item notify-item">
+                                <a href="#" class="dropdown-item notify-item">
                                     <div class="d-flex align-items-start">
                                         <img class="d-flex me-2 rounded-circle" src="{{ asset('assets/images/users/user-2.jpg') }}" alt="Generic placeholder image" height="32">
                                         <div class="w-100">
@@ -46,7 +46,7 @@
                                     </div>
                                 </a>
                                 <!-- item-->
-                                <a href="javascript:void(0);" class="dropdown-item notify-item">
+                                <a href="#" class="dropdown-item notify-item">
                                     <div class="d-flex align-items-start">
                                         <img class="d-flex me-2 rounded-circle" src="{{ asset('assets/images/users/user-5.jpg') }}" alt="Generic placeholder image" height="32">
                                         <div class="w-100">
@@ -93,7 +93,7 @@
                     </div>
                     <div class="noti-scroll" data-simplebar>
                         <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item active">
+                        <a href="#" class="dropdown-item notify-item active">
                             <div class="notify-icon">
                                 <img src="{{ asset('assets/images/users/user-1.jpg') }}" class="img-fluid rounded-circle" alt="" /> 
                             </div>
@@ -103,7 +103,7 @@
                             </p>
                         </a>
                         <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
+                        <a href="#" class="dropdown-item notify-item">
                             <div class="notify-icon bg-primary">
                                 <i class="mdi mdi-comment-account-outline"></i>
                             </div>
@@ -112,7 +112,7 @@
                             </p>
                         </a>
                         <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
+                        <a href="#" class="dropdown-item notify-item">
                             <div class="notify-icon">
                                 <img src="{{ asset('assets/images/users/user-4.jpg') }}" class="img-fluid rounded-circle" alt="" /> 
                             </div>
@@ -122,7 +122,7 @@
                             </p>
                         </a>
                         <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
+                        <a href="#" class="dropdown-item notify-item">
                             <div class="notify-icon bg-warning">
                                 <i class="mdi mdi-account-plus"></i>
                             </div>
@@ -131,7 +131,7 @@
                             </p>
                         </a>
                         <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
+                        <a href="#" class="dropdown-item notify-item">
                             <div class="notify-icon bg-info">
                                 <i class="mdi mdi-comment-account-outline"></i>
                             </div>
@@ -140,7 +140,7 @@
                             </p>
                         </a>
                         <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item notify-item">
+                        <a href="#" class="dropdown-item notify-item">
                             <div class="notify-icon bg-secondary">
                                 <i class="mdi mdi-heart"></i>
                             </div>
@@ -151,7 +151,7 @@
                         </a>
                     </div>
                     <!-- All-->
-                    <a href="javascript:void(0);" class="dropdown-item text-center text-primary notify-item notify-all">
+                    <a href="#" class="dropdown-item text-center text-primary notify-item notify-all">
                     View all
                     <i class="fe-arrow-right"></i>
                     </a>
@@ -194,7 +194,7 @@
                         </a>
                     @endauth
                     <!-- item-->
-                    <a href="javascript:void(0);" class="dropdown-item notify-item">
+                    <a href="#" class="dropdown-item notify-item">
                         <i class="fe-settings"></i>
                         <span>Settings</span>
                     </a>
@@ -220,44 +220,44 @@
                     @auth('admin')
                         <form method="POST" action="{{ route('admin.logout') }}">
                             @csrf
-                            <a class="dropdown-item notify-item" href="{{ route('admin.logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <button type="submit" class="dropdown-item notify-item">
                                 <i class="fe-log-out"></i>
                                 <span>Logout</span>
-                            </a>
+                            </button>
                         </form>
                     @endauth
                     @auth('marketing')
                         <form method="POST" action="{{ route('marketing.logout') }}">
                             @csrf
-                            <a class="dropdown-item notify-item" href="{{ route('marketing.logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <button type="submit" class="dropdown-item notify-item">
                                 <i class="fe-log-out"></i>
                                 <span>Logout</span>
-                            </a>
+                            </button>
                         </form>
                     @endauth
                     @auth('tenant')
                         <form method="POST" action="{{ route('tenant.logout') }}">
                             @csrf
-                            <a class="dropdown-item notify-item" href="{{ route('tenant.logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <button type="submit" class="dropdown-item notify-item">
                                 <i class="fe-log-out"></i>
                                 <span>Logout</span>
-                            </a>
+                            </button>
                         </form>
                     @endauth
                     @auth('kasir')
                         <form method="POST" action="{{ route('kasir.logout') }}">
                             @csrf
-                            <a class="dropdown-item notify-item" href="{{ route('kasir.logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <button type="submit" class="dropdown-item notify-item">
                                 <i class="fe-log-out"></i>
                                 <span>Logout</span>
-                            </a>
+                            </button>
                         </form>
                     @endauth
                     <!-- item-->
                 </div>
             </li>
             <li class="dropdown notification-list">
-                <a href="javascript:void(0);" class="nav-link right-bar-toggle waves-effect waves-light">
+                <a href="#" class="nav-link right-bar-toggle waves-effect waves-light">
                 <i class="fe-settings noti-icon"></i>
                 </a>
             </li>
@@ -307,28 +307,28 @@
                 </a>
                 <div class="dropdown-menu">
                     @auth('admin')
-                        <a href="javascript:void(0);" class="dropdown-item">
+                        <a href="#" class="dropdown-item">
                             <i class="mdi mdi-account-multiple-plus me-1"></i>
                             <span>Tambah Marketing</span>
                         </a>
-                        <a href="javascript:void(0);" class="dropdown-item">
+                        <a href="#" class="dropdown-item">
                             <i class="mdi mdi-account-tie-voice me-1"></i>
                             <span>Marketing Accounts</span>
                         </a>
                         <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item">
+                        <a href="#" class="dropdown-item">
                             <i class="fe-bar-chart-line- me-1"></i>
                             <span>Revenue Report</span>
                         </a>
                         <!-- item-->
-                        <a href="javascript:void(0);" class="dropdown-item">
+                        <a href="#" class="dropdown-item">
                             <i class="fe-settings me-1"></i>
                             <span>Settings</span>
                         </a>
                     @endauth
                     <div class="dropdown-divider"></div>
                     <!-- item-->
-                    <a href="javascript:void(0);" class="dropdown-item">
+                    <a href="#" class="dropdown-item">
                         <i class="fe-headphones me-1"></i>
                         <span>Help & Support</span>
                     </a>
@@ -347,25 +347,25 @@
                                     <h5 class="text-dark mt-0">UI Components</h5>
                                     <ul class="list-unstyled megamenu-list">
                                         <li>
-                                            <a href="javascript:void(0);">Widgets</a>
+                                            <a href="#">Widgets</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Nestable List</a>
+                                            <a href="#">Nestable List</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Range Sliders</a>
+                                            <a href="#">Range Sliders</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Masonry Items</a>
+                                            <a href="#">Masonry Items</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Sweet Alerts</a>
+                                            <a href="#">Sweet Alerts</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Treeview Page</a>
+                                            <a href="#">Treeview Page</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Tour Page</a>
+                                            <a href="#">Tour Page</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -373,25 +373,25 @@
                                     <h5 class="text-dark mt-0">Applications</h5>
                                     <ul class="list-unstyled megamenu-list">
                                         <li>
-                                            <a href="javascript:void(0);">eCommerce Pages</a>
+                                            <a href="#">eCommerce Pages</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">CRM Pages</a>
+                                            <a href="#">CRM Pages</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Email</a>
+                                            <a href="#">Email</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Calendar</a>
+                                            <a href="#">Calendar</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Team Contacts</a>
+                                            <a href="#">Team Contacts</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Task Board</a>
+                                            <a href="#">Task Board</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Email Templates</a>
+                                            <a href="#">Email Templates</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -399,25 +399,25 @@
                                     <h5 class="text-dark mt-0">Extra Pages</h5>
                                     <ul class="list-unstyled megamenu-list">
                                         <li>
-                                            <a href="javascript:void(0);">Left Sidebar with User</a>
+                                            <a href="#">Left Sidebar with User</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Menu Collapsed</a>
+                                            <a href="#">Menu Collapsed</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Small Left Sidebar</a>
+                                            <a href="#">Small Left Sidebar</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">New Header Style</a>
+                                            <a href="#">New Header Style</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Search Result</a>
+                                            <a href="#">Search Result</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Gallery Pages</a>
+                                            <a href="#">Gallery Pages</a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0);">Maintenance & Coming Soon</a>
+                                            <a href="#">Maintenance & Coming Soon</a>
                                         </li>
                                     </ul>
                                 </div>

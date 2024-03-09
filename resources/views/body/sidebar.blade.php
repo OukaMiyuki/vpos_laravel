@@ -4,7 +4,7 @@
         <div class="user-box text-center">
             <img src="{{ !empty(auth()->user()->detail->photo) ? Storage::url('images/profile/'.auth()->user()->detail->photo) : asset('assets/images/blank_profile.png') }}" alt="user-img" title="Mat Helme" class="rounded-circle avatar-md">
             <div class="dropdown">
-                <a href="javascript: void(0);" class="text-dark dropdown-toggle h5 mt-2 mb-1 d-block" data-bs-toggle="dropdown">{{ auth()->user()->name }}</a>
+                <a href="#" class="text-dark dropdown-toggle h5 mt-2 mb-1 d-block" data-bs-toggle="dropdown">{{ auth()->user()->name }}</a>
                 <div class="dropdown-menu user-pro-dropdown">
                     <!-- item-->
                     <a href="
@@ -25,7 +25,7 @@
                         <span>My Account</span>
                     </a>
                     <!-- item-->
-                    <a href="javascript:void(0);" class="dropdown-item notify-item">
+                    <a href="#" class="dropdown-item notify-item">
                         <i class="fe-settings me-1"></i>
                         <span>Settings</span>
                     </a>
@@ -51,37 +51,37 @@
                     @auth('admin')
                         <form method="POST" action="{{route('admin.logout')}}">
                             @csrf
-                            <a class="dropdown-item notify-item" href="{{route('admin.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <button type="submit" class="dropdown-item notify-item">
                                 <i class="fe-log-out me-1"></i>
                                 <span>Logout</span>
-                            </a>
+                            </button>
                         </form>
                     @endauth
                     @auth('marketing')
                         <form method="POST" action="{{route('marketing.logout')}}">
                             @csrf
-                            <a class="dropdown-item notify-item" href="{{route('marketing.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <button type="submit" class="dropdown-item notify-item">
                                 <i class="fe-log-out me-1"></i>
                                 <span>Logout</span>
-                            </a>
+                            </button>
                         </form>
                     @endauth
                     @auth('tenant')
                         <form method="POST" action="{{route('tenant.logout')}}">
                             @csrf
-                            <a class="dropdown-item notify-item" href="{{route('tenant.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <button type="submit" class="dropdown-item notify-item">
                                 <i class="fe-log-out me-1"></i>
                                 <span>Logout</span>
-                            </a>
+                            </button>
                         </form>
                     @endauth
                     @auth('kasir')
                         <form method="POST" action="{{route('kasir.logout')}}">
                             @csrf
-                            <a class="dropdown-item notify-item" href="{{route('kasir.logout')}}" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <button type="submit" class="dropdown-item notify-item">
                                 <i class="fe-log-out me-1"></i>
                                 <span>Logout</span>
-                            </a>
+                            </button>
                         </form>
                     @endauth
                 </div>
@@ -212,7 +212,7 @@
                         <div class="collapse" id="sidebarCrm">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="">Merchant List</a>
+                                    <a href="#">Merchant List</a>
                                 </li>
                             </ul>
                         </div>

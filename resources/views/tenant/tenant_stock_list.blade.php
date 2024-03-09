@@ -14,10 +14,10 @@
                                     <i class="mdi mdi-calendar-range"></i>
                                     </span>
                                 </div>
-                                <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-2">
+                                <a href="#" class="btn btn-blue btn-sm ms-2">
                                 <i class="mdi mdi-autorenew"></i>
                                 </a>
-                                <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-1">
+                                <a href="#" class="btn btn-blue btn-sm ms-1">
                                 <i class="mdi mdi-filter-variant"></i>
                                 </a>
                             </form>
@@ -73,7 +73,7 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                <img src="{{ !empty($stok->product->photo) ? Storage::url('images/product/'.$stok->product->photo) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" style="width:50px; height:40px;" alt="Product Photo">
+                                                <img src="{{ !empty($stok->product->photo) ? Storage::url('images/product/'.$stok->product->photo) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" alt="Product Photo">
                                             </td>
                                             <td>{{ $stok->barcode }}</td>
                                             <td>{{ $stok->product->product_name }}</td>

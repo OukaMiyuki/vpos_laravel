@@ -9,7 +9,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
+                                <li class="breadcrumb-item"><a href="#">Settings</a></li>
                                 <li class="breadcrumb-item active">POS</li>
                             </ol>
                         </div>
@@ -41,13 +41,13 @@
                                         @endphp
                                         @foreach ($allCart as $cart)
                                             <tr>
-                                                <td><a href="{{ route('kasir.pos.deleteCart', ['id' => $cart->rowId]) }}" style="font-size: 20px;"><span class="mdi mdi-trash-can-outline"></span></a></td>
-                                                <td style="text-align: left;">{{ $cart->name }}</td>
+                                                <td><a href="{{ route('kasir.pos.deleteCart', ['id' => $cart->rowId]) }}"><h4><span class="mdi mdi-trash-can-outline"></span></h4></a></td>
+                                                <td class="text-start">{{ $cart->name }}</td>
                                                 <td>
                                                     <form id="qtyform" action="{{ route('kasir.pos.updateCart') }}" method="post">
                                                         @csrf
                                                         <input type="hidden" name="id" value="{{ $cart->rowId }}">
-                                                        <input type="number" name="qty" style="width:40px;" value="{{ $cart->qty }}" min="1">
+                                                        <input type="number" name="qty" class="w-50" value="{{ $cart->qty }}" min="1">
                                                         <button type="submit" class="btn btn-sm btn-success"><span class="mdi mdi-check-bold"></span></button>
                                                     </form>
                                                 </td>
@@ -66,8 +66,8 @@
                                     $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
                                     $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
                                 @endphp
-                                <p style="font-size:18px; color:#FFF">Total Item Quantity : {{ Cart::count() }} </p>
-                                <p style="font-size:18px; color:#FFF">Diskon (
+                                <p class="pos-price-text">Total Item Quantity : {{ Cart::count() }} </p>
+                                <p class="pos-price-text">Diskon (
                                     @php
                                         $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
                                     @endphp
@@ -77,8 +77,8 @@
                                         @endif
                                      @endif
                                 ) : Rp. {{ Cart::discount() }}</p>
-                                <p style="font-size:18px; color:#FFF">Sub Total : Rp. {{ Cart::subtotal() }}</p>
-                                <p style="font-size:18px; color:#FFF">Pajak (
+                                <p class="pos-price-text">Sub Total : Rp. {{ Cart::subtotal() }}</p>
+                                <p class="pos-price-text">Pajak (
                                     @if(!empty($pajak->pajak))
                                         {{ $pajak->pajak }}%
                                     @endif
@@ -91,6 +91,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="mb-3">
+                                            <input type="hidden" class="d-none" name="subbttl" id="subbttl" required value="{{ Cart::total() }}" readonly>
                                             <select @if(Cart::subtotal()==0) disabled @endif class="form-select @error('pembayaran') is-invalid @enderror" id="pembayaran" name="pembayaran">
                                                 <option value="">- Pilih jenis pembayaran -</option>
                                                 <option value="Tunai">Tunai</option>
@@ -166,7 +167,7 @@
                                                             <input readonly type="hidden" id="name" name="name" value="{{ $stok->product->product_name }}">
                                                             <input readonly type="hidden" id="qty" name="qty" value="1">
                                                             <input readonly type="hidden" id="price" name="price" value="{{ $stok->product->harga_jual }}">
-                                                            <button type="submit" style="font-size:20px; color:#000;">
+                                                            <button class="pos-add-button" type="submit">
                                                                 <span class="mdi mdi-plus-box"></span>
                                                             </button>
                                                         </form>

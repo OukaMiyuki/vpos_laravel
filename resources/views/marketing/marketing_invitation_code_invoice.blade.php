@@ -7,8 +7,8 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="javascript: void(0);">UBold</a></li>
-                                <li class="breadcrumb-item"><a href="javascript: void(0);">Extra Pages</a></li>
+                                <li class="breadcrumb-item"><a href="#">UBold</a></li>
+                                <li class="breadcrumb-item"><a href="#">Extra Pages</a></li>
                                 <li class="breadcrumb-item active">Invoice</li>
                             </ol>
                         </div>
@@ -105,12 +105,12 @@
                                         <table class="table mt-4 table-centered">
                                             <thead>
                                                 <tr>
-                                                    <th style="width: 5%">#</th>
-                                                    <th style="width: 30%">Nominal</th>
-                                                    <th style="width: 15%">Tanggal Penarikan</th>
-                                                    <th style="width: 10%">Pajak 2%</th>
-                                                    <th style="width: 10%">Biaya Admin 2%</th>
-                                                    <th style="width: 30%" class="text-end">Total</th>
+                                                    <th width="5%">#</th>
+                                                    <th width="30%">Nominal</th>
+                                                    <th width="15%">Tanggal Penarikan</th>
+                                                    <th width="10%">Pajak 2%</th>
+                                                    <th width="10%">Biaya Admin 2%</th>
+                                                    <th width="30%" class="text-end">Total</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

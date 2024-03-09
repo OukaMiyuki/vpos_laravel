@@ -15,10 +15,10 @@
                                     <i class="mdi mdi-calendar-range"></i>
                                     </span>
                                 </div>
-                                <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-2">
+                                <a href="#" class="btn btn-blue btn-sm ms-2">
                                 <i class="mdi mdi-autorenew"></i>
                                 </a>
-                                <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-1">
+                                <a href="#" class="btn btn-blue btn-sm ms-1">
                                 <i class="mdi mdi-filter-variant"></i>
                                 </a>
                             </form>
@@ -137,7 +137,7 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td style="width: 36px;">
+                                            <td>
                                                 <img src="{{ asset('assets/images/users/user-2.jpg') }}" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm" />
                                             </td>
                                             <td>
@@ -154,12 +154,12 @@
                                                 0.00097036 BTC
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
+                                                <a href="#" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 36px;">
+                                            <td>
                                                 <img src="{{ asset('assets/images/users/user-3.jpg') }}" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm" />
                                             </td>
                                             <td>
@@ -176,12 +176,12 @@
                                                 1.70360009 ETH
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
+                                                <a href="#" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 36px;">
+                                            <td>
                                                 <img src="{{ asset('assets/images/users/user-4.jpg') }}" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm" />
                                             </td>
                                             <td>
@@ -198,12 +198,12 @@
                                                 12.58 EUR
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
+                                                <a href="#" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 36px;">
+                                            <td>
                                                 <img src="{{ asset('assets/images/users/user-5.jpg') }}" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm" />
                                             </td>
                                             <td>
@@ -220,12 +220,12 @@
                                                 30.83 CNY
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
+                                                <a href="#" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 36px;">
+                                            <td>
                                                 <img src="{{ asset('assets/images/users/user-6.jpg') }}" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm" />
                                             </td>
                                             <td>
@@ -242,8 +242,8 @@
                                                 1.00097036 BTC
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-plus"></i></a>
+                                                <a href="#" class="btn btn-xs btn-danger"><i class="mdi mdi-minus"></i></a>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -296,7 +296,7 @@
                                                 <span class="badge bg-soft-warning text-warning">Upcoming</span>
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -313,7 +313,7 @@
                                                 <span class="badge bg-soft-success text-success">Paid</span>
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -330,7 +330,7 @@
                                                 <span class="badge bg-soft-success text-success">Paid</span>
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -347,7 +347,7 @@
                                                 <span class="badge bg-soft-danger text-danger">Overdue</span>
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -364,7 +364,7 @@
                                                 <span class="badge bg-soft-warning text-warning">Upcoming</span>
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -381,7 +381,7 @@
                                                 <span class="badge bg-soft-success text-success">Paid</span>
                                             </td>
                                             <td>
-                                                <a href="javascript: void(0);" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
+                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
                                             </td>
                                         </tr>
                                     </tbody>

@@ -29,8 +29,12 @@ class LoginController extends Controller {
                 'email' => trans('auth.failed'),
             ]);
         }
+        $notification = array(
+            'message' => 'Anda berhasil login!',
+            'alert-type' => 'success',
+        );
         $request->session()->regenerate();
-        return redirect()->intended(RouteServiceProvider::ADMIN_DASHBOARD);
+        return redirect()->intended(RouteServiceProvider::ADMIN_DASHBOARD)->with($notification);
     }
 
 

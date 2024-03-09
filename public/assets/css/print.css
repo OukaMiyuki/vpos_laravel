@@ -1,0 +1,153 @@
+body {font-size:14px;font-family: monospace;margin:0;padding:0;}
+#print-button {
+    margin: 1em 0 1em 0;
+    display: flex;
+    justify-content: center;
+}
+#print-button button {
+    width: 18%;
+}
+#invoice-POS{
+    border: 1px solid #ddd;
+    padding: 2mm;
+    margin: 0 auto;
+    width: 58mm;
+    /* page-break-after:always; */
+    background: #FFF;
+}
+#invoice-POS ::selection {
+    background: #f31544;
+    color: #FFF;
+}
+#invoice-POS ::moz-selection {
+    background: #f31544;
+    color: #FFF;
+}
+#invoice-POS h1 {
+    font-size: 1.5em;
+    color: #000000 !important;
+}
+#invoice-POS h2 {
+    font-size: .9em;
+}
+#invoice-POS h3 {
+    font-size: 0.9em;
+    font-weight: 600;
+    line-height: 0.8em;
+}
+#invoice-POS p.customer {
+    font-size: 0.57em;
+    color: #000000 !important; 
+    line-height: 0em;
+    font-weight: 800;
+}
+#invoice-POS #legalcopy p {
+    font-size: 0.57em;
+    color: #000000 !important;
+    font-weight: 700 !important;
+    line-height: 1.2em;
+    text-align: center;
+}
+#invoice-POS #top, #invoice-POS #mid, #invoice-POS #bot {
+    border-bottom: 1px solid #EEE;
+}
+#invoice-POS #top {
+    min-height: 100px;
+}
+#invoice-POS #mid {
+    min-height: 80px;
+}
+#invoice-POS #bot {
+    min-height: 50px !important;
+}
+#invoice-POS #top .logo {
+    height: 50px;
+    width: 50px;
+    background: url(https://codeforui.com/posts/dummylogo.png) no-repeat;
+    background-size: 50px 50px;
+}
+#invoice-POS .info {
+    display: block;
+    margin-left: 0;
+}
+#invoice-POS .title {
+    float: right;
+}
+#invoice-POS .title p {
+    text-align: right;
+}
+#invoice-POS table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#invoice-POS .tabletitle {
+    font-size: 0.6em;
+    background: #EEE;
+    font-weight: 700;
+}
+#invoice-POS tr.pembayaran {
+    line-height: .1em !important;
+    font-size: .6em !important;
+}
+#invoice-POS tr.pembayaran h2 {
+    font-weight: 700;
+}
+#invoice-POS td.payment, #invoice-POS td.sub-total {
+    text-align: right;
+}
+#invoice-POS td.qty {
+    text-align: center;
+}
+#invoice-POS .service {
+    border-bottom: 1px solid #EEE;
+}
+#invoice-POS .item {
+    width: 24mm;
+}
+#invoice-POS .itemtext {
+    font-size: 0.5em;
+}
+#invoice-POS #legalcopy {
+    margin-top: 5mm;
+}
+h2.storeTitle {
+    font-weight: 700 !important;
+}
+p.storeAddress {
+    font-size: .6em !important; 
+    font-weight: 600 !important;
+}
+p.customerTitle {
+    font-weight: 600 !important;
+}
+table.customerInfo {
+    margin-bottom: 1em; 
+    font-weight: 600 !important;
+}
+h2.itemTitle{
+    font-weight: 600 !important;
+}
+.tabletitle td.sub-total {
+    width: 120px;
+}
+@media print {
+    body { font-size:14px;font-family: monospace; } */
+    body { width: 58mm !important;}
+    /* body {
+        visibility: hidden;
+    }
+    #invoice-POS {
+        width: 44mm;
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        top: 0;
+    } */
+    /* #print-button {
+        display: none;
+    } */
+    /* body.struk .sheet          { padding: 2mm; }
+    .txt-left { text-align: left;}
+    .txt-center { text-align: center;}
+    .txt-right { text-align: right;} */
+}

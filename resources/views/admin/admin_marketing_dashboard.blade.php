@@ -15,10 +15,10 @@
                                     <i class="mdi mdi-calendar-range"></i>
                                     </span>
                                 </div>
-                                <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-2">
+                                <a href="#" class="btn btn-blue btn-sm ms-2">
                                 <i class="mdi mdi-autorenew"></i>
                                 </a>
-                                <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-1">
+                                <a href="#" class="btn btn-blue btn-sm ms-1">
                                 <i class="mdi mdi-filter-variant"></i>
                                 </a>
                             </form>
@@ -131,7 +131,7 @@
                                     <tbody>
                                         @foreach ($marketingData as $marData)
                                             <tr>
-                                                <td style="width: 36px;">
+                                                <td>
                                                     <img src="{{ !empty($marData->detail->photo) ? Storage::url('images/profile/'.$marData->detail->photo) : asset('assets/images/blank_profile.png') }}"" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm" />
                                                 </td>
                                                 <td>

@@ -9,7 +9,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="javascript: void(0);">Settings</a></li>
+                                <li class="breadcrumb-item"><a href="#">Settings</a></li>
                                 <li class="breadcrumb-item active">POS</li>
                             </ol>
                         </div>
