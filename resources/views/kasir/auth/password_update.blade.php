@@ -1,4 +1,4 @@
-<x-tenant-layout>
+<x-kasir-layout>
 
     <div class="content">
         <!-- Start Content-->
@@ -23,7 +23,7 @@
                 <div class="col-lg-8 col-xl-8">
                     <div class="card">
                         <div class="card-body">
-                            <form method="post" action="{{ route('tenant.password.update') }}">
+                            <form method="post" action="{{ route('kasir.password.update') }}">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12">
@@ -85,4 +85,4 @@
         <!-- container -->
     </div>
 
-</x-tenant-layout>
+</x-kasir-layout>

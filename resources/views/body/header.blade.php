@@ -181,7 +181,7 @@
                             {{ route('tenant.profile') }}
                         @endauth
                         @auth('kasir')
-                            
+                            {{ route('kasir.profile') }}
                         @endauth
                     " class="dropdown-item notify-item">
                         <i class="fe-user"></i>
@@ -210,7 +210,7 @@
                             {{ route('tenant.password') }}
                         @endauth
                         @auth('kasir')
-                            
+                            {{ route('kasir.password') }}
                         @endauth
                     " class="dropdown-item notify-item">
                         <i class="fe-lock"></i>

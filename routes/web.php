@@ -201,6 +201,12 @@ Route::middleware(['auth:kasir', 'throttle', 'addnonceScript', 'addnonceStyle', 
     // Route::post('/dashboard/kasir/pos/transaction/update', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingUpdate'])->name('kasir.pos.transaction.pending.update');
 
     Route::get('/dashboard/kasir/transaction/finish', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionFinish'])->name('kasir.transaction.finish');
+
+    Route::get('settings/profile', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profile'])->name('kasir.profile');
+    Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profileAccountUpdate'])->name('kasir.profile.account.update');
+    Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profileInfoUpdate'])->name('kasir.profile.info.update');
+    Route::get('settings/password', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'password'])->name('kasir.password');
+    Route::post('settings/password/update', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'passwordUpdate'])->name('kasir.password.update');
 });
 
 require __DIR__.'/auth.php';

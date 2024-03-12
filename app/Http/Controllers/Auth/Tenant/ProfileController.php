@@ -18,7 +18,7 @@ class ProfileController extends Controller{
     }
 
     public function profileAccountUpdate(Request $request){
-        $profileInfo = Tenant::find($request->id);
+        $profileInfo = Tenant::find(auth()->user()->id);
 
         $profileInfo->update([
             'name' => $request->name,
@@ -34,7 +34,7 @@ class ProfileController extends Controller{
     }
 
     public function profileInfoUpdate(Request $request){
-        $profileInfo = DetailTenant::find($request->id);
+        $profileInfo = DetailTenant::find(auth()->user()->detail->id);
 
         if($request->hasFile('photo')){
             $file = $request->file('photo');

@@ -1,4 +1,4 @@
-<x-admin-layout>
+<x-marketing-layout>
 
     <div class="content">
         <!-- Start Content-->
@@ -85,4 +85,4 @@
         <!-- container -->
     </div>
 
-</x-admin-layout>
+</x-marketing-layout>

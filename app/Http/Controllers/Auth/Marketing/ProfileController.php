@@ -17,7 +17,7 @@ class ProfileController extends Controller {
     }
 
     public function profileAccountUpdate(Request $request){
-        $profileInfo = Marketing::find($request->id);
+        $profileInfo = Marketing::find(auth()->user()->id);
 
         $profileInfo->update([
             'name' => $request->name,
@@ -33,7 +33,7 @@ class ProfileController extends Controller {
     }
 
     public function profileInfoUpdate(Request $request){
-        $profileInfo = DetailMarketing::find($request->id);
+        $profileInfo = DetailMarketing::find(auth()->user()->detail->id);
 
         if($request->hasFile('photo')){
             $file = $request->file('photo');
