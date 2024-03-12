@@ -150,7 +150,7 @@
                         <div class="collapse" id="transaction">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="{{ route('kasir.transaction.pending') }}">Pending</a>
+                                    <a href="{{ route('kasir.transaction.pending') }}">Transaction Pending</a>
                                 </li>
                             </ul>
                             <ul class="nav-second-level">
@@ -160,7 +160,7 @@
                             </ul>
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="{{ route('kasir.transaction.finish') }}">Finish</a>
+                                    <a href="{{ route('kasir.transaction.finish') }}">Transaction Finish</a>
                                 </li>
                             </ul>
                         </div>
@@ -295,6 +295,26 @@
                                 </li>
                                 <li>
                                     <a href="{{ route('tenant.product.stock.list') }}">Stock Manager</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#transaksi" data-bs-toggle="collapse">
+                            <i class="mdi mdi-qrcode-scan"></i>
+                            <span> Transaksi </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="transaksi">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('tenant.transaction.list') }}">Semua Transaksi</a>
+                                </li>
+                                <li>
+                                    <a href="#">Transaction Pending</a>
+                                </li>
+                                <li>
+                                    <a href="#">Payment Pending</a>
                                 </li>
                             </ul>
                         </div>

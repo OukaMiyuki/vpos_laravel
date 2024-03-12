@@ -211,6 +211,23 @@ class KasirController extends Controller {
         return view('kasir.kasir_transaction_restore', compact('customField', 'invoice'))->with($notification);
     }
 
+    public function transactionPendingDelete($id) {
+        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                ->where('id_kasir', auth()->user()->id)
+                ->where('jenis_pembayaran', NULL)
+                ->find($id);
+        session()->forget('cart');
+        if(!is_null($invoice)) {
+            $invoice->deleteCart($invoice);
+        }
+        $invoice->delete();
+        $notification = array(
+            'message' => 'Transaction Deleted Successfully!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
     public function cartTransactionProcess(Request $request){
         if($request->jenisPembayaran == "Tunai"){
             $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

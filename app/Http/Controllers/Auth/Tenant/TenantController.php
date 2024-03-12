@@ -516,4 +516,8 @@ class TenantController extends Controller {
 
         return redirect()->back()->with($notification);
     }
+
+    public function transactionList(){
+        
+    }
 }

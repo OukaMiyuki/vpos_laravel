@@ -151,6 +151,8 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'addnonceSc
     Route::get('/dashboard/data/batch/product/stock/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockDelete'])->name('tenant.product.stock.delete');
     Route::get('/dashboard/data/batch/product/stock/barcode/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockBarcode'])->name('tenant.product.stock.barcode.show');
 
+    Route::get('/dashboard/data/transaction/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionList'])->name('tenant.transaction.list');
+
     Route::get('/dashboard/store/settings/discount', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModify'])->name('tenant.discount.modify');
     Route::post('/dashboard/store/settings/discount/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModifyInsert'])->name('tenant.discount.insert');
 
@@ -197,8 +199,8 @@ Route::middleware(['auth:kasir', 'throttle', 'addnonceScript', 'addnonceStyle', 
 
     Route::get('/dashboard/kasir/transaction/pending', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPending'])->name('kasir.transaction.pending');
     Route::get('/dashboard/kasir/transaction/restore/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingRestore'])->name('kasir.transaction.pending.restore');
+    Route::get('/dashboard/kasir/transaction/pending/delete/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingDelete'])->name('kasir.transaction.pending.delete');
     Route::post('/dashboard/kasir/transaction/pending/process', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionPendingProcess'])->name('kasir.pos.transaction.pending.process');
-    // Route::post('/dashboard/kasir/pos/transaction/update', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingUpdate'])->name('kasir.pos.transaction.pending.update');
 
     Route::get('/dashboard/kasir/transaction/finish', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionFinish'])->name('kasir.transaction.finish');
 

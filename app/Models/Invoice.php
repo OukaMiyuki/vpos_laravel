@@ -70,4 +70,16 @@ class Invoice extends Model {
         $InvoiceField->content5 = request()->content5;
         $InvoiceField->save();
     }
+
+    public function deleteCart($model){
+        $cartContent = ShoppingCart::where('id_invoice', $model->id)->get();
+        foreach($cartContent as $cart){
+            $stock = ProductStock::find($cart->id_product);
+            $updateStok = (int) $stock->stok + (int) $cart->qty;
+            $stock->update([
+                'stok' => $updateStok
+            ]);
+            $cart->delete();
+        }
+    }
 }
