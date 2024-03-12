@@ -197,7 +197,10 @@ Route::middleware(['auth:kasir', 'throttle', 'addnonceScript', 'addnonceStyle', 
 
     Route::get('/dashboard/kasir/transaction/pending', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPending'])->name('kasir.transaction.pending');
     Route::get('/dashboard/kasir/transaction/restore/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingRestore'])->name('kasir.transaction.pending.restore');
+    Route::post('/dashboard/kasir/transaction/pending/process', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionPendingProcess'])->name('kasir.pos.transaction.pending.process');
     // Route::post('/dashboard/kasir/pos/transaction/update', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingUpdate'])->name('kasir.pos.transaction.pending.update');
+
+    Route::get('/dashboard/kasir/transaction/finish', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionFinish'])->name('kasir.transaction.finish');
 });
 
 require __DIR__.'/auth.php';

@@ -72,20 +72,20 @@ $(document).ready(function(){
     });
 
 
-    document.getElementById('enable_manual_batcode').onclick = function() {
-        const barcode_txt = document.getElementById('barcode');
-        if (barcode_txt.readOnly) {
-            barcode_txt.readOnly = false;
-            this.innerHTML = "Masukkan Barcode via Scanner";
-            // console.log('✅ element is read-only');
-        } else {
-            // console.log('⛔️ element is not read-only');
-            this.innerHTML = "Input Barcode Manual";
-            barcode_txt.value = "";
-            barcode_txt.readOnly = true;
-        }
-        // document.getElementById('myInput').readOnly = false;
-    };
+    // document.getElementById('enable_manual_batcode').onclick = function() {
+    //     const barcode_txt = document.getElementById('barcode');
+    //     if (barcode_txt.readOnly) {
+    //         barcode_txt.readOnly = false;
+    //         this.innerHTML = "Masukkan Barcode via Scanner";
+    //         // console.log('✅ element is read-only');
+    //     } else {
+    //         // console.log('⛔️ element is not read-only');
+    //         this.innerHTML = "Input Barcode Manual";
+    //         barcode_txt.value = "";
+    //         barcode_txt.readOnly = true;
+    //     }
+    //     // document.getElementById('myInput').readOnly = false;
+    // };
 
     // var barcode = "";
     // var interval = "";

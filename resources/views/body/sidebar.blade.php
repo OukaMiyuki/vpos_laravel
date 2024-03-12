@@ -153,33 +153,14 @@
                                     <a href="{{ route('kasir.transaction.pending') }}">Pending</a>
                                 </li>
                             </ul>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#payment" data-bs-toggle="collapse">
-                            <i class="mdi mdi-account-tie-voice"></i>
-                            <span> Payment </span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="collapse" id="payment">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Pending</a>
+                                    <a href="#">Payment Pending</a>
                                 </li>
                             </ul>
-                        </div>
-                    </li>
-                    <li class="menu-title mt-2">Report</li>
-                    <li>
-                        <a href="#report" data-bs-toggle="collapse">
-                            <i class="mdi mdi-account-tie-voice"></i>
-                            <span> Transaction </span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="collapse" id="report">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Report</a>
+                                    <a href="{{ route('kasir.transaction.finish') }}">Finish</a>
                                 </li>
                             </ul>
                         </div>

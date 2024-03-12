@@ -1,17 +1,9 @@
-body {font-size:14px;font-family: monospace;margin:0;padding:0;}
-#print-button {
-    margin: 1em 0 1em 0;
-    display: flex;
-    justify-content: center;
-}
-#print-button button {
-    width: 18%;
-}
+body {font-size:14px;font-family: monospace;margin:0;padding:1rem;}
 #invoice-POS{
-    border: 1px solid #ddd;
-    padding: 2mm;
+    /* border: 1px solid #ddd; */
+    /* padding: 1rem; */
     margin: 0 auto;
-    width: 58mm;
+    width: 100%;
     /* page-break-after:always; */
     background: #FFF;
 }
@@ -27,8 +19,8 @@ body {font-size:14px;font-family: monospace;margin:0;padding:0;}
     font-size: 1.5em;
     color: #000000 !important;
 }
-#invoice-POS h2 {
-    font-size: .9em;
+#invoice-POS h2.storeTitle {
+    font-size: 1em;
 }
 #invoice-POS h3 {
     font-size: 0.9em;
@@ -36,13 +28,13 @@ body {font-size:14px;font-family: monospace;margin:0;padding:0;}
     line-height: 0.8em;
 }
 #invoice-POS p.customer {
-    font-size: 0.57em;
+    font-size: .7em;
     color: #000000 !important; 
     line-height: 0em;
     font-weight: 800;
 }
 #invoice-POS #legalcopy p {
-    font-size: 0.57em;
+    font-size: .7em;
     color: #000000 !important;
     font-weight: 700 !important;
     line-height: 1.2em;
@@ -63,7 +55,7 @@ body {font-size:14px;font-family: monospace;margin:0;padding:0;}
 #invoice-POS #top .logo {
     height: 50px;
     width: 50px;
-    background: url(https://codeforui.com/posts/dummylogo.png) no-repeat;
+    background: url() no-repeat;
     background-size: 50px 50px;
 }
 #invoice-POS .info {
@@ -81,13 +73,13 @@ body {font-size:14px;font-family: monospace;margin:0;padding:0;}
     border-collapse: collapse;
 }
 #invoice-POS .tabletitle {
-    font-size: 0.6em;
+    font-size: .48em;
     background: #EEE;
     font-weight: 700;
 }
 #invoice-POS tr.pembayaran {
     line-height: .1em !important;
-    font-size: .6em !important;
+    font-size: .45em !important;
 }
 #invoice-POS tr.pembayaran h2 {
     font-weight: 700;
@@ -105,7 +97,8 @@ body {font-size:14px;font-family: monospace;margin:0;padding:0;}
     width: 24mm;
 }
 #invoice-POS .itemtext {
-    font-size: 0.5em;
+    font-size: .65em;
+    font-weight: 600;
 }
 #invoice-POS #legalcopy {
     margin-top: 5mm;
@@ -114,7 +107,7 @@ h2.storeTitle {
     font-weight: 700 !important;
 }
 p.storeAddress {
-    font-size: .6em !important; 
+    font-size: .78em !important; 
     font-weight: 600 !important;
 }
 p.customerTitle {
@@ -122,17 +115,17 @@ p.customerTitle {
 }
 table.customerInfo {
     margin-bottom: 1em; 
-    font-weight: 600 !important;
+    font-weight: 700 !important;
 }
 h2.itemTitle{
-    font-weight: 600 !important;
+    font-weight: 700 !important;
 }
 .tabletitle td.sub-total {
     width: 120px;
 }
 @media print {
-    body { font-size:14px;font-family: monospace; } */
-    body { width: 58mm !important;}
+    body { font-size:14px;font-family: monospace; }
+    /* body { width: 58mm !important;} */
     /* body {
         visibility: hidden;
     }

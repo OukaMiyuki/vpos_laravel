@@ -31,7 +31,7 @@
 
                                         <div class="logo logo-light">
                                             <span class="logo-lg">
-                                                <img src="assets/images/logo-light.png" alt="" height="22">
+                                                <img src="{{ asset('assets/images/logo/small.png') }}" alt="" height="22">
                                             </span>
                                         </div>
                                     </div>
@@ -183,10 +183,11 @@
 
                             <div class="mt-4 mb-1">
                                 <div class="text-end d-print-none">
+                                    <a href="{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}" class="btn btn-primary waves-effect waves-light" target="_blank"><i class="mdi mdi-printer me-1"></i> Print Nota</a>
                                     {{-- <a href="" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a> --}}
                                     {{-- <a href="" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow','height=500,width=255,left=100,top=100,resizable=no,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a> --}}
-                                    <a href="" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow','resizable=no,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a>
-                                    <a href="#" class="btn btn-info waves-effect waves-light">Submit</a>
+                                    {{-- <a id="printNota" nonce="{{ csp_nonce() }}" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow','resizable=no,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a>&nbsp;&nbsp; --}}
+                                    {{-- <a href="#" class="btn btn-info waves-effect waves-light">Submit</a> --}}
                                 </div>
                             </div>
                         </div>

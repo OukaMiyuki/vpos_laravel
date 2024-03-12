@@ -40,8 +40,10 @@ class KasirController extends Controller {
 
         if(!empty($tax)){
             Cart::setGlobalTax($tax->pajak);
+        } else {
+            Cart::setGlobalTax(0);
         }
-        Cart::setGlobalTax(21);
+        // Cart::setGlobalTax(21);
         Cart::add([
             'id' => $request->id,
             'name' => $request->name,
@@ -152,7 +154,7 @@ class KasirController extends Controller {
     public function transactionPending(){
         $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
                             ->where('id_kasir', auth()->user()->id)
-                            ->where('status_pembayaran', 0)
+                            ->where('jenis_pembayaran', NULL)
                             ->latest()
                             ->get();
         return view('kasir.kasir_invoice_pending', compact('invoice'));
@@ -169,15 +171,19 @@ class KasirController extends Controller {
 
         $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
                     ->where('is_active', 1)->first();
+        
+        $customField = TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
 
         if(!empty($tax)){
             Cart::setGlobalTax($tax->pajak);
+        } else {
+            Cart::setGlobalTax(0);
         }
-        Cart::setGlobalTax(21);
+        // Cart::setGlobalTax(21);
 
         foreach($invoice->shoppingCart as $cart){
             Cart::add([
-                'id' => $cart->id,
+                'id' => $cart->id_product,
                 'name' => $cart->product_name,
                 'qty' => $cart->qty,
                 'price' => $cart->harga,
@@ -202,52 +208,96 @@ class KasirController extends Controller {
             'message' => 'Transaction restored!',
             'alert-type' => 'success',
         );
-        return view('kasir.kasir_transaction_restore')->with($notification);
+        return view('kasir.kasir_transaction_restore', compact('customField', 'invoice'))->with($notification);
     }
 
     public function cartTransactionProcess(Request $request){
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $pin = mt_rand(1000000, 9999999)
-            . mt_rand(1000000, 9999999)
-            . $characters[rand(0, strlen($characters) - 1)];
-        $string = str_shuffle($pin);
-        $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
-        $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
-        $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
-        $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
-        $invoice = Invoice::create([
-            'id_tenant' => auth()->user()->id_tenant,
-            'id_kasir' => auth()->user()->id,
-            'nomor_invoice' => $string,
-            'jenis_pembayaran' => $request->jenisPembayaran,
-            'nominal_bayar' => $request->nominalText,
-            'kembalian' => $kembalian,
-            'status_pembayaran' => 1,
-            'sub_total' => $subtotal,
-            'pajak' => $tax,
-            'diskon' => $diskon,
-            'tanggal_pelunasan' => Carbon::now(),
-            'tanggal_transaksi' => Carbon::now()
-        ]);
+        if($request->jenisPembayaran == "Tunai"){
+            $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $pin = mt_rand(1000000, 9999999)
+                . mt_rand(1000000, 9999999)
+                . $characters[rand(0, strlen($characters) - 1)];
+            $string = str_shuffle($pin);
+            $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
+            $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
+            $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
+            $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
+            $invoice = Invoice::create([
+                'id_tenant' => auth()->user()->id_tenant,
+                'id_kasir' => auth()->user()->id,
+                'nomor_invoice' => $string,
+                'jenis_pembayaran' => $request->jenisPembayaran,
+                'nominal_bayar' => $request->nominalText,
+                'kembalian' => $kembalian,
+                'status_pembayaran' => 1,
+                'sub_total' => $subtotal,
+                'pajak' => $tax,
+                'diskon' => $diskon,
+                'tanggal_pelunasan' => Carbon::now(),
+                'tanggal_transaksi' => Carbon::now()
+            ]);
+    
+            if(!is_null($invoice)) {
+                $invoice->storeCart($invoice);
+                $invoice->fieldSave($invoice);
+            }
+    
+            session()->forget('cart');
+    
+            $notification = array(
+                'message' => 'Transaksi berhasil diproses!',
+                'alert-type' => 'success',
+            );
+            // return view('kasir.kasir_invoice_preview', compact('invoice'))->with($notification);
+            return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
+        } else if($request->jenisPembayaran == "Tunai"){
 
-        if(!is_null($invoice)) {
-            $invoice->storeCart($invoice);
-            $invoice->fieldSave($invoice);
         }
+    }
 
-        session()->forget('cart');
-
-        $notification = array(
-            'message' => 'Transaksi berhasil diproses!',
-            'alert-type' => 'success',
-        );
-        // return view('kasir.kasir_invoice_preview', compact('invoice'))->with($notification);
-        return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
+    public function cartTransactionPendingProcess(Request $request){
+        if($request->jenisPembayaran == "Tunai"){
+            $invoice = Invoice::find($request->id_invoice);
+            $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
+            $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
+            $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
+            $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
+            $invoice->update([
+                'jenis_pembayaran' => $request->jenisPembayaran,
+                'tanggal_pelunasan' => Carbon::now(),
+                'status_pembayaran' => 1,
+                'sub_total' => $subtotal,
+                'pajak' => $tax,
+                'diskon' => $diskon,
+                'nominal_bayar' => $request->nominalText,
+                'kembalian' => $kembalian,
+            ]);
+            if(!is_null($invoice)) {
+                $invoice->fieldSave($invoice);
+            }
+            session()->forget('cart');
+            $notification = array(
+                'message' => 'Transaksi berhasil diproses!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
+        } else if($request->jenisPembayaran == "Tunai"){
+            
+        }
     }
 
     public function cartTransactionInvoice($id){
         $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
         return view('kasir.kasir_invoice_preview', compact('invoice'));
+    }
+
+    public function transactionFinish(){
+        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->where('status_pembayaran', 1)
+                            ->latest()
+                            ->get();
+        return view('kasir.kasir_invoice_finish', compact('invoice'));
     }
 
     public function cartTransactionInvoiceReceipt($id){
