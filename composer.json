@@ -20,7 +20,8 @@
         "laravel/tinker": "^2.8",
         "mike42/escpos-php": "^4.0",
         "picqer/php-barcode-generator": "^2.4",
-        "rawilk/laravel-printing": "^3.0"
+        "rawilk/laravel-printing": "^3.0",
+        "spatie/laravel-csp": "^2.9"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

@@ -1,9 +1,9 @@
 $(document).ready(function(){
-    var form = document.getElementById("logout-form");
+    // var form = document.getElementById("logout-form");
 
-    document.getElementById("#logout").addEventListener("click", function () {
-      form.submit();
-    });
+    // document.getElementById("#logout").addEventListener("click", function () {
+    //   form.submit();
+    // });
 
     $('#image').change(function(e){
         var reader = new FileReader();

@@ -36,6 +36,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Spatie\Csp\AddCspHeaders::class,
         ],
 
         'api' => [
@@ -67,5 +68,7 @@ class Kernel extends HttpKernel
         'tenantemailverivied' => \App\Http\Middleware\TenantEmailVerification::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'addnonceScript' => \App\Http\Middleware\AddNonceToInlineScripts::class,
+        'addnonceStyle' => \App\Http\Middleware\AddNonceToInlineStyle::class,
     ];
 }
