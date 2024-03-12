@@ -3,7 +3,11 @@ p.pos-price-text {
     color: white;
 }
 
-button.pos-add-button {
+input.qty_txt{
+    width: 40px;
+}
+
+.pos-add-button {
     font-size: 20px;
     color: black;
 }

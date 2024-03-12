@@ -46,7 +46,7 @@
                                                     
                                                         <td>{{ $cart->name }}</td>
                                                         <td>
-                                                            <input readonly type="number" name="qty" style="width:40px;" value="{{ $cart->qty }}" min="1">
+                                                            <input readonly type="number" name="qty" class="qty_txt" value="{{ $cart->qty }}" min="1">
                                                         </td>
                                                         <td>{{ $cart->price }}</td>
                                                         <td>{{ $cart->price*$cart->qty }}</td>

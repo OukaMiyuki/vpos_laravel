@@ -71,7 +71,7 @@
         <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
         <script src="{{ asset('assets/libs/selectize/js/standalone/selectize.min.js') }}"></script>
         <!-- Dashboar 1 init js-->
-        <script src="{{ asset('assets/js/pages/dashboard-1.init.js') }}"></script>
+        {{-- <script src="{{ asset('assets/js/pages/dashboard-1.init.js') }}"></script> --}}
         <!-- App js-->
         <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
         <script src="{{ asset('assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
@@ -89,7 +89,7 @@
         <script src="{{ asset('assets/js/pages/datatables.init.js') }}"></script>
         <script src="{{ asset('assets/libs/moment/min/moment.min.js') }}"></script>
         <script src="{{ asset('assets/libs/fullcalendar/main.min.js') }}"></script>
-        <script src="{{ asset('assets/js/pages/calendar.init.js') }}"></script>
+        {{-- <script src="{{ asset('assets/js/pages/calendar.init.js') }}"></script> --}}
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
         {{-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script> --}}
         <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
@@ -114,7 +114,7 @@
 
         {{-- Custom FOrm JS --}}
 
-        <script>
+        <script nonce="{{ csp_nonce() }}">
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"
                 switch(type){

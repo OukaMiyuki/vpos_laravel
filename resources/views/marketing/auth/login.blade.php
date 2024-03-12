@@ -17,7 +17,7 @@
         <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- Head js -->
         <script src="{{ asset('assets/js/head.js') }}"></script>
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" >
+        <link href="{{ asset('assets/libs/toastr/build/toastr.min.css') }}" rel="stylesheet" type="text/css" />
     </head>
     <body class="authentication-bg authentication-bg-pattern">
         <div class="account-pages mt-5 mb-5">
@@ -92,15 +92,15 @@
         </div>
         <!-- end page -->
         <footer class="footer footer-alt">
-            2015 - <script>document.write(new Date().getFullYear())</script> &copy; UBold theme by <a href="" class="text-white-50">Coderthemes</a> 
+            2015 - <script nonce="{{ csp_nonce() }}">document.write(new Date().getFullYear())</script> &copy; UBold theme by <a href="" class="text-white-50">Coderthemes</a> 
         </footer>
         <!-- Vendor js -->
         <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
         <!-- App js -->
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+        <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
 
-        <script>
+        <script nonce="{{ csp_nonce() }}">
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"
                 switch(type){

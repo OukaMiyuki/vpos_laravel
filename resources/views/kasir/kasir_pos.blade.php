@@ -47,7 +47,7 @@
                                                     <form id="qtyform" action="{{ route('kasir.pos.updateCart') }}" method="post">
                                                         @csrf
                                                         <input type="hidden" name="id" value="{{ $cart->rowId }}">
-                                                        <input type="number" name="qty" class="w-50" value="{{ $cart->qty }}" min="1">
+                                                        <input type="number" name="qty" class="qty_txt" value="{{ $cart->qty }}" min="1">
                                                         <button type="submit" class="btn btn-sm btn-success"><span class="mdi mdi-check-bold"></span></button>
                                                     </form>
                                                 </td>
