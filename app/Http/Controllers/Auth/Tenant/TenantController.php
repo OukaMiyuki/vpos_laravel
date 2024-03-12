@@ -15,6 +15,7 @@ use App\Models\ProductStock;
 use App\Models\Tax;
 use App\Models\Discount;
 use App\Models\TenantField;
+use App\Models\Invoice;
 
 class TenantController extends Controller {
 
@@ -518,6 +519,12 @@ class TenantController extends Controller {
     }
 
     public function transactionList(){
-        
+        $invoice = Invoice::where('id_tenant', auth()->user()->id)->latest()->get();
+        return view('tenant.tenant_transaction_list', compact('invoice'));
+    }
+
+    public function transactionInvoiceView($id){
+        $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
+        return view('tenant.tenant_invoice_preview', compact('invoice'));
     }
 }

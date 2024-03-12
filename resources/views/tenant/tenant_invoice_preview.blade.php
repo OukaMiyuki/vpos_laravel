@@ -1,4 +1,4 @@
-<x-kasir-layout>
+<x-tenant-layout>
     <div class="content">
         <div class="container-fluid">
             <div class="row">
@@ -88,7 +88,7 @@
                                 <div class="col-sm-6">
                                     <h6>Info Transaksi</h6>
                                     @php
-                                        $field = App\Models\TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
+                                        $field = App\Models\TenantField::where('id_tenant', auth()->user()->id)->first();
                                     @endphp
                                     @if (!empty($field))
                                         <address>
@@ -104,10 +104,10 @@
                                 <div class="col-sm-6">
                                     <h6>Info Kasir</h6>
                                     <address>
-                                        Nama Kasir : {{ auth()->user()->name }}<br>
+                                        Nama Kasir : <br>
                                         Jabatan : Kasir<br>
-                                        Nomor Telp./WA : {{ auth()->user()->phone }}<br>
-                                        Email : {{ auth()->user()->email }}<br>
+                                        Nomor Telp./WA : <br>
+                                        Email : <br>
                                     </address>
                                 </div> <!-- end col -->
                             </div>
@@ -198,4 +198,4 @@
 
         </div>
     </div>
-</x-kasir-layout>
+</x-tenant-layout>

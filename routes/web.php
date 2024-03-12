@@ -152,6 +152,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'addnonceSc
     Route::get('/dashboard/data/batch/product/stock/barcode/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockBarcode'])->name('tenant.product.stock.barcode.show');
 
     Route::get('/dashboard/data/transaction/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionList'])->name('tenant.transaction.list');
+    Route::get('/dashboard/data/transaction/invoice/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionInvoiceView'])->name('tenant.transaction.invoice');
 
     Route::get('/dashboard/store/settings/discount', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModify'])->name('tenant.discount.modify');
     Route::post('/dashboard/store/settings/discount/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModifyInsert'])->name('tenant.discount.insert');

@@ -308,6 +308,11 @@ class KasirController extends Controller {
         return view('kasir.kasir_invoice_preview', compact('invoice'));
     }
 
+    public function cartTransactionInvoiceReceipt($id){
+        $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
+        return view('kasir.printer', compact('invoice'));
+    }
+
     public function transactionFinish(){
         $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
                             ->where('id_kasir', auth()->user()->id)
@@ -315,10 +320,5 @@ class KasirController extends Controller {
                             ->latest()
                             ->get();
         return view('kasir.kasir_invoice_finish', compact('invoice'));
-    }
-
-    public function cartTransactionInvoiceReceipt($id){
-        $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
-        return view('kasir.printer', compact('invoice'));
     }
 }
