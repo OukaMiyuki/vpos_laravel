@@ -18,6 +18,8 @@ class CustomPolicy extends Basic {
             // ->addDirective(Directive::CONNECT, Scheme::WSS)
             ->addNonceForDirective(Directive::SCRIPT)
             ->addNonceForDirective(Directive::STYLE)
-            ->addDirective(Directive::IMG, 'data:');
+            ->addDirective(Directive::IMG, 'data:')
+            ->addDirective(Directive::FORM_ACTION, 'https://vpos.jsp.my.id/kasir/login')
+            ->addDirective(Directive::FORM_ACTION, 'https://vpos.jsp.my.id/kasir/logout');
     }
 }
