@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth\Admin\Api;
+namespace App\Http\Controllers\Auth\Marketing\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller {
-    
     public function register(Request $request) {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
@@ -36,38 +35,38 @@ class AuthController extends Controller {
             return response()->json($validator->errors());
         }
 
-        $admin = Admin::create([
+        $marketing = Marketing::create([
             'name' => $request->name,
-            'phone' => $request->phone,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
         ]);
 
-        if(!is_null($admin)) {
-            $admin->detailAdminStore($admin);
+        if(!is_null($marketing)) {
+            $marketing->detailMarketingStore($marketing);
         }
 
-        // event(new Registered($admin));
+        event(new Registered($marketing));
 
-        $token = $admin->createToken('auth_token')->plainTextToken;
+        $token = $marketing->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'data' => $admin,
+            'data' => $marketing,
             'access_token' => $token,
             'token_type' => 'Bearer'
         ]);
     }
 
     public function login(Request $request) {
-        if (! Auth::guard('admin')->attempt($request->only('email', 'password'))) {
+        if (! Auth::guard('marketing')->attempt($request->only('email', 'password'))) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 401);
         }
 
-        $admin = Admin::where('email', $request->email)->firstOrFail();
+        $marketing = Marketing::where('email', $request->email)->firstOrFail();
 
-        $token = $admin->createToken('auth_token')->plainTextToken;
+        $token = $marketing->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login success',
