@@ -70,5 +70,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'addnonceScript' => \App\Http\Middleware\AddNonceToInlineScripts::class,
         'addnonceStyle' => \App\Http\Middleware\AddNonceToInlineStyle::class,
+        'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+        'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
     ];
 }
