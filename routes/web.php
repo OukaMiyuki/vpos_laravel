@@ -186,7 +186,7 @@ Route::middleware(['auth:kasir', 'throttle', 'addnonceScript', 'addnonceStyle', 
 
     Route::post('logout', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'destroy'])->name('kasir.logout');
 
-    Route::view('/dashboard','kasir.dashboard');
+    Route::get('/dashboard', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'index'])->name('kasir.dashboard');
     Route::get('/dashboard/kasir/pos', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'kasirPos'])->name('kasir.pos');
     Route::post('/dashboard/kasir/pos/addcart', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'addCart'])->name('kasir.pos.addCart');
     Route::get('/dashboard/kasir/pos/allitem', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'allItem'])->name('kasir.pos.allitem');

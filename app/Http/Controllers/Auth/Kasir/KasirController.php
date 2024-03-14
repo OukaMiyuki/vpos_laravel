@@ -16,6 +16,10 @@ use App\Models\TenantField;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
 
 class KasirController extends Controller {
+    public function index(){
+        return view('kasir.dashboard');
+    }
+
     public function kasirPos(){
         // session()->forget('cart');
         // $stock = Product::with('productStock')->where('id_tenant', auth()->user()->id_tenant)

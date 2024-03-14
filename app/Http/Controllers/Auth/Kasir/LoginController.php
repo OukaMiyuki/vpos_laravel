@@ -37,7 +37,7 @@ class LoginController extends Controller {
         );
         $request->session()->regenerate();
         RateLimiter::clear($this->throttleKey());
-        return redirect()->intended(RouteServiceProvider::KASIR_DASHBOARD)->with($notification);
+        return redirect()->route('kasir.dashboard')->with($notification);
     }
 
     public function ensureIsNotRateLimited(): void {
