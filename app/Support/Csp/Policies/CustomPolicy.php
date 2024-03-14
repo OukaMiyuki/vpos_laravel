@@ -19,6 +19,7 @@ class CustomPolicy extends Basic {
             ->addNonceForDirective(Directive::SCRIPT)
             ->addNonceForDirective(Directive::STYLE)
             ->addDirective(Directive::IMG, 'data:')
-            ->addDirective(Directive::FORM_ACTION, 'https://vpos.jsp.my.id');
+            ->addDirective(Directive::FORM_ACTION, 'https://vpos.jsp.my.id')
+            ->addDirective(Directive::FORM_ACTION, 'unsafe-allow-redirects');
     }
 }
