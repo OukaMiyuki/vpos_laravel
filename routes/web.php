@@ -175,7 +175,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'addnonceSc
 Route::middleware(['guest:kasir', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('kasir')->group( function () {
 
     Route::get('login', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'create'])->name('kasir.login');
-    Route::post('login', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'store']);
+    Route::post('login', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'store'])->name('kasir.login.process')
 
     // Route::get('register', [App\Http\Controllers\Auth\Kasir\RegisterController::class, 'create'])->name('kasir.register');
     // Route::post('register', [App\Http\Controllers\Auth\Kasir\RegisterController::class, 'store']);
