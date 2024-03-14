@@ -3,7 +3,6 @@
     <head>
         <meta charset="utf-8" />
         <title>VPOS | Kasir - Dashboard</title>
-        @cspMetaTag(App\Support\Csp\Policies\CustomPolicy::class)
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
         <meta content="Coderthemes" name="author" />
@@ -116,7 +115,7 @@
 
         {{-- Custom FOrm JS --}}
 
-        <script nonce="{{ csp_nonce() }}">
+        <script>
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"
                 switch(type){

@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <meta property="csp-nonce" content="{{ csp_nonce() }}">
+        <meta property="csp-nonce">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>@yield('title')</title>

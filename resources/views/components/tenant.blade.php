@@ -114,7 +114,7 @@
 
         {{-- Custom FOrm JS --}}
 
-        <script nonce="{{ csp_nonce() }}">
+        <script>
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"
                 switch(type){

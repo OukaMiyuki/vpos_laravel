@@ -2,8 +2,6 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Support\Csp\Policies\CustomPolicy;
-use Spatie\Csp\AddCspHeaders;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +20,7 @@ Route::get('/', function () {
 
 // Temporarry commit because of error
 
-Route::middleware(['guest:admin', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('admin')->group( function () {
+Route::middleware(['guest:admin', 'throttle'])->prefix('admin')->group( function () {
     Route::get('login', [App\Http\Controllers\Auth\Admin\LoginController::class, 'create'])->name('admin.login');
     Route::post('login', [App\Http\Controllers\Auth\Admin\LoginController::class, 'store']);
     // Route::get('register', [App\Http\Controllers\Auth\Admin\RegisterController::class, 'create'])->name('admin.register');
@@ -43,7 +41,7 @@ Route::middleware(['guest:admin', 'throttle', 'addnonceScript', 'addnonceStyle',
 //     Route::post('logout', [App\Http\Controllers\Auth\Admin\LoginController::class, 'destroy'])->name('admin.logout');
 // });
 
-Route::middleware(['auth:admin', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('admin')->group( function () {
+Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function () {
     Route::post('logout', [App\Http\Controllers\Auth\Admin\LoginController::class, 'destroy'])->name('admin.logout');
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
 
@@ -60,7 +58,7 @@ Route::middleware(['auth:admin', 'throttle', 'addnonceScript', 'addnonceStyle', 
     Route::post('dashboard/data/marketing/account_info_update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountInfoUpdate'])->name('admin.dashboard.marketing.info.update');
 });
 
-Route::middleware(['guest:marketing', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('marketing')->group( function () {
+Route::middleware(['guest:marketing', 'throttle'])->prefix('marketing')->group( function () {
     Route::get('login', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'create'])->name('marketing.login');
     Route::post('login', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'store']);
     Route::get('register', [App\Http\Controllers\Auth\Marketing\RegisterController::class, 'create'])->name('marketing.register');
@@ -68,7 +66,7 @@ Route::middleware(['guest:marketing', 'throttle', 'addnonceScript', 'addnonceSty
 
 });
 
-Route::middleware(['auth:marketing', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('marketing')->group( function () {
+Route::middleware(['auth:marketing', 'throttle'])->prefix('marketing')->group( function () {
     Route::get('/verify-email', [App\Http\Controllers\Auth\Marketing\EmailVerificationPromptController::class, 'emailVerificationView'])->name('marketing.verification.notice');
     Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Marketing\VerifyEmailController::class, 'verificationProcess'])
                 ->middleware(['signed', 'throttle:6,1'])
@@ -80,7 +78,7 @@ Route::middleware(['auth:marketing', 'throttle', 'addnonceScript', 'addnonceStyl
     Route::post('logout', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'destroy'])->name('marketing.logout');
 });
 
-Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('marketing')->group( function () {
+Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle'])->prefix('marketing')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'index'])->name('marketing.dashboard');
 
     Route::get('settings/profile', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profile'])->name('marketing.profile');
@@ -95,7 +93,7 @@ Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'addn
     Route::get('/dashboard/data/code/cashout/invoice', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutInvoice'])->name('marketing.dashboard.invitationcode.cashout.invoice');
 });
 
-Route::middleware(['guest:tenant', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('tenant')->group( function () {
+Route::middleware(['guest:tenant', 'throttle'])->prefix('tenant')->group( function () {
 
     Route::get('login', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'create'])->name('tenant.login');
     Route::post('login', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'store']);
@@ -105,7 +103,7 @@ Route::middleware(['guest:tenant', 'throttle', 'addnonceScript', 'addnonceStyle'
 
 });
 
-Route::middleware(['auth:tenant', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('tenant')->group( function () {
+Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( function () {
     Route::get('/verify-email', [App\Http\Controllers\Auth\Tenant\EmailVerificationPromptController::class, 'emailVerificationView'])->name('tenant.verification.notice');
     Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Tenant\VerifyEmailController::class, 'verificationProcess'])
                 ->middleware(['signed', 'throttle:6,1'])
@@ -117,7 +115,7 @@ Route::middleware(['auth:tenant', 'throttle', 'addnonceScript', 'addnonceStyle',
     Route::post('logout', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'destroy'])->name('tenant.logout');
 });
 
-Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('tenant')->group( function () {
+Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle'])->prefix('tenant')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'index'])->name('tenant.dashboard');
     Route::get('/dashboard/data/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');
     Route::get('/dashboard/data/kasir/info/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirDetail'])->name('tenant.kasir.detail');
@@ -172,17 +170,17 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'addnonceSc
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'passwordUpdate'])->name('tenant.password.update');
 });
 
-Route::middleware(['guest:kasir', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('kasir')->group( function () {
+Route::middleware(['guest:kasir', 'throttle'])->prefix('kasir')->group( function () {
 
     Route::get('login', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'create'])->name('kasir.login');
-    Route::post('login', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'store'])->name('kasir.login.process')
+    Route::post('login', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'store'])->name('kasir.login.process');
 
     // Route::get('register', [App\Http\Controllers\Auth\Kasir\RegisterController::class, 'create'])->name('kasir.register');
     // Route::post('register', [App\Http\Controllers\Auth\Kasir\RegisterController::class, 'store']);
 
 });
 
-Route::middleware(['auth:kasir', 'throttle', 'addnonceScript', 'addnonceStyle', AddCspHeaders::class.':'.CustomPolicy::class])->prefix('kasir')->group( function () {
+Route::middleware(['auth:kasir', 'throttle'])->prefix('kasir')->group( function () {
 
     Route::post('logout', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'destroy'])->name('kasir.logout');
 

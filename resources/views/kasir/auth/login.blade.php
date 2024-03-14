@@ -3,7 +3,6 @@
     <head>
         <meta charset="utf-8" />
         <title>VPOS | Login - Area</title>
-        @cspMetaTag(App\Support\Csp\Policies\CustomPolicy::class)
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
         <meta content="Coderthemes" name="author" />
@@ -93,7 +92,7 @@
         </div>
         <!-- end page -->
         <footer class="footer footer-alt">
-            2015 - <script nonce="{{ csp_nonce() }}">document.write(new Date().getFullYear())</script> &copy; UBold theme by <a href="" class="text-white-50">Coderthemes</a> 
+            2015 - <script>document.write(new Date().getFullYear())</script> &copy; UBold theme by <a href="" class="text-white-50">Coderthemes</a> 
         </footer>
         <!-- Vendor js -->
         <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
@@ -101,7 +100,7 @@
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
         <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
 
-        <script nonce="{{ csp_nonce() }}">
+        <script>
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"
                 switch(type){

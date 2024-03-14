@@ -88,7 +88,7 @@
         {{-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script> --}}
         <script src="{{ asset('assets/js/pages/admin.init.js') }}"></script>
         <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
-        <script nonce="{{ csp_nonce() }}">
+        <script>
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"
                 switch(type){
