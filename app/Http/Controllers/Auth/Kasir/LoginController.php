@@ -25,7 +25,7 @@ class LoginController extends Controller {
             'password' => ['required', 'string'],
         ]);
 
-        if(! Auth::guard('kasir')->attempt($request->only('email', 'password'), $request->boolean('remember'))){
+        if(! Auth::guard('kasir')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
