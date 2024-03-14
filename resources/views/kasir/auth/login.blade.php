@@ -42,7 +42,7 @@
                                     </div>
                                     <p class="text-muted mb-4 mt-3">Masukkan Email, Username atau No. WA dan Password untuk masuk!</p>
                                 </div>
-                                <form method="POST" action="/kasir/login">
+                                <form method="POST" action="{{route('kasir.login')}}">
                                     @csrf
                                     <div class="mb-3">
                                         <label for="email" class="form-label">Email</label>
@@ -70,7 +70,7 @@
                                         </div>
                                     </div>
                                     <div class="text-center d-grid">
-                                        <button class="btn btn-primary" type="submit"> Log In </button>
+                                        <input class="btn btn-primary" type="submit" value="Log In">
                                     </div>
                                 </form>
                             </div>
