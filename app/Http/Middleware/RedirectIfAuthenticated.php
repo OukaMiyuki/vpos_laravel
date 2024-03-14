@@ -28,18 +28,18 @@ class RedirectIfAuthenticated {
                 } else if(Auth::guard('kasir')->check()){
                     return redirect(RouteServiceProvider::KASIR_DASHBOARD);
                 }
-            } 
-            // else {
-            //     if (Auth::guard('admin')->check()) {
-            //         return redirect(RouteServiceProvider::ADMIN_DASHBOARD);
-            //     } else if(Auth::guard('marketing')->check()){
-            //         return redirect(RouteServiceProvider::MARKETING_DASHBOARD);
-            //     } else if(Auth::guard('tenant')->check()){
-            //         return redirect(RouteServiceProvider::TENANT_DASHBOARD);
-            //     } else if(Auth::guard('kasir')->check()){
-            //         return redirect(RouteServiceProvider::KASIR_DASHBOARD);
-            //     }
-            // }
+            }
+            else {
+                if (Auth::guard('admin')->check()) {
+                    return redirect(RouteServiceProvider::ADMIN_DASHBOARD);
+                } else if(Auth::guard('marketing')->check()){
+                    return redirect(RouteServiceProvider::MARKETING_DASHBOARD);
+                } else if(Auth::guard('tenant')->check()){
+                    return redirect(RouteServiceProvider::TENANT_DASHBOARD);
+                } else if(Auth::guard('kasir')->check()){
+                    return redirect(RouteServiceProvider::KASIR_DASHBOARD);
+                }
+            }
         }
 
         return $next($request);

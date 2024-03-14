@@ -62,22 +62,25 @@
             <!--End Invoice Mid-->
             <div id="bot">
                 <div id="table">
-                    <table>
-                        <tr class="tabletitle">
-                            <td class="item">
-                                <h2 class="itemTitle">Item</h2>
-                            </td>
-                            <td class="Hours qty">
-                                <h2 class="itemTitle">Qty</h2>
-                            </td>
-                            <td class="Rate sub-total" width="120">
-                                <h2 class="itemTitle">Sub Total</h2>
-                            </td>
-                        </tr>
+                    <table class="items-table">
+                        <thead class="items-thead">
+                            <tr class="tabletitle">
+                                <th class="item">
+                                    <h2 class="itemTitle">Item</h2>
+                                </th>
+                                <th class="Hours qty">
+                                    <h2 class="itemTitle">Qty</h2>
+                                </th>
+                                <th class="Rate sub-total" width="120">
+                                    <h2 class="itemTitle">Sub Total</h2>
+                                </th>
+                            </tr>
+                        </thead>
                         @php
                             $total=0;
                         @endphp
                         @foreach ($invoice->shoppingCart as $cart)
+                        <tbody class="items-tbody">
                             <tr class="service">
                                 <td class="tableitem">
                                     <p class="itemtext">{{ $cart->product_name }}</p>
@@ -92,129 +95,90 @@
                             @php
                                 $total+=$cart->sub_total;
                             @endphp
+                        </tbody>
                         @endforeach
-                        {{-- <tr class="service">
-                            <td class="tableitem">
-                                <p class="itemtext">Communication</p>
-                            </td>
-                            <td class="tableitem qty">
-                                <p class="itemtext">5</p>
-                            </td>
-                            <td class="tableitem sub-total">
-                                <p class="itemtext">Rp. 100.000</p>
-                            </td>
-                        </tr>
-                        <tr class="service">
-                            <td class="tableitem">
-                                <p class="itemtext">Asset Gathering</p>
-                            </td>
-                            <td class="tableitem qty">
-                                <p class="itemtext">3</p>
-                            </td>
-                            <td class="tableitem sub-total">
-                                <p class="itemtext">Rp. 200.000</p>
-                            </td>
-                        </tr>
-                        <tr class="service">
-                            <td class="tableitem">
-                                <p class="itemtext">Design Development</p>
-                            </td>
-                            <td class="tableitem qty	">
-                                <p class="itemtext">5</p>
-                            </td>
-                            <td class="tableitem sub-total">
-                                <p class="itemtext">Rp. 1.000.0000</p>
-                            </td>
-                        </tr>
-                        <tr class="service">
-                            <td class="tableitem">
-                                <p class="itemtext">Animation</p>
-                            </td>
-                            <td class="tableitem qty">
-                                <p class="itemtext">20</p>
-                            </td>
-                            <td class="tableitem sub-total">
-                                <p class="itemtext">Rp. 500.000</p>
-                            </td>
-                        </tr>
-                        <tr class="service">
-                            <td class="tableitem">
-                                <p class="itemtext">Animation Revisions</p>
-                            </td>
-                            <td class="tableitem qty">
-                                <p class="itemtext">10</p>
-                            </td>
-                            <td class="tableitem sub-total">
-                                <p class="itemtext">Rp. 300.000</p>
-                            </td>
-                        </tr> --}}
-                        @php
-                            $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
-                            $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
-                        @endphp
-                        <tr class="tabletitle pembayaran">
-                            <td></td>
-                            <td class="Rate">
-                                <h2>Disc.(@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</h2>
-                            </td>
-                            <td class="payment">
-                                <h2>{{$invoice->diskon}}</h2>
-                            </td>
-                        </tr>
-						<tr class="tabletitle pembayaran">
-                            <td></td>
-                            <td class="Rate">
-                                <h2>Sub Total</h2>
-                            </td>
-                            <td class="payment">
-                                <h2>{{ $total }}</h2>
-                            </td>
-                        </tr>
-						<tr class="tabletitle pembayaran">
-                            <td></td>
-                            <td class="Rate">
-                                <h2>Pajak(@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</h2>
-                            </td>
-                            <td class="payment">
-                                <h2>{{$invoice->pajak}}</h2>
-                            </td>
-                        </tr>
-						<tr class="tabletitle pembayaran">
-                            <td></td>
-                            <td class="Rate">
-                                <h2>Total</h2>
-                            </td>
-                            <td class="payment">
-                                <h2>{{ $invoice->sub_total }}</h2>
-                            </td>
-                        </tr>
-						<tr class="tabletitle pembayaran">
-                            <td></td>
-                            <td class="Rate">
-                                <h2>Pembayaran</h2>
-                            </td>
-                            <td class="payment">
-                                <h2>Tunai</h2>
-                            </td>
-                        </tr>
-						<tr class="tabletitle pembayaran">
-                            <td></td>
-                            <td class="Rate">
-                                <h2>Bayar</h2>
-                            </td>
-                            <td class="payment">
-                                <h2>{{ $invoice->nominal_bayar }}</h2>
-                            </td>
-                        </tr>
-						<tr class="tabletitle pembayaran">
-                            <td></td>
-                            <td class="Rate">
-                                <h2>Kembalian</h2>
-                            </td>
-                            <td class="payment">
-                                <h2>{{ $invoice->kembalian }}</h2>
-                            </td>
-                        </tr>
+                    </table>
+                    @php
+                        $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                        $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                    @endphp
+                    <table class="payments">
+                        <colgroup>
+                            <col class="short" />
+                            <col span="2" class="long" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="tabletitle pembayaran">
+                                <td></td>
+                                <td class="Rate">
+                                    <h2>Disc.(@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</h2>
+                                </td>
+                                <td class="payment">
+                                    <h2>{{$invoice->diskon}}</h2>
+                                </td>
+                            </tr>
+                            <tr class="tabletitle pembayaran">
+                                <td></td>
+                                <td class="Rate">
+                                    <h2>Sub Total</h2>
+                                </td>
+                                <td class="payment">
+                                    <h2>{{ $total }}</h2>
+                                </td>
+                            </tr>
+                            <tr class="tabletitle pembayaran">
+                                <td></td>
+                                <td class="Rate">
+                                    <h2>Pajak(@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</h2>
+                                </td>
+                                <td class="payment">
+                                    <h2>{{$invoice->pajak}}</h2>
+                                </td>
+                            </tr>
+                            <tr class="tabletitle pembayaran">
+                                <td></td>
+                                <td class="Rate">
+                                    <h2>Total</h2>
+                                </td>
+                                <td class="payment">
+                                    <h2>{{ $invoice->sub_total }}</h2>
+                                </td>
+                            </tr>
+                            <tr class="tabletitle pembayaran">
+                                <td></td>
+                                <td class="Rate">
+                                    <h2>Pembayaran</h2>
+                                </td>
+                                <td class="payment">
+                                    <h2>Tunai</h2>
+                                </td>
+                            </tr>
+                            <tr class="tabletitle pembayaran">
+                                <td></td>
+                                <td class="Rate">
+                                    <h2>Bayar</h2>
+                                </td>
+                                <td class="payment">
+                                    <h2>{{ $invoice->nominal_bayar }}</h2>
+                                </td>
+                            </tr>
+                            <tr class="tabletitle pembayaran">
+                                <td></td>
+                                <td class="Rate">
+                                    <h2>Kembalian</h2>
+                                </td>
+                                <td class="payment">
+                                    <h2>{{ $invoice->kembalian }}</h2>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
                 <div id="legalcopy">
@@ -222,6 +186,6 @@
                 </div>
             </div>
         </div>
-        <script src="{{ asset('assets/js/pos.js') }}"></script>
+        {{-- <script src="{{ asset('assets/js/pos.js') }}"></script> --}}
     </body>
 </html>

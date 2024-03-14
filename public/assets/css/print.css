@@ -1,4 +1,14 @@
-body {font-size:14px;font-family: monospace;margin:0;padding:1rem;}
+/* @font-face {
+    font-family: 'LCD';
+    src: url('../fonts/LCD Solid 1.12.woff') format('woff'),
+         url('../fonts/LCD Solid 1.12.ttf') format('truetype');
+}  */
+body {
+    font-size:14px;
+    /* font-family: LCD; */
+    margin:0;
+    padding:1rem;
+}
 #invoice-POS{
     /* border: 1px solid #ddd; */
     /* padding: 1rem; */
@@ -94,6 +104,7 @@ body {font-size:14px;font-family: monospace;margin:0;padding:1rem;}
     border-bottom: 1px solid #EEE;
 }
 #invoice-POS .item {
+    text-align: left !important;
     width: 24mm;
 }
 #invoice-POS .itemtext {
@@ -120,11 +131,15 @@ table.customerInfo {
 h2.itemTitle{
     font-weight: 700 !important;
 }
-.tabletitle td.sub-total {
+.tabletitle th.sub-total {
+    text-align: right !important;
     width: 120px;
 }
 @media print {
-    body { font-size:14px;font-family: monospace; }
+    body { 
+        font-size:14px;
+        /* font-family: LCD;  */
+    }
     /* body { width: 58mm !important;} */
     /* body {
         visibility: hidden;
@@ -143,4 +158,21 @@ h2.itemTitle{
     .txt-left { text-align: left;}
     .txt-center { text-align: center;}
     .txt-right { text-align: right;} */
+}
+
+table.payments { width: 100%; margin-bottom: 50px; }
+.short {
+    width: 40%
+}
+.long {
+    width: 40%;
+}
+
+thead.items-thead {
+    border-top: double #000000;
+    border-bottom: double #000000;
+}
+
+tbody.items-tbody{
+    border-bottom: double #000000;
 }
