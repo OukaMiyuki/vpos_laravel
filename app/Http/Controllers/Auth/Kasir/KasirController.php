@@ -14,6 +14,7 @@ use App\Models\Discount;
 use App\Models\Tax;
 use App\Models\TenantField;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
+use GuzzleHttp\Client;
 
 class KasirController extends Controller {
     public function index(){
@@ -233,16 +234,17 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionProcess(Request $request){
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $pin = mt_rand(1000000, 9999999)
+            . mt_rand(1000000, 9999999)
+            . $characters[rand(0, strlen($characters) - 1)];
+        $string = str_shuffle($pin);
+        $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
+        $total = (int) substr(str_replace([',', '.'], '', Cart::total()), 0, -2);
+        $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
+        $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
+        $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
         if($request->jenisPembayaran == "Tunai"){
-            $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            $pin = mt_rand(1000000, 9999999)
-                . mt_rand(1000000, 9999999)
-                . $characters[rand(0, strlen($characters) - 1)];
-            $string = str_shuffle($pin);
-            $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
-            $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
-            $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
-            $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
             $invoice = Invoice::create([
                 'id_tenant' => auth()->user()->id_tenant,
                 'id_kasir' => auth()->user()->id,
@@ -271,8 +273,79 @@ class KasirController extends Controller {
             );
             // return view('kasir.kasir_invoice_preview', compact('invoice'))->with($notification);
             return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
-        } else if($request->jenisPembayaran == "Tunai"){
+        } else if($request->jenisPembayaran == "Qris"){
+            //Create Client object to deal with
+            $client = new Client();
+            // Define the request parameters
+            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+            // $headers = [
+            //     'Content-Type' => 'application/json',
+            // ];
 
+            // $data = [
+            //     'amount' => 1000,
+            //     'transactionNo' => "DEM20240315091544999",
+            //     'pos_id' => "IN01",
+            // ];
+    
+            // // POST request using the created object
+            // $postResponse = $client->post($url, [
+            //     'headers' => $headers,
+            //     'json' => $data,
+            // ]);
+
+            // Get the response code
+            $postResponse = $client->request('POST',  'https://erp.pt-best.com/api/dynamic_qris_wt_new', [
+                'form_params' => [
+                    'amount' => $total,
+                    'transactionNo' => $string,
+                    'pos_id' => "IN01",
+                    'secret_key' => "Vpos71237577"
+                ]
+            ]);
+            $responseCode = $postResponse->getStatusCode();
+            $data = json_decode($postResponse->getBody());
+            // $contents = $postResponse->getBody()->getContents();
+            // $contents = $postResponse->getBody()->getContents();
+            // $result = json_decode($contents, true);
+            // $data = $result['qrisData'];
+            // dd($your_final_result );
+            // $response = (string) $postResponse->getBody();
+            // $response =json_decode($response);
+            // $key_value = $response->data->qrisData;
+            // dd($data->data->data->qrisData);
+            // return response()->json([
+            //     'response_code' => $responseCode,
+            //     'data' => $data
+            // ]);
+
+            $invoice = Invoice::create([
+                'id_tenant' => auth()->user()->id_tenant,
+                'id_kasir' => auth()->user()->id,
+                'nomor_invoice' => $string,
+                'jenis_pembayaran' => $request->jenisPembayaran,
+                'qris_data' => $data->data->data->qrisData,
+                'status_pembayaran' => 0,
+                'sub_total' => $subtotal,
+                'pajak' => $tax,
+                'diskon' => $diskon,
+                'tanggal_pelunasan' => Carbon::now(),
+                'tanggal_transaksi' => Carbon::now()
+            ]);
+    
+            if(!is_null($invoice)) {
+                $invoice->storeCart($invoice);
+                $invoice->fieldSave($invoice);
+            }
+    
+            session()->forget('cart');
+    
+            $notification = array(
+                'message' => 'Transaksi berhasil diproses!',
+                'alert-type' => 'success',
+            );
+            // return view('kasir.kasir_invoice_preview', compact('invoice'))->with($notification);
+            return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
         }
     }
 

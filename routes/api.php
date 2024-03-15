@@ -55,4 +55,6 @@ Route::middleware(['guest:kasir'])->prefix('kasir')->group( function () {
 Route::middleware(['auth:sanctum', 'abilities:kasir'])->prefix('kasir')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'user']);
+    Route::get('/pos', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'kasirPos']);
+    Route::post('/add-chart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'addCart']);
 });

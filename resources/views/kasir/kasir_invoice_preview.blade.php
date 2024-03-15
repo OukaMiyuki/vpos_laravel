@@ -100,7 +100,6 @@
                                         </address>
                                     @endif
                                 </div> <!-- end col -->
-
                                 <div class="col-sm-6">
                                     <h6>Info Kasir</h6>
                                     <address>
@@ -188,6 +187,41 @@
                                     {{-- <a href="" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow','height=500,width=255,left=100,top=100,resizable=no,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a> --}}
                                     {{-- <a id="printNota" nonce="{{ csp_nonce() }}" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow','resizable=no,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a>&nbsp;&nbsp; --}}
                                     {{-- <a href="#" class="btn btn-info waves-effect waves-light">Submit</a> --}}
+                                    @if (($invoice->jenis_pembayaran == "Qris") && (!empty($invoice->qris_data)) && ($invoice->status_pembayaran == 0))
+                                        &nbsp;&nbsp;<a href=""  data-bs-toggle="modal" data-bs-target="#lihatqris" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Lihat Qris</a>
+                                        <div class="modal fade" id="lihatqris" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="staticBackdropLabel">Data Qris Pembayaran</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form class="px-3">
+                                                        @csrf
+                                                        <div class="modal-body">
+                                                            <div class="row text-center">
+                                                                <div class="col-md-12">
+                                                                    <div class="mb-3">
+                                                                        <label for="qris" class="form-label">Data Qris</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row text-center">
+                                                                <div class="col-md-12">
+                                                                    <div class="mb-3">
+                                                                        {!! QrCode::size(300)->generate($invoice->qris_data) !!}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>

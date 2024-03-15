@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('shopping_carts', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('id_invoice');
+            $table->bigInteger('id_invoice')->nullable();
             $table->bigInteger('id_product');
             $table->string('product_name');
             $table->integer('qty');
