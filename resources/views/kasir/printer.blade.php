@@ -15,50 +15,61 @@
 					<p  class="storeAddress">@if(!empty(auth()->user()->tenant->storeDetail->alamat)){{ auth()->user()->tenant->storeDetail->alamat }}@endif</p>
                 </div>
             </center>
-            <div id="mid">
-                <div class="info">
-                    <h3 class="customerTitle">Customer Info</h3>
-                    <!-- <p> 
-                        Nama : Ahmad Riza Syahputra</br>
-						Alamat : Jl. Janti Sidoarjo No. 01 Waru</br>
-						Kota : Surabaya</br>
-                        Email : xyz@gmail.com</br>
-                        Phone : 085156719832</br>
-                    </p> -->
-					<table class="customerInfo">
-                        @php
-                            $field = App\Models\TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
-                        @endphp
-                        @if (!empty($field))
-                            <tr class="custom-field">
-                                <td><p class="customer">{{ $field->baris1 }}</p></td>
-                                <td><p class="customer">:</p></td>
-                                <td><p class="customer">{{ $invoice->invoiceField->content1 }}</p></td>
-                            </tr>
-                            <tr class="custom-field">
-                                <td><p class="customer">{{ $field->baris2 }}</p></td>
-                                <td><p class="customer">:</p></td>
-                                <td><p class="customer">{{ $invoice->invoiceField->content2 }}</p></td>
-                            </tr>
-                            <tr class="custom-field">
-                                <td><p class="customer">{{ $field->baris3 }}</p></td>
-                                <td><p class="customer">:</p></td>
-                                <td><p class="customer">{{ $invoice->invoiceField->content3 }}</p></td>
-                            </tr>
-                            <tr class="custom-field">
-                                <td><p class="customer">{{ $field->baris4 }}</p></td>
-                                <td><p class="customer">:</p></td>
-                                <td><p class="customer">{{ $invoice->invoiceField->content4 }}</p></td>
-                            </tr>
-                            <tr class="custom-field">
-                                <td><p class="customer">{{ $field->baris5 }}</p></td>
-                                <td><p class="customer">:</p></td>
-                                <td><p class="customer">{{ $invoice->invoiceField->content5 }}</p></td>
-                            </tr>
-                        @endif
-					</table>
-                </div>
-            </div>
+            @php
+                $field = App\Models\TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
+            @endphp
+            @if(!empty($field->id))
+                @if (($invoice->invoiceField->content1 != "") && ($invoice->invoiceField->content2 != "") && ($invoice->invoiceField->content3 != "") && ($invoice->invoiceField->content4 != "") && ($invoice->invoiceField->content5 != ""))
+                    <div id="mid">
+                        <div class="info">
+                            <h3 class="customerTitle">Customer Info</h3>
+                            <table class="customerInfo">
+                                @if (!empty($invoice->invoiceField->content1))
+                                    <tr class="custom-field">
+                                        <td width="35%"><p class="customer">{{ $field->baris1 }}</p></td>
+                                        <td width="5%"><p class="customer">:</p></td>
+                                        <td width="60%"><p class="customer">{{ $invoice->invoiceField->content1 }}</p></td>
+                                    </tr>
+                                @endif
+                                @if (!empty($invoice->invoiceField->content2))
+                                    <tr class="custom-field">
+                                        <td width="35%"><p class="customer">{{ $field->baris2 }}</p></td>
+                                        <td width="5%"><p class="customer">:</p></td>
+                                        <td width="60%"><p class="customer">{{ $invoice->invoiceField->content2 }}</p></td>
+                                    </tr>
+                                @endif
+                                @if (!empty($invoice->invoiceField->content3))
+                                    <tr class="custom-field">
+                                        <td width="35%"><p class="customer">{{ $field->baris3 }}</p></td>
+                                        <td width="5%"><p class="customer">:</p></td>
+                                        <td width="60%"><p class="customer">{{ $invoice->invoiceField->content3 }}</p></td>
+                                    </tr>
+                                @endif
+                                @if (!empty($invoice->invoiceField->content4))
+                                    <tr class="custom-field">
+                                        <td width="35%"><p class="customer">{{ $field->baris4 }}</p></td>
+                                        <td width="5%"><p class="customer">:</p></td>
+                                        <td width="60%"><p class="customer">{{ $invoice->invoiceField->content4 }}</p></td>
+                                    </tr>
+                                @endif
+                                @if (!empty($invoice->invoiceField->content5))
+                                    <tr class="custom-field">
+                                        <td width="35%"><p class="customer">{{ $field->baris5 }}</p></td>
+                                        <td width="5%"><p class="customer">:</p></td>
+                                        <td width="60%"><p class="customer">{{ $invoice->invoiceField->content5 }}</p></td>
+                                    </tr>
+                                @endif
+                            </table>
+                        </div>
+                    </div>
+                @else
+                    <br>
+                    <br>
+                @endif
+            @else
+                <br>
+                <br>
+            @endif
             <!--End Invoice Mid-->
             <div id="bot">
                 <div id="table">

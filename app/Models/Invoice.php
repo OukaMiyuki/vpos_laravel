@@ -59,15 +59,35 @@ class Invoice extends Model {
     }
 
     public function fieldSave($model){
+        $content1="";
+        $content2="";
+        $content3="";
+        $content4="";
+        $content5="";
+        if(!empty(request()->content1)){
+            $content1 = request()->content1;
+        }
+        if(!empty(request()->content2)){
+            $content2 = request()->content2;
+        }
+        if(!empty(request()->content3)){
+            $content3 = request()->content3;
+        }
+        if(!empty(request()->content4)){
+            $content4 = request()->content4;
+        }
+        if(!empty(request()->content5)){
+            $content5 = request()->content5;
+        }
         $InvoiceField = new InvoiceField();
         $InvoiceField->id_invoice = $model->id;
         $InvoiceField->id_kasir = auth()->user()->id;
         $InvoiceField->id_custom_field = auth()->user()->tenant->tenantField->id;
-        $InvoiceField->content1 = request()->content1;
-        $InvoiceField->content2 = request()->content2;
-        $InvoiceField->content3 = request()->content3;
-        $InvoiceField->content4 = request()->content4;
-        $InvoiceField->content5 = request()->content5;
+        $InvoiceField->content1 = $content1;
+        $InvoiceField->content2 = $content2;
+        $InvoiceField->content3 = $content3;
+        $InvoiceField->content4 = $content4;
+        $InvoiceField->content5 = $content5;
         $InvoiceField->save();
     }
 

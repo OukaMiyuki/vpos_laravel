@@ -491,6 +491,21 @@ class TenantController extends Controller {
 
     public function customFieldInsert(Request $request) {
         $customField = TenantField::where('id_tenant', auth()->user()->id)->find($request->id);
+        if(is_null($request->baris1)){
+            $request->aktivasi_baris_1 = 0;
+        }
+        if(is_null($request->baris2)){
+            $request->aktivasi_baris_2 = 0;
+        }
+        if(is_null($request->baris3)){
+            $request->aktivasi_baris_3 = 0;
+        }
+        if(is_null($request->baris4)){
+            $request->aktivasi_baris_4 = 0;
+        }
+        if(is_null($request->baris5)){
+            $request->aktivasi_baris_5 = 0;
+        }
         if(empty($customField)){
             TenantField::create([
                 'id_tenant' => auth()->user()->id,
@@ -499,6 +514,11 @@ class TenantController extends Controller {
                 'baris3' => $request->baris3,
                 'baris4' => $request->baris4,
                 'baris5' => $request->baris5,
+                'baris_1_activation' => $request->aktivasi_baris_1,
+                'baris_2_activation' => $request->aktivasi_baris_2,
+                'baris_3_activation' => $request->aktivasi_baris_3,
+                'baris_4_activation' => $request->aktivasi_baris_4,
+                'baris_5_activation' => $request->aktivasi_baris_5,
             ]);
         } else {
             $customField->update([
@@ -507,6 +527,11 @@ class TenantController extends Controller {
                 'baris3' => $request->baris3,
                 'baris4' => $request->baris4,
                 'baris5' => $request->baris5,
+                'baris_1_activation' => $request->aktivasi_baris_1,
+                'baris_2_activation' => $request->aktivasi_baris_2,
+                'baris_3_activation' => $request->aktivasi_baris_3,
+                'baris_4_activation' => $request->aktivasi_baris_4,
+                'baris_5_activation' => $request->aktivasi_baris_5,
             ]);
         }
 
