@@ -18,12 +18,12 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::middleware(['guest:admin'])->prefix('admin')->group( function () {
+Route::middleware(['guest:admin', 'throttle:90,1'])->prefix('admin')->group( function () {
     Route::post('register', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'register']);
     Route::post('login', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'login']);
 });
 
-Route::middleware(['auth:sanctum', 'abilities:admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:admin', 'throttle:90,1'])->prefix('admin')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'user']);
 });
