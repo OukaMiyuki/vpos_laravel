@@ -18,41 +18,41 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::middleware(['guest:admin', 'throttle:90,1'])->prefix('admin')->group( function () {
+Route::middleware(['guest:admin', 'throttle:10,1', 'custom.restrict'])->prefix('admin')->group( function () {
     Route::post('register', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'register']);
     Route::post('login', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'login']);
 });
 
-Route::middleware(['auth:sanctum', 'abilities:admin', 'throttle:90,1'])->prefix('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:admin', 'throttle:10,1', 'custom.restrict'])->prefix('admin')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'user']);
 });
 
-Route::middleware(['guest:marketing'])->prefix('marketing')->group( function () {
+Route::middleware(['guest:marketing', 'throttle:10,1','custom.restrict'])->prefix('marketing')->group( function () {
     Route::post('register', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'register']);
     Route::post('login', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'login']);
 });
 
-Route::middleware(['auth:sanctum', 'abilities:marketing'])->prefix('marketing')->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:marketing', 'throttle:10,1','custom.restrict'])->prefix('marketing')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'user']);
 });
 
-Route::middleware(['guest:tenant'])->prefix('tenant')->group( function () {
+Route::middleware(['guest:tenant', 'throttle:10,1', 'custom.restrict'])->prefix('tenant')->group( function () {
     Route::post('register', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'register']);
     Route::post('login', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'login']);
 });
 
-Route::middleware(['auth:sanctum', 'abilities:tenant'])->prefix('tenant')->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:10,1', 'custom.restrict'])->prefix('tenant')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'user']);
 });
 
-Route::middleware(['guest:kasir'])->prefix('kasir')->group( function () {
+Route::middleware(['guest:kasir', 'throttle:10,1', 'custom.restrict'])->prefix('kasir')->group( function () {
     Route::post('login', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'login']);
 });
 
-Route::middleware(['auth:sanctum', 'abilities:kasir'])->prefix('kasir')->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:10,1', 'custom.restrict'])->prefix('kasir')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'user']);
     Route::get('/pos', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'kasirPos']);

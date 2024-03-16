@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd71562b8f572454c96da28aed6f82e4",
+    "content-hash": "f7873439d6ea68b0fada620620a5e2cf",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -808,6 +808,85 @@
                 }
             ],
             "time": "2023-11-12T22:16:48+00:00"
+        },
+        {
+            "name": "graham-campbell/throttle",
+            "version": "v10.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/GrahamCampbell/Laravel-Throttle.git",
+                "reference": "670a98a06e8229c20b06b3539a1031ee772f03ec"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/GrahamCampbell/Laravel-Throttle/zipball/670a98a06e8229c20b06b3539a1031ee772f03ec",
+                "reference": "670a98a06e8229c20b06b3539a1031ee772f03ec",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/cache": "^8.75 || ^9.0 || ^10.0",
+                "illuminate/contracts": "^8.75 || ^9.0 || ^10.0",
+                "illuminate/http": "^8.75 || ^9.0 || ^10.0",
+                "illuminate/support": "^8.75 || ^9.0 || ^10.0",
+                "php": "^7.4.15 || ^8.0.2"
+            },
+            "require-dev": {
+                "graham-campbell/analyzer": "^4.0",
+                "graham-campbell/testbench": "^6.0",
+                "mockery/mockery": "^1.5.1",
+                "phpunit/phpunit": "^9.6.3 || ^10.0.12"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "GrahamCampbell\\Throttle\\ThrottleServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GrahamCampbell\\Throttle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Graham Campbell",
+                    "email": "hello@gjcampbell.co.uk",
+                    "homepage": "https://github.com/GrahamCampbell"
+                }
+            ],
+            "description": "Throttle Is A Rate Limiter For Laravel",
+            "keywords": [
+                "Graham Campbell",
+                "GrahamCampbell",
+                "Laravel Throttle",
+                "Laravel-Throttle",
+                "framework",
+                "laravel",
+                "rate limit",
+                "throttle",
+                "throttling"
+            ],
+            "support": {
+                "issues": "https://github.com/GrahamCampbell/Laravel-Throttle/issues",
+                "source": "https://github.com/GrahamCampbell/Laravel-Throttle/tree/v10.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/GrahamCampbell",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/graham-campbell/throttle",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-03-07T01:12:54+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
