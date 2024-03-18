@@ -77,7 +77,31 @@ class KasirController extends Controller {
                         })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
 
             $message = "";
-            
+
+            if(!count($stock)){
+                $message = "Products not found";
+            } else {
+                $message = "Fetch Success";
+            }
+            return response()->json([
+                'message' => $message,
+                'dataStokProduk' => $stock
+            ]);
+        }
+    }
+
+    public function searchBarcode(Request $request){
+        $barcode = $request->barcode;
+        if($barcode){
+            $stock = ProductStock::with('product')
+                        ->where(function ($query){
+                                $query->where('stok', '!=', 0);
+                        })
+                        ->where('barcode', $barcode)
+                        ->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
+
+            $message = "";
+
             if(!count($stock)){
                 $message = "Products not found";
             } else {
@@ -91,6 +115,12 @@ class KasirController extends Controller {
     }
 
     public function addCart(Request $request){
+        $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
+        ->where('is_active', 1)->first();
+
+        $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
+                ->where('is_active', 1)->first();
+
         return response()->json([
             'message' => 'Added Success',
             'data' => $request->all()
