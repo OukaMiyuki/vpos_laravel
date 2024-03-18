@@ -40,15 +40,28 @@ class KasirController extends Controller {
     }
 
     public function filterCategory(Request $request){
-        $caregory = $request->id_category;
+        $category = $request->id_category;
+        // $stock = ProductStock::with(['product' => function ($query) use ($category) {
+        //                     $query->where('id_category', $category);
+        //                 }])
+        //                 ->where(function ($query){
+        //                         $query->where('stok', '!=', 0);
+        //                 })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
         $stock = ProductStock::with('product')
-                        ->where(function ($query) {
-                                $query->where('stok', '!=', 0)
-                                      ->where('id_category' == $request->id_category);
-                        })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
+                     ->whereHas('product', function($q) use($category) {
+                            $q->where('id_category', $category);
+                    })->where(function ($query){
+                            $query->where('stok', '!=', 0);
+                    })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
+        $message = "";
+        if(!count($stock)){
+            $message = "Products not found";
+        } else {
+            $message = "Fetch Success";
+        }
         return response()->json([
-            'message' => 'Fetch Success',
-            'dataStokProduk' => $stock,
+            'message' => $message,
+            'dataStokProduk' => $stock
         ]);
 
     }
@@ -58,7 +71,7 @@ class KasirController extends Controller {
         // $Search = $request->input('Search');
         // $categoryPost = $request->input('post_category');
         // $postAll = [];
-        
+
         // if($Search){
         //     if($Keyword){
         //         $postAll = Blog::latest()->where('status', 1)
