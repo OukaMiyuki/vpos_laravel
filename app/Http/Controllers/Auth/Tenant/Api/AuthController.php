@@ -22,19 +22,34 @@ use Illuminate\Validation\Rule;
 class AuthController extends Controller {
     
     public function register(Request $request) {
+        //EDIT DISINI
+        // $validator = Validator::make($request->all(), [
+        //     'name' => ['required', 'string', 'max:255'],
+        //     'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
+        //     'no_ktp' => ['required', 'string', 'numeric', 'digits:16', 'unique:'.DetailAdmin::class, 'unique:'.DetailMarketing::class, 'unique:'.DetailTenant::class, 'unique:'.DetailKasir::class],
+        //     'phone' => ['required', 'string', 'numeric', 'digits_between:1,20', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
+        //     'jenis_kelamin' => ['required'],
+        //     'tempat_lahir' => ['required'],
+        //     'tanggal_lahir' => ['required'],
+        //     'alamat' => ['required', 'string', 'max:255'],
+        //     'password' => ['required', 'confirmed', 'min:8'],
+        //     'inv_code' => ['required', Rule::exists('invitation_codes')->where(function ($query) {
+        //                     return $query->where('inv_code', request()->get('inv_code'));
+        //                 })],
+        // ]);
+
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
-            'no_ktp' => ['required', 'string', 'numeric', 'digits:16', 'unique:'.DetailAdmin::class, 'unique:'.DetailMarketing::class, 'unique:'.DetailTenant::class, 'unique:'.DetailKasir::class],
             'phone' => ['required', 'string', 'numeric', 'digits_between:1,20', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
-            'jenis_kelamin' => ['required'],
-            'tempat_lahir' => ['required'],
-            'tanggal_lahir' => ['required'],
-            'alamat' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'confirmed', 'min:8'],
+            'password' => ['required', 'min:8'],
             'inv_code' => ['required', Rule::exists('invitation_codes')->where(function ($query) {
                             return $query->where('inv_code', request()->get('inv_code'));
                         })],
+            // 'no_ktp' => ['required', 'string', 'numeric', 'digits:16', 'unique:'.DetailAdmin::class, 'unique:'.DetailMarketing::class, 'unique:'.DetailTenant::class, 'unique:'.DetailKasir::class],
+            // 'jenis_kelamin' => ['required'],
+            // 'tempat_lahir' => ['required'],
+            // 'tanggal_lahir' => ['required'],
         ]);
 
         if ($validator->fails()) {
@@ -63,8 +78,16 @@ class AuthController extends Controller {
         return response()->json([
             'data' => $tenant,
             'access_token' => $token,
-            'token_type' => 'Bearer'
+            'token_type' => 'Bearer',
+            'data' => array(
+                'sup_user_id'           => $tenant->id,
+                'sup_user_name'         => $tenant->name,
+                'sup_user_referal_code' => $invitationcodeid->id,
+                'sup_user_email'        => $request->email,
+                'sup_user_token'        => $token,
+            ),
         ]);
+        //EDIT DISINI
     }
 
     public function login(Request $request) {
@@ -76,13 +99,26 @@ class AuthController extends Controller {
 
         $tenant = Tenant::where('email', $request->email)->firstOrFail();
 
+        //EDIT DISINI
+
         $token = $tenant->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login success',
             'access_token' => $token,
-            'token_type' => 'Bearer'
+            'token_type' => 'Bearer',
+            'data' => array(
+                'sup_user_id'           => $tenant->id,
+                'sup_user_name'         => $tenant->name,
+                'sup_user_referal_code' => $tenant->id_inv_code,
+                'sup_user_company'      => null,
+                'sup_user_email'        => $tenant->email,
+                'sup_user_type'         => 'owner',
+                'sup_user_token'        => $token
+            ),
         ]);
+
+        //EDIT DISINI
     }
 
     public function user(){

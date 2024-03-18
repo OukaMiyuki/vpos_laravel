@@ -18,24 +18,34 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::middleware(['guest:admin', 'throttle:10,1', 'custom.restrict'])->prefix('admin')->group( function () {
-    Route::post('register', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'register']);
-    Route::post('login', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'login']);
+// Route::middleware(['guest:admin', 'throttle:10,1', 'custom.restrict'])->prefix('admin')->group( function () {
+//     Route::post('register', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'register']);
+//     Route::post('login', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'login']);
+// });
+
+// Route::middleware(['auth:sanctum', 'abilities:admin', 'throttle:10,1', 'custom.restrict'])->prefix('admin')->group(function () {
+//     Route::post('/logout', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'logout']);
+//     Route::get('/user', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'user']);
+// });
+
+// Route::middleware(['guest:marketing', 'throttle:10,1','custom.restrict'])->prefix('marketing')->group( function () {
+//     Route::post('register', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'register']);
+//     Route::post('login', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'login']);
+// });
+
+// Route::middleware(['auth:sanctum', 'abilities:marketing', 'throttle:10,1','custom.restrict'])->prefix('marketing')->group(function () {
+//     Route::post('/logout', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'logout']);
+//     Route::get('/user', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'user']);
+// });
+
+Route::middleware(['guest:tenant', 'guest:kasir', 'throttle:10,1', 'custom.restrict'])->group( function () {
+    Route::post('register', [\App\Http\Controllers\Auth\Api\RegisterController::class, 'registerTenant']);
+    Route::post('login', [\App\Http\Controllers\Auth\Api\LoginController::class, 'login']);
 });
 
-Route::middleware(['auth:sanctum', 'abilities:admin', 'throttle:10,1', 'custom.restrict'])->prefix('admin')->group(function () {
-    Route::post('/logout', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'logout']);
-    Route::get('/user', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'user']);
-});
-
-Route::middleware(['guest:marketing', 'throttle:10,1','custom.restrict'])->prefix('marketing')->group( function () {
-    Route::post('register', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'register']);
-    Route::post('login', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'login']);
-});
-
-Route::middleware(['auth:sanctum', 'abilities:marketing', 'throttle:10,1','custom.restrict'])->prefix('marketing')->group(function () {
-    Route::post('/logout', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'logout']);
-    Route::get('/user', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'user']);
+Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throttle:10,1', 'custom.restrict'])->group(function () {
+    Route::post('/logout', [\App\Http\Controllers\Auth\Api\LoginController::class, 'logout']);
+    Route::get('/user', [\App\Http\Controllers\Auth\Api\LoginController::class, 'user']);
 });
 
 Route::middleware(['guest:tenant', 'throttle:10,1', 'custom.restrict'])->prefix('tenant')->group( function () {
@@ -55,6 +65,9 @@ Route::middleware(['guest:kasir', 'throttle:10,1', 'custom.restrict'])->prefix('
 Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:10,1', 'custom.restrict'])->prefix('kasir')->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'user']);
-    Route::get('/pos', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'kasirPos']);
+    Route::get('/product', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productList']);
+    Route::get('/category', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productCategory']);
+    Route::post('/filter-category', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'filterCategory']);
+    Route::post('/search-product', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'searchProduct']);
     Route::post('/add-chart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'addCart']);
 });
