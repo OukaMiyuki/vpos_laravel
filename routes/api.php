@@ -38,12 +38,12 @@ use Illuminate\Support\Facades\Route;
 //     Route::get('/user', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'user']);
 // });
 
-Route::middleware(['guest:tenant', 'guest:kasir', 'throttle:10,1', 'custom.restrict'])->group( function () {
+Route::middleware(['guest:tenant', 'guest:kasir', 'throttle:90,1', 'custom.restrict'])->group( function () {
     Route::post('register', [\App\Http\Controllers\Auth\Api\RegisterController::class, 'registerTenant']);
     Route::post('login', [\App\Http\Controllers\Auth\Api\LoginController::class, 'login']);
 });
 
-Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throttle:10,1', 'custom.restrict'])->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throttle:90,1', 'custom.restrict'])->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\Api\LoginController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Api\LoginController::class, 'user']);
 });
@@ -62,7 +62,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throt
 //     Route::post('login', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'login']);
 // });
 
-Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:10,1', 'custom.restrict'])->prefix('kasir')->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:90,1', 'custom.restrict'])->prefix('kasir')->group(function () {
     // Route::post('/logout', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'user']);
     Route::get('/product', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productList']);
@@ -70,5 +70,7 @@ Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:10,1', 'custom.r
     Route::post('/filter-category', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'filterCategory']);
     Route::post('/search-product', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'searchProduct']);
     Route::post('/search-barcode', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'searchBarcode']);
-    Route::post('/add-chart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'addCart']);
+    Route::post('/add-cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'addCart']);
+    Route::get('/cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'listCart']);
+    Route::post('/cart-process', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'processCart']);
 });

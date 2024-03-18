@@ -115,15 +115,111 @@ class KasirController extends Controller {
     }
 
     public function addCart(Request $request){
-        $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
-        ->where('is_active', 1)->first();
+        $cart = ShoppingCart::create([
+            'id_kasir' => auth()->user()->id,
+            'id_product' => $request->id_product,
+            'product_name' => $request->product_name,
+            'qty' => $request->qty,
+            'harga' => $request->harga,
+            'sub_total' => $request->qty*$request->harga
+        ]);
+        // $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
+        //          ->where('is_active', 1)->first();
+        // $disc = 0;
+        // $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
+        //         ->where('is_active', 1)->first();
+        // $pajak = 0;
 
-        $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
-                ->where('is_active', 1)->first();
+        // Cart::add([
+        //     'id' => $request->id,
+        //     'name' => $request->name,
+        //     'qty' => $request->qty,
+        //     'price' => $request->price,
+        //     'weight' => 20,
+        //     'options' => ['size' => 'large']
+        // ]);
 
+        // if(!empty($tax)){
+        //     Cart::setGlobalTax($tax->pajak);
+        //     $pajak = $tax->pajak;
+        // } else {
+        //     Cart::setGlobalTax(0);
+        //     $pajak = 0;
+        // }
+
+        // $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
+        // if(!empty($diskon)){
+        //     if($subtotal >= $diskon->min_harga){
+        //         Cart::setGlobalDiscount($diskon->diskon);
+        //         $disc = $diskon->diskon;
+        //     } else {
+        //         Cart::setGlobalDiscount(0);
+        //         $disc = 0;
+        //     }
+        // }
+
+
+        
         return response()->json([
             'message' => 'Added Success',
-            'data' => $request->all()
+            'cart' => $cart
         ]);
+    }
+
+    public function listCart(){
+        $cartContent = ShoppingCart::with('product')
+                                ->where('id_kasir', auth()->user()->id)
+                                ->whereNull('id_invoice')
+                                ->latest()
+                                ->get();
+        return response()->json([
+            'message' => 'Fetch Success',
+            'cartData' => $cartContent,
+        ]);
+    }
+
+    public function processCart(Request $request){
+        $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
+                 ->where('is_active', 1)->first();
+        $disc = 0;
+        $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
+                ->where('is_active', 1)->first();
+        $pajak = 0;
+
+        if(!empty($tax)){
+            $pajak = $tax->pajak;
+        } else {
+            $pajak = 0;
+        }
+
+        $cartContent = ShoppingCart::with('product')
+                            ->where('id_kasir', auth()->user()->id)
+                            ->whereNull('id_invoice')
+                            ->latest()
+                            ->get();
+
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $pin = mt_rand(1000000, 9999999)
+            . mt_rand(1000000, 9999999)
+            . $characters[rand(0, strlen($characters) - 1)];
+        $string = str_shuffle($pin);
+        
+        $invoice = Invoice::create([
+            'id_tenant' => auth()->user()->id_tenant,
+            'id_kasir' => auth()->user()->id,
+            'nomor_invoice' => $string,
+            'tanggal_transaksi' => Carbon::now(),
+            'jenis_pembayaran' => "Qris",
+        ]);
+
+        // $subtotal = 0;
+        // $nominalpajak = 0;
+        // $nominaldiskon = 0;
+        // foreach($cartContent as $cart){
+        //     $cart->update([
+        //         'id_invoice' => $invoice->id
+        //     ]);
+        //     $subtotal+= (int) $cart->sub_total;
+        // }
     }
 }

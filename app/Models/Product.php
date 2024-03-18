@@ -9,6 +9,7 @@ use App\Models\Batch;
 use App\Models\ProductStock;
 use App\Models\Tenant;
 use App\Models\Supplier;
+use App\Models\ShoppingCart;
 
 class Product extends Model {
     use HasFactory;
@@ -46,6 +47,10 @@ class Product extends Model {
 
     public function productStock() {
         return $this->hasMany(ProductStock::class, 'id_batch_product', 'id');
+    }
+
+    public function shoppingCart() {
+        return $this->hasMany(ShoppingCart::class, 'id_product', 'id');
     }
 
     public static function boot(){
