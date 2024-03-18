@@ -67,31 +67,27 @@ class KasirController extends Controller {
     }
 
     public function searchProduct(Request $request) {
-        // $Keyword = $request->input('Keyword');
-        // $Search = $request->input('Search');
-        // $categoryPost = $request->input('post_category');
-        // $postAll = [];
+        $keyword = $request->product_name;
+        if($keyword){
+            $stock = ProductStock::with('product')
+                        ->whereHas('product', function($q) use($keyword) {
+                            $q->where('product_name', 'LIKE', '%'.$keyword.'%');
+                        })->where(function ($query){
+                                $query->where('stok', '!=', 0);
+                        })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
 
-        // if($Search){
-        //     if($Keyword){
-        //         $postAll = Blog::latest()->where('status', 1)
-        //                 ->when($Keyword, function($query) use ($Keyword){
-        //                     $query->where('title', 'LIKE', '%'.$Keyword.'%');
-        //                 })->paginate(4);
-
-        //     } else if($Keyword == ""){
-        //         $postAll = Blog::latest()->where('status', 1)->paginate(4);
-        //     }
-        // } else if($categoryPost){
-        //     $postAll = Blog::whereHas('category', function($q) use ($categoryPost){
-        //                     $q->where('name', '=', $categoryPost);
-        //                 })->where('status', 1)->paginate(4);
-        // } else {
-        //     $postAll = Blog::latest()->where('status', 1)->paginate(4);
-        // }
-        // session()->flashInput($request->input());
-
-        // return view('welcome', compact('postAll'));
+            $message = "";
+            
+            if(!count($stock)){
+                $message = "Products not found";
+            } else {
+                $message = "Fetch Success";
+            }
+            return response()->json([
+                'message' => $message,
+                'dataStokProduk' => $stock
+            ]);
+        }
     }
 
     public function addCart(Request $request){
