@@ -116,68 +116,68 @@ class KasirController extends Controller {
     }
 
     public function addCart(Request $request){
-        $cart = ShoppingCart::create([
-            'id_kasir' => auth()->user()->id,
-            'id_product' => $request->id_product,
-            'product_name' => $request->product_name,
-            'qty' => $request->qty,
-            'harga' => $request->harga,
-            'sub_total' => $request->qty*$request->harga
-        ]);
+        $cartCheckup = ShoppingCart::where('id_kasir', auth()->user()->id)
+                                ->whereNull('id_invoice')
+                                ->get();
 
-        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->where('id_batch_product', $cart->id_product)->first();
-        $stoktemp = $stock->stok;
-        $stock->update([
-            'stok' => (int) $stoktemp-$cart->qty
-        ]);
-        // $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
-        //          ->where('is_active', 1)->first();
-        // $disc = 0;
-        // $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
-        //         ->where('is_active', 1)->first();
-        // $pajak = 0;
+        if(empty($cartCheckup)){
+            $cart = ShoppingCart::create([
+                'id_kasir' => auth()->user()->id,
+                'id_product' => $request->id_stok,
+                'product_name' => $request->product_name,
+                'qty' => $request->qty,
+                'harga' => $request->harga,
+                'sub_total' => $request->qty*$request->harga
+            ]);
 
-        // Cart::add([
-        //     'id' => $request->id,
-        //     'name' => $request->name,
-        //     'qty' => $request->qty,
-        //     'price' => $request->price,
-        //     'weight' => 20,
-        //     'options' => ['size' => 'large']
-        // ]);
+            $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($request->id_stok);
+            $stoktemp = $stock->stok;
+            $stock->update([
+                'stok' => (int) $stoktemp-$cart->qty
+            ]);
 
-        // if(!empty($tax)){
-        //     Cart::setGlobalTax($tax->pajak);
-        //     $pajak = $tax->pajak;
-        // } else {
-        //     Cart::setGlobalTax(0);
-        //     $pajak = 0;
-        // }
+            return response()->json([
+                'message' => 'Added Success',
+                'cart' => $cart
+            ]);
+        } else {            
+            $cart = $cartCheckup->where('id_product' ,$request->id_stok)->first();
 
-        // $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
-        // if(!empty($diskon)){
-        //     if($subtotal >= $diskon->min_harga){
-        //         Cart::setGlobalDiscount($diskon->diskon);
-        //         $disc = $diskon->diskon;
-        //     } else {
-        //         Cart::setGlobalDiscount(0);
-        //         $disc = 0;
-        //     }
-        // }
+            if(empty($cart)){
+                $cart = ShoppingCart::create([
+                    'id_kasir' => auth()->user()->id,
+                    'id_product' => $request->id_stok,
+                    'product_name' => $request->product_name,
+                    'qty' => $request->qty,
+                    'harga' => $request->harga,
+                    'sub_total' => $request->qty*$request->harga
+                ]);
+            } else {
+                $tempqty = $cart->qty;
+                $cart->update([
+                    'qty' => $tempqty+$request->qty,
+                    'sub_total' => ($tempqty+$request->qty)*$cart->harga
+                ]);
+            }
 
+            $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($request->id_stok);
+            $stoktemp = $stock->stok;
+            $stock->update([
+                'stok' => (int) $stoktemp-$request->qty
+            ]);
 
-        
-        return response()->json([
-            'message' => 'Added Success',
-            'cart' => $cart
-        ]);
+            return response()->json([
+                'message' => 'Added Success',
+                'cart' => $cart
+            ]);
+        }
     }
 
     public function deleteCart(Request $request){
         $id_cart = $request->id_cart;
-        $cart = ShoppingCart::find($id_cart);
+        $cart = ShoppingCart::where('id_kasir', auth()->user()->id)->find($id_cart);
         $qty = $cart->qty;
-        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->where('id_batch_product', $cart->id_product)->first();
+        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($cart->id_product);
         $stoktemp = $stock->stok;
         $stock->update([
             'stok' => (int) $stoktemp+$qty
@@ -186,7 +186,6 @@ class KasirController extends Controller {
         return response()->json([
             'message' => 'Success Deleted',
         ]);
-
     }
 
     public function listCart(){
@@ -288,5 +287,179 @@ class KasirController extends Controller {
             'cartData' => $cartContent,
         ]);
 
+    }
+
+    public function transactionList(){
+        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->latest()
+                            ->get();
+        return response()->json([
+            'message' => 'Fetch Success',
+            'transaction-data' => $invoice,
+        ]);
+    }
+
+    public function transactionPending(){
+        $invoice = Invoice::where('status_pembayaran', 0)
+                            ->where('id_tenant', auth()->user()->id_tenant)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->latest()
+                            ->get();
+        return response()->json([
+            'message' => 'Fetch Success',
+            'transaction-data' => $invoice,
+        ]);
+    }
+
+    public function transactionCartAdd(Request $request){
+        $invoice = Invoice::with('shoppingCart')
+                        ->where('id_tenant', auth()->user()->id_tenant)
+                        ->where('id_kasir', auth()->user()->id)
+                        ->find($request->id_invoice);
+
+        // $cartCheckup = ShoppingCart::where('id_kasir', auth()->user()->id)
+        //                         ->where('id_invoice', $request->id_invoice)
+        //                         ->get();
+
+        $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
+
+        if(empty($cart)){
+            $cart = ShoppingCart::create([
+                'id_kasir' => auth()->user()->id,
+                'id_invoice' =>  $request->id_invoice,
+                'id_product' => $request->id_stok,
+                'product_name' => $request->product_name,
+                'qty' => $request->qty,
+                'harga' => $request->harga,
+                'sub_total' => $request->qty*$request->harga
+            ]);
+        } else {
+            $tempqty = $cart->qty;
+            $cart->update([
+                'qty' => $tempqty+$request->qty,
+                'sub_total' => ($tempqty+$request->qty)*$cart->harga
+            ]);
+        }
+
+        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($request->id_stok);
+        $stoktemp = $stock->stok;
+        $stock->update([
+            'stok' => (int) $stoktemp-$request->qty
+        ]);
+
+        return response()->json([
+            'message' => 'Added Success',
+            'cart' => $cart
+        ]);
+    }
+
+    public function transactionPendingUpdate(Request $request){
+        $invoice = Invoice::with('shoppingCart')
+                        ->where('id_tenant', auth()->user()->id_tenant)
+                        ->where('id_kasir', auth()->user()->id)
+                        ->find($request->id_invoice);
+
+        $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
+                            ->where('is_active', 1)->first();
+        $disc = 0;
+        $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
+                    ->where('is_active', 1)->first();
+        $pajak = 0;
+       
+        if(!empty($tax)){
+            $pajak = $tax->pajak;
+        } else {
+            $pajak = 0;
+        }
+
+        if(!empty($diskon)){
+            $disc = $diskon->diskon;
+        } else {
+            $disc = 0;
+        }
+
+        $subtotal = 0;
+        $nominalpajak = 0;
+        $nominaldiskon = 0;
+        foreach($invoice->shoppingCart as $cart){
+            $subtotal+= (int) $cart->sub_total;
+        }
+        $nominaldiskon = ($disc/100)*$subtotal;
+        $temptotal = $subtotal-$nominaldiskon;
+        $nominalpajak = ($pajak/100)*$temptotal;
+        $total = $temptotal+$nominalpajak;
+
+        $client = new Client();
+        $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+        $postResponse = $client->request('POST',  'https://erp.pt-best.com/api/dynamic_qris_wt_new', [
+            'form_params' => [
+                'amount' => $total,
+                'transactionNo' => $invoice->nomor_invoice,
+                'pos_id' => "IN01",
+                'secret_key' => "Vpos71237577"
+            ]
+        ]);
+        $responseCode = $postResponse->getStatusCode();
+        $data = json_decode($postResponse->getBody());
+
+        $invoice->update([
+            'qris_data' => $data->data->data->qrisData,
+            'sub_total' => $temptotal,
+            'pajak' => $nominalpajak,
+            'diskon' => $nominaldiskon,
+            'nominal_bayar' => $total
+        ]);
+
+        return response()->json([
+            'message' => 'Fetch Success',
+            'invoice' => $invoice,
+            'cartData' => $invoice->shoppingCart,
+        ]);
+}
+
+    public function transactionCartDelete(Request $request){
+        $invoice = Invoice::with('shoppingCart')
+                        ->where('id_tenant', auth()->user()->id_tenant)
+                        ->where('id_kasir', auth()->user()->id)
+                        ->find($request->id_invoice);
+        $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
+        $id_cart = $request->id_cart;
+        $qty = $cart->qty;
+        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($cart->id_product);
+        $stoktemp = $stock->stok;
+        $stock->update([
+            'stok' => (int) $stoktemp+$qty
+        ]);
+        $cart->delete();
+        return response()->json([
+            'message' => 'Success Deleted',
+        ]);
+    }
+
+    public function transactionPendingDelete(Request $request){
+        $invoice = Invoice::where('status_pembayaran', 0)->find($request->id);
+        $cartContent = ShoppingCart::with('product')->where('id_invoice', $request->id)->get();
+        foreach($cartContent as $cart){
+            $tempqty = $cart->qty;
+            $productStock = ProductStock::find($cart->id_product);
+            $stok = $cart->qty + $productStock->stok;
+            $productStock->update([
+                'stok' => $stok
+            ]);
+            $cart->delete();
+        }
+        $invoice->delete();
+        return response()->json([
+            'message' => 'Transaction deleted',
+        ]);
+    }
+
+    public function transactionDetail($id){
+        $invoice = Invoice::with('shoppingCart')->find($id);
+        return response()->json([
+            'message' => 'Fetch Success',
+            'transaction-data' => $invoice,
+        ]);
     }
 }
