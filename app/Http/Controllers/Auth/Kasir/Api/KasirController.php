@@ -15,6 +15,7 @@ use App\Models\Tax;
 use App\Models\TenantField;
 use App\Models\ProductCategory;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
+use GuzzleHttp\Client;
 
 class KasirController extends Controller {
     public function productList(){
@@ -123,6 +124,12 @@ class KasirController extends Controller {
             'harga' => $request->harga,
             'sub_total' => $request->qty*$request->harga
         ]);
+
+        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->where('id_batch_product', $cart->id_product)->first();
+        $stoktemp = $stock->stok;
+        $stock->update([
+            'stok' => (int) $stoktemp-$cart->qty
+        ]);
         // $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
         //          ->where('is_active', 1)->first();
         // $disc = 0;
@@ -166,6 +173,22 @@ class KasirController extends Controller {
         ]);
     }
 
+    public function deleteCart(Request $request){
+        $id_cart = $request->id_cart;
+        $cart = ShoppingCart::find($id_cart);
+        $qty = $cart->qty;
+        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->where('id_batch_product', $cart->id_product)->first();
+        $stoktemp = $stock->stok;
+        $stock->update([
+            'stok' => (int) $stoktemp+$qty
+        ]);
+        $cart->delete();
+        return response()->json([
+            'message' => 'Success Deleted',
+        ]);
+
+    }
+
     public function listCart(){
         $cartContent = ShoppingCart::with('product')
                                 ->where('id_kasir', auth()->user()->id)
@@ -192,6 +215,18 @@ class KasirController extends Controller {
             $pajak = 0;
         }
 
+        if(!empty($diskon)){
+            $disc = $diskon->diskon;
+        } else {
+            $disc = 0;
+        }
+
+        // return response()->json([
+        //     'message' => 'Fetch Success',
+        //     'diskon' => $disc,
+        //     'pajak' => $pajak,
+        // ]);
+
         $cartContent = ShoppingCart::with('product')
                             ->where('id_kasir', auth()->user()->id)
                             ->whereNull('id_invoice')
@@ -212,14 +247,46 @@ class KasirController extends Controller {
             'jenis_pembayaran' => "Qris",
         ]);
 
-        // $subtotal = 0;
-        // $nominalpajak = 0;
-        // $nominaldiskon = 0;
-        // foreach($cartContent as $cart){
-        //     $cart->update([
-        //         'id_invoice' => $invoice->id
-        //     ]);
-        //     $subtotal+= (int) $cart->sub_total;
-        // }
+        $subtotal = 0;
+        $nominalpajak = 0;
+        $nominaldiskon = 0;
+        foreach($cartContent as $cart){
+            $cart->update([
+                'id_invoice' => $invoice->id
+            ]);
+            $subtotal+= (int) $cart->sub_total;
+        }
+        $nominaldiskon = ($disc/100)*$subtotal;
+        $temptotal = $subtotal-$nominaldiskon;
+        $nominalpajak = ($pajak/100)*$temptotal;
+        $total = $temptotal+$nominalpajak;
+
+        $client = new Client();
+        $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+        $postResponse = $client->request('POST',  'https://erp.pt-best.com/api/dynamic_qris_wt_new', [
+            'form_params' => [
+                'amount' => $total,
+                'transactionNo' => $string,
+                'pos_id' => "IN01",
+                'secret_key' => "Vpos71237577"
+            ]
+        ]);
+        $responseCode = $postResponse->getStatusCode();
+        $data = json_decode($postResponse->getBody());
+
+        $invoice->update([
+            'qris_data' => $data->data->data->qrisData,
+            'sub_total' => $temptotal,
+            'pajak' => $nominalpajak,
+            'diskon' => $nominaldiskon,
+            'nominal_bayar' => $total
+        ]);
+
+        return response()->json([
+            'message' => 'Fetch Success',
+            'invoice' => $invoice,
+            'cartData' => $cartContent,
+        ]);
+
     }
 }

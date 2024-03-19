@@ -329,6 +329,7 @@ class KasirController extends Controller {
                 'sub_total' => $subtotal,
                 'pajak' => $tax,
                 'diskon' => $diskon,
+                'nominal_bayar' => $total,
                 'tanggal_pelunasan' => Carbon::now(),
                 'tanggal_transaksi' => Carbon::now()
             ]);

@@ -71,6 +71,7 @@ Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:90,1', 'custom.r
     Route::post('/search-product', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'searchProduct']);
     Route::post('/search-barcode', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'searchBarcode']);
     Route::post('/add-cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'addCart']);
+    Route::post('/delete-cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'deleteCart']);
     Route::get('/cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'listCart']);
     Route::post('/cart-process', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'processCart']);
 });
