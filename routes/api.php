@@ -80,5 +80,6 @@ Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:90,1', 'custom.r
     Route::post('/transaction/pending/cart/delete', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionCartDelete']);
     Route::post('/transaction/pending/update', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionPendingUpdate']);
     Route::post('/transaction/pending/delete', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionPendingDelete']);
+    Route::post('/transaction/change-payment', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionChangePayment']);
     Route::get('/transaction/detail/{id}', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionDetail']);
 });

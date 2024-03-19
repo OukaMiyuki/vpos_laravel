@@ -416,15 +416,15 @@ class KasirController extends Controller {
             'invoice' => $invoice,
             'cartData' => $invoice->shoppingCart,
         ]);
-}
+    }
 
     public function transactionCartDelete(Request $request){
         $invoice = Invoice::with('shoppingCart')
                         ->where('id_tenant', auth()->user()->id_tenant)
                         ->where('id_kasir', auth()->user()->id)
                         ->find($request->id_invoice);
-        $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
-        $id_cart = $request->id_cart;
+        // $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
+        $cart = $invoice->shoppingCart->find($request->id_cart);
         $qty = $cart->qty;
         $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($cart->id_product);
         $stoktemp = $stock->stok;
@@ -438,8 +438,8 @@ class KasirController extends Controller {
     }
 
     public function transactionPendingDelete(Request $request){
-        $invoice = Invoice::where('status_pembayaran', 0)->find($request->id);
-        $cartContent = ShoppingCart::with('product')->where('id_invoice', $request->id)->get();
+        $invoice = Invoice::where('status_pembayaran', 0)->find($request->id_invoice);
+        $cartContent = ShoppingCart::with('product')->where('id_invoice', $request->id_invoice)->get();
         foreach($cartContent as $cart){
             $tempqty = $cart->qty;
             $productStock = ProductStock::find($cart->id_product);
@@ -452,6 +452,20 @@ class KasirController extends Controller {
         $invoice->delete();
         return response()->json([
             'message' => 'Transaction deleted',
+        ]);
+    }
+
+    public function transactionChangePayment(Request $request){
+        $invoice = Invoice::where('status_pembayaran', 0)->find($request->id_invoice);
+        $invoice->update([
+            'tanggal_pelunasan' => Carbon::now(),
+            'jenis_pembayaran' => "Tunai",
+            'qris_data' => NULL,
+            'status_pembayaran' => 1
+        ]);
+        return response()->json([
+            'message' => 'Payment Success',
+            'transaction-data' => $invoice,
         ]);
     }
 
