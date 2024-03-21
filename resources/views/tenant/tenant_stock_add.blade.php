@@ -46,7 +46,7 @@
                                                 <label for="barcode" class="form-label">Barcode</label>
                                                 <div class="row">
                                                     <div class="col-6">
-                                                        <input required type="text" class="form-control" name="barcode" id="barcode" value="" placeholder="Masukkan barcode">
+                                                        <input required type="text" class="form-control" name="barcode" id="barcode" value="" placeholder="Masukkan barcode" readonly>
                                                     </div>
                                                     <div class="col-6">
                                                         <button type="button" id="enable_manual_batcode" class="btn btn-success waves-effect waves-light w-100">Input Barcode Manual</button>
