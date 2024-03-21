@@ -19,7 +19,7 @@
                 $field = App\Models\TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
             @endphp
             @if(!empty($field->id))
-                @if (($invoice->invoiceField->content1 != "") && ($invoice->invoiceField->content2 != "") && ($invoice->invoiceField->content3 != "") && ($invoice->invoiceField->content4 != "") && ($invoice->invoiceField->content5 != ""))
+                @if (($invoice->invoiceField->content1 != "") || ($invoice->invoiceField->content2 != "") || ($invoice->invoiceField->content3 != "") || ($invoice->invoiceField->content4 != "") || ($invoice->invoiceField->content5 != ""))
                     <div id="mid">
                         <div class="info">
                             <h3 class="customerTitle">Customer Info</h3>
@@ -129,15 +129,6 @@
                             <tr class="tabletitle pembayaran">
                                 <td></td>
                                 <td class="Rate">
-                                    <h2>Disc.(@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</h2>
-                                </td>
-                                <td class="payment">
-                                    <h2>{{$invoice->diskon}}</h2>
-                                </td>
-                            </tr>
-                            <tr class="tabletitle pembayaran">
-                                <td></td>
-                                <td class="Rate">
                                     <h2>Sub Total</h2>
                                 </td>
                                 <td class="payment">
@@ -147,10 +138,10 @@
                             <tr class="tabletitle pembayaran">
                                 <td></td>
                                 <td class="Rate">
-                                    <h2>Pajak(@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</h2>
+                                    <h2>Disc.(@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</h2>
                                 </td>
                                 <td class="payment">
-                                    <h2>{{$invoice->pajak}}</h2>
+                                    <h2>{{$invoice->diskon}}</h2>
                                 </td>
                             </tr>
                             <tr class="tabletitle pembayaran">
@@ -165,10 +156,19 @@
                             <tr class="tabletitle pembayaran">
                                 <td></td>
                                 <td class="Rate">
+                                    <h2>Pajak(@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</h2>
+                                </td>
+                                <td class="payment">
+                                    <h2>{{$invoice->pajak}}</h2>
+                                </td>
+                            </tr>
+                            <tr class="tabletitle pembayaran">
+                                <td></td>
+                                <td class="Rate">
                                     <h2>Pembayaran</h2>
                                 </td>
                                 <td class="payment">
-                                    <h2>Tunai</h2>
+                                    <h2>{{ $invoice->jenis_pembayaran}}</h2>
                                 </td>
                             </tr>
                             <tr class="tabletitle pembayaran">
@@ -180,18 +180,27 @@
                                     <h2>{{ $invoice->nominal_bayar }}</h2>
                                 </td>
                             </tr>
-                            <tr class="tabletitle pembayaran">
-                                <td></td>
-                                <td class="Rate">
-                                    <h2>Kembalian</h2>
-                                </td>
-                                <td class="payment">
-                                    <h2>{{ $invoice->kembalian }}</h2>
-                                </td>
-                            </tr>
+                            @if ($invoice->jenis_pembayaran == "Tunai")
+                                <tr class="tabletitle pembayaran">
+                                    <td></td>
+                                    <td class="Rate">
+                                        <h2>Kembalian</h2>
+                                    </td>
+                                    <td class="payment">
+                                        <h2>{{ $invoice->kembalian }}</h2>
+                                    </td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
+                @if ($invoice->jenis_pembayaran == "Qris")
+                    @if ($invoice->status_pembayaran == 0)
+                        <div class="qris">
+                            {!! QrCode::size(200)->generate($invoice->qris_data) !!}
+                        </div>  
+                    @endif
+                @endif
                 <div id="legalcopy">
                     <p class="legal"><strong>Terima Kasih atas kunjungan anda!</strong>  Harap simpan baik baik bukti pembayaran ini, untuk keperluan garansi dan lain sebagainya. </p>
                 </div>

@@ -57,17 +57,28 @@
                                             <tr>
                                                 <td><p><strong>Tanggal Transaksi</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;Jan 17, 2016</span></p></td>
+                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $invoice->tanggal_transaksi }}</span></p></td>
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Tanggal Pembayaran</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;Jan 17, 2016</span></p></td>
+                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $invoice->tanggal_pelunasan }}</span></p></td>
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Status Pembayaran</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p>&nbsp;&nbsp;&nbsp;&nbsp;<span class="badge bg-success">Di bayar</span></p></td>
+                                                <td><p>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    @if($invoice->status_pembayaran == 1)
+                                                        <span class="badge bg-success">
+                                                            Di bayar
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-warning">
+                                                            Belum di bayar
+                                                        </span>
+                                                    @endif
+                                                    </p>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Invoice</strong></p></td>
@@ -171,9 +182,13 @@
                                     <div class="float-end">
                                         <p><b>Sub-total (Rp.):</b> <span class="float-end">{{ $total }}</span></p>
                                         <p><b>Discount (@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif):</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{$invoice->diskon}}</span></p>
-                                        <p><b>Pajak (@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif):</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{$invoice->pajak}}</span></p>
                                         <p><b>Total (Rp.):</b> <span class="float-end">{{ $invoice->sub_total }}</span></p>
-                                        <h3>Rp. {{$invoice->sub_total+$invoice->pajak}}</h3>
+                                        <p><b>Pajak (@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif):</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{$invoice->pajak}}</span></p>
+                                        <h3>Tagihan : Rp. {{$invoice->sub_total+$invoice->pajak}}</h3>
+                                        @if ($invoice->jenis_pembayaran == "Tunai")
+                                            <p><b>Nominal di bayar (Rp.):</b> <span class="float-end"><strong>{{ $invoice->nominal_bayar }}</strong></span></p>
+                                            <p><b>Kambalian (Rp.):</b> <span class="float-end"><strong>{{ $invoice->kembalian }}</strong></span></p>
+                                        @endif
                                     </div>
                                     <div class="clearfix"></div>
                                 </div> <!-- end col -->
@@ -216,6 +231,58 @@
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    @if ($invoice->status_pembayaran == 0)
+                                        &nbsp;&nbsp;<a href=""  data-bs-toggle="modal" data-bs-target="#ubahpembayaran" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Ubah Pembayaran</a>
+                                        <div class="modal fade" id="ubahpembayaran" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="staticBackdropLabel">Apakah yakin ingin ubah pembayaran?</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form class="px-3" action="{{ route('kasir.pos.transaction.pending.changePayment') }}" method="POST">
+                                                        @csrf
+                                                        <div class="modal-body">
+                                                            <div class="row text-center">
+                                                                <div class="col-md-12">
+                                                                    <div class="mb-3">
+                                                                        <label for="qris" class="form-label">Konfirmasi ubah Pembayaran ke Tunai
+                                                                        </label>
+                                                                        <input type="hidden" class="d-none" name="id" id="id" required readonly value="{{$invoice->id}}">
+                                                                        <input type="hidden" class="d-none" name="ttl" id="ttl" required readonly value="{{$invoice->sub_total+$invoice->pajak}}">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row text-start">
+                                                                <div class="col-md-12">
+                                                                    <div class="mb-3">
+                                                                        <label for="nom" class="form-label">Masukkan Nominal Bayar</label>
+                                                                        <input type="text" class="form-control @error('nominal') is-invalid @enderror" name="nominal" id="nom" value="{{ old('nominal') }}" placeholder="Masukkan data nominal pembayaran" required>
+                                                                        @error('nominal')
+                                                                            <span class="text-danger">{{ $message }}</span>
+                                                                        @enderror
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12">
+                                                                    <div class="mb-3">
+                                                                        <label for="kem" class="form-label">Kembalian</label>
+                                                                        <input type="text" class="form-control @error('kembalian') is-invalid @enderror" name="kembalian" id="kem" value="{{ old('kembalian') }}" placeholder="Nominal kembalian" required readonly>
+                                                                        @error('kembalian')
+                                                                            <span class="text-danger">{{ $message }}</span>
+                                                                        @enderror
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-primary">Konfirmasi</button>
                                                         </div>
                                                     </form>
                                                 </div>

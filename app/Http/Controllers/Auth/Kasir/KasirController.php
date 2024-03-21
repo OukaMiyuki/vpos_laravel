@@ -170,13 +170,15 @@ class KasirController extends Controller {
         $invoice = Invoice::with('shoppingCart')
                             ->where('id_tenant', auth()->user()->id_tenant)
                             ->where('id_kasir', auth()->user()->id)
+                            ->whereNull('jenis_pembayaran')
+                            ->where('status_pembayaran', 0)
                             ->find($id);
         $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
                             ->where('is_active', 1)->first();
 
         $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
                     ->where('is_active', 1)->first();
-        
+
         $customField = TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
 
         if(!empty($tax)){
@@ -259,14 +261,14 @@ class KasirController extends Controller {
                 'tanggal_pelunasan' => Carbon::now(),
                 'tanggal_transaksi' => Carbon::now()
             ]);
-    
+
             if(!is_null($invoice)) {
                 $invoice->storeCart($invoice);
                 $invoice->fieldSave($invoice);
             }
-    
+
             session()->forget('cart');
-    
+
             $notification = array(
                 'message' => 'Transaksi berhasil diproses!',
                 'alert-type' => 'success',
@@ -287,7 +289,7 @@ class KasirController extends Controller {
             //     'transactionNo' => "DEM20240315091544999",
             //     'pos_id' => "IN01",
             // ];
-    
+
             // // POST request using the created object
             // $postResponse = $client->post($url, [
             //     'headers' => $headers,
@@ -330,17 +332,16 @@ class KasirController extends Controller {
                 'pajak' => $tax,
                 'diskon' => $diskon,
                 'nominal_bayar' => $total,
-                'tanggal_pelunasan' => Carbon::now(),
                 'tanggal_transaksi' => Carbon::now()
             ]);
-    
+
             if(!is_null($invoice)) {
                 $invoice->storeCart($invoice);
                 $invoice->fieldSave($invoice);
             }
-    
+
             session()->forget('cart');
-    
+
             $notification = array(
                 'message' => 'Transaksi berhasil diproses!',
                 'alert-type' => 'success',
@@ -351,12 +352,14 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionPendingProcess(Request $request){
+        $invoice = Invoice::where('id_kasir', auth()->user()->id)
+                            ->where('id_tenant', auth()->user()->id_tenant)
+                            ->find($request->id_invoice);
+        $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
+        $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
+        $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
+        $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
         if($request->jenisPembayaran == "Tunai"){
-            $invoice = Invoice::find($request->id_invoice);
-            $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
-            $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
-            $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
-            $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
             $invoice->update([
                 'jenis_pembayaran' => $request->jenisPembayaran,
                 'tanggal_pelunasan' => Carbon::now(),
@@ -376,9 +379,66 @@ class KasirController extends Controller {
                 'alert-type' => 'success',
             );
             return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
-        } else if($request->jenisPembayaran == "Tunai"){
-            
+        } else if($request->jenisPembayaran == "Qris"){
+            $total = (int) substr(str_replace([',', '.'], '', Cart::total()), 0, -2);
+            $client = new Client();
+            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+            $postResponse = $client->request('POST',  'https://erp.pt-best.com/api/dynamic_qris_wt_new', [
+                'form_params' => [
+                    'amount' => $total,
+                    'transactionNo' => $invoice->nomor_invoice,
+                    'pos_id' => "IN01",
+                    'secret_key' => "Vpos71237577"
+                ]
+            ]);
+            $responseCode = $postResponse->getStatusCode();
+            $data = json_decode($postResponse->getBody());
+
+            $invoice->update([
+                'jenis_pembayaran' => $request->jenisPembayaran,
+                'tanggal_pelunasan' => Carbon::now(),
+                'status_pembayaran' => 0,
+                'qris_data' => $data->data->data->qrisData,
+                'sub_total' => $subtotal,
+                'pajak' => $tax,
+                'diskon' => $diskon,
+                'nominal_bayar' => $total,
+            ]);
+
+            if(!is_null($invoice)) {
+                $invoice->fieldSave($invoice);
+            }
+
+            session()->forget('cart');
+
+            $notification = array(
+                'message' => 'Transaksi berhasil diproses!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
         }
+    }
+
+    public function cartTransactionPendingChangePayment(Request $request){
+        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->find($request->id);
+        $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalian);
+        $invoice->update([
+            'tanggal_pelunasan' => Carbon::now(),
+            'jenis_pembayaran' => "Tunai",
+            'qris_data' => NULL,
+            'status_pembayaran' => 1,
+            'nominal_bayar' => $request->nominal,
+            'kembalian' => $kembalian,
+        ]);
+
+        $notification = array(
+            'message' => 'Transaksi berhasil diproses!',
+            'alert-type' => 'success',
+        );
+
+        return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
     }
 
     public function cartTransactionInvoice($id){

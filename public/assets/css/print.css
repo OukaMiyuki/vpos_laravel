@@ -160,7 +160,7 @@ h2.itemTitle{
     .txt-right { text-align: right;} */
 }
 
-table.payments { width: 100%; margin-bottom: 50px; }
+table.payments { width: 100%; margin-bottom: 20px; }
 .short {
     width: 40%
 }
@@ -175,4 +175,8 @@ thead.items-thead {
 
 tbody.items-tbody{
     border-bottom: double #000000;
+}
+
+div.qris {
+    text-align: center;
 }

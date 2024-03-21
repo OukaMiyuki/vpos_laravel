@@ -186,6 +186,23 @@ $(document).ready(function() {
     });
 });
 
+$(document).ready(function() {
+    let kmbtxtt = document.getElementById("kem");
+    $('#nom').on("input", function() {
+        let nom = $('#nom').val();
+        let subtl = $('#ttl').val();
+        let angka_sub_total = subtl.replace(/[^0-9.-]+/g,"");
+        let sbtotal = parseInt(angka_sub_total);
+        let kembl = nom-sbtotal;
+        if (kembl >= 0){
+            // $('#kembalian').val(kembalian);
+            kmbtxtt.value = formatRupiah(kembl, "Rp. ");
+        } else {
+            $('#kem').val(0);
+        }
+    });
+});
+
 function formatRupiah(angka, prefix) {
     var number_string = angka.toString().replace(/[^,\d]/g, ""),
         split = number_string.split(","),

@@ -200,6 +200,7 @@ Route::middleware(['auth:kasir', 'throttle'])->prefix('kasir')->group( function 
     Route::get('/dashboard/kasir/transaction/restore/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingRestore'])->name('kasir.transaction.pending.restore');
     Route::get('/dashboard/kasir/transaction/pending/delete/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingDelete'])->name('kasir.transaction.pending.delete');
     Route::post('/dashboard/kasir/transaction/pending/process', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionPendingProcess'])->name('kasir.pos.transaction.pending.process');
+    Route::post('/dashboard/kasir/transaction/pending/change-payment', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionPendingChangePayment'])->name('kasir.pos.transaction.pending.changePayment');
 
     Route::get('/dashboard/kasir/transaction/finish', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionFinish'])->name('kasir.transaction.finish');
 
