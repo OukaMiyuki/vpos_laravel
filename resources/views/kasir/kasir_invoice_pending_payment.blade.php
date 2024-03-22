@@ -22,7 +22,7 @@
                                 </a>
                             </form>
                         </div>
-                        <h4 class="page-title">Pending Transaction</h4>
+                        <h4 class="page-title">Qris Pending Transaction</h4>
                     </div>
                 </div>
             </div>
@@ -46,6 +46,7 @@
                                             <th>No.</th>
                                             <th>Invoice</th>
                                             <th>Tanggal Transaksi</th>
+                                            <th>Pembayaran</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
@@ -57,13 +58,14 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
+                                                <td>{{ $invoice->jenis_pembayaran }}</td>
                                                 <td><span class="badge bg-soft-warning text-warning">Pending</span></td>
                                                 <td>
-                                                    <a href="{{ route('kasir.transaction.pending.restore', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restore transaction" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
+                                                    <a href="{{ route('kasir.pos.transaction.invoice', ['id' => $invoice->id ]) }}">
+                                                        <button title="Lihat Transaksi" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                     <a href="{{ route('kasir.transaction.pending.delete', ['id' => $invoice->id ]) }}">
-                                                        <button title="Hapus transaksi pending" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                        <button title="Batalkan Transaksi" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                     </a>
                                                 </td>
                                             </tr>

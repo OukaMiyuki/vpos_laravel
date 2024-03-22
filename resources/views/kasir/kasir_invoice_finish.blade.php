@@ -38,14 +38,15 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Transaction List&nbsp;&nbsp;&nbsp;<a href="{{ route('kasir.pos') }}"><button title="Tambah transaksi baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Transaksi Baru</button></a</h4>
+                            <h4 class="header-title mb-3">Tabel Transaction List&nbsp;&nbsp;&nbsp;<a href="{{ route('kasir.pos') }}"><button title="Tambah transaksi baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Transaksi Baru</button></a></h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="datatable-buttons" class="table table-striped dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>Invoice</th>
                                             <th>Tanggal Transaksi</th>
+                                            <th>Pembayaran</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
@@ -57,6 +58,7 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
+                                                <td>{{ $invoice->jenis_pembayaran }}</td>
                                                 <td><span class="badge bg-soft-success text-success">Selesai</span></td>
                                                 <td>
                                                     <a href="{{ route('kasir.pos.transaction.invoice', ['id' => $invoice->id ]) }}">

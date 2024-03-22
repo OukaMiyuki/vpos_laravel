@@ -155,7 +155,7 @@
                             </ul>
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Payment Pending</a>
+                                    <a href="{{ route('kasir.transaction.pending.payment') }}">Payment Pending</a>
                                 </li>
                             </ul>
                             <ul class="nav-second-level">
@@ -311,10 +311,10 @@
                                     <a href="{{ route('tenant.transaction.list') }}">Semua Transaksi</a>
                                 </li>
                                 <li>
-                                    <a href="#">Transaction Pending</a>
+                                    <a href="{{ route('tenant.transaction.list.pending') }}">Transaction Pending</a>
                                 </li>
                                 <li>
-                                    <a href="#">Payment Pending</a>
+                                    <a href="{{ route('tenant.transaction.list.pending.payment') }}">Payment Pending</a>
                                 </li>
                             </ul>
                         </div>

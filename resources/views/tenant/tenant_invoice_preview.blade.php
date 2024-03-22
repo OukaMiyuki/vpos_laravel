@@ -57,17 +57,34 @@
                                             <tr>
                                                 <td><p><strong>Tanggal Transaksi</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;Jan 17, 2016</span></p></td>
+                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $invoice->tanggal_transaksi }}</span></p></td>
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Tanggal Pembayaran</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;Jan 17, 2016</span></p></td>
+                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $invoice->tanggal_pelunasan }}</span></p></td>
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Status Pembayaran</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p>&nbsp;&nbsp;&nbsp;&nbsp;<span class="badge bg-success">Di bayar</span></p></td>
+                                                <td><p>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    @if (empty($invoice->jenis_pembayaran))
+                                                        <span class="badge bg-danger">
+                                                            Belum Diproses
+                                                        </span>
+                                                    @else
+                                                        @if($invoice->status_pembayaran == 1)
+                                                            <span class="badge bg-success">
+                                                                Di bayar
+                                                            </span>
+                                                        @else
+                                                            <span class="badge bg-warning">
+                                                                Belum di bayar
+                                                            </span>
+                                                        @endif
+                                                    @endif
+                                                    </p>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Invoice</strong></p></td>
@@ -75,7 +92,7 @@
                                                 <td><p>&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ $invoice->nomor_invoice }}</span></p></td>
                                             </tr>
                                             <tr>
-                                                <td><p><strong>Janis Pembayaran</strong></p></td>
+                                                <td><p><strong>Jenis Pembayaran</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
                                                 <td><p>&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ $invoice->jenis_pembayaran }}</span></p></td>
                                             </tr>
@@ -92,22 +109,21 @@
                                     @endphp
                                     @if (!empty($field))
                                         <address>
-                                            {{ $field->baris1 }} : {{ $invoice->invoiceField->content1 }}<br>
-                                            {{ $field->baris2 }} : {{ $invoice->invoiceField->content2 }}<br>
-                                            {{ $field->baris3 }} : {{ $invoice->invoiceField->content3 }}<br>
-                                            {{ $field->baris4 }} : {{ $invoice->invoiceField->content4 }}<br>
-                                            {{ $field->baris5 }} : {{ $invoice->invoiceField->content5 }}
+                                            @if (!empty($field->baris1)) {{ $field->baris1 }} : @if(!empty($invoice->invoiceField->content1)) {{ $invoice->invoiceField->content1 }} @endif<br>@endif
+                                            @if (!empty($field->baris2)) {{ $field->baris2 }} : @if(!empty($invoice->invoiceField->content2)) {{ $invoice->invoiceField->content2 }} @endif<br>@endif
+                                            @if (!empty($field->baris3)) {{ $field->baris3 }} : @if(!empty($invoice->invoiceField->content3)) {{ $invoice->invoiceField->content3 }} @endif<br>@endif
+                                            @if (!empty($field->baris4)) {{ $field->baris4 }} : @if(!empty($invoice->invoiceField->content4)) {{ $invoice->invoiceField->content4 }} @endif<br>@endif
+                                            @if (!empty($field->baris5)) {{ $field->baris5 }} : @if(!empty($invoice->invoiceField->content5)) {{ $invoice->invoiceField->content5 }} @endif<br>@endif
                                         </address>
                                     @endif
                                 </div> <!-- end col -->
-
                                 <div class="col-sm-6">
                                     <h6>Info Kasir</h6>
                                     <address>
-                                        Nama Kasir : <br>
+                                        Nama Kasir : {{ $invoice->kasir->name }}<br>
                                         Jabatan : Kasir<br>
-                                        Nomor Telp./WA : <br>
-                                        Email : <br>
+                                        Nomor Telp./WA : {{ $invoice->kasir->phone }}<br>
+                                        Email : {{ $invoice->kasir->email }}<br>
                                     </address>
                                 </div> <!-- end col -->
                             </div>
@@ -166,15 +182,19 @@
                                 </div> <!-- end col -->
                                 <div class="col-sm-6">
                                     @php
-                                        $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
-                                        $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                                        $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id)->where('is_active', 1)->first();
+                                        $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id)->where('is_active', 1)->first();
                                     @endphp
                                     <div class="float-end">
                                         <p><b>Sub-total (Rp.):</b> <span class="float-end">{{ $total }}</span></p>
                                         <p><b>Discount (@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif):</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{$invoice->diskon}}</span></p>
-                                        <p><b>Pajak (@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif):</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{$invoice->pajak}}</span></p>
                                         <p><b>Total (Rp.):</b> <span class="float-end">{{ $invoice->sub_total }}</span></p>
-                                        <h3>Rp. {{$invoice->sub_total+$invoice->pajak}}</h3>
+                                        <p><b>Pajak (@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif):</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{$invoice->pajak}}</span></p>
+                                        <h3>Tagihan : Rp. {{$invoice->sub_total+$invoice->pajak}}</h3>
+                                        @if ($invoice->jenis_pembayaran == "Tunai")
+                                            <p><b>Nominal di bayar (Rp.):</b> <span class="float-end"><strong>{{ $invoice->nominal_bayar }}</strong></span></p>
+                                            <p><b>Kambalian (Rp.):</b> <span class="float-end"><strong>{{ $invoice->kembalian }}</strong></span></p>
+                                        @endif
                                     </div>
                                     <div class="clearfix"></div>
                                 </div> <!-- end col -->
@@ -183,11 +203,7 @@
 
                             <div class="mt-4 mb-1">
                                 <div class="text-end d-print-none">
-                                    <a href="{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}" class="btn btn-primary waves-effect waves-light" target="_blank"><i class="mdi mdi-printer me-1"></i> Print Nota</a>
-                                    {{-- <a href="" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a> --}}
-                                    {{-- <a href="" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow','height=500,width=255,left=100,top=100,resizable=no,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a> --}}
-                                    {{-- <a id="printNota" nonce="{{ csp_nonce() }}" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow','resizable=no,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a>&nbsp;&nbsp; --}}
-                                    {{-- <a href="#" class="btn btn-info waves-effect waves-light">Submit</a> --}}
+                                    <a href="javascript:window.print()" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print</a>
                                 </div>
                             </div>
                         </div>

@@ -68,14 +68,20 @@
                                                 <td><p><strong>Status Pembayaran</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
                                                 <td><p>&nbsp;&nbsp;&nbsp;&nbsp;
-                                                    @if($invoice->status_pembayaran == 1)
-                                                        <span class="badge bg-success">
-                                                            Di bayar
+                                                    @if (empty($invoice->jenis_pembayaran))
+                                                        <span class="badge bg-danger">
+                                                            Belum Diproses
                                                         </span>
                                                     @else
-                                                        <span class="badge bg-warning">
-                                                            Belum di bayar
-                                                        </span>
+                                                        @if($invoice->status_pembayaran == 1)
+                                                            <span class="badge bg-success">
+                                                                Di bayar
+                                                            </span>
+                                                        @else
+                                                            <span class="badge bg-warning">
+                                                                Belum di bayar
+                                                            </span>
+                                                        @endif
                                                     @endif
                                                     </p>
                                                 </td>
@@ -86,7 +92,7 @@
                                                 <td><p>&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ $invoice->nomor_invoice }}</span></p></td>
                                             </tr>
                                             <tr>
-                                                <td><p><strong>Janis Pembayaran</strong></p></td>
+                                                <td><p><strong>Jenis Pembayaran</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
                                                 <td><p>&nbsp;&nbsp;&nbsp;&nbsp;<span>{{ $invoice->jenis_pembayaran }}</span></p></td>
                                             </tr>
@@ -103,11 +109,11 @@
                                     @endphp
                                     @if (!empty($field))
                                         <address>
-                                            {{ $field->baris1 }} : {{ $invoice->invoiceField->content1 }}<br>
-                                            {{ $field->baris2 }} : {{ $invoice->invoiceField->content2 }}<br>
-                                            {{ $field->baris3 }} : {{ $invoice->invoiceField->content3 }}<br>
-                                            {{ $field->baris4 }} : {{ $invoice->invoiceField->content4 }}<br>
-                                            {{ $field->baris5 }} : {{ $invoice->invoiceField->content5 }}
+                                            @if (!empty($field->baris1)) {{ $field->baris1 }} : @if(!empty($invoice->invoiceField->content1)) {{ $invoice->invoiceField->content1 }} @endif<br>@endif
+                                            @if (!empty($field->baris2)) {{ $field->baris2 }} : @if(!empty($invoice->invoiceField->content2)) {{ $invoice->invoiceField->content2 }} @endif<br>@endif
+                                            @if (!empty($field->baris3)) {{ $field->baris3 }} : @if(!empty($invoice->invoiceField->content3)) {{ $invoice->invoiceField->content3 }} @endif<br>@endif
+                                            @if (!empty($field->baris4)) {{ $field->baris4 }} : @if(!empty($invoice->invoiceField->content4)) {{ $invoice->invoiceField->content4 }} @endif<br>@endif
+                                            @if (!empty($field->baris5)) {{ $field->baris5 }} : @if(!empty($invoice->invoiceField->content5)) {{ $invoice->invoiceField->content5 }} @endif<br>@endif
                                         </address>
                                     @endif
                                 </div> <!-- end col -->

@@ -38,36 +38,48 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Transaction List&nbsp;&nbsp;&nbsp;<a href="{{ route('kasir.pos') }}"><button title="Tambah transaksi baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Transaksi Baru</button></a</h4>
+                            <h4 class="header-title mb-3">Tabel Transaction List</h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
+                                            <th>Action</th>
                                             <th>No.</th>
                                             <th>Invoice</th>
+                                            <th>Kasir</th>
                                             <th>Tanggal Transaksi</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th>Pembayaran</th>
+                                            <th>Status Transaksi</th>
+                                            <th>Status Pembayaran</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($invoice as $invoice)
                                             <tr>
+                                                <td>
+                                                    <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
+                                                        <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                    </a>
+                                                </td>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
+                                                <td>{{ $invoice->kasir->name }}</td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
+                                                <td>{{ $invoice->jenis_pembayaran }}</td>
+                                                <td>
+                                                    @if (!empty($invoice->jenis_pembayaran))
+                                                        <span class="badge bg-soft-warning text-warning">Pending</span>
+                                                    @else
+                                                        <span class="badge bg-soft-danger text-danger">Belum Diproses</span>
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     @if($invoice->status_pembayaran == 0)
                                                         <span class="badge bg-soft-warning text-warning">Pending</span>
                                                     @elseif($invoice->status_pembayaran == 1)
                                                         <span class="badge bg-soft-success text-success">Selesai</span>
                                                     @endif
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
-                                                    </a>
                                                 </td>
                                             </tr>
                                         @endforeach

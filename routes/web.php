@@ -150,6 +150,8 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle'])->prefix('t
     Route::get('/dashboard/data/batch/product/stock/barcode/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockBarcode'])->name('tenant.product.stock.barcode.show');
 
     Route::get('/dashboard/data/transaction/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionList'])->name('tenant.transaction.list');
+    Route::get('/dashboard/data/transaction/list/pending', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPending'])->name('tenant.transaction.list.pending');
+    Route::get('/dashboard/data/transaction/list/pending/payment', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPendingPayment'])->name('tenant.transaction.list.pending.payment');
     Route::get('/dashboard/data/transaction/invoice/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionInvoiceView'])->name('tenant.transaction.invoice');
 
     Route::get('/dashboard/store/settings/discount', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModify'])->name('tenant.discount.modify');
@@ -202,6 +204,7 @@ Route::middleware(['auth:kasir', 'throttle'])->prefix('kasir')->group( function 
     Route::post('/dashboard/kasir/transaction/pending/process', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionPendingProcess'])->name('kasir.pos.transaction.pending.process');
     Route::post('/dashboard/kasir/transaction/pending/change-payment', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionPendingChangePayment'])->name('kasir.pos.transaction.pending.changePayment');
 
+    Route::get('/dashboard/kasir/transaction/pending/payment', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingPayment'])->name('kasir.transaction.pending.payment');
     Route::get('/dashboard/kasir/transaction/finish', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionFinish'])->name('kasir.transaction.finish');
 
     Route::get('settings/profile', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profile'])->name('kasir.profile');

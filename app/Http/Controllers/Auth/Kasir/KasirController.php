@@ -160,9 +160,20 @@ class KasirController extends Controller {
         $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('jenis_pembayaran', NULL)
+                            ->where('status_pembayaran', 0)
                             ->latest()
                             ->get();
         return view('kasir.kasir_invoice_pending', compact('invoice'));
+    }
+
+    public function transactionPendingPayment(){
+        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                        ->where('id_kasir', auth()->user()->id)
+                        ->where('jenis_pembayaran', "Qris")
+                        ->where('status_pembayaran', 0)
+                        ->latest()
+                        ->get();
+        return view('kasir.kasir_invoice_pending_payment', compact('invoice'));
     }
 
     public function transactionPendingRestore($id){

@@ -1,4 +1,4 @@
-<x-kasir-layout>
+<x-tenant-layout>
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
@@ -22,7 +22,7 @@
                                 </a>
                             </form>
                         </div>
-                        <h4 class="page-title">Pending Transaction</h4>
+                        <h4 class="page-title">Data Transaksi Payment Pending</h4>
                     </div>
                 </div>
             </div>
@@ -38,15 +38,17 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Transaction List&nbsp;&nbsp;&nbsp;<a href="{{ route('kasir.pos') }}"><button title="Tambah transaksi baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Transaksi Baru</button></a></h4>
+                            <h4 class="header-title mb-3">Tabel Transaction Pending List</h4>
                             <div class="table-responsive">
-                                <table id="datatable-buttons" class="table table-striped dt-responsive nowrap w-100">
+                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>Invoice</th>
+                                            <th>Kasir</th>
                                             <th>Tanggal Transaksi</th>
-                                            <th>Status</th>
+                                            <th>Pembayaran</th>
+                                            <th>Status Transaksi</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -56,14 +58,15 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
+                                                <td>{{ $invoice->kasir->name }}</td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td><span class="badge bg-soft-warning text-warning">Pending</span></td>
+                                                <td>{{ $invoice->jenis_pembayaran }}</td>
                                                 <td>
-                                                    <a href="{{ route('kasir.transaction.pending.restore', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restore transaction" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
-                                                    </a>
-                                                    <a href="{{ route('kasir.transaction.pending.delete', ['id' => $invoice->id ]) }}">
-                                                        <button title="Hapus transaksi pending" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                    <span class="badge bg-soft-warning text-warning">Pending</span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
+                                                        <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                 </td>
                                             </tr>
@@ -79,4 +82,4 @@
         </div>
         <!-- container -->
     </div>
-</x-kasir-layout>
+</x-tenant-layout>

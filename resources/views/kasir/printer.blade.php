@@ -19,7 +19,7 @@
                 $field = App\Models\TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
             @endphp
             @if(!empty($field->id))
-                @if (($invoice->invoiceField->content1 != "") || ($invoice->invoiceField->content2 != "") || ($invoice->invoiceField->content3 != "") || ($invoice->invoiceField->content4 != "") || ($invoice->invoiceField->content5 != ""))
+                @if ( !empty($invoice->invoiceField->content1) || !empty($invoice->invoiceField->content2) || !empty($invoice->invoiceField->content3) || !empty($invoice->invoiceField->content4) || !empty($invoice->invoiceField->content5))
                     <div id="mid">
                         <div class="info">
                             <h3 class="customerTitle">Customer Info</h3>

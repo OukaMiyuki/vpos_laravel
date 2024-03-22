@@ -548,6 +548,24 @@ class TenantController extends Controller {
         return view('tenant.tenant_transaction_list', compact('invoice'));
     }
 
+    public function transactionListPending(){
+        $invoice = Invoice::where('id_tenant', auth()->user()->id)
+                            ->where('jenis_pembayaran', NULL)
+                            ->where('status_pembayaran', 0)
+                            ->latest()
+                            ->get();
+        return view('tenant.tenant_transaction_list_pending', compact('invoice'));
+    }
+
+    public function transactionListPendingPayment(){
+        $invoice = Invoice::where('id_tenant', auth()->user()->id)
+                        ->where('jenis_pembayaran', "Qris")
+                        ->where('status_pembayaran', 0)
+                        ->latest()
+                        ->get();
+        return view('tenant.tenant_transaction_list_pending_payment', compact('invoice'));
+    }
+
     public function transactionInvoiceView($id){
         $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
         return view('tenant.tenant_invoice_preview', compact('invoice'));
