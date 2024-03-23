@@ -276,6 +276,7 @@ class KasirController extends Controller {
             if(!is_null($invoice)) {
                 $invoice->storeCart($invoice);
                 $invoice->fieldSave($invoice);
+                $invoice->updateTunaiWallet($total);
             }
 
             session()->forget('cart');

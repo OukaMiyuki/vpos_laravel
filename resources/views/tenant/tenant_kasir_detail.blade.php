@@ -64,13 +64,13 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="name" class="form-label">Nama Lengkap</label>
-                                                <input type="text" class="form-control" name="name" id="name" required value="{{ $kasir->name }}" placeholder="Masukkan nama lengkap">
+                                                <input readonly type="text" class="form-control" name="name" id="name" required value="{{ $kasir->name }}" placeholder="Masukkan nama lengkap">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="email" class="form-label">Email</label>
-                                                <input type="email" class="form-control" name="email" id="email" required value="{{ $kasir->email }}" placeholder="Masukkan email akun">
+                                                <input readonly type="email" class="form-control" name="email" id="email" required value="{{ $kasir->email }}" placeholder="Masukkan email akun">
                                             </div>
                                         </div>
                                         <!-- end col -->
@@ -79,7 +79,7 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="phone" class="form-label">Phone Number</label>
-                                                <input type="text" class="form-control" name="phone" id="phone" required value="{{ $kasir->phone }}" placeholder="Enter email">
+                                                <input readonly type="text" class="form-control" name="phone" id="phone" required value="{{ $kasir->phone }}" placeholder="Enter email">
                                             </div>
                                         </div>
                                     </div>
@@ -90,7 +90,7 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="no_ktp" class="form-label">Nomor KTP</label>
-                                                <input type="text" class="form-control" name="no_ktp" id="no_ktp" required value="{{$kasir->detail->no_ktp}}" placeholder="Masukkan nomor KTP">
+                                                <input readonly type="text" class="form-control" name="no_ktp" id="no_ktp" required value="{{$kasir->detail->no_ktp}}" placeholder="Masukkan nomor KTP">
                                             </div>
                                         </div>
                                     </div>
@@ -98,13 +98,13 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
-                                                <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="{{ $kasir->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
+                                                <input readonly type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="{{ $kasir->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                                                <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ $kasir->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" required>
+                                                <input readonly type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ $kasir->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" required>
                                             </div>
                                         </div>
                                     </div>
@@ -112,11 +112,7 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
-                                                <select class="form-select @error('jenis_kelamin') is-invalid @enderror" id="jenis_kelamin" name="jenis_kelamin" required>
-                                                    <option value="">- Pilih jenis kelamin -</option>
-                                                    <option @if($kasir->detail->jenis_kelamin == "Laki-laki") selected @endif value="Laki-laki">Laki-laki</option>
-                                                    <option @if($kasir->detail->jenis_kelamin == "Perempuan") selected @endif value="Perempuan">Perempuan</option>
-                                                </select>
+                                                <input readonly type="text" class="form-control" name="jenis_kelamin" id="jenis_kelamin" required value="{{ $kasir->detail->jenis_kelamin }}" placeholder="Masukkan jenis kelamin">
                                             </div>
                                         </div>
                                     </div>
@@ -124,7 +120,7 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="alamat" class="form-label">Alamat</label>
-                                                <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $kasir->detail->alamat !!}</textarea>
+                                                <textarea readonly placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $kasir->detail->alamat !!}</textarea>
                                             </div>
                                         </div>
                                     </div>

@@ -363,7 +363,7 @@
                         <div class="collapse" id="finance">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Total Saldo</a>
+                                    <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
                                 </li>
                                 <li>
                                     <a href="#">History Penarikan</a>

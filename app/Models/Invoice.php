@@ -11,6 +11,8 @@ use App\Models\Tenant;
 use App\Models\InvoiceField;
 use App\Models\Product;
 use App\Models\ProductStock;
+use App\Models\TunaiWallet;
+use App\Models\QrisWallet;
 
 class Invoice extends Model {
     use HasFactory;
@@ -101,5 +103,13 @@ class Invoice extends Model {
             ]);
             $cart->delete();
         }
+    }
+
+    public function updateTunaiWallet($total){
+        $tunaiWallet = TunaiWallet::where('id_tenant', auth()->user()->id_tenant)->first();
+        $totalSaldo = (int) $tunaiWallet->saldo+$total;
+        $tunaiWallet->update([
+            'saldo' => $totalSaldo
+        ]);
     }
 }

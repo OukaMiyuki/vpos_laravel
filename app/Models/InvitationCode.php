@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Marketing;
+use App\Models\Tenant;
 
 class InvitationCode extends Model {
     use HasFactory;
@@ -19,5 +20,9 @@ class InvitationCode extends Model {
 
     public function marketing(){
         return $this->belongsTo(Marketing::class, 'id_marketing', 'id');
+    }
+
+    public function tenant(){
+        return $this->hasMany(Tenant::class, 'id_inv_code', 'id');
     }
 }

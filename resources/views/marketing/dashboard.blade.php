@@ -40,9 +40,9 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">20</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $code }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Invitation Code</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('marketing.dashboard.invitationcode.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -65,9 +65,9 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">127</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $tenantNumber }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Redeemed Code</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('marketing.dashboard.tenant.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>

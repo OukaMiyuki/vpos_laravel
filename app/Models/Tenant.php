@@ -15,9 +15,12 @@ use App\Models\ProductCategory;
 use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\Invoice;
+use App\Models\InvitationCode;
 use App\Models\Tax;
 use App\Models\Discount;
 use App\Models\TenantField;
+use App\Models\TunaiWallet;
+use App\Models\QrisWallet;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -41,6 +44,10 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function invitationCode(){
+        return $this->belongsTo(InvitationCode::class, 'id_inv_code', 'id');
+    }
 
     public function detail(){
         return $this->hasOne(DetailTenant::class, 'id_tenant', 'id');
@@ -82,6 +89,14 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         return $this->hasOne(TenantField::class, 'id_tenant', 'id');
     }
 
+    public function saldoTunai(){
+        return $this->hasOne(TunaiWallet::class, 'id_tenant', 'id');
+    }
+
+    public function saldoQris(){
+        return $this->hasOne(QrisWallet::class, 'id_user', 'id');
+    }
+
     public function sendEmailVerificationNotification() {
         $this->notify(new EmailVerificationNotification);
     }
@@ -101,5 +116,14 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         $StoreDetail = new StoreDetail();
         $StoreDetail->id_tenant = $model->id;
         $StoreDetail->save();
+    }
+
+    public function createWallet($model){
+        $tunaiWallet = new TunaiWallet();
+        $qrisWallet = new QrisWallet();
+        $tunaiWallet->id_tenant = $model->id;
+        $tunaiWallet->save();
+        $qrisWallet->id_tenant = $model->id;
+        $qrisWallet->save();
     }
 }

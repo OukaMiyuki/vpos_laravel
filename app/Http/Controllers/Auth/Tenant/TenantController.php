@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Tenant;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Kasir;
@@ -16,15 +17,52 @@ use App\Models\Tax;
 use App\Models\Discount;
 use App\Models\TenantField;
 use App\Models\Invoice;
+use App\Models\QrisWallet;
+use App\Models\TunaiWallet;
 
 class TenantController extends Controller {
 
     public function index(){
-        return view('tenant.dashboard');
+        $product = Product::where('id_tenant', auth()->user()->id)->count();
+        $kasir = Kasir::where('id_tenant', auth()->user()->id)->count();
+        $supplier = Supplier::where('id_tenant', auth()->user()->id)->count();
+        $todayTransaction = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                                    ->where('id_tenant', auth()->user()->id)
+                                    ->count();
+        $todayTransactionFinish = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                                    ->where('id_tenant', auth()->user()->id)
+                                    ->where('status_pembayaran', 1)
+                                    ->count();
+        $category = ProductCategory::where('id_tenant', auth()->user()->id)->count();
+        $invoice = Invoice::where('id_tenant', auth()->user()->id)->count();
+        $latestInvoice = Invoice::with('kasir')
+                                ->where('id_tenant', auth()->user()->id)
+                                ->where('status_pembayaran', 1)
+                                ->latest()
+                                ->take(10)
+                                ->get();
+        $qrisWallet = QrisWallet::where('id_tenant', auth()->user()->id)->first();
+        $tunaiWallet = TunaiWallet::where('id_tenant', auth()->user()->id)->first();
+        $totalSaldo = (int)filter_var($qrisWallet->saldo, FILTER_SANITIZE_NUMBER_INT) + (int) filter_var($tunaiWallet->saldo, FILTER_SANITIZE_NUMBER_INT);
+        $pemasukanHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                            ->where('id_tenant', auth()->user()->id)
+                            ->where('status_pembayaran', 1)
+                            ->sum('sub_total');
+        $pajakHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                            ->where('id_tenant', auth()->user()->id)
+                            ->where('status_pembayaran', 1)
+                            ->sum('pajak');
+        $totalHariIni = (int)filter_var($pemasukanHariIni, FILTER_SANITIZE_NUMBER_INT) + (int)filter_var($pajakHariIni, FILTER_SANITIZE_NUMBER_INT);
+        return view('tenant.dashboard', compact('product', 'kasir', 'supplier', 'todayTransaction', 'invoice', 'category', 'todayTransactionFinish', 'latestInvoice', 'totalSaldo', 'totalHariIni'));
     }
 
     public function kasirList(){
-        $kasir = Kasir::with('detail')->where('id_tenant', auth()->user()->id)->latest()->get();
+        $kasir = Kasir::with('detail')
+                        ->select(['id','name', 'email', 'is_active'])
+                        ->where('id_tenant', auth()->user()->id)
+                        ->latest()
+                        ->get();
+        // dd($kasir);
         return view('tenant.tenant_kasir_list', compact('kasir'));
     }
 
@@ -63,7 +101,10 @@ class TenantController extends Controller {
     }
 
     public function kasirDetail($id){
-        $kasir = Kasir::where('id_tenant', auth()->user()->id)->with('detail')->find($id);
+        $kasir = Kasir::where('id_tenant', auth()->user()->id)
+                        ->select(['id','name', 'email', 'is_active', 'phone'])
+                        ->with('detail')
+                        ->find($id);
         return view('tenant.tenant_kasir_detail', compact('kasir'));
     }
 
@@ -569,5 +610,11 @@ class TenantController extends Controller {
     public function transactionInvoiceView($id){
         $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
         return view('tenant.tenant_invoice_preview', compact('invoice'));
+    }
+
+    public function saldoData(){
+        $tunai = TunaiWallet::where('id_tenant', auth()->user()->id)->first();
+        $qris = QrisWallet::where('id_tenant', auth()->user()->id)->first();
+        return view('tenant.tenant_saldo', compact('tunai', 'qris'));
     }
 }

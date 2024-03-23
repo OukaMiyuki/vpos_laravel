@@ -49,6 +49,7 @@ class RegisterController extends Controller {
         // return redirect(RouteServiceProvider::MARKETING_DASHBOARD);
         if(!is_null($marketing)) {
             $marketing->detailMarketingStore($marketing);
+            $marketing->createWallet($marketing);
         }
 
         event(new Registered($marketing));
