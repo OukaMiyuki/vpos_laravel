@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Marketing;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\InvitationCode;
 use App\Models\Marketing;
@@ -67,9 +68,16 @@ class MarketingController extends Controller {
     }
 
     public function marketingTenantDetail($inv_code, $id,){
-        $tenant = Tenant::with(['detail', 'storeDetail'])
+        $tenant = Tenant::select(['id', 'name', 'email', 'phone', 'is_active'])
+                        ->with(['detail', 'storeDetail'])
                         ->where('id_inv_code', $inv_code)
+                        ->where(DB::table('invitation_codes')
+                            ->where('inv_code', $inv_code)
+                            ->where('id_marketing', auth()->user()->id)
+                            ->first()
+                        )
                         ->find($id);
-        dd($tenant);
+        // dd($tenant);
+        return view('marketing.marketing_tenant_detail', compact('tenant'));
     }
 }

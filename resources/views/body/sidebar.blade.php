@@ -243,10 +243,7 @@
                         <div class="collapse" id="sidebarCrm">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Tenant List</a>
-                                </li>
-                                <li>
-                                    <a href="#">Merchant List</a>
+                                    <a href="{{ route('marketing.dashboard.tenant.list') }}">Tenant List</a>
                                 </li>
                                 <li>
                                     <a href="#">Data Penarikan</a>
@@ -263,7 +260,7 @@
                         <div class="collapse" id="finance">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="crm-dashboard.html">Penarikan</a>
+                                    <a href="crm-dashboard.html">Penarikan Anda</a>
                                 </li>
                                 <li>
                                     <a href="crm-customers.html">Total Saldo</a>
