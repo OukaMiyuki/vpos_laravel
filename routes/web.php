@@ -119,6 +119,7 @@ Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( functio
 });
 
 Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle'])->prefix('tenant')->group( function () {
+    Route::get('check-payment', function () { event(new App\Events\PaymentCheck('Someone')); return "Event has been sent!";});
     Route::get('test', function () {
         event(new App\Events\PaymentCheck('Someone'));
         return "Event has been sent!";
