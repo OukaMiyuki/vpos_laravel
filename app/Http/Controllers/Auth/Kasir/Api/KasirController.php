@@ -32,7 +32,7 @@ class KasirController extends Controller {
         ]);
     }
 
-    public function productDetail(){
+    public function productDetail(Request $request){
         $stock = ProductStock::with(['product' => function ($query) {
                             $query->with('category')->get();
                         }])
