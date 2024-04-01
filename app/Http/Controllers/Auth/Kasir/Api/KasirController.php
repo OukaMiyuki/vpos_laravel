@@ -32,6 +32,21 @@ class KasirController extends Controller {
         ]);
     }
 
+    public function productDetail($id){
+        $stock = ProductStock::with(['product' => function ($query) {
+                            $query->with('category')->get();
+                        }])
+                        ->where(function ($query){
+                                $query->where('stok', '!=', 0);
+                        })->where('id_tenant', auth()->user()->id_tenant)
+                        ->find($id);
+
+        return response()->json([
+            'message' => 'Fetch Success',
+            'data-detail-stock' => $stock,
+        ]);
+    }
+
     public function productCategory() {
         $productCategory = ProductCategory::where('id_tenant', auth()->user()->id_tenant)->latest()->get();
         return response()->json([

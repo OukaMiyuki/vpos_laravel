@@ -119,6 +119,10 @@ Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( functio
 });
 
 Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle'])->prefix('tenant')->group( function () {
+    Route::get('test', function () {
+        event(new App\Events\PaymentCheck('Someone'));
+        return "Event has been sent!";
+        });
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'index'])->name('tenant.dashboard');
     Route::get('/dashboard/data/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');
     Route::get('/dashboard/data/kasir/info/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirDetail'])->name('tenant.kasir.detail');

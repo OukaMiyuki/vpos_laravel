@@ -104,6 +104,21 @@
         <script src="{{ asset('assets/libs/devbridge-autocomplete/jquery.autocomplete.min.js') }}"></script>
         <script src="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js') }}"></script>
         <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
+        <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+        <script>
+            // Enable pusher logging -  No need to add in Production
+            // Pusher.logToConsole = true;
+            // Initialization the Pusher JS library
+            var pusher = new Pusher('API_KEY_HERE', {
+                encrypted: true
+            });
+            // Subscribe to the channel we specified in our Laravel Event
+            var channel = pusher.subscribe('post-liked');
+                // Bind a function to an Event (the full Laravel class)
+                channel.bind('App\Events\PaymentCheck', function(data) {
+                // this is called when the event notification is received...
+            });
+        </script>
 
         {{-- ON SCAN --}}
         <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
