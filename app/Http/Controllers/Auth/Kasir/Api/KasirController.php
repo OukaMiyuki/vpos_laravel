@@ -16,206 +16,361 @@ use App\Models\TenantField;
 use App\Models\ProductCategory;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
 use GuzzleHttp\Client;
+use Illuminate\Http\JsonResponse;
+use Exception;
 
 class KasirController extends Controller {
-    public function productList(){
-        $stock = ProductStock::with('product')
-                        ->where(function ($query) {
-                                $query->where('stok', '!=', 0);
-                        })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
-        // $customField = TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
-        // $stockProduk = $stock;
-        return response()->json([
-            'message' => 'Fetch Success',
-            'dataStokProduk' => $stock,
-            // 'customField' => $customField
-        ]);
+    public function productList() : JsonResponse{
+        $stock = "";
+        try {
+            $stock = ProductStock::with('product')
+                                ->where(function ($query) {
+                                        $query->where('stok', '!=', 0);
+                                })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if($stock->count() == 0 || $stock == ""){
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'data-status' => 'No data found in this collection!',
+                'dataStokProduk' => $stock,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'dataStokProduk' => $stock,
+                'status' => 200
+            ]);
+        }
     }
 
-    public function productDetail(Request $request){
-        $stock = ProductStock::with(['product' => function ($query) {
-                            $query->with('category')->get();
-                        }])
-                        ->where(function ($query){
-                                $query->where('stok', '!=', 0);
-                        })->where('id_tenant', auth()->user()->id_tenant)
-                        ->find($request->id);
+    public function productDetail(Request $request) : JsonResponse {
+        $stock = "";
+        $id = $request->id;
+        try {
+            $stock = ProductStock::with(['product' => function ($query) {
+                        $query->with('category')->get();
+                    }])
+                    ->where(function ($query){
+                            $query->where('stok', '!=', 0);
+                    })->where('id_tenant', auth()->user()->id_tenant)
+                    ->findOrFail($id);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
 
         return response()->json([
             'message' => 'Fetch Success',
             'data-detail-stock' => $stock,
+            'status' => 200
         ]);
     }
 
-    public function productCategory() {
-        $productCategory = ProductCategory::where('id_tenant', auth()->user()->id_tenant)->latest()->get();
-        return response()->json([
-            'message' => 'Fetch Success',
-            'productCategory' => $productCategory,
-        ]);
-    }
-
-    public function filterCategory(Request $request){
-        $category = $request->id_category;
-        // $stock = ProductStock::with(['product' => function ($query) use ($category) {
-        //                     $query->where('id_category', $category);
-        //                 }])
-        //                 ->where(function ($query){
-        //                         $query->where('stok', '!=', 0);
-        //                 })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
-        $stock = ProductStock::with('product')
-                     ->whereHas('product', function($q) use($category) {
-                            $q->where('id_category', $category);
-                    })->where(function ($query){
-                            $query->where('stok', '!=', 0);
-                    })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
-        $message = "";
-        if(!count($stock)){
-            $message = "Products not found";
-        } else {
-            $message = "Fetch Success";
+    public function productCategory() : JsonResponse {
+        $productCategory = "";
+        try {
+            $productCategory = ProductCategory::select(['id','name'])->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
         }
-        return response()->json([
-            'message' => $message,
-            'dataStokProduk' => $stock
-        ]);
-
+        if($productCategory->count() == 0 || $productCategory == ""){
+            return response()->json([
+                'message' => 'Fetch Success',
+                'data-status' => 'No data found in this collection!',
+                'productCategory' => $productCategory,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success',
+                'productCategory' => $productCategory,
+                'status' => 200
+            ]);
+        }
     }
 
-    public function searchProduct(Request $request) {
-        $keyword = $request->product_name;
-        if($keyword){
+    public function filterCategory(Request $request) : JsonResponse {
+        $category = $request->id_category;
+        $stock = "";
+        try {
             $stock = ProductStock::with('product')
-                        ->whereHas('product', function($q) use($keyword) {
-                            $q->where('product_name', 'LIKE', '%'.$keyword.'%');
+                        ->whereHas('product', function($q) use ($category) {
+                                $q->where('id_category', $category);
                         })->where(function ($query){
                                 $query->where('stok', '!=', 0);
-                        })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
-
-            $message = "";
-
-            if(!count($stock)){
-                $message = "Products not found";
-            } else {
-                $message = "Fetch Success";
-            }
+                        })->where('id_tenant', auth()->user()->id_tenant)
+                        ->latest()
+                        ->get();
+        } catch (Exception $e) {
             return response()->json([
-                'message' => $message,
-                'dataStokProduk' => $stock
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if($stock->count() == 0 || $stock == ""){
+            return response()->json([
+                'message' => 'Fetch Success',
+                'data-status' => 'No product found in this category!',
+                'dataStokProduk' => $stock,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => "Fetch Success!",
+                'dataStokProduk' => $stock,
+                'status' => 200
             ]);
         }
     }
 
-    public function searchBarcode(Request $request){
+    public function searchProduct(Request $request) : JsonResponse {
+        $keyword = $request->product_name;
+        $stock = "";
+        if($keyword){
+            try {
+                $stock = ProductStock::with('product')
+                                    ->whereHas('product', function($q) use($keyword) {
+                                        $q->where('product_name', 'LIKE', '%'.$keyword.'%');
+                                    })->where(function ($query){
+                                            $query->where('stok', '!=', 0);
+                                    })->where('id_tenant', auth()->user()->id_tenant)
+                                    ->latest()
+                                    ->get();
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to fetch data!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
+            }
+            
+            if($stock->count() == 0 || $stock == ""){
+                return response()->json([
+                    'message' => 'Fetch Success',
+                    'data-status' => 'No product found!',
+                    'dataStokProduk' => $stock,
+                    'status' => 200
+                ]);
+            } else {
+                return response()->json([
+                    'message' => "Fetch Success!",
+                    'dataStokProduk' => $stock,
+                    'status' => 200
+                ]);
+            }
+        }
+    }
+
+    public function searchBarcode(Request $request) : JsonResponse {
         $barcode = $request->barcode;
+        $stock = "";
         if($barcode){
-            $stock = ProductStock::with('product')
-                        ->where(function ($query){
-                                $query->where('stok', '!=', 0);
-                        })
-                        ->where('barcode', $barcode)
-                        ->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
-
-            $message = "";
-
-            if(!count($stock)){
-                $message = "Products not found";
-            } else {
-                $message = "Fetch Success";
+            try {
+                $stock = ProductStock::with('product')
+                                    ->where(function ($query){
+                                            $query->where('stok', '!=', 0);
+                                    })
+                                    ->where('barcode', $barcode)
+                                    ->where('id_tenant', auth()->user()->id_tenant)
+                                    ->firstOrFail();
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to fetch data!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
             }
+
             return response()->json([
-                'message' => $message,
-                'dataStokProduk' => $stock
+                'message' => "Fetch Success!",
+                'dataStokProduk' => $stock,
+                'status' => 200
             ]);
         }
     }
 
-    public function addCart(Request $request){
-        $cartCheckup = ShoppingCart::where('id_kasir', auth()->user()->id)
-                                ->whereNull('id_invoice')
-                                ->get();
-
-        if(empty($cartCheckup)){
-            $cart = ShoppingCart::create([
-                'id_kasir' => auth()->user()->id,
-                'id_product' => $request->id_stok,
-                'product_name' => $request->product_name,
-                'qty' => $request->qty,
-                'harga' => $request->harga,
-                'sub_total' => $request->qty*$request->harga
-            ]);
-
-            $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($request->id_stok);
-            $stoktemp = $stock->stok;
-            $stock->update([
-                'stok' => (int) $stoktemp-$cart->qty
-            ]);
-
+    public function addCart(Request $request) : JsonResponse {
+        $cartCheckup = "";
+        $stock = "";
+        $stoktemp = "";
+        $cart = "";
+        try {
+            $cartCheckup = ShoppingCart::where('id_kasir', auth()->user()->id)
+                                    ->whereNull('id_invoice')
+                                    ->get();
+        } catch (Exception $e) {
             return response()->json([
-                'message' => 'Added Success',
-                'cart' => $cart
+                'message' => 'Data chekup fail, please check the server or query!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
             ]);
-        } else {            
-            $cart = $cartCheckup->where('id_product' ,$request->id_stok)->first();
+            exit;
+        }
 
-            if(empty($cart)){
-                $cart = ShoppingCart::create([
-                    'id_kasir' => auth()->user()->id,
-                    'id_product' => $request->id_stok,
-                    'product_name' => $request->product_name,
-                    'qty' => $request->qty,
-                    'harga' => $request->harga,
-                    'sub_total' => $request->qty*$request->harga
-                ]);
+        try {
+            $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->where('stok', '!=', 0)->findOrFail($request->id_stok);
+            $stoktemp = $stock->stok;
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to find data stock. make sure the id is correct!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if($stoktemp == 0 || $stoktemp<$request->qty){
+            return response()->json([
+                'message' => 'Stok barang tidak cukup!',
+                'status' => 200,
+            ]);
+        } else {
+            if($cartCheckup->count() == 0 || $cartCheckup == ""){
+                try {
+                    $cart = ShoppingCart::create([
+                        'id_kasir' => auth()->user()->id,
+                        'id_product' => $request->id_stok,
+                        'product_name' => $request->product_name,
+                        'qty' => $request->qty,
+                        'harga' => $request->harga,
+                        'sub_total' => $request->qty*$request->harga
+                    ]);
+                    $stock->update([
+                        'stok' => (int) $stoktemp-$cart->qty
+                    ]);
+                    return response()->json([
+                        'message' => 'Added Success',
+                        'cart' => $cart,
+                        'data' => 'Add new cart'
+                    ]);
+                } catch (Exception $e) {
+                    return response()->json([
+                        'message' => 'Failed to insert data!',
+                        'error-message' => $e->getMessage(),
+                        'status' => 500,
+                    ]);
+                    exit;
+                }
             } else {
-                $tempqty = $cart->qty;
-                $cart->update([
-                    'qty' => $tempqty+$request->qty,
-                    'sub_total' => ($tempqty+$request->qty)*$cart->harga
+                try {
+                    $cart = $cartCheckup->where('id_product' ,$request->id_stok)->first();
+                    if(empty($cart)){
+                        $cart = ShoppingCart::create([
+                            'id_kasir' => auth()->user()->id,
+                            'id_product' => $request->id_stok,
+                            'product_name' => $request->product_name,
+                            'qty' => $request->qty,
+                            'harga' => $request->harga,
+                            'sub_total' => $request->qty*$request->harga
+                        ]);
+                    } else {
+                        $tempqty = $cart->qty;
+                        $cart->update([
+                            'qty' => $tempqty+$request->qty,
+                            'sub_total' => ($tempqty+$request->qty)*$cart->harga
+                        ]);
+                    }
+                } catch (Exception $e) {
+                    return response()->json([
+                        'message' => 'Failed to find data stock. make sure the id is correct!',
+                        'error-message' => $e->getMessage(),
+                        'status' => 500,
+                    ]);
+                    exit;
+                }
+                $stock->update([
+                    'stok' => (int) $stoktemp-$request->qty
+                ]);
+                return response()->json([
+                    'message' => 'Added Success',
+                    'cart' => $cart,
+                    'data' => 'Uodate cart'
                 ]);
             }
-
-            $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($request->id_stok);
-            $stoktemp = $stock->stok;
-            $stock->update([
-                'stok' => (int) $stoktemp-$request->qty
-            ]);
-
-            return response()->json([
-                'message' => 'Added Success',
-                'cart' => $cart
-            ]);
         }
     }
 
-    public function deleteCart(Request $request){
+    public function deleteCart(Request $request) : JsonResponse {
         $id_cart = $request->id_cart;
-        $cart = ShoppingCart::where('id_kasir', auth()->user()->id)->find($id_cart);
-        $qty = $cart->qty;
-        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($cart->id_product);
-        $stoktemp = $stock->stok;
-        $stock->update([
-            'stok' => (int) $stoktemp+$qty
-        ]);
-        $cart->delete();
+        try {
+            $cart = ShoppingCart::where('id_kasir', auth()->user()->id)->findOrFail($id_cart);
+            $qty = $cart->qty;
+            $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->findOrFail($cart->id_product);
+            $stoktemp = $stock->stok;
+            $stock->update([
+                'stok' => (int) $stoktemp+$qty
+            ]);
+            $cart->delete();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete cart',
+                'error-message' => $e->getMessage(),
+                'status' => $e->getCode(),
+            ]);
+            exit;
+        }
+
         return response()->json([
             'message' => 'Success Deleted',
         ]);
     }
 
-    public function listCart(){
-        $cartContent = ShoppingCart::with('product')
-                                ->where('id_kasir', auth()->user()->id)
-                                ->whereNull('id_invoice')
-                                ->latest()
-                                ->get();
-        return response()->json([
-            'message' => 'Fetch Success',
-            'cartData' => $cartContent,
-        ]);
+    public function listCart() : JsonResponse {
+        try {
+            $cartContent = ShoppingCart::with('product')
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->whereNull('id_invoice')
+                                    ->latest()
+                                    ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if($cartContent->count() == 0 || $cartContent == ""){
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'data-status' => 'Cart is empty!',
+                'dataStokProduk' => $cartContent,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success',
+                'cartData' => $cartContent,
+                'status' => 200
+            ]);
+        }
     }
 
-    public function processCart(Request $request){
+    public function processCart(Request $request) : JsonResponse {
         $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
                  ->where('is_active', 1)->first();
         $disc = 0;
@@ -235,12 +390,6 @@ class KasirController extends Controller {
             $disc = 0;
         }
 
-        // return response()->json([
-        //     'message' => 'Fetch Success',
-        //     'diskon' => $disc,
-        //     'pajak' => $pajak,
-        // ]);
-
         $cartContent = ShoppingCart::with('product')
                             ->where('id_kasir', auth()->user()->id)
                             ->whereNull('id_invoice')
@@ -252,7 +401,7 @@ class KasirController extends Controller {
             . mt_rand(1000000, 9999999)
             . $characters[rand(0, strlen($characters) - 1)];
         $string = str_shuffle($pin);
-        
+
         $invoice = Invoice::create([
             'id_tenant' => auth()->user()->id_tenant,
             'id_kasir' => auth()->user()->id,
@@ -304,15 +453,59 @@ class KasirController extends Controller {
 
     }
 
-    public function transactionList(){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
-                            ->where('id_kasir', auth()->user()->id)
-                            ->latest()
-                            ->get();
-        return response()->json([
-            'message' => 'Fetch Success',
-            'transaction-data' => $invoice,
-        ]);
+    public function transactionList(Request $request){
+        $tgl_awal = $request->tgl_awal;
+        $tgl_akhir = $request->tgl_akhir;
+        $invoice = "";
+        $showdate = "";
+        if($tgl_awal && $tgl_akhir) {
+            $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                        ->where('id_kasir', auth()->user()->id)
+                        ->whereBetween('tanggal_transaksi', [$tgl_awal, $tgl_akhir])
+                        ->latest()
+                        ->get();
+            $showdate = 'Data transaksi dari tanggal '.$tgl_awal.' s/d tanggal '.$tgl_akhir;
+
+            if($invoice->count() == 0 || $invoice == ""){
+                return response()->json([
+                    'message' => 'Fetch Success',
+                    'date-type' => 'Data transaksi tidak ditemukan',
+                    'transaction-number' => $invoice->count(),
+                    'transaction-data' => $invoice,
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Fetch Success',
+                    'date-type' => $showdate,
+                    'transaction-number' => $invoice->count(),
+                    'transaction-data' => $invoice,
+                ]);
+            }
+
+        } else {
+            $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                        ->where('id_kasir', auth()->user()->id)
+                        ->whereDate('tanggal_transaksi', Carbon::today())
+                        ->latest()
+                        ->get();
+            $showdate = "Data transaksi per-hari ini.";
+
+            if($invoice->count() == 0  || $invoice == ""){
+                return response()->json([
+                    'message' => 'Fetch Success',
+                    'date-type' => 'Data transaksi tidak ditemukan',
+                    'transaction-number' => $invoice->count(),
+                    'transaction-data' => $invoice,
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Fetch Success',
+                    'date-type' => $showdate,
+                    'transaction-number' => $invoice->count(),
+                    'transaction-data' => $invoice,
+                ]);
+            }
+        }
     }
 
     public function transactionPending(){
@@ -381,7 +574,7 @@ class KasirController extends Controller {
         $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
                     ->where('is_active', 1)->first();
         $pajak = 0;
-       
+
         if(!empty($tax)){
             $pajak = $tax->pajak;
         } else {
@@ -485,7 +678,10 @@ class KasirController extends Controller {
     }
 
     public function transactionDetail($id){
-        $invoice = Invoice::with('shoppingCart')->find($id);
+        $invoice = Invoice::with(['shoppingCart' => function($query){
+                        $query->with('product')->get();
+                    }
+                ])->find($id);
         return response()->json([
             'message' => 'Fetch Success',
             'transaction-data' => $invoice,

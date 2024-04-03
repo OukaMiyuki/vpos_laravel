@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('product_stocks', function (Blueprint $table) {
             $table->id();
             $table->integer('id_batch_product')->nullable();
-            $table->string('barcode')->nullable();
+            $table->string('barcode')->unique()->nullable();
             $table->timestamps();
         });
     }
