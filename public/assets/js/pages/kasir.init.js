@@ -20,6 +20,15 @@ $(document).ready(function(){
         $("#show #keterangan").val(keterangan);
     });
 
+    $(document).on("click", "#add_custom_product", function() {
+        var id = $(this).data('id');
+        var barcode = $(this).data('barcode');
+        var pd_name = $(this).data('pd_name');
+        $("#show #id_id").val(id);
+        $("#show #barcode_barcode").val(barcode);
+        $("#show #name_name").val(pd_name);
+    });
+
     $(document).on("click", "#editsupplier", function() {
         var id = $(this).data('id');
         var nama_supplier = $(this).data('nama');
@@ -135,7 +144,9 @@ onScan.attachTo(document, {
         var Cells = theTbl.getElementsByTagName("td");
         console.log(Cells[2].innerText);
         if(Cells[2].innerText == sCode){
-            document.getElementById('cartForm').submit();
+            if(Cells[5].innerText != 0){
+                document.getElementById('cartForm').submit();
+            }
         }
     },
     onKeyDetect: function(iKeyCode){ // output all potentially relevant key events - great for debugging!

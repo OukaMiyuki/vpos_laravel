@@ -115,6 +115,18 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
+                                                <label for="j_produk" class="form-label">Jenis Produk</label>
+                                                <select class="form-select @error('j_produk') is-invalid @enderror" id="j_produk" name="j_produk" required>
+                                                    <option value="">- Pilih Jenis -</option>
+                                                    <option value="Fixed">Fixed Price</option>
+                                                    <option value="Custom">Custom Price</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
                                                 <label for="photo" class="form-label">Upload Foto Product</label>
                                                 <input type="file" required id="image" class="form-control" name="photo" accept="image/*">
                                             </div>

@@ -167,9 +167,15 @@
                                                             <input readonly type="hidden" id="name" name="name" value="{{ $stok->product->product_name }}">
                                                             <input readonly type="hidden" id="qty" name="qty" value="1">
                                                             <input readonly type="hidden" id="price" name="price" value="{{ $stok->product->harga_jual }}">
-                                                            <button class="pos-add-button" type="submit">
-                                                                <span class="mdi mdi-plus-box"></span>
-                                                            </button>
+                                                            @if ($stok->product->harga_jual == 0)
+                                                                <button id="add_custom_product" data-id="{{ $stok->id }}" data-barcode="{{ $stok->barcode }}" data-pd_name="{{ $stok->product->product_name }}" data-bs-toggle="modal" data-bs-target="#modalAddCustomProduct" class="pos-add-button" type="button">
+                                                                    <span class="mdi mdi-plus-box"></span>
+                                                                </button>
+                                                            @else
+                                                                <button class="pos-add-button" type="submit">
+                                                                    <span class="mdi mdi-plus-box"></span>
+                                                                </button>
+                                                            @endif
                                                         </form>
                                                     </td>
                                                     <td>
@@ -290,6 +296,40 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Proses Transaksi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalAddCustomProduct" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Masukkan Harga</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="px-3" action="{{ route('kasir.pos.addCart') }}" method="post" id="show">
+                    @csrf
+                    <div class="modal-body" id="checkoutProcess">
+                        <input readonly type="hidden" id="id_id" name="id" value="">
+                        <input readonly type="hidden" id="barcode_barcode" name="barcode" value="">
+                        <input readonly type="hidden" id="name_name" name="name" value="">
+                        <input readonly type="hidden" id="qty" name="qty" value="1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="hbarang" class="form-label">Harga</label>
+                                    <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" id="hbarang" value="{{ old('price') }}" placeholder="Masukkan harga barang">
+                                    @error('content1')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Tambah</button>
                     </div>
                 </form>
             </div>

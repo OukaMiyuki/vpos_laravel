@@ -267,11 +267,21 @@ class TenantController extends Controller {
     }
 
     public function batchProductInsert(Request $request){
+        $harga = "";
+        if($request->j_produk == "Fixed"){
+            $harga = $request->h_jual;
+        } else if($request->j_produk == "Custom"){
+            $harga = 0;
+            //return $harga;
+        } else {
+            return "salah";
+        }
         $file = $request->file('photo');
         $namaFile = $request->p_name;
         $storagePath = Storage::path('public/images/product');
         $ext = $file->getClientOriginalExtension();
         $filename = $namaFile.'-'.time().'.'.$ext;
+        $harga = "";
 
         try {
             $file->move($storagePath, $filename);
@@ -290,8 +300,7 @@ class TenantController extends Controller {
             'nomor_rak' => $request->rak,
             'tanggal_beli' => $request->t_beli,
             'tanggal_expired' => $request->t_expired,
-            'harga_beli' => $request->h_beli,
-            'harga_jual' => $request->h_jual
+            'harga_jual' => (int) $harga
         ]);
 
         $notification = array(

@@ -26,7 +26,11 @@ class KasirController extends Controller {
             $stock = ProductStock::with('product')
                                 ->where(function ($query) {
                                         $query->where('stok', '!=', 0);
-                                })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
+                                })
+                                ->where('id_tenant', auth()->user()->id_tenant)
+                                ->where('harga_jual', '!=', 0)
+                                ->latest()
+                                ->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
