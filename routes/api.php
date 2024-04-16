@@ -65,6 +65,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throt
 Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:90,1', 'custom.restrict'])->prefix('kasir')->group(function () {
     // Route::post('/logout', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'user']);
+    Route::post('/user/detail', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'userDetail']);
     Route::get('/product', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productList']);
     Route::post('/product/detail', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productDetail']);
     Route::get('/category', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productCategory']);

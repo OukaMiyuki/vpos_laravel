@@ -165,7 +165,7 @@ class KasirController extends Controller {
                 ]);
                 exit;
             }
-            
+
             if($stock->count() == 0 || $stock == ""){
                 return response()->json([
                     'message' => 'Fetch Success',

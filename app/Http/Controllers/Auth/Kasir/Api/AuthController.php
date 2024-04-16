@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Kasir;
+// use App\Models\Admin;
+// use App\Models\Tenant;
 
-class AuthController extends Controller {   
+class AuthController extends Controller {
     public function login(Request $request) {
         if (! Auth::guard('kasir')->attempt($request->only('email', 'password'))) {
             return response()->json([
@@ -31,6 +33,26 @@ class AuthController extends Controller {
     public function user(){
         $user = Auth::user();
         return response()->json(['data' => $user]);
+    }
+
+    public function userDetail(Request $request) : JsonResponse {
+        $user = "";
+        // $id = $request->id;
+        try {
+            $user = Kasir::with('detail')->where('id', Auth::user()->id)->firstOrFail();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+        return response()->json([
+            'message' => 'Fetch Success',
+            'data-detail-user' => $user,
+            'status' => 200
+        ]);
     }
 
     public function logout() {
