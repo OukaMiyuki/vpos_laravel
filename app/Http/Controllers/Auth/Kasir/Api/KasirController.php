@@ -194,7 +194,7 @@ class KasirController extends Controller {
                                     })
                                     ->where('barcode', $barcode)
                                     ->where('id_tenant', auth()->user()->id_tenant)
-                                    ->firstOrFail();
+                                    ->first();
             } catch (Exception $e) {
                 return response()->json([
                     'message' => 'Failed to fetch data!',
@@ -339,6 +339,7 @@ class KasirController extends Controller {
     }
 
     public function listCart() : JsonResponse {
+        $cartContent = "";
         try {
             $cartContent = ShoppingCart::with('product')
                                     ->where('id_kasir', auth()->user()->id)
@@ -354,7 +355,7 @@ class KasirController extends Controller {
             exit;
         }
 
-        if($cartContent->count() == 0 || $cartContent == ""){
+        if(empty($cartContent) || $cartContent->count() == 0 || $cartContent == ""){
             return response()->json([
                 'message' => 'Fetch Success!',
                 'data-status' => 'Cart is empty!',
@@ -370,6 +371,7 @@ class KasirController extends Controller {
         }
     }
 
+    //Try Catch Not Yet Applied
     public function processCart(Request $request) : JsonResponse {
         $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
                  ->where('is_active', 1)->first();
@@ -452,19 +454,30 @@ class KasirController extends Controller {
         ]);
 
     }
+    //Try Catch Not Yet Applied
 
-    public function transactionList(Request $request){
+    public function transactionList(Request $request) : JsonResponse {
         $tgl_awal = $request->tgl_awal;
         $tgl_akhir = $request->tgl_akhir;
         $invoice = "";
         $showdate = "";
+
         if($tgl_awal && $tgl_akhir) {
-            $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
-                        ->where('id_kasir', auth()->user()->id)
-                        ->whereBetween('tanggal_transaksi', [$tgl_awal, $tgl_akhir])
-                        ->latest()
-                        ->get();
-            $showdate = 'Data transaksi dari tanggal '.$tgl_awal.' s/d tanggal '.$tgl_akhir;
+            try {
+                $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->whereBetween('tanggal_transaksi', [$tgl_awal, $tgl_akhir])
+                                    ->latest()
+                                    ->get();
+                $showdate = 'Data transaksi dari tanggal '.$tgl_awal.' s/d tanggal '.$tgl_akhir;
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to fetch data!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
+            }
 
             if($invoice->count() == 0 || $invoice == ""){
                 return response()->json([
@@ -483,12 +496,21 @@ class KasirController extends Controller {
             }
 
         } else {
-            $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
-                        ->where('id_kasir', auth()->user()->id)
-                        ->whereDate('tanggal_transaksi', Carbon::today())
-                        ->latest()
-                        ->get();
-            $showdate = "Data transaksi per-hari ini.";
+            try {
+                $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->whereDate('tanggal_transaksi', Carbon::today())
+                                    ->latest()
+                                    ->get();
+                $showdate = "Data transaksi per-hari ini.";
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to fetch data!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
+            }
 
             if($invoice->count() == 0  || $invoice == ""){
                 return response()->json([
@@ -508,31 +530,51 @@ class KasirController extends Controller {
         }
     }
 
-    public function transactionPending(){
-        $invoice = Invoice::where('status_pembayaran', 0)
-                            ->where('id_tenant', auth()->user()->id_tenant)
-                            ->where('id_kasir', auth()->user()->id)
-                            ->latest()
-                            ->get();
+    public function transactionPending() : JsonResponse {
+        $invoice = "";
+        try {
+            $invoice = Invoice::where('status_pembayaran', 0)
+                                ->where('id_tenant', auth()->user()->id_tenant)
+                                ->where('id_kasir', auth()->user()->id)
+                                ->latest()
+                                ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
         return response()->json([
             'message' => 'Fetch Success',
             'transaction-data' => $invoice,
         ]);
     }
 
-    public function transactionCartAdd(Request $request){
-        $invoice = Invoice::with('shoppingCart')
-                        ->where('id_tenant', auth()->user()->id_tenant)
-                        ->where('id_kasir', auth()->user()->id)
-                        ->find($request->id_invoice);
+    public function transactionCartAdd(Request $request) : JsonResponse {
+        $cart = "";
+        try {
+            $invoice = Invoice::with('shoppingCart')
+                                ->where('id_tenant', auth()->user()->id_tenant)
+                                ->where('id_kasir', auth()->user()->id)
+                                ->find($request->id_invoice);
+            $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
 
         // $cartCheckup = ShoppingCart::where('id_kasir', auth()->user()->id)
         //                         ->where('id_invoice', $request->id_invoice)
         //                         ->get();
 
-        $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
-
-        if(empty($cart)){
+        if(empty($cart) || $cart->count() == 0 || $cart = ""){
             $cart = ShoppingCart::create([
                 'id_kasir' => auth()->user()->id,
                 'id_invoice' =>  $request->id_invoice,
@@ -562,7 +604,8 @@ class KasirController extends Controller {
         ]);
     }
 
-    public function transactionPendingUpdate(Request $request){
+    //Try Catch Not Yet Applied
+    public function transactionPendingUpdate(Request $request) : JsonResponse {
         $invoice = Invoice::with('shoppingCart')
                         ->where('id_tenant', auth()->user()->id_tenant)
                         ->where('id_kasir', auth()->user()->id)
@@ -625,63 +668,104 @@ class KasirController extends Controller {
             'cartData' => $invoice->shoppingCart,
         ]);
     }
+    //Try Catch Not Yet Applied
 
-    public function transactionCartDelete(Request $request){
-        $invoice = Invoice::with('shoppingCart')
-                        ->where('id_tenant', auth()->user()->id_tenant)
-                        ->where('id_kasir', auth()->user()->id)
-                        ->find($request->id_invoice);
-        // $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
-        $cart = $invoice->shoppingCart->find($request->id_cart);
-        $qty = $cart->qty;
-        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($cart->id_product);
-        $stoktemp = $stock->stok;
-        $stock->update([
+    public function transactionCartDelete(Request $request) : JsonResponse {
+        try {
+            $invoice = Invoice::with('shoppingCart')
+                                ->where('id_tenant', auth()->user()->id_tenant)
+                                ->where('id_kasir', auth()->user()->id)
+                                ->find($request->id_invoice);
+            // $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
+            $cart = $invoice->shoppingCart->find($request->id_cart);
+            $qty = $cart->qty;
+            $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($cart->id_product);
+            $stoktemp = $stock->stok;
+            $stock->update([
             'stok' => (int) $stoktemp+$qty
-        ]);
-        $cart->delete();
+            ]);
+            $cart->delete();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
         return response()->json([
             'message' => 'Success Deleted',
         ]);
     }
 
-    public function transactionPendingDelete(Request $request){
-        $invoice = Invoice::where('status_pembayaran', 0)->find($request->id_invoice);
-        $cartContent = ShoppingCart::with('product')->where('id_invoice', $request->id_invoice)->get();
-        foreach($cartContent as $cart){
-            $tempqty = $cart->qty;
-            $productStock = ProductStock::find($cart->id_product);
-            $stok = $cart->qty + $productStock->stok;
-            $productStock->update([
-                'stok' => $stok
+    public function transactionPendingDelete(Request $request) : JsonResponse {
+        try {
+            $invoice = Invoice::where('status_pembayaran', 0)->find($request->id_invoice);
+            $cartContent = ShoppingCart::with('product')->where('id_invoice', $request->id_invoice)->get();
+            foreach($cartContent as $cart){
+                $tempqty = $cart->qty;
+                $productStock = ProductStock::find($cart->id_product);
+                $stok = $cart->qty + $productStock->stok;
+                $productStock->update([
+                    'stok' => $stok
+                ]);
+                $cart->delete();
+            }
+            $invoice->delete();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
             ]);
-            $cart->delete();
+            exit;
         }
-        $invoice->delete();
         return response()->json([
             'message' => 'Transaction deleted',
         ]);
     }
 
-    public function transactionChangePayment(Request $request){
-        $invoice = Invoice::where('status_pembayaran', 0)->find($request->id_invoice);
-        $invoice->update([
-            'tanggal_pelunasan' => Carbon::now(),
-            'jenis_pembayaran' => "Tunai",
-            'qris_data' => NULL,
-            'status_pembayaran' => 1
-        ]);
+    public function transactionChangePayment(Request $request) : JsonResponse {
+        $invoice = "";
+        try {
+            $invoice = Invoice::where('status_pembayaran', 0)->find($request->id_invoice);
+            $invoice->update([
+                'tanggal_pelunasan' => Carbon::now(),
+                'jenis_pembayaran' => "Tunai",
+                'qris_data' => NULL,
+                'status_pembayaran' => 1
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
         return response()->json([
             'message' => 'Payment Success',
             'transaction-data' => $invoice,
         ]);
     }
 
-    public function transactionDetail($id){
-        $invoice = Invoice::with(['shoppingCart' => function($query){
-                        $query->with('product')->get();
-                    }
-                ])->find($id);
+    public function transactionDetail($id) : JsonResponse {
+        $invoice = "";
+        try {
+            $invoice = Invoice::with(['shoppingCart' => function($query){
+                                $query->with('product')->get();
+                            }
+                        ])->findOrFail($id);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
         return response()->json([
             'message' => 'Fetch Success',
             'transaction-data' => $invoice,
