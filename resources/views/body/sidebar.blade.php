@@ -117,7 +117,7 @@
                         {{ route('tenant.dashboard') }}
                     @endauth
                     @auth('kasir')
-                        Kasir
+                        {{ route('kasir.dashboard') }}
                     @endauth
                     ">
                         <i class="mdi mdi-view-dashboard-outline"></i>
@@ -127,7 +127,7 @@
                 @auth('kasir')
                     <li>
                         <a href="{{ route('kasir.pos') }}">
-                            <i class="mdi mdi-calendar"></i>
+                            <i class="mdi mdi-point-of-sale"></i>
                             <span> POS </span>
                         </a>
                     </li>
@@ -143,7 +143,7 @@
                     <li class="menu-title mt-2">Transaction</li>
                     <li>
                         <a href="#transaction" data-bs-toggle="collapse">
-                            <i class="mdi mdi-account-tie-voice"></i>
+                            <i class="mdi mdi-folder-open"></i>
                             <span> Transaction </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -186,7 +186,7 @@
                     </li>
                     <li>
                         <a href="#sidebarCrm" data-bs-toggle="collapse">
-                            <i class="mdi mdi-storefront-outline"></i>
+                            <i class="mdi mdi-store"></i>
                             <span> Merchant </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -200,7 +200,7 @@
                     </li>
                     <li>
                         <a href="#finance" data-bs-toggle="collapse">
-                            <i class="mdi mdi-cash-multiple"></i>
+                            <i class="mdi mdi-finance"></i>
                             <span> Finance </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -236,7 +236,7 @@
                     </li>
                     <li>
                         <a href="#sidebarCrm" data-bs-toggle="collapse">
-                            <i class="mdi mdi-storefront-outline"></i>
+                            <i class="mdi mdi-store"></i>
                             <span> Merchant </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -253,7 +253,7 @@
                     </li>
                     <li>
                         <a href="#finance" data-bs-toggle="collapse">
-                            <i class="mdi mdi-cash-multiple"></i>
+                            <i class="mdi mdi-finance"></i>
                             <span> Finance </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -272,7 +272,7 @@
                 @auth('tenant')
                     <li>
                         <a href="#toko" data-bs-toggle="collapse">
-                            <i class="mdi mdi-qrcode-scan"></i>
+                            <i class="mdi mdi-store"></i>
                             <span> Menu Toko </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -298,7 +298,7 @@
                     </li>
                     <li>
                         <a href="#transaksi" data-bs-toggle="collapse">
-                            <i class="mdi mdi-qrcode-scan"></i>
+                            <i class="mdi mdi-folder-open"></i>
                             <span> Transaksi </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -318,7 +318,7 @@
                     </li>
                     <li>
                         <a href="#karyawan" data-bs-toggle="collapse">
-                            <i class="mdi mdi-qrcode-scan"></i>
+                            <i class="mdi mdi-account-multiple-outline"></i>
                             <span> Menu Karyawan </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -332,7 +332,7 @@
                     </li>
                     <li>
                         <a href="#harga" data-bs-toggle="collapse">
-                            <i class="mdi mdi-qrcode-scan"></i>
+                            <i class="mdi mdi-sale"></i>
                             <span> Store Managament </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -353,7 +353,7 @@
                     <li class="menu-title mt-2">Finance Manager</li>
                     <li>
                         <a href="#finance" data-bs-toggle="collapse">
-                            <i class="mdi mdi-qrcode-scan"></i>
+                            <i class="mdi mdi-finance"></i>
                             <span> Finance </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -371,7 +371,7 @@
                     <li class="menu-title mt-2">Other Menu</li>
                     <li>
                         <a href="#role" data-bs-toggle="collapse">
-                            <i class="mdi mdi-qrcode-scan"></i>
+                            <i class="mdi mdi-folder-key"></i>
                             <span> Role Manager </span>
                             <span class="menu-arrow"></span>
                         </a>

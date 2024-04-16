@@ -189,7 +189,7 @@
                     </a>
                     @auth('tenant')
                         <a href="{{ route('tenant.store.profile') }}" class="dropdown-item notify-item">
-                            <i class="fe-settings"></i>
+                            <i class="mdi mdi-store"></i>
                             <span>Store Settings</span>
                         </a>
                     @endauth
