@@ -25,10 +25,9 @@ class KasirController extends Controller {
         try {
             $stock = ProductStock::with('product')
                                 ->where(function ($query) {
-                                        $query->where('stok', '!=', 0);
+                                        $query->where('stok', '!=', 0)->where('harga_jual', '!=', 0);
                                 })
                                 ->where('id_tenant', auth()->user()->id_tenant)
-                                ->where('harga_jual', '!=', 0)
                                 ->latest()
                                 ->get();
         } catch (Exception $e) {
