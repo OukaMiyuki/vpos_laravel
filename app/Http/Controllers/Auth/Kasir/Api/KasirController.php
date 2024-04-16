@@ -23,9 +23,11 @@ class KasirController extends Controller {
     public function productList() : JsonResponse{
         $stock = "";
         try {
-            $stock = ProductStock::with('product')
+            $stock = ProductStock::with(['product' => function ($query) {
+                                        $query->where('harga_jual', '!=',0);
+                                }])
                                 ->where(function ($query) {
-                                        $query->where('stok', '!=', 0)->where('harga_jual', '!=', 0);
+                                        $query->where('stok', '!=', 0);
                                 })
                                 ->where('id_tenant', auth()->user()->id_tenant)
                                 ->latest()
