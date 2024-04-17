@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Models\Tenant;
 use App\Models\DetailTenant;
 use App\Models\StoreDetail;
+use App\Models\RekeningTenant;
 
 class ProfileController extends Controller{
     public function profile(){
@@ -145,8 +146,10 @@ class ProfileController extends Controller{
             $tenantStore->update([
                 'name' => $request->name,
                 'alamat' => $request->alamat,
+                'no_telp_toko' => $request->no_telp,
                 'jenis_usaha' => $request->jenis,
                 'status_umi' => $request->umi,
+                'catatan_kaki' => $request->catatan,
                 'photo' => $filename
             ]);;
 
@@ -159,8 +162,10 @@ class ProfileController extends Controller{
             $tenantStore->update([
                 'name' => $request->name,
                 'alamat' => $request->alamat,
+                'no_telp_toko' => $request->no_telp,
                 'jenis_usaha' => $request->jenis,
                 'status_umi' => $request->umi,
+                'catatan_kaki' => $request->catatan,
             ]);
 
             $notification = array(
@@ -170,4 +175,8 @@ class ProfileController extends Controller{
             return redirect()->back()->with($notification);
         }
     }
+
+    // public function rekeingSetting(){
+    //     $rekening = RekeningTenant::find()
+    // }
 }

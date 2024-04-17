@@ -18,7 +18,25 @@ use GuzzleHttp\Client;
 
 class KasirController extends Controller {
     public function index(){
-        return view('kasir.dashboard');
+        $product = Product::where('id_tenant', auth()->user()->id_tenant)->count();
+        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->count();
+        $totalInvoiceHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                                        ->where('id_tenant', auth()->user()->id_tenant)
+                                        ->where('id_kasir', auth()->user()->id)
+                                        ->count();
+        $totalInvoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->count();
+        $pemasukanHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                                    ->where('id_tenant', auth()->user()->id_tenant)
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->where('status_pembayaran', 1)
+                                    ->sum(\DB::raw('sub_total + pajak'));
+        $totalPemasukan = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->where('status_pembayaran', 1)
+                                    ->sum(\DB::raw('sub_total + pajak'));
+        return view('kasir.dashboard', compact(['product', 'stock', 'totalInvoiceHariIni', 'totalInvoice', 'pemasukanHariIni', 'totalPemasukan']));
     }
 
     public function kasirPos(){

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth\Tenant\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Models\Admin;
 use App\Models\Marketing;
 use App\Models\Tenant;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
+use Exception;
 
 class AuthController extends Controller {
     
@@ -124,6 +127,109 @@ class AuthController extends Controller {
     public function user(){
         $user = Auth::user();
         return response()->json(['data' => $user]);
+    }
+
+    public function userDetail(Request $request) : JsonResponse {
+        $user = "";
+        // $id = $request->id;
+        try {
+            // $user = Tenant::select('id')
+            //                 ->with([
+            //                 'detail' => function(Builder $query){
+            //                     $query->select(
+            //                         'detail_tenants.id as detail_id',
+            //                         'detail_tenants.id_tenant as id_detail_tenant',
+            //                         'no_ktp',
+            //                         'tempat_lahir',
+            //                         'tanggal_lahir',
+            //                         'jenis_kelamin',
+            //                         'detail_tenants.alamat as alamat_tenant',
+            //                         'detail_tenants.photo as tenant_photo_profile'
+            //                     );
+            //                 }, 
+            //                 'storeDetail' => function(Builder $query){
+            //                     $query->select(
+            //                         'store_details.id as store_detail_id',
+            //                         'store_details.id_tenant as id_store_detail_tenant',
+            //                         'store_details.name as nama_toko',
+            //                         'store_details.alamat as alamat_toko',
+            //                         'store_details.no_telp_toko as no_telp_toko',
+            //                         'jenis_usaha',
+            //                         'status_umi',
+            //                         'catatan_kaki',
+            //                         'store_details.photo as photo_toko'
+            //                     );
+            //                 }
+            //                 ])
+            //                 ->where('id', Auth::user()->id)
+            //                 ->firstOrFail();
+            $user = Tenant::with(['detail', 'storeDetail'])
+                                ->whereHas('detail', function($q) {
+                                    $q->select(
+                                        'detail_tenants.id as detail_id',
+                                        'detail_tenants.id_tenant as id_detail_tenant',
+                                        'no_ktp',
+                                        'tempat_lahir',
+                                        'tanggal_lahir',
+                                        'jenis_kelamin',
+                                        'detail_tenants.alamat as alamat_tenant',
+                                        'detail_tenants.photo as tenant_photo_profile'
+                                    );
+                                })
+                                ->whereHas('storeDetail', function($q) {
+                                    $q->select(
+                                        'store_details.id as store_detail_id',
+                                        'store_details.id_tenant as id_store_detail_tenant',
+                                        'store_details.name as nama_toko',
+                                        'store_details.alamat as alamat_toko',
+                                        'store_details.no_telp_toko as no_telp_toko',
+                                        'jenis_usaha',
+                                        'status_umi',
+                                        'catatan_kaki',
+                                        'store_details.photo as photo_toko'
+                                    );
+                                })
+                                ->where('id', Auth::user()->id)
+                                ->firstOrFail();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+        return response()->json([
+            'message' => 'Fetch Success',
+            'data-detail-user' => $user,
+            'status' => 200
+        ]);
+    }
+
+    public function csInfo() : JsonResponse {
+        try {
+            $cs = InvitationCode::with('marketing')
+                                ->select([
+                                    'invitation_codes.id as inv_id',
+                                    'invitation_codes.id_marketing',
+                                    'invitation_codes.inv_code as code'
+                                ])
+                                ->where('id', Auth::user()->id_inv_code)
+                                ->firstOrFail();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        return response()->json([
+            'message' => 'Fetch Success',
+            'data-cs' => $cs,
+            'status' => 200
+        ]);
     }
 
     public function logout() {

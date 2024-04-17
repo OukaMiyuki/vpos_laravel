@@ -35,13 +35,13 @@
                             <div class="row">
                                 <div class="col-3">
                                     <div class="avatar-lg rounded-circle bg-primary border-primary border shadow">
-                                        <i class="mdi mdi-account-tie-voice font-22 avatar-title text-white"></i>
+                                        <i class="mdi mdi-format-list-checks font-22 avatar-title text-white"></i>
                                     </div>
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">58</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Total Barang</p>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $stock }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Stok Barang</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
@@ -60,38 +60,13 @@
                             <div class="row">
                                 <div class="col-3">
                                     <div class="avatar-lg rounded-circle bg-success border-success border shadow">
-                                        <i class="mdi mdi-qrcode font-22 avatar-title text-white"></i>
+                                        <i class="mdi mdi-file-cabinet font-22 avatar-title text-white"></i>
                                     </div>
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">127</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Supplier</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row-->
-                        </div>
-                    </div>
-                    <!-- end widget-rounded-circle-->
-                </div>
-                <!-- end col-->
-                <div class="col-md-6 col-xl-3">
-                    <div class="widget-rounded-circle card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-info border-info border shadow">
-                                        <i class="mdi mdi-account-cash-outline font-22 avatar-title text-white"></i>
-                                    </div>
-                                </div>
-                                <div class="col-9">
-                                    <div class="text-end">
-                                        <h3 class="text-dark mt-1""><span data-plugin="counterup">10</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Kasir</p>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $product }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Banyak Produk</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
@@ -110,13 +85,38 @@
                             <div class="row">
                                 <div class="col-3">
                                     <div class="avatar-lg rounded-circle bg-warning border-warning border shadow">
-                                        <i class="mdi mdi-database-arrow-right-outline font-22 avatar-title text-white"></i>
+                                        <i class="mdi mdi-folder-open-outline font-22 avatar-title text-white"></i>
                                     </div>
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">78</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Kategori</p>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $totalInvoiceHariIni }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Transaksi Hari Ini</p>
+                                        <a href="" class="btn btn-blue btn-sm ms-2">
+                                            <i class="mdi mdi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
+                </div>
+                <!-- end col-->
+                <div class="col-md-6 col-xl-3">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-2">
+                                    <div class="avatar-lg rounded-circle bg-danger border-danger border shadow">
+                                        <i class="mdi mdi-folder-multiple-outline font-22 avatar-title text-white"></i>
+                                    </div>
+                                </div>
+                                <div class="col-10">
+                                    <div class="text-end">
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $totalInvoice }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Transaksi</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
@@ -131,19 +131,20 @@
                 <!-- end col-->
             </div>
             <div class="row">
+                <!-- end col-->
                 <div class="col-md-6 col-xl-6">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-success border-success border shadow">
+                                <div class="col-2">
+                                    <div class="avatar-lg rounded-circle bg-info border-info border shadow">
                                         <i class="mdi mdi-cash font-22 avatar-title text-white"></i>
                                     </div>
                                 </div>
-                                <div class="col-9">
+                                <div class="col-10">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">3000000</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Total Pemasukan hari ini</p>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $pemasukanHariIni }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Pemasukan Hari Ini</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
@@ -160,15 +161,15 @@
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-danger border-danger border shadow">
+                                <div class="col-2">
+                                    <div class="avatar-lg rounded-circle bg-success border-success border shadow">
                                         <i class="mdi mdi-cash-multiple font-22 avatar-title text-white"></i>
                                     </div>
                                 </div>
-                                <div class="col-9">
+                                <div class="col-10">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">4000000</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Total Saldo</p>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukan }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Pemasukan</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
@@ -195,7 +196,7 @@
                                     <a href="javascript:void(0);" class="dropdown-item">Lihat Semua Laporan</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Top Marketing</h4>
+                            <h4 class="header-title mb-3">Transaksi Terbaru</h4>
                             <div class="table-responsive">
                                 <table class="table table-borderless table-hover table-nowrap table-centered m-0">
                                     <thead class="table-light">
@@ -336,7 +337,7 @@
                                     <a href="javascript:void(0);" class="dropdown-item">Lihat Semua Laporan</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">History Penarikan Terbaru</h4>
+                            <h4 class="header-title mb-3">Payment Pending</h4>
                             <div class="table-responsive">
                                 <table class="table table-borderless table-nowrap table-hover table-centered m-0">
                                     <thead class="table-light">

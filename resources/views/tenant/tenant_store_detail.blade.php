@@ -59,6 +59,14 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
+                                                    <label for="no_telp" class="form-label">No. Telp. Toko</label>
+                                                    <input type="text" class="form-control" name="no_telp" id="no_telp" required value="{{ $tenantStore->no_telp_toko }}" placeholder="Masukkan nomor telepon toko">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
                                                     <label for="jenis" class="form-label">Jenis Usaha</label>
                                                     <input type="text" class="form-control" name="jenis" id="jenis" required value="{{ $tenantStore->jenis_usaha }}" placeholder="Masukkan jenis usaha">
                                                 </div>
@@ -81,6 +89,14 @@
                                                 <div class="mb-3">
                                                     <label for="alamat" class="form-label">Alamat</label>
                                                     <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $tenantStore->alamat !!}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label for="catatan" class="form-label">Catatan Kaki Nota</label>
+                                                    <textarea placeholder="Masukkan catatan kaki" class="form-control" id="catatan" name="catatan" rows="5" spellcheck="false" required>{!! $tenantStore->catatan_kaki !!}</textarea>
                                                 </div>
                                             </div>
                                         </div>

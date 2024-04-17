@@ -27,8 +27,13 @@ class Marketing extends Authenticatable implements MustVerifyEmail {
     ];
 
     protected $hidden = [
+        'email',
         'password',
+        'email_verified_at',
         'remember_token',
+        'is_active',
+        'created_at',
+        'updated_at'
     ];
 
     protected $casts = [

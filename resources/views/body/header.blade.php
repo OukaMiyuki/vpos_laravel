@@ -189,8 +189,18 @@
                     </a>
                     @auth('tenant')
                         <a href="{{ route('tenant.store.profile') }}" class="dropdown-item notify-item">
-                            <i class="mdi mdi-store"></i>
+                            <i class="mdi mdi-store-outline"></i>
                             <span>Store Settings</span>
+                        </a>
+                        <a href="{{ route('tenant.store.profile') }}" class="dropdown-item notify-item">
+                            <i class="mdi mdi-credit-card-outline"></i>
+                            <span>Rekening</span>
+                        </a>
+                    @endauth
+                    @auth('marketing')
+                        <a href="{{ route('tenant.store.profile') }}" class="dropdown-item notify-item">
+                            <i class="mdi mdi-credit-card-outline"></i>
+                            <span>Rekening</span>
                         </a>
                     @endauth
                     <!-- item-->

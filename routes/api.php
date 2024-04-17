@@ -53,10 +53,10 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throt
 //     Route::post('login', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'login']);
 // });
 
-// Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:10,1', 'custom.restrict'])->prefix('tenant')->group(function () {
-//     Route::post('/logout', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'logout']);
-//     Route::get('/user', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'user']);
-// });
+Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:10,1', 'custom.restrict'])->prefix('tenant')->group(function () {
+    Route::post('/user/detail', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userDetail']);
+    Route::get('/cs-info', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'csInfo']);
+});
 
 // Route::middleware(['guest:kasir', 'throttle:10,1', 'custom.restrict'])->prefix('kasir')->group( function () {
 //     Route::post('login', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'login']);
