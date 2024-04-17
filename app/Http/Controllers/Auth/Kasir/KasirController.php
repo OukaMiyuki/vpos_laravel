@@ -291,25 +291,10 @@ class KasirController extends Controller {
             //Create Client object to deal with
             $client = new Client();
             // Define the request parameters
-            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
-            // $headers = [
-            //     'Content-Type' => 'application/json',
-            // ];
-
-            // $data = [
-            //     'amount' => 1000,
-            //     'transactionNo' => "DEM20240315091544999",
-            //     'pos_id' => "IN01",
-            // ];
-
-            // // POST request using the created object
-            // $postResponse = $client->post($url, [
-            //     'headers' => $headers,
-            //     'json' => $data,
-            // ]);
+            $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
 
             // Get the response code
-            $postResponse = $client->request('POST',  'https://erp.pt-best.com/api/dynamic_qris_wt_new', [
+            $postResponse = $client->request('POST',  $url, [
                 'form_params' => [
                     'amount' => $total,
                     'transactionNo' => $string,
@@ -394,8 +379,8 @@ class KasirController extends Controller {
         } else if($request->jenisPembayaran == "Qris"){
             $total = (int) substr(str_replace([',', '.'], '', Cart::total()), 0, -2);
             $client = new Client();
-            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
-            $postResponse = $client->request('POST',  'https://erp.pt-best.com/api/dynamic_qris_wt_new', [
+            $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
+            $postResponse = $client->request('POST',  $url, [
                 'form_params' => [
                     'amount' => $total,
                     'transactionNo' => $invoice->nomor_invoice,

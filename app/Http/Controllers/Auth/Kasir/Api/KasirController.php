@@ -432,8 +432,8 @@ class KasirController extends Controller {
         $total = $temptotal+$nominalpajak;
 
         $client = new Client();
-        $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
-        $postResponse = $client->request('POST',  'https://erp.pt-best.com/api/dynamic_qris_wt_new', [
+        $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
+        $postResponse = $client->request('POST',  $url, [
             'form_params' => [
                 'amount' => $total,
                 'transactionNo' => $string,
@@ -647,8 +647,8 @@ class KasirController extends Controller {
         $total = $temptotal+$nominalpajak;
 
         $client = new Client();
-        $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
-        $postResponse = $client->request('POST',  'https://erp.pt-best.com/api/dynamic_qris_wt_new', [
+        $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
+        $postResponse = $client->request('POST',  $url, [
             'form_params' => [
                 'amount' => $total,
                 'transactionNo' => $invoice->nomor_invoice,
