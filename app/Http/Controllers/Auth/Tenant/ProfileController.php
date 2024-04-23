@@ -5,6 +5,11 @@ namespace App\Http\Controllers\Auth\Tenant;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Imports\CsvImport;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -12,6 +17,11 @@ use App\Models\Tenant;
 use App\Models\DetailTenant;
 use App\Models\StoreDetail;
 use App\Models\RekeningTenant;
+use App\Models\UmiRequest;
+use GuzzleHttp\Client;
+use App\Mail\SendUmiEmail;
+use File;
+use Mail;
 
 class ProfileController extends Controller{
     public function profile(){
@@ -146,6 +156,8 @@ class ProfileController extends Controller{
             $tenantStore->update([
                 'name' => $request->name,
                 'alamat' => $request->alamat,
+                'kabupaten' => $request->kabupaten,
+                'kode_pos' => $request->kode_pos,
                 'no_telp_toko' => $request->no_telp,
                 'jenis_usaha' => $request->jenis,
                 'status_umi' => $request->umi,
@@ -162,6 +174,8 @@ class ProfileController extends Controller{
             $tenantStore->update([
                 'name' => $request->name,
                 'alamat' => $request->alamat,
+                'kabupaten' => $request->kabupaten,
+                'kode_pos' => $request->kode_pos,
                 'no_telp_toko' => $request->no_telp,
                 'jenis_usaha' => $request->jenis,
                 'status_umi' => $request->umi,
@@ -176,7 +190,91 @@ class ProfileController extends Controller{
         }
     }
 
-    // public function rekeingSetting(){
-    //     $rekening = RekeningTenant::find()
-    // }
+    public function rekeingSetting(){
+        $rekening = RekeningTenant::where('id_tenant', auth()->user()->id)->first();
+        $client = new Client();
+        $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
+        $postResponse = $client->request('POST',  $url);
+        $responseCode = $postResponse->getStatusCode();
+        $data = json_decode($postResponse->getBody());
+        $dataBankList = $data->bankSwiftList;
+        //dd($data->bankSwiftList);
+        return view('tenant.tenant_rekening_setting', compact('rekening', 'dataBankList'));
+    }
+
+    public function umiRequestForm(){
+        $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)->first();
+        if(empty($umiRequest)){
+            $umiRequest = "Empty";
+        }
+        return view('tenant.tenant_umi_request', compact('umiRequest'));
+    }
+
+    public function umiRequestProcess(Request $request){
+        $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)->first();
+        if(empty($umiRequest) || is_null($umiRequest) || $umiRequest == ""){
+            $tanggal = date("j F Y", strtotime(date('Y-m-d')));
+            $nama_pemilik = $request->nama_pemilik;
+            $no_ktp = $request->no_ktp;
+            $no_hp = $request->no_hp;
+            $email = $request->email;
+            $nama_usaha = $request->nama_usaha;
+            $jenis_usaha = $request->jenis_usaha;
+            $alamat = $request->alamat;
+            $kab_kota = $request->kab_kota;
+            $kode_pos = $request->kode_pos;
+            $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_NOBU_QRIS_(NMID).xlsx');
+            $userDocsPath = Storage::path('public/docs/umi/user_doc');
+            $filename = 'Formulir Pendaftaran NOBU QRIS (NMID) PT BRAHMA ESATAMA_'.$nama_usaha.'_'.date('dmYHis').'.xlsx';
+            $fileSave = $userDocsPath.'/'.$filename;
+            try {
+                File::copy($templatePath, $fileSave);
+                $spreadsheet = IOFactory::load($fileSave);
+                $sheet = $spreadsheet->getActiveSheet();
+                $sheet->setCellValue('D6', $tanggal);
+                $sheet->setCellValue('C10', $nama_pemilik);
+                $sheet->setCellValue('D10', $no_ktp);
+                $sheet->setCellValue('E10', $no_hp);
+                $sheet->setCellValue('F10', $email);
+                $sheet->setCellValue('G10', $nama_usaha);
+                $sheet->setCellValue('H10', $jenis_usaha);
+                $sheet->setCellValue('I10', $alamat);
+                $sheet->setCellValue('J10', $kab_kota);
+                $sheet->setCellValue('K10', $kode_pos);
+                $sheet->setCellValue('L10', 'Ya');
+                $sheet->setCellValue('M10', 'UMI - Penjualan/Tahun: < 2M');
+                $sheet->setCellValue('N10', 'Booth (Dinamis & Statis)');
+                $sheet->setCellValue('O10', '0,00%');
+                $sheet->setCellValue('P10', 'Ya');
+                $sheet->setCellValue('Q10', '');
+                $newFilePath = $fileSave;
+                $writer = new Xlsx($spreadsheet);
+                $writer->save($newFilePath);
+                UmiRequest::create([
+                    'id_tenant' => auth()->user()->id,
+                    'tanggal_pengajuan' => Carbon::now(),
+                    'file_path' => $filename
+                ]);
+                $mailData = [
+                    'title' => 'Formulir Pendaftaran UMI',
+                    'body' => 'This is for testing email using smtp.',
+                    'file' => $fileSave
+                ];
+                 
+                Mail::to('amarwibianto@gmail.com')->send(new SendUmiEmail($mailData));
+                   
+                dd("Email is sent successfully.");
+                // $notification = array(
+                //     'message' => 'Permintaan UMI berhasil diajukan!',
+                //     'alert-type' => 'success',
+                // );
+                // return redirect()->back()->with($notification);
+            } catch (Exception $e) {
+                return $e;
+                exit;
+            }
+        } else {
+            return redirect()->back();
+        }
+    }
 }

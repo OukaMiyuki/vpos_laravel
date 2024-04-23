@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Kasir;
 use App\Models\Invoice;
-use App\Models\TenantField;
 
-class InvoiceField extends Model {
+class CustomerIdentifier extends Model {
     use HasFactory;
 
     protected $guarded = [];
@@ -19,8 +18,5 @@ class InvoiceField extends Model {
 
     public function invoice(){
         return $this->belongsTo(Invoice::class, 'id_invoice', 'id');
-    }
-    public function field(){
-        return $this->belongsTo(TenantField::class, 'id_custom_field', 'id');
     }
 }

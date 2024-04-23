@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Tenant;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\File;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -166,7 +167,6 @@ class TenantController extends Controller {
         $batch = Batch::where('id_tenant', auth()->user()->id)->latest()->get();
         return view('tenant.tenant_batch_list', compact('batch'));
     }
-
 
     public function batchInsert(Request $request){
         Batch::create([

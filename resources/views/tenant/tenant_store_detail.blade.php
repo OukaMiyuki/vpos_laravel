@@ -95,6 +95,22 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
+                                                    <label for="kabupaten" class="form-label">Kabupaten/Kota</label>
+                                                    <input type="text" class="form-control" name="kabupaten" id="kabupaten" required value="{{ $tenantStore->kabupaten }}" placeholder="Masukkan kabupaten atau kota">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label for="kode_pos" class="form-label">Kode Pos</label>
+                                                    <input type="text" class="form-control" name="kode_pos" id="kode_pos" required value="{{ $tenantStore->kode_pos }}" placeholder="Masukkan kode pos">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
                                                     <label for="catatan" class="form-label">Catatan Kaki Nota</label>
                                                     <textarea placeholder="Masukkan catatan kaki" class="form-control" id="catatan" name="catatan" rows="5" spellcheck="false" required>{!! $tenantStore->catatan_kaki !!}</textarea>
                                                 </div>

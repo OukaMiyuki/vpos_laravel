@@ -21,6 +21,7 @@ use App\Models\Discount;
 use App\Models\TenantField;
 use App\Models\TunaiWallet;
 use App\Models\QrisWallet;
+use App\Models\UmiRequest;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -55,6 +56,10 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
 
     public function storeDetail(){
         return $this->hasOne(StoreDetail::class, 'id_tenant', 'id');
+    }
+
+    public function umi(){
+        return $this->hasOne(UmiRequest::class, 'id_tenant', 'id');
     }
 
     public function supplier(){

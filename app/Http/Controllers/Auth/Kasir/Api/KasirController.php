@@ -376,6 +376,39 @@ class KasirController extends Controller {
         }
     }
 
+    public function listCartInvoice(Request $request) : JsonResponse {
+        $cartContent = "";
+        try {
+            $cartContent = ShoppingCart::with('product')
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->where('id_invoice', $request->id_invoice)
+                                    // ->latest()
+                                    ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if(empty($cartContent) || $cartContent->count() == 0 || $cartContent == ""){
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'data-status' => 'Cart is empty!',
+                'dataStokProduk' => $cartContent,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success',
+                'cartData' => $cartContent,
+                'status' => 200
+            ]);
+        }
+    }
+
     //Try Catch Not Yet Applied
     public function processCart(Request $request) : JsonResponse {
         $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)

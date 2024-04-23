@@ -11,6 +11,7 @@ use App\Models\DetailKasir;
 use App\Models\Invoice;
 use App\Models\InvoiceField;
 use App\Models\Tenant;
+use App\Models\CustomerIdentifier;
 
 class Kasir extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -49,6 +50,10 @@ class Kasir extends Authenticatable implements MustVerifyEmail {
 
     public function invoiceField(){
         return $this->hasMany(InvoiceField::class, 'id_kasir', 'id');
+    }
+
+    public function customer(){
+        return $this->hasMany(CustomerIdentifier::class, 'id_kasir', 'id');
     }
 
     public function detailKasirStore($model){

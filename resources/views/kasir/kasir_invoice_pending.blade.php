@@ -45,6 +45,7 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>Invoice</th>
+                                            <th>Customer Info</th>
                                             <th>Tanggal Transaksi</th>
                                             <th>Status</th>
                                             <th>Action</th>
@@ -56,6 +57,7 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
+                                                <td>{{ $invoice->customer->customer_info }}</td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
                                                 <td><span class="badge bg-soft-warning text-warning">Pending</span></td>
                                                 <td>

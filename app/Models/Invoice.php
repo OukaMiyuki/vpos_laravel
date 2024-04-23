@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use GuzzleHttp\Client;
 use App\Models\ShoppingCart;
 use App\Models\Kasir;
 use App\Models\Tenant;
@@ -13,6 +14,7 @@ use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\TunaiWallet;
 use App\Models\QrisWallet;
+use App\Models\CustomerIdentifier;
 
 class Invoice extends Model {
     use HasFactory;
@@ -33,6 +35,10 @@ class Invoice extends Model {
 
     public function invoiceField() {
         return $this->hasOne(InvoiceField::class, 'id_invoice', 'id');
+    }
+
+    public function customer() {
+        return $this->hasOne(CustomerIdentifier::class, 'id_invoice', 'id');
     }
 
     public function storeCart($model){
@@ -66,8 +72,10 @@ class Invoice extends Model {
         $content3="";
         $content4="";
         $content5="";
+        $customerInfo="";
         if(!empty(request()->content1)){
             $content1 = request()->content1;
+            $customerInfo=request()->content1;
         }
         if(!empty(request()->content2)){
             $content2 = request()->content2;
@@ -91,6 +99,26 @@ class Invoice extends Model {
         $InvoiceField->content4 = $content4;
         $InvoiceField->content5 = $content5;
         $InvoiceField->save();
+        if(empty($model->jenis_pembayaran) || is_null($model->jenis_pembayaran) || $model->jenis_pembayaran == NULL || $model->jenis_pembayaran == ""){
+            $CustomerIdentifier = new CustomerIdentifier();
+            $CustomerIdentifier->id_invoice = $model->id;
+            $CustomerIdentifier->id_kasir = auth()->user()->id;
+            $CustomerIdentifier->customer_info = $customerInfo;
+            $CustomerIdentifier->save();
+        }
+    }
+
+    public function customerIdentifier($model){
+        $customerInfo="";
+        if(!empty(request()->cust_info)){
+            $customerInfo = request()->cust_info;
+        }
+        $CustomerIdentifier = new CustomerIdentifier();
+        $CustomerIdentifier->id_invoice = $model->id;
+        $CustomerIdentifier->id_kasir = auth()->user()->id;
+        $CustomerIdentifier->customer_info = $customerInfo;
+        $CustomerIdentifier->description   = request()->description;
+        $CustomerIdentifier->save();
     }
 
     public function deleteCart($model){
@@ -111,5 +139,40 @@ class Invoice extends Model {
         $tunaiWallet->update([
             'saldo' => $totalSaldo
         ]);
+    }
+
+    public static function boot(){
+        parent::boot();
+
+        static::creating(function($model){
+            $client = new Client();
+            $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
+            $invoice_code = "VP";
+            $time=time();
+            $date = date('dmYHis');
+            $index_number = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                                            ->where('id_kasir', auth()->user()->id)
+                                            ->max('id') + 1;
+            $generate_nomor_invoice = $invoice_code.$date.str_pad($index_number, 9, '0', STR_PAD_LEFT);
+            $model->nomor_invoice = $generate_nomor_invoice;
+            if($model->jenis_pembayaran == "Qris"){
+                try {
+                    $postResponse = $client->request('POST',  $url, [
+                        'form_params' => [
+                            'amount' => $model->nominal_bayar,
+                            'transactionNo' => $generate_nomor_invoice,
+                            'pos_id' => "VP",
+                            'secret_key' => "Vpos71237577"
+                        ]
+                    ]);
+                    $responseCode = $postResponse->getStatusCode();
+                    $data = json_decode($postResponse->getBody());
+                    $model->qris_data = $data->data->data->qrisData;
+                } catch (Exception $e) {
+                    return $e;
+                    exit;
+                }
+            }
+        });
     }
 }

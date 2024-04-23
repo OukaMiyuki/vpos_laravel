@@ -119,7 +119,7 @@
                                     <div class="col-md-12">
                                         <div class="mb-3">
                                             <button @if(Cart::subtotal()==0) disabled @endif type="button" disabled id="formCheckout" class="btn btn-blue waves-effect waves-light m-1">Create Invoice</button>&nbsp;&nbsp;
-                                            <button @if(Cart::subtotal()==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.save') }}" formmethod="post" class="btn m-1 btn-blue waves-effect waves-light">Save Transaction</button>&nbsp;&nbsp;
+                                            <button @if(Cart::subtotal()==0) disabled @endif type="button" data-bs-toggle="modal" data-bs-target="#modalAddCustomerIdentifier"  class="btn m-1 btn-blue waves-effect waves-light">Save Transaction</button>&nbsp;&nbsp;
                                             <button @if(Cart::subtotal()==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.clear') }}" formmethod="post" class="btn m-1 btn-blue waves-effect waves-light">Clear Transaction</button>
                                         </div>
                                     </div>
@@ -219,9 +219,9 @@
                 <form class="px-3" action="{{ route('kasir.pos.transaction.process') }}" method="post">
                     @csrf
                     <div class="modal-body" id="checkoutProcess">
-                        <input hidden class="d-none" type="text" name="jenisPembayaran" id="jenisPembayaran">
-                        <input hidden class="d-none" type="text" name="nominalText" id="nominalText">
-                        <input hidden class="d-none" type="text" name="kembalianText" id="kembalianText">
+                        <input hidden class="d-none" type="text" name="jenisPembayaran" id="jenisPembayaran" readonly>
+                        <input hidden class="d-none" type="text" name="nominalText" id="nominalText" readonly>
+                        <input hidden class="d-none" type="text" name="kembalianText" id="kembalianText" readonly>
                         @switch(true)
                             @case($customField->id != '')
                                 @if (!empty($customField->baris1) && $customField->baris_1_activation != 0)
@@ -330,6 +330,47 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Tambah</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalAddCustomerIdentifier" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Masukkan Info Pelanggan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="px-3" action="{{ route('kasir.pos.transaction.save') }}" method="post" id="show">
+                    @csrf
+                    <div class="modal-body" id="checkoutProcess">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="cust_info" class="form-label">Customer Info</label>
+                                    <input type="text" required class="form-control @error('cust_info') is-invalid @enderror" name="cust_info" id="cust_info" value="{{ old('cust_info') }}" placeholder="Nama Pelanggan/Nomor Meja">
+                                    @error('cust_info')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Keterangan (Opsional boleh dikosongi)</label>
+                                    <textarea placeholder="Masukkan keterangan" class="form-control" id="description" name="description" rows="5" spellcheck="false">{!! old('description') !!}</textarea>
+                                    @error('description')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Simpan Transaksi</button>
                     </div>
                 </form>
             </div>

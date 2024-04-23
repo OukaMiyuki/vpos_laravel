@@ -180,7 +180,10 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle'])->prefix('t
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profileInfoUpdate'])->name('tenant.profile.info.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'password'])->name('tenant.password');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'passwordUpdate'])->name('tenant.password.update');
-    // Route::get('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeingSetting'])->name('tenant.rekening.setting');
+    Route::get('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeingSetting'])->name('tenant.rekening.setting');
+
+    Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestForm'])->name('tenant.request.umi');
+    Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');
 });
 
 Route::middleware(['guest:kasir', 'throttle'])->prefix('kasir')->group( function () {
@@ -211,6 +214,9 @@ Route::middleware(['auth:kasir', 'throttle'])->prefix('kasir')->group( function 
 
     Route::get('/dashboard/transaction/pending', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPending'])->name('kasir.transaction.pending');
     Route::get('/dashboard/transaction/restore/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingRestore'])->name('kasir.transaction.pending.restore');
+    Route::post('/dashboard/transaction/pending/addcart', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingAddCart'])->name('kasir.transaction.pending.addCart');
+    Route::post('/dashboard/transaction/pending/updatecart', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingUpdateCart'])->name('kasir.transaction.pending.updateCart');
+    Route::post('/dashboard/transaction/pending/deletecart', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingDeleteCart'])->name('kasir.transaction.pending.deleteCart');
     Route::get('/dashboard/transaction/pending/delete/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingDelete'])->name('kasir.transaction.pending.delete');
     Route::post('/dashboard/transaction/pending/process', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionPendingProcess'])->name('kasir.pos.transaction.pending.process');
     Route::post('/dashboard/transaction/pending/change-payment', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionPendingChangePayment'])->name('kasir.pos.transaction.pending.changePayment');
@@ -223,6 +229,9 @@ Route::middleware(['auth:kasir', 'throttle'])->prefix('kasir')->group( function 
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profileInfoUpdate'])->name('kasir.profile.info.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'password'])->name('kasir.password');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'passwordUpdate'])->name('kasir.password.update');
+
+    Route::get('tesprint', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'testPrint']);
+    Route::get('testime', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'testTimestamp']);
 });
 
 require __DIR__.'/auth.php';

@@ -13,6 +13,7 @@ use App\Models\DetailMarketing;
 use App\Models\DetailTenant;
 use App\Models\DetailKasir;
 use App\Models\InvitationCode;
+use App\Models\StoreDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -203,6 +204,63 @@ class AuthController extends Controller {
             'message' => 'Fetch Success',
             'data-detail-user' => $user,
             'status' => 200
+        ]);
+    }
+
+    public function userUpdate(Request $request) : JsonResponse {
+        // $id = $request->id;
+        $nama_toko = $request->nama_toko;
+        $alamat_toko = $request->alamat_toko;
+        $catatan_kaki_toko = $request->catatan_kaki_toko;
+        $phone_toko = $request->phone_toko;
+        $name = $request->name;
+        // $phone = $request->phone;
+        $password = $request->password;
+        $tenant = "";
+        $store_detail = "";
+        try {
+            $tenant = Tenant::with('detail')->where('id', Auth::user()->id)->firstOrFail();
+            // ->where('id', $id)->firstOrFail();
+            $store_detail = StoreDetail::where('id_tenant', $tenant->id)->firstOrFail();
+            // ->where('id', $id)->firstOrFail();
+            if($password == null || $password == ''){
+                $tenant->update([
+                    'name' => $name,
+                    // 'phone' => $phone,
+                ]);
+                $store_detail->update([
+                    'name' => $nama_toko,
+                    'alamat' => $alamat_toko,
+                    'catatan_kaki' => $catatan_kaki_toko,
+                    'no_telp_toko' => $phone_toko,
+                ]);
+            }else{
+                $tenant->update([
+                    'name' => $name,
+                    // 'phone' => $phone,
+                    // 'password' => $password,
+                    'password' => Hash::make($password),
+                ]);
+                $store_detail->update([
+                    'name' => $nama_toko,
+                    'alamat' => $alamat_toko,
+                    'catatan_kaki' => $catatan_kaki_toko,
+                    'no_telp_toko' => $phone_toko,
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        return response()->json([
+            'message' => 'Update Success',
+            // 'data' => $kasir,
+            // 'cartData' => $invoice->shoppingCart,
         ]);
     }
 

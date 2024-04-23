@@ -15,6 +15,8 @@ use App\Models\Tax;
 use App\Models\TenantField;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
 use GuzzleHttp\Client;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
+use Mike42\Escpos\Printer;
 
 class KasirController extends Controller {
     public function index(){
@@ -93,7 +95,6 @@ class KasirController extends Controller {
 
     public function allItem(){
         $product_item_cart = Cart::content();
-        // Cart::instance('cart-9')->restore(auth()->user()->id);
         return view('kasir.kasir_pos_all_item_cart', compact('product_item_cart'));
     }
 
@@ -136,25 +137,15 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionSave(Request $request){
-        // Available alpha caracters
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-        // generate a pin based on 2 * 7 digits + a random character
-        $pin = mt_rand(1000000, 9999999)
-            . mt_rand(1000000, 9999999)
-            . $characters[rand(0, strlen($characters) - 1)];
-
-        // shuffle the result
-        $string = str_shuffle($pin);
         $invoice = Invoice::create([
             'id_tenant' => auth()->user()->id_tenant,
             'id_kasir' => auth()->user()->id,
-            'nomor_invoice' => $string,
             'jenis_pembayaran' => $request->pembayaran,
             'tanggal_transaksi' => Carbon::now()
         ]);
         if(!is_null($invoice)) {
             $invoice->storeCart($invoice);
+            $invoice->customerIdentifier($invoice);
             session()->forget('cart');
         }
         $notification = array(
@@ -174,102 +165,7 @@ class KasirController extends Controller {
         return redirect()->back()->with($notification);
     }
 
-    public function transactionPending(){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
-                            ->where('id_kasir', auth()->user()->id)
-                            ->where('jenis_pembayaran', NULL)
-                            ->where('status_pembayaran', 0)
-                            ->latest()
-                            ->get();
-        return view('kasir.kasir_invoice_pending', compact('invoice'));
-    }
-
-    public function transactionPendingPayment(){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
-                        ->where('id_kasir', auth()->user()->id)
-                        ->where('jenis_pembayaran', "Qris")
-                        ->where('status_pembayaran', 0)
-                        ->latest()
-                        ->get();
-        return view('kasir.kasir_invoice_pending_payment', compact('invoice'));
-    }
-
-    public function transactionPendingRestore($id){
-        session()->forget('cart');
-        $invoice = Invoice::with('shoppingCart')
-                            ->where('id_tenant', auth()->user()->id_tenant)
-                            ->where('id_kasir', auth()->user()->id)
-                            ->whereNull('jenis_pembayaran')
-                            ->where('status_pembayaran', 0)
-                            ->find($id);
-        $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
-                            ->where('is_active', 1)->first();
-
-        $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
-                    ->where('is_active', 1)->first();
-
-        $customField = TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
-
-        if(!empty($tax)){
-            Cart::setGlobalTax($tax->pajak);
-        } else {
-            Cart::setGlobalTax(0);
-        }
-        // Cart::setGlobalTax(21);
-
-        foreach($invoice->shoppingCart as $cart){
-            Cart::add([
-                'id' => $cart->id_product,
-                'name' => $cart->product_name,
-                'qty' => $cart->qty,
-                'price' => $cart->harga,
-                'weight' => 20,
-                'options' => ['size' => 'large']
-            ]);
-
-            $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
-            if(!empty($diskon)){
-                if($subtotal >= $diskon->min_harga){
-                    Cart::setGlobalDiscount($diskon->diskon);
-                } else {
-                    Cart::setGlobalDiscount(0);
-                }
-            }
-        }
-        // $stock = ProductStock::with('product')
-        //                 ->where(function ($query) {
-        //                         $query->where('stok', '!=', 0);
-        //                 })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
-        $notification = array(
-            'message' => 'Transaction restored!',
-            'alert-type' => 'success',
-        );
-        return view('kasir.kasir_transaction_restore', compact('customField', 'invoice'))->with($notification);
-    }
-
-    public function transactionPendingDelete($id) {
-        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
-                ->where('id_kasir', auth()->user()->id)
-                ->where('jenis_pembayaran', NULL)
-                ->find($id);
-        session()->forget('cart');
-        if(!is_null($invoice)) {
-            $invoice->deleteCart($invoice);
-        }
-        $invoice->delete();
-        $notification = array(
-            'message' => 'Transaction Deleted Successfully!',
-            'alert-type' => 'success',
-        );
-        return redirect()->back()->with($notification);
-    }
-
     public function cartTransactionProcess(Request $request){
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $pin = mt_rand(1000000, 9999999)
-            . mt_rand(1000000, 9999999)
-            . $characters[rand(0, strlen($characters) - 1)];
-        $string = str_shuffle($pin);
         $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
         $total = (int) substr(str_replace([',', '.'], '', Cart::total()), 0, -2);
         $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
@@ -279,7 +175,6 @@ class KasirController extends Controller {
             $invoice = Invoice::create([
                 'id_tenant' => auth()->user()->id_tenant,
                 'id_kasir' => auth()->user()->id,
-                'nomor_invoice' => $string,
                 'jenis_pembayaran' => $request->jenisPembayaran,
                 'nominal_bayar' => $request->nominalText,
                 'kembalian' => $kembalian,
@@ -303,45 +198,12 @@ class KasirController extends Controller {
                 'message' => 'Transaksi berhasil diproses!',
                 'alert-type' => 'success',
             );
-            // return view('kasir.kasir_invoice_preview', compact('invoice'))->with($notification);
             return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
         } else if($request->jenisPembayaran == "Qris"){
-            //Create Client object to deal with
-            $client = new Client();
-            // Define the request parameters
-            $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
-
-            // Get the response code
-            $postResponse = $client->request('POST',  $url, [
-                'form_params' => [
-                    'amount' => $total,
-                    'transactionNo' => $string,
-                    'pos_id' => "IN01",
-                    'secret_key' => "Vpos71237577"
-                ]
-            ]);
-            $responseCode = $postResponse->getStatusCode();
-            $data = json_decode($postResponse->getBody());
-            // $contents = $postResponse->getBody()->getContents();
-            // $contents = $postResponse->getBody()->getContents();
-            // $result = json_decode($contents, true);
-            // $data = $result['qrisData'];
-            // dd($your_final_result );
-            // $response = (string) $postResponse->getBody();
-            // $response =json_decode($response);
-            // $key_value = $response->data->qrisData;
-            // dd($data->data->data->qrisData);
-            // return response()->json([
-            //     'response_code' => $responseCode,
-            //     'data' => $data
-            // ]);
-
             $invoice = Invoice::create([
                 'id_tenant' => auth()->user()->id_tenant,
                 'id_kasir' => auth()->user()->id,
-                'nomor_invoice' => $string,
                 'jenis_pembayaran' => $request->jenisPembayaran,
-                'qris_data' => $data->data->data->qrisData,
                 'status_pembayaran' => 0,
                 'sub_total' => $subtotal,
                 'pajak' => $tax,
@@ -366,43 +228,221 @@ class KasirController extends Controller {
         }
     }
 
+    public function transactionPending(){
+        $invoice = Invoice::with('customer')
+                            ->where('id_tenant', auth()->user()->id_tenant)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->where('jenis_pembayaran', NULL)
+                            ->where('status_pembayaran', 0)
+                            ->latest()
+                            ->get();
+        return view('kasir.kasir_invoice_pending', compact('invoice'));
+    }
+
+    public function transactionPendingPayment(){
+        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                        ->where('id_kasir', auth()->user()->id)
+                        ->where('jenis_pembayaran', "Qris")
+                        ->where('status_pembayaran', 0)
+                        ->latest()
+                        ->get();
+        return view('kasir.kasir_invoice_pending_payment', compact('invoice'));
+    }
+
+    public function transactionPendingRestore($id){
+        //session()->forget('cart');
+        $invoice = Invoice::with('shoppingCart', 'customer')
+                            ->where('id_tenant', auth()->user()->id_tenant)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->whereNull('jenis_pembayaran')
+                            ->where('status_pembayaran', 0)
+                            ->find($id);
+        $stock = ProductStock::with('product')
+                            ->where(function ($query) {
+                                    $query->where('stok', '!=', 0);
+                            })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
+        $customField = TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
+        $shoppingCart = $invoice->shoppingCart;
+        $notification = array(
+            'message' => 'Transaction restored!',
+            'alert-type' => 'success',
+        );
+        return view('kasir.kasir_transaction_restore', compact('customField', 'invoice', 'stock', 'shoppingCart'))->with($notification);
+    }
+
+    public function transactionPendingAddCart(Request $request){
+        $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
+                                    ->where('id_invoice', $request->id_invoice)
+                                    ->first();
+
+        $stock = ProductStock::find($request->id_product);
+
+        if($stock->stok < $request->qty){
+            $notification = array(
+                'message' => 'Stok tidak mencukupi!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+
+        if(empty($shoppingCart) || $shoppingCart->count() == 0 || $shoppingCart == ""){
+            ShoppingCart::create([
+                'id_kasir' => auth()->user()->id,
+                'id_invoice' => $request->id_invoice,
+                'id_product' => $request->id_product,
+                'product_name' => $request->name,
+                'qty' => $request->qty,
+                'harga' => $request->price,
+                'sub_total' => $request->qty*$request->price
+            ]);
+        } else {
+            $tempQty = $shoppingCart->qty;
+            $totalQty = $tempQty+$request->qty;
+            $shoppingCart->update([
+                'qty' => $totalQty,
+                'sub_total' => $totalQty*$request->price
+            ]);
+        }
+
+        $updateStok = (int) $stock->stok - (int) $request->qty;
+        $stock->update([
+            'stok' => $updateStok
+        ]);
+
+        $notification = array(
+            'message' => 'Successfully Added!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
+    public function transactionPendingUpdateCart(Request $request){
+        $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
+                                    ->where('id_invoice', $request->id_invoice)
+                                    ->first();
+        $stock = ProductStock::find($request->id_product);
+        if($shoppingCart->qty<$request->qty){
+            $penambahan=(int) $request->qty-$shoppingCart->qty;
+            $updateqty=$penambahan+$shoppingCart->qty;
+            $harga=$shoppingCart->harga;
+            if($stock->stok<$penambahan){
+                $notification = array(
+                    'message' => 'Stok tidak mencukupi untuk jumlah tersebut!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $shoppingCart->update([
+                    'qty' => $updateqty,
+                    'sub_total' => $updateqty*$harga
+                ]);
+                $updateStok = (int) $stock->stok - (int) $penambahan;
+                $stock->update([
+                    'stok' => $updateStok
+                ]);
+                //dd($updateqty);
+                $notification = array(
+                    'message' => 'Successfully Updated!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            }
+        } else if($shoppingCart->qty>$request->qty){
+            $pengurangan=(int) $shoppingCart->qty-$request->qty;
+            //$updateqty=$pengurangan-$request->qty;
+            $harga=$shoppingCart->harga;
+
+            $shoppingCart->update([
+                'qty' => $request->qty,
+                'sub_total' => $request->qty*$harga
+            ]);
+            $updateStok = (int) $stock->stok + (int) $pengurangan;
+            $stock->update([
+                'stok' => $updateStok
+            ]);
+            $notification = array(
+                'message' => 'Successfully Updated! dua',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            $notification = array(
+                'message' => 'Successfully Added!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
+    public function transactionPendingDeleteCart(Request $request){
+        $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
+                                    ->where('id_invoice', $request->id_invoice)
+                                    ->first();
+        $stock = ProductStock::find($request->id_product);
+        $updateStok = (int) $stock->stok+$shoppingCart->qty;
+        $stock->update([
+            'stok' => $updateStok
+        ]);
+        $shoppingCart->delete();
+        //dd($updateqty);
+        $notification = array(
+            'message' => 'Successfully Updated!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
+    public function transactionPendingDelete($id) {
+        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                ->where('id_kasir', auth()->user()->id)
+                ->where('jenis_pembayaran', NULL)
+                ->find($id);
+        session()->forget('cart');
+        if(!is_null($invoice)) {
+            $invoice->deleteCart($invoice);
+        }
+        $invoice->delete();
+        $notification = array(
+            'message' => 'Transaction Deleted Successfully!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
     public function cartTransactionPendingProcess(Request $request){
         $invoice = Invoice::where('id_kasir', auth()->user()->id)
                             ->where('id_tenant', auth()->user()->id_tenant)
                             ->find($request->id_invoice);
-        $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
-        $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
-        $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
         $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
         if($request->jenisPembayaran == "Tunai"){
             $invoice->update([
                 'jenis_pembayaran' => $request->jenisPembayaran,
                 'tanggal_pelunasan' => Carbon::now(),
                 'status_pembayaran' => 1,
-                'sub_total' => $subtotal,
-                'pajak' => $tax,
-                'diskon' => $diskon,
+                'sub_total' => $request->sub_total_belanja,
+                'pajak' => $request->nominal_pajak,
+                'diskon' => $request->nominal_diskon,
                 'nominal_bayar' => $request->nominalText,
                 'kembalian' => $kembalian,
             ]);
             if(!is_null($invoice)) {
                 $invoice->fieldSave($invoice);
             }
-            session()->forget('cart');
+            //session()->forget('cart');
             $notification = array(
                 'message' => 'Transaksi berhasil diproses!',
                 'alert-type' => 'success',
             );
             return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
         } else if($request->jenisPembayaran == "Qris"){
-            $total = (int) substr(str_replace([',', '.'], '', Cart::total()), 0, -2);
+            $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
             $client = new Client();
-            $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
+            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
             $postResponse = $client->request('POST',  $url, [
                 'form_params' => [
                     'amount' => $total,
                     'transactionNo' => $invoice->nomor_invoice,
-                    'pos_id' => "IN01",
+                    'pos_id' => "VP",
                     'secret_key' => "Vpos71237577"
                 ]
             ]);
@@ -414,9 +454,9 @@ class KasirController extends Controller {
                 'tanggal_pelunasan' => Carbon::now(),
                 'status_pembayaran' => 0,
                 'qris_data' => $data->data->data->qrisData,
-                'sub_total' => $subtotal,
-                'pajak' => $tax,
-                'diskon' => $diskon,
+                'sub_total' => $request->sub_total_belanja,
+                'pajak' => $request->nominal_pajak,
+                'diskon' => $request->nominal_diskon,
                 'nominal_bayar' => $total,
             ]);
 
@@ -473,5 +513,19 @@ class KasirController extends Controller {
                             ->latest()
                             ->get();
         return view('kasir.kasir_invoice_finish', compact('invoice'));
+    }
+
+    public function testPrint(){
+        $connector = new FilePrintConnector("php://stdout");
+        $printer = new Printer($connector);
+        $printer -> text("Hello World!\n");
+        $printer -> cut();
+        $printer -> close();
+        return $printer;
+    }
+
+    public function testTimestamp(){
+        $time = date("dmY");
+        return $time;
     }
 }

@@ -55,6 +55,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throt
 
 Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:10,1', 'custom.restrict'])->prefix('tenant')->group(function () {
     Route::post('/user/detail', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userDetail']);
+    Route::post('/user/update', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userUpdate']);
     Route::get('/cs-info', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'csInfo']);
 });
 
@@ -66,6 +67,7 @@ Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:90,1', 'custom.r
     // Route::post('/logout', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'user']);
     Route::post('/user/detail', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'userDetail']);
+    Route::post('/user/update', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'userUpdate']);
     Route::get('/product', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productList']);
     Route::post('/product/detail', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productDetail']);
     Route::get('/category', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productCategory']);
@@ -75,6 +77,7 @@ Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:90,1', 'custom.r
     Route::post('/add-cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'addCart']);
     Route::post('/delete-cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'deleteCart']);
     Route::get('/cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'listCart']);
+    Route::post('/cart-invoice', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'listCartInvoice']);
     Route::post('/cart-process', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'processCart']);
     Route::post('/transaction', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionList']);
     Route::get('/transaction/pending', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionPending']);
