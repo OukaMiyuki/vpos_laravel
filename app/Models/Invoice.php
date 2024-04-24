@@ -153,7 +153,7 @@ class Invoice extends Model {
 
         static::creating(function($model){
             $client = new Client();
-            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+            $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
             $invoice_code = "VP";
             $time=time();
             $date = date('dmYHis');

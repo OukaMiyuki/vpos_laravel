@@ -424,8 +424,10 @@ class KasirController extends Controller {
                 'nominal_bayar' => $request->nominalText,
                 'kembalian' => $kembalian,
             ]);
+            $total = $request->sub_total_belanja+$request->nominal_pajak;
             if(!is_null($invoice)) {
                 $invoice->fieldSave($invoice);
+                $invoice->updateTunaiWallet($total);
             }
             //session()->forget('cart');
             $notification = array(
@@ -436,7 +438,7 @@ class KasirController extends Controller {
         } else if($request->jenisPembayaran == "Qris"){
             $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
             $client = new Client();
-            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+            $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
             $postResponse = $client->request('POST',  $url, [
                 'form_params' => [
                     'amount' => $total,
