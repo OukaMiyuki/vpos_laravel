@@ -59,7 +59,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:10,1', 'custom.
     Route::post('/user/update-store', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userUpdateStore']);
     Route::get('/cs-info', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'csInfo']);
 
-    Route::get('/kasir-list', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'kasirList']);
+    Route::post('/kasir-list', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'kasirList']);
     Route::post('/kasir/detail', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'kasirDetail']);
     Route::post('/kasir/register', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'kasirRegister']);
 

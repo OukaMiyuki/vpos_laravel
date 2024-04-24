@@ -13,6 +13,7 @@ use App\Models\StoreDetail;
 use App\Models\RekeningTenant;
 use App\Models\ProductStock;
 use App\Models\TenantField;
+use App\Models\Product;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Exception;
@@ -265,18 +266,9 @@ class TenantController extends Controller {
     }
 
     public function productList() : JsonResponse{
-        $stock = "";
+        $product = "";
         try {
-            $stock = ProductStock::with(['product' => function ($query) {
-                                        $query->where('harga_jual', '!=',0);
-                                }])
-                                ->where(function ($query) {
-                                        $query->where('stok', '!=', 0)
-                                              ->where('harga_beli', '!=', 0);
-                                })
-                                ->where('id_tenant', auth()->user()->id)
-                                ->latest()
-                                ->get();
+            $product = Product::where('id_tenant', auth()->user()->id)->latest()->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -286,17 +278,17 @@ class TenantController extends Controller {
             exit;
         }
 
-        if($stock->count() == 0 || $stock == "" || is_null($stock) || empty($stock)){
+        if($product->count() == 0 || $product == "" || is_null($product) || empty($product)){
             return response()->json([
                 'message' => 'Fetch Success!',
                 'data-status' => 'No data found in this collection!',
-                'dataStokProduk' => $stock,
+                'data-product' => $product,
                 'status' => 200
             ]);
         } else {
             return response()->json([
                 'message' => 'Fetch Success!',
-                'dataStokProduk' => $stock,
+                'data-product' => $product,
                 'status' => 200
             ]);
         }
