@@ -140,7 +140,6 @@ class KasirController extends Controller {
         $invoice = Invoice::create([
             'id_tenant' => auth()->user()->id_tenant,
             'id_kasir' => auth()->user()->id,
-            'jenis_pembayaran' => $request->pembayaran,
             'tanggal_transaksi' => Carbon::now()
         ]);
         if(!is_null($invoice)) {

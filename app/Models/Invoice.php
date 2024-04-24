@@ -99,12 +99,19 @@ class Invoice extends Model {
         $InvoiceField->content4 = $content4;
         $InvoiceField->content5 = $content5;
         $InvoiceField->save();
-        if(empty($model->jenis_pembayaran) || is_null($model->jenis_pembayaran) || $model->jenis_pembayaran == NULL || $model->jenis_pembayaran == ""){
+        $CustomerIdentifier = CustomerIdentifier::where('id_kasir', auth()->user()->id)
+                                                    ->where('id_invoice', $model->id)
+                                                    ->first();
+        if(empty($CustomerIdentifier) || is_null($CustomerIdentifier) || $CustomerIdentifier == NULL || $CustomerIdentifier == ""){
             $CustomerIdentifier = new CustomerIdentifier();
             $CustomerIdentifier->id_invoice = $model->id;
             $CustomerIdentifier->id_kasir = auth()->user()->id;
             $CustomerIdentifier->customer_info = $customerInfo;
             $CustomerIdentifier->save();
+        } else {
+            $CustomerIdentifier->update([
+                'customer_info' => $customerInfo
+            ]);
         }
     }
 
@@ -146,7 +153,7 @@ class Invoice extends Model {
 
         static::creating(function($model){
             $client = new Client();
-            $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
+            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
             $invoice_code = "VP";
             $time=time();
             $date = date('dmYHis');

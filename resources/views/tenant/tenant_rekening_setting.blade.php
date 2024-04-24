@@ -23,7 +23,7 @@
                 <div class="col-lg-8 col-xl-8">
                     <div class="card">
                         <div class="card-body">
-                            <form method="post" action="{{ route('tenant.password.update') }}">
+                            <form method="post" action="">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12">

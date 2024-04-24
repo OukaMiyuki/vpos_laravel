@@ -160,7 +160,7 @@ class ProfileController extends Controller{
                 'kode_pos' => $request->kode_pos,
                 'no_telp_toko' => $request->no_telp,
                 'jenis_usaha' => $request->jenis,
-                'status_umi' => $request->umi,
+                //'status_umi' => $request->umi,
                 'catatan_kaki' => $request->catatan,
                 'photo' => $filename
             ]);;
@@ -178,7 +178,7 @@ class ProfileController extends Controller{
                 'kode_pos' => $request->kode_pos,
                 'no_telp_toko' => $request->no_telp,
                 'jenis_usaha' => $request->jenis,
-                'status_umi' => $request->umi,
+                //'status_umi' => $request->umi,
                 'catatan_kaki' => $request->catatan,
             ]);
 
@@ -263,12 +263,12 @@ class ProfileController extends Controller{
                  
                 Mail::to('amarwibianto@gmail.com')->send(new SendUmiEmail($mailData));
                    
-                dd("Email is sent successfully.");
-                // $notification = array(
-                //     'message' => 'Permintaan UMI berhasil diajukan!',
-                //     'alert-type' => 'success',
-                // );
-                // return redirect()->back()->with($notification);
+                //dd("Email is sent successfully.");
+                $notification = array(
+                    'message' => 'Permintaan UMI berhasil diajukan!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
             } catch (Exception $e) {
                 return $e;
                 exit;

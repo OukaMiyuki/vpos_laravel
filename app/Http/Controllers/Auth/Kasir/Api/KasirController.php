@@ -27,7 +27,8 @@ class KasirController extends Controller {
                                         $query->where('harga_jual', '!=',0);
                                 }])
                                 ->where(function ($query) {
-                                        $query->where('stok', '!=', 0);
+                                        $query->where('stok', '!=', 0)
+                                              ->where('harga_beli', '!=', 0);
                                 })
                                 ->where('id_tenant', auth()->user()->id_tenant)
                                 ->latest()
@@ -409,8 +410,44 @@ class KasirController extends Controller {
         }
     }
 
+    public function getAlias() : JsonResponse {
+        $alias = "";
+        try {
+            $alias = TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if(empty($alias) || $alias == "" || is_null($alias) || $alias->count() == 0 ){
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'data-status' => 'No data found in this collection!',
+                'alias-data' => $alias,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'alias-data' => $alias,
+                'status' => 200
+            ]);
+        }
+    }
+
     //Try Catch Not Yet Applied
     public function processCart(Request $request) : JsonResponse {
+        $subtotal = 0;
+        $nominalpajak = 0;
+        $nominaldiskon = 0;
+        $nominaldiskon = 0;
+        $temptotal = 0;
+        $nominalpajak = 0;
+        $total = 0;
         $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
                  ->where('is_active', 1)->first();
         $disc = 0;
@@ -435,58 +472,43 @@ class KasirController extends Controller {
                             ->whereNull('id_invoice')
                             ->latest()
                             ->get();
-
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $pin = mt_rand(1000000, 9999999)
-            . mt_rand(1000000, 9999999)
-            . $characters[rand(0, strlen($characters) - 1)];
-        $string = str_shuffle($pin);
-
-        $invoice = Invoice::create([
-            'id_tenant' => auth()->user()->id_tenant,
-            'id_kasir' => auth()->user()->id,
-            'nomor_invoice' => $string,
-            'tanggal_transaksi' => Carbon::now(),
-            'jenis_pembayaran' => "Qris",
-        ]);
-
-        $subtotal = 0;
-        $nominalpajak = 0;
-        $nominaldiskon = 0;
+        
         foreach($cartContent as $cart){
-            $cart->update([
-                'id_invoice' => $invoice->id
-            ]);
             $subtotal+= (int) $cart->sub_total;
         }
-        $nominaldiskon = ($disc/100)*$subtotal;
+        
+        if($subtotal>=$disc){
+            $nominaldiskon = ($disc/100)*$subtotal;
+        }
+
         $temptotal = $subtotal-$nominaldiskon;
         $nominalpajak = ($pajak/100)*$temptotal;
         $total = $temptotal+$nominalpajak;
 
-        $client = new Client();
-        $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
-        $postResponse = $client->request('POST',  $url, [
-            'form_params' => [
-                'amount' => $total,
-                'transactionNo' => $string,
-                'pos_id' => "IN01",
-                'secret_key' => "Vpos71237577"
-            ]
-        ]);
-        $responseCode = $postResponse->getStatusCode();
-        $data = json_decode($postResponse->getBody());
-
-        $invoice->update([
-            'qris_data' => $data->data->data->qrisData,
+        $invoice = Invoice::create([
+            'id_tenant' => auth()->user()->id_tenant,
+            'id_kasir' => auth()->user()->id,
+            'jenis_pembayaran' => "Qris",
+            'status_pembayaran' => 0,
             'sub_total' => $temptotal,
             'pajak' => $nominalpajak,
             'diskon' => $nominaldiskon,
-            'nominal_bayar' => $total
+            'nominal_bayar' => $total,
+            'tanggal_transaksi' => Carbon::now(),
         ]);
 
+        foreach($cartContent as $cart){
+            $cart->update([
+                'id_invoice' => $invoice->id
+            ]);
+        }
+
+        if(!is_null($invoice)) {
+            $invoice->fieldSave($invoice);
+        }
+
         return response()->json([
-            'message' => 'Fetch Success',
+            'message' => 'Transaction has been processed successfully',
             'invoice' => $invoice,
             'cartData' => $cartContent,
         ]);
@@ -674,7 +696,10 @@ class KasirController extends Controller {
         foreach($invoice->shoppingCart as $cart){
             $subtotal+= (int) $cart->sub_total;
         }
-        $nominaldiskon = ($disc/100)*$subtotal;
+        $nominaldiskon = 0;
+        if($subtotal>=$disc){
+            $nominaldiskon = ($disc/100)*$subtotal;
+        }
         $temptotal = $subtotal-$nominaldiskon;
         $nominalpajak = ($pajak/100)*$temptotal;
         $total = $temptotal+$nominalpajak;
@@ -720,7 +745,7 @@ class KasirController extends Controller {
             $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($cart->id_product);
             $stoktemp = $stock->stok;
             $stock->update([
-            'stok' => (int) $stoktemp+$qty
+                'stok' => (int) $stoktemp+$qty
             ]);
             $cart->delete();
         } catch (Exception $e) {

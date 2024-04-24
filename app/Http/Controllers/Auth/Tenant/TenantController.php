@@ -63,7 +63,6 @@ class TenantController extends Controller {
                         ->where('id_tenant', auth()->user()->id)
                         ->latest()
                         ->get();
-        // dd($kasir);
         return view('tenant.tenant_kasir_list', compact('kasir'));
     }
 
@@ -87,7 +86,6 @@ class TenantController extends Controller {
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
         ]);
-
 
         if(!is_null($kasir)) {
             $kasir->detailKasirStore($kasir);
@@ -556,34 +554,19 @@ class TenantController extends Controller {
         if(is_null($request->baris5)){
             $request->aktivasi_baris_5 = 0;
         }
-        if(empty($customField)){
-            TenantField::create([
-                'id_tenant' => auth()->user()->id,
-                'baris1' => $request->baris1,
-                'baris2' => $request->baris2,
-                'baris3' => $request->baris3,
-                'baris4' => $request->baris4,
-                'baris5' => $request->baris5,
-                'baris_1_activation' => $request->aktivasi_baris_1,
-                'baris_2_activation' => $request->aktivasi_baris_2,
-                'baris_3_activation' => $request->aktivasi_baris_3,
-                'baris_4_activation' => $request->aktivasi_baris_4,
-                'baris_5_activation' => $request->aktivasi_baris_5,
-            ]);
-        } else {
-            $customField->update([
-                'baris1' => $request->baris1,
-                'baris2' => $request->baris2,
-                'baris3' => $request->baris3,
-                'baris4' => $request->baris4,
-                'baris5' => $request->baris5,
-                'baris_1_activation' => $request->aktivasi_baris_1,
-                'baris_2_activation' => $request->aktivasi_baris_2,
-                'baris_3_activation' => $request->aktivasi_baris_3,
-                'baris_4_activation' => $request->aktivasi_baris_4,
-                'baris_5_activation' => $request->aktivasi_baris_5,
-            ]);
-        }
+
+        $customField->update([
+            'baris1' => $request->baris1,
+            'baris2' => $request->baris2,
+            'baris3' => $request->baris3,
+            'baris4' => $request->baris4,
+            'baris5' => $request->baris5,
+            'baris_1_activation' => $request->aktivasi_baris_1,
+            'baris_2_activation' => $request->aktivasi_baris_2,
+            'baris_3_activation' => $request->aktivasi_baris_3,
+            'baris_4_activation' => $request->aktivasi_baris_4,
+            'baris_5_activation' => $request->aktivasi_baris_5,
+        ]);
 
         $notification = array(
             'message' => 'Data berhasil diupdate!',

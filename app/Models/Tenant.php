@@ -123,6 +123,12 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         $StoreDetail->save();
     }
 
+    public function fieldInsert($model){
+        $TenantField = new TenantField();
+        $TenantField->id_tenant = $model->id;
+        $TenantField->save();
+    }
+
     public function createWallet($model){
         $tunaiWallet = new TunaiWallet();
         $qrisWallet = new QrisWallet();

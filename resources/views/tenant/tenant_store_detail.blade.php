@@ -76,11 +76,21 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="umi" class="form-label">Status UMI</label>
-                                                    <select class="form-select @error('umi') is-invalid @enderror" id="umi" name="umi" required>
-                                                        <option value="">- Pilih status UMI -</option>
-                                                        <option @if($tenantStore->status_umi == 0) selected @endif value="0">Tidak Terdaftar</option>
-                                                        <option @if($tenantStore->status_umi == 1) selected @endif value="1">Terdaftar</option>
-                                                    </select>
+                                                    @php
+                                                        $umi = "";
+                                                        if($tenantStore->status_umi == NULL || $tenantStore->status_umi == "" || empty($tenantStore->status_umi) || is_null($tenantStore->status_umi)){
+                                                            $umi = "Belum Terdaftar";
+                                                        } else {
+                                                            if($tenantStore->status_umi == 0) {
+                                                                $umi = "Belum Disetujui";
+                                                            } else if($tenantStore->status_umi == 1){
+                                                                $umi = "Terdaftar";
+                                                            } else if($tenantStore->status_umi == 2){
+                                                                $umi = "Ditolak";
+                                                            }
+                                                        }
+                                                    @endphp
+                                                    <input type="text" class="form-control" name="umi" id="umi" required value="{{ $umi }}" placeholder="Masukkan status UMI" readonly>
                                                 </div>
                                             </div>
                                         </div>

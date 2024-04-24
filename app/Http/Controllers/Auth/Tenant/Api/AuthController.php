@@ -208,45 +208,15 @@ class AuthController extends Controller {
     }
 
     public function userUpdate(Request $request) : JsonResponse {
-        // $id = $request->id;
-        $nama_toko = $request->nama_toko;
-        $alamat_toko = $request->alamat_toko;
-        $catatan_kaki_toko = $request->catatan_kaki_toko;
-        $phone_toko = $request->phone_toko;
         $name = $request->name;
-        // $phone = $request->phone;
         $password = $request->password;
         $tenant = "";
-        $store_detail = "";
         try {
-            $tenant = Tenant::with('detail')->where('id', Auth::user()->id)->firstOrFail();
-            // ->where('id', $id)->firstOrFail();
-            $store_detail = StoreDetail::where('id_tenant', $tenant->id)->firstOrFail();
-            // ->where('id', $id)->firstOrFail();
+            $tenant = Tenant::with('detail')->where('id', Auth::user()->id)->firstOrFail();// ->where('id', $id)->firstOrFail();
             if($password == null || $password == ''){
-                $tenant->update([
-                    'name' => $name,
-                    // 'phone' => $phone,
-                ]);
-                $store_detail->update([
-                    'name' => $nama_toko,
-                    'alamat' => $alamat_toko,
-                    'catatan_kaki' => $catatan_kaki_toko,
-                    'no_telp_toko' => $phone_toko,
-                ]);
+                $tenant->update(['name' => $name,]);
             }else{
-                $tenant->update([
-                    'name' => $name,
-                    // 'phone' => $phone,
-                    // 'password' => $password,
-                    'password' => Hash::make($password),
-                ]);
-                $store_detail->update([
-                    'name' => $nama_toko,
-                    'alamat' => $alamat_toko,
-                    'catatan_kaki' => $catatan_kaki_toko,
-                    'no_telp_toko' => $phone_toko,
-                ]);
+                $tenant->update(['name' => $name,'password' => Hash::make($password),]);
             }
         } catch (Exception $e) {
             return response()->json([
@@ -256,12 +226,34 @@ class AuthController extends Controller {
             ]);
             exit;
         }
+        return response()->json(['message' => 'Update Success',]);
+    }
 
-        return response()->json([
-            'message' => 'Update Success',
-            // 'data' => $kasir,
-            // 'cartData' => $invoice->shoppingCart,
-        ]);
+    public function userUpdateStore(Request $request) : JsonResponse {
+        $nama_toko = $request->nama_toko;
+        $alamat_toko = $request->alamat_toko;
+        $catatan_kaki_toko = $request->catatan_kaki_toko;
+        $phone_toko = $request->phone_toko;
+        $tenant = "";
+        $store_detail = "";
+        try {
+            //$tenant = Tenant::with('detail')->where('id', Auth::user()->id)->firstOrFail();// ->where('id', $id)->firstOrFail();
+            $store_detail = StoreDetail::where('id_tenant', auth()->user()->id)->firstOrFail();// ->where('id', $id)->firstOrFail();
+            $store_detail->update([
+                'name' => $nama_toko,
+                'alamat' => $alamat_toko,
+                'catatan_kaki' => $catatan_kaki_toko,
+                'no_telp_toko' => $phone_toko,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+        return response()->json(['message' => 'Update Success',]);
     }
 
     public function csInfo() : JsonResponse {

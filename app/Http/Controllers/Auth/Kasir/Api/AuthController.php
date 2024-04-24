@@ -58,41 +58,27 @@ class AuthController extends Controller {
     }
 
     public function userUpdate(Request $request) : JsonResponse {
-        // $id = $request->id;
         $name = $request->name;
-        // $phone = $request->phone;
         $password = $request->password;
         $kasir = "";
         try {
-            $kasir = Kasir::with('detail')
-            ->where('id', Auth::user()->id)->firstOrFail();
-            // ->where('id', $id)->firstOrFail();
+            $kasir = Kasir::with('detail')->where('id', Auth::user()->id)->firstOrFail();
+
             if($password == null || $password == ''){
-                $kasir->update([
-                    'name' => $name,
-                    // 'phone' => $phone,
-                ]);
+                $kasir->update(['name' => $name,]);
             }else{
-                $kasir->update([
-                    'name' => $name,
-                    // 'phone' => $phone,
-                    // 'password' => $password,
-                    'password' => Hash::make($password),
-                ]);
+                $kasir->update(['name' => $name,'password' => Hash::make($password),]);
             }
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Failed to fetch data!',
+                'message' => 'Failed to update data!',
                 'error-message' => $e->getMessage(),
                 'status' => 500,
             ]);
             exit;
         }
-
         return response()->json([
             'message' => 'Update Success',
-            // 'data' => $kasir,
-            // 'cartData' => $invoice->shoppingCart,
         ]);
     }
 

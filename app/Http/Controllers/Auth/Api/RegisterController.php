@@ -48,7 +48,9 @@ class RegisterController extends Controller {
 
         if(!is_null($tenant)) {
             $tenant->detailTenantStore($tenant);
+            $tenant->fieldInsert($tenant);
             $tenant->storeInsert($tenant);
+            $tenant->createWallet($tenant);
         }
 
         event(new Registered($tenant));
