@@ -369,6 +369,15 @@
                         <div class="collapse" id="finance">
                             <ul class="nav-second-level">
                                 <li>
+                                    <a href="{{ route('tenant.saldo') }}">Dashboard Finansial</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('tenant.saldo') }}">Pemasukan</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
                                 </li>
                                 <li>
