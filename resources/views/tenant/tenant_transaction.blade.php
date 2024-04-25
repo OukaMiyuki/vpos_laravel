@@ -67,7 +67,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-5">
-                                    <img src="{{ asset('assets/images/icons/transaction-pending.png') }}" class="img-fluid" alt="">
+                                    <img src="{{ asset('assets/images/icons/time.png') }}" class="img-fluid" alt="">
                                 </div>
                                 <div class="col-7">
                                     <div class="text-end">

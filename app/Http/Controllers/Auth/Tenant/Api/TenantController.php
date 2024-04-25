@@ -129,26 +129,36 @@ class TenantController extends Controller {
         $baris3 = $request->baris3;
         $baris4 = $request->baris4;
         $baris5 = $request->baris5;
-        $baris1_activation = $request->baris1_activation;
-        $baris2_activation = $request->baris2_activation;
-        $baris3_activation = $request->baris3_activation;
-        $baris4_activation = $request->baris4_activation;
-        $baris5_activation = $request->baris5_activation;
+        $baris1_activation = 1;
+        $baris2_activation = 1;
+        $baris3_activation = 1;
+        $baris4_activation = 1;
+        $baris5_activation = 1;
 
         if(is_null($baris1)){
             $baris1_activation = 0;
+        } else {
+            $baris1_activation = 1;
         }
         if(is_null($baris2)){
             $baris2_activation = 0;
+        } else {
+            $baris2_activation = 1;
         }
         if(is_null($baris3)){
             $baris3_activation = 0;
+        } else {
+            $baris3_activation = 1;
         }
         if(is_null($baris4)){
             $baris4_activation = 0;
+        } else {
+            $baris4_activation = 1;
         }
         if(is_null($baris5)){
             $baris5_activation = 0;
+        } else {
+            $baris5_activation = 1;
         }
 
         try {
