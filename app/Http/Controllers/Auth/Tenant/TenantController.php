@@ -108,7 +108,12 @@ class TenantController extends Controller {
     }
 
     public function tenantMenuToko(){
-        return view('tenant.tenant_toko');
+        $supplierCount = Supplier::where('id_tenant', auth()->user()->id)->count();
+        $batchCount = Supplier::where('id_tenant', auth()->user()->id)->count();
+        $categoryCount = ProductCategory::where('id_tenant', auth()->user()->id)->count();
+        $batchProductCount = Product::where('id_tenant', auth()->user()->id)->count();
+        $barcodeCount = ProductStock::where('id_tenant', auth()->user()->id)->count();
+        return view('tenant.tenant_toko', compact('supplierCount', 'batchCount', 'categoryCount', 'batchProductCount', 'barcodeCount'));
     }
 
     public function supplierList(){
@@ -581,7 +586,24 @@ class TenantController extends Controller {
     }
 
     public function tenantTransaction(){
-        return view('tenant.tenant_transaction');
+        $allTransaksiCount = Invoice::where('id_tenant', auth()->user()->id)->count();
+        $transaksiHariIniCount= Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                                    ->where('id_tenant', auth()->user()->id)
+                                    ->count();
+        $transaksiPendingCount= Invoice::where('id_tenant', auth()->user()->id)
+                                    ->whereNull('jenis_pembayaran')
+                                    ->count();
+        $paymentPendingCount= Invoice::where('id_tenant', auth()->user()->id)
+                                    ->where('status_pembayaran', 0)
+                                    ->count();
+        $invoiceFinishCount = Invoice::where('id_tenant', auth()->user()->id)
+                                    ->where('status_pembayaran', 1)
+                                    ->count();
+        $invoicePaymentQrisFinish = Invoice::where('id_tenant', auth()->user()->id)
+                                    ->where('jenis_pembayaran', 'Qris')
+                                    ->where('status_pembayaran', 1)
+                                    ->count();
+        return view('tenant.tenant_transaction', compact('allTransaksiCount', 'transaksiHariIniCount', 'transaksiPendingCount', 'paymentPendingCount', 'invoiceFinishCount', 'invoicePaymentQrisFinish'));
     }
 
     public function transactionList(){

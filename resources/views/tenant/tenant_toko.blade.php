@@ -27,9 +27,9 @@
                                 </div>
                                 <div class="col-7">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">23</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $supplierCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Supplier</p>
-                                        <a href="{{ route('tenant.product.batch.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.supplier.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -49,9 +49,9 @@
                                 </div>
                                 <div class="col-7">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">30</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $batchCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Batch Code</p>
-                                        <a href="{{ route('tenant.supplier.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.batch.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -73,7 +73,7 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1"><span data-plugin="counterup">30</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Categories</p>
-                                        <a href="{{ route('tenant.supplier.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.category.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -93,9 +93,9 @@
                                 </div>
                                 <div class="col-7">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">30</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $categoryCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Batch Product</p>
-                                        <a href="{{ route('tenant.supplier.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.product.batch.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -116,9 +116,9 @@
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">30</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $batchProductCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Barcode Stock</p>
-                                        <a href="{{ route('tenant.supplier.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.product.stock.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>

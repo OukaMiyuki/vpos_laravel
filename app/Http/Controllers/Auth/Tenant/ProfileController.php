@@ -197,7 +197,7 @@ class ProfileController extends Controller{
     public function rekeingSetting(){
         $rekening = RekeningTenant::where('id_tenant', auth()->user()->id)->first();
         $client = new Client();
-        $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
+        $url = 'http://erp.pt-best.com/api/testing-get-swift-code';
         $postResponse = $client->request('POST',  $url);
         $responseCode = $postResponse->getStatusCode();
         $data = json_decode($postResponse->getBody());

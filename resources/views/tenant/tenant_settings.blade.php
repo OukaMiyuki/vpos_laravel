@@ -64,7 +64,7 @@
                                 <div class="text-center pt-3">
                                     <div class="row text-center">
                                         <div class="col-12">
-                                            <img src="{{ asset('assets/images/icons/rekening.png') }}" class="img-fluid" alt="">
+                                            <img src="{{ asset('assets/images/icons/rekening-bank.png') }}" class="img-fluid" alt="">
                                         </div>
                                     </div>
                                     <div class="row mt-3">
@@ -83,7 +83,7 @@
                                 <div class="text-center pt-3">
                                     <div class="row text-center">
                                         <div class="col-12">
-                                            <img src="{{ asset('assets/images/icons/lock3.png') }}" class="img-fluid" alt="">
+                                            <img src="{{ asset('assets/images/icons/password.png') }}" class="img-fluid" alt="">
                                         </div>
                                     </div>
                                     <div class="row mt-3">

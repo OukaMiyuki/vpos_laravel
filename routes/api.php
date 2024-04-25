@@ -69,6 +69,9 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:10,1', 'custom.
     Route::post('/setting/alias/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'aliasUpdate']);
 
     Route::get('/product', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productList']);
+    Route::get('/category', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productCategory']);
+    Route::post('/filter-category', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'filterCategory']);
+    Route::post('/search-product', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'searchProduct']);
     //Route::post('/setting/rekening', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'rekeningSetting']);
 });
 
@@ -78,7 +81,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:10,1', 'custom.
 
 Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:90,1', 'custom.restrict'])->prefix('kasir')->group(function () {
     // Route::post('/logout', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'logout']);
-    Route::get('/user', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'user']);
+    //Route::get('/user', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'user']);
     Route::post('/user/detail', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'userDetail']);
     Route::post('/user/update', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'userUpdate']);
     Route::get('/product', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productList']);

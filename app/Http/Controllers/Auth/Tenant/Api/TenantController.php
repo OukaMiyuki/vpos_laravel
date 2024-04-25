@@ -14,6 +14,7 @@ use App\Models\RekeningTenant;
 use App\Models\ProductStock;
 use App\Models\TenantField;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Exception;
@@ -301,6 +302,103 @@ class TenantController extends Controller {
                 'data-product' => $product,
                 'status' => 200
             ]);
+        }
+    }
+
+    public function productCategory() : JsonResponse {
+        $productCategory = "";
+        try {
+            $productCategory = ProductCategory::select(['id','name'])->where('id_tenant', auth()->user()->id)->latest()->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+        if($productCategory->count() == 0 || $productCategory == ""){
+            return response()->json([
+                'message' => 'Fetch Success',
+                'data-status' => 'No data found in this collection!',
+                'productCategory' => $productCategory,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success',
+                'productCategory' => $productCategory,
+                'status' => 200
+            ]);
+        }
+    }
+
+    public function filterCategory(Request $request) : JsonResponse {
+        $category = $request->id_category;
+        $product = "";
+        try {
+            $product = Product::where('id_category', $category)
+                                ->where('id_tenant', auth()->user()->id)
+                                ->latest()
+                                ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if($product->count() == 0 || $product == "" || empty($product) || is_null($product)){
+            return response()->json([
+                'message' => 'Fetch Success',
+                'data-status' => 'No product found in this category!',
+                'data-product' => $product,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => "Fetch Success walaaa!",
+                'data-product' => $product,
+                'status' => 200
+            ]);
+        }
+    }
+
+    public function searchProduct(Request $request) : JsonResponse {
+        $keyword = $request->product_name;
+        $product = "";
+        if($keyword){
+            try {
+                $product = Product::where('id_tenant', auth()->user()->id)
+                                    ->where('product_name', 'LIKE', '%'.$keyword.'%')
+                                    ->latest()
+                                    ->get();
+
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to fetch data!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
+            }
+
+            if($product->count() == 0 || $product == "" || empty($product) || is_null($product)){
+                return response()->json([
+                    'message' => 'Fetch Success',
+                    'data-status' => 'No product found!',
+                    'dataStokProduk' => $product,
+                    'status' => 200
+                ]);
+            } else {
+                return response()->json([
+                    'message' => "Fetch Success!",
+                    'dataStokProduk' => $product,
+                    'status' => 200
+                ]);
+            }
         }
     }
 }

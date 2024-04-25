@@ -9,11 +9,12 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="#">Settings</a></li>
-                                <li class="breadcrumb-item active">Profile</li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.kasir') }}">Kasir</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.kasir.list') }}">Data Kasir</a></li>
+                                <li class="breadcrumb-item active">Profile Kasir</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Profile</h4>
+                        <h4 class="page-title">Profile Kasir</h4>
                     </div>
                 </div>
             </div>

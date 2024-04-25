@@ -9,7 +9,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="#">Toko</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.toko') }}">Toko</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.product.stock.list') }}">Stock Product</a></li>
                                 <li class="breadcrumb-item active">Edit</li>
                             </ol>
