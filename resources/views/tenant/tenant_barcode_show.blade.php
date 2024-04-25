@@ -8,9 +8,10 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="#">Settings</a></li>
-                                <li class="breadcrumb-item active">Profile</li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="#">Toko</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.product.stock.list') }}">Stock Product</a></li>
+                                <li class="breadcrumb-item active">Barcode</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Data Barcode</h4>

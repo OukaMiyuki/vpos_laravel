@@ -24,6 +24,10 @@ use File;
 use Mail;
 
 class ProfileController extends Controller{
+    public function tenantSettings(){
+        return view('tenant.tenant_settings');
+    }
+
     public function profile(){
         return view('tenant.tenant_profile');
     }
@@ -193,7 +197,7 @@ class ProfileController extends Controller{
     public function rekeingSetting(){
         $rekening = RekeningTenant::where('id_tenant', auth()->user()->id)->first();
         $client = new Client();
-        $url = 'http://erp.pt-best.com/api/testing-get-swift-code';
+        $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
         $postResponse = $client->request('POST',  $url);
         $responseCode = $postResponse->getStatusCode();
         $data = json_decode($postResponse->getBody());

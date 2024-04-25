@@ -24,9 +24,6 @@ use App\Models\TunaiWallet;
 class TenantController extends Controller {
 
     public function index(){
-        $product = Product::where('id_tenant', auth()->user()->id)->count();
-        $kasir = Kasir::where('id_tenant', auth()->user()->id)->count();
-        $supplier = Supplier::where('id_tenant', auth()->user()->id)->count();
         $todayTransaction = Invoice::whereDate('tanggal_transaksi', Carbon::today())
                                     ->where('id_tenant', auth()->user()->id)
                                     ->count();
@@ -34,7 +31,6 @@ class TenantController extends Controller {
                                     ->where('id_tenant', auth()->user()->id)
                                     ->where('status_pembayaran', 1)
                                     ->count();
-        $category = ProductCategory::where('id_tenant', auth()->user()->id)->count();
         $invoice = Invoice::where('id_tenant', auth()->user()->id)->count();
         $latestInvoice = Invoice::with('kasir')
                                 ->where('id_tenant', auth()->user()->id)
@@ -54,7 +50,11 @@ class TenantController extends Controller {
                             ->where('status_pembayaran', 1)
                             ->sum('pajak');
         $totalHariIni = (int)filter_var($pemasukanHariIni, FILTER_SANITIZE_NUMBER_INT) + (int)filter_var($pajakHariIni, FILTER_SANITIZE_NUMBER_INT);
-        return view('tenant.dashboard', compact('product', 'kasir', 'supplier', 'todayTransaction', 'invoice', 'category', 'todayTransactionFinish', 'latestInvoice', 'totalSaldo', 'totalHariIni'));
+        return view('tenant.dashboard', compact('todayTransaction', 'invoice', 'todayTransactionFinish', 'latestInvoice', 'totalSaldo', 'totalHariIni'));
+    }
+
+    public function tenantKasirDashboard(){
+        return view('tenant.tenant_kasir');
     }
 
     public function kasirList(){
@@ -105,6 +105,10 @@ class TenantController extends Controller {
                         ->with('detail')
                         ->find($id);
         return view('tenant.tenant_kasir_detail', compact('kasir'));
+    }
+
+    public function tenantMenuToko(){
+        return view('tenant.tenant_toko');
     }
 
     public function supplierList(){
@@ -261,7 +265,7 @@ class TenantController extends Controller {
     }
 
     public function batchProductAdd(){
-        return view('tenant.tenant_tambah_product');
+        return view('tenant.tenant_product_add');
     }
 
     public function batchProductInsert(Request $request){
@@ -574,6 +578,10 @@ class TenantController extends Controller {
         );
 
         return redirect()->back()->with($notification);
+    }
+
+    public function tenantTransaction(){
+        return view('tenant.tenant_transaction');
     }
 
     public function transactionList(){

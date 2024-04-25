@@ -12,6 +12,10 @@ use App\Models\Kasir;
 use App\Models\DetailKasir;
 
 class ProfileController extends Controller {
+    public function kasirSettings(){
+        return view('kasir.kasir_settings');
+    }
+
     public function profile(){
         return view('kasir.kasir_profile');
     }

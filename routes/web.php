@@ -125,42 +125,46 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle'])->prefix('t
         return "Event has been sent!";
         });
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'index'])->name('tenant.dashboard');
-    Route::get('/dashboard/data/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');
-    Route::get('/dashboard/data/kasir/info/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirDetail'])->name('tenant.kasir.detail');
+    Route::get('/dashboard/kasir', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantKasirDashboard'])->name('tenant.kasir');
+    Route::get('/dashboard/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');
+    Route::get('/dashboard/kasir/info/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirDetail'])->name('tenant.kasir.detail');
     Route::post('/kasir/register', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirRegister'])->name('tenant.register.kasir');
-    Route::get('/dashboard/data/supplier/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierList'])->name('tenant.supplier.list');
-    Route::post('/dashboard/data/supplier/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierInsert'])->name('tenant.supplier.insert');
-    Route::post('/dashboard/data/supplier/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierUpdate'])->name('tenant.supplier.update');
-    Route::get('/dashboard/data/supplier/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierDelete'])->name('tenant.supplier.delete');
-    Route::get('/dashboard/data/product/batch/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchList'])->name('tenant.batch.list');
-    Route::post('/dashboard/data/product/batch/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchInsert'])->name('tenant.batch.insert');
-    Route::post('/dashboard/data/product/batch/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchUpdate'])->name('tenant.batch.update');
-    Route::get('/dashboard/data/product/batch/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchDelete'])->name('tenant.batch.delete');
-    Route::get('/dashboard/data/product/category/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryList'])->name('tenant.category.list');
-    Route::post('/dashboard/data/product/category/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryInsert'])->name('tenant.category.insert');
-    Route::post('/dashboard/data/product/category/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryUpdate'])->name('tenant.category.update');
-    Route::get('/dashboard/data/product/category/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryDelete'])->name('tenant.category.delete');
+    
+    Route::get('/dashboard/toko', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantMenuToko'])->name('tenant.toko');
+    Route::get('/dashboard/toko/supplier/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierList'])->name('tenant.supplier.list');
+    Route::post('/dashboard/toko/supplier/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierInsert'])->name('tenant.supplier.insert');
+    Route::post('/dashboard/toko/supplier/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierUpdate'])->name('tenant.supplier.update');
+    Route::get('/dashboard/toko/supplier/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierDelete'])->name('tenant.supplier.delete');
+    Route::get('/dashboard/toko/product/batch/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchList'])->name('tenant.batch.list');
+    Route::post('/dashboard/toko/product/batch/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchInsert'])->name('tenant.batch.insert');
+    Route::post('/dashboard/toko/product/batch/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchUpdate'])->name('tenant.batch.update');
+    Route::get('/dashboard/toko/product/batch/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchDelete'])->name('tenant.batch.delete');
+    Route::get('/dashboard/toko/product/category/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryList'])->name('tenant.category.list');
+    Route::post('/dashboard/toko/product/category/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryInsert'])->name('tenant.category.insert');
+    Route::post('/dashboard/toko/product/category/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryUpdate'])->name('tenant.category.update');
+    Route::get('/dashboard/toko/product/category/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'categoryDelete'])->name('tenant.category.delete');
 
-    Route::get('/dashboard/data/batch/product/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductList'])->name('tenant.product.batch.list');
-    Route::get('/dashboard/data/batch/product/add', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductAdd'])->name('tenant.product.batch.add');
-    Route::post('/dashboard/data/batch/product/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductInsert'])->name('tenant.product.batch.insert');
-    Route::get('/dashboard/data/batch/product/detail/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductDetail'])->name('tenant.product.batch.detail');
-    Route::get('/dashboard/data/batch/product/edit/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductEdit'])->name('tenant.product.batch.edit');
-    Route::post('/dashboard/data/batch/product/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductUpdate'])->name('tenant.product.batch.update');
-    Route::get('/dashboard/data/batch/product/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductDelete'])->name('tenant.product.batch.delete');
+    Route::get('/dashboard/toko/batch/product/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductList'])->name('tenant.product.batch.list');
+    Route::get('/dashboard/toko/batch/product/add', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductAdd'])->name('tenant.product.batch.add');
+    Route::post('/dashboard/toko/batch/product/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductInsert'])->name('tenant.product.batch.insert');
+    Route::get('/dashboard/toko/batch/product/detail/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductDetail'])->name('tenant.product.batch.detail');
+    Route::get('/dashboard/toko/batch/product/edit/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductEdit'])->name('tenant.product.batch.edit');
+    Route::post('/dashboard/toko/batch/product/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductUpdate'])->name('tenant.product.batch.update');
+    Route::get('/dashboard/toko/batch/product/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'batchProductDelete'])->name('tenant.product.batch.delete');
 
-    Route::get('/dashboard/data/batch/product/stock', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockList'])->name('tenant.product.stock.list');
-    Route::get('/dashboard/data/batch/product/stock/add', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockAdd'])->name('tenant.product.stock.add');
-    Route::post('/dashboard/data/batch/product/stock/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockInsert'])->name('tenant.product.stock.insert');
-    Route::get('/dashboard/data/batch/product/stock/edit/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockEdit'])->name('tenant.product.stock.edit');
-    Route::post('/dashboard/data/batch/product/stock/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockUpdate'])->name('tenant.product.stock.update');
-    Route::get('/dashboard/data/batch/product/stock/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockDelete'])->name('tenant.product.stock.delete');
-    Route::get('/dashboard/data/batch/product/stock/barcode/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockBarcode'])->name('tenant.product.stock.barcode.show');
+    Route::get('/dashboard/toko/batch/product/stock', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockList'])->name('tenant.product.stock.list');
+    Route::get('/dashboard/toko/batch/product/stock/add', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockAdd'])->name('tenant.product.stock.add');
+    Route::post('/dashboard/toko/batch/product/stock/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockInsert'])->name('tenant.product.stock.insert');
+    Route::get('/dashboard/toko/batch/product/stock/edit/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockEdit'])->name('tenant.product.stock.edit');
+    Route::post('/dashboard/toko/batch/product/stock/update', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockUpdate'])->name('tenant.product.stock.update');
+    Route::get('/dashboard/toko/batch/product/stock/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockDelete'])->name('tenant.product.stock.delete');
+    Route::get('/dashboard/toko/batch/product/stock/barcode/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockBarcode'])->name('tenant.product.stock.barcode.show');
 
-    Route::get('/dashboard/data/transaction/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionList'])->name('tenant.transaction.list');
-    Route::get('/dashboard/data/transaction/list/pending', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPending'])->name('tenant.transaction.list.pending');
-    Route::get('/dashboard/data/transaction/list/pending/payment', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPendingPayment'])->name('tenant.transaction.list.pending.payment');
-    Route::get('/dashboard/data/transaction/invoice/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionInvoiceView'])->name('tenant.transaction.invoice');
+    Route::get('/dashboard/transaction', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantTransaction'])->name('tenant.transaction');
+    Route::get('/dashboard/transaction/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionList'])->name('tenant.transaction.list');
+    Route::get('/dashboard/transaction/list/pending', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPending'])->name('tenant.transaction.list.pending');
+    Route::get('/dashboard/transaction/list/pending/payment', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPendingPayment'])->name('tenant.transaction.list.pending.payment');
+    Route::get('/dashboard/transaction/invoice/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionInvoiceView'])->name('tenant.transaction.invoice');
 
     Route::get('/dashboard/data/saldo', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'saldoData'])->name('tenant.saldo');
 
@@ -172,7 +176,8 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle'])->prefix('t
 
     Route::get('/dashboard/store/settings/custom_fields', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'customField'])->name('tenant.customField.modify');
     Route::post('/dashboard/store/settings/custom_fields/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'customFieldInsert'])->name('tenant.customField.modify.insert');
-
+    
+    Route::get('settings', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tenantSettings'])->name('tenant.settings');
     Route::get('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettings'])->name('tenant.store.profile');
     Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profile'])->name('tenant.profile');
@@ -212,6 +217,7 @@ Route::middleware(['auth:kasir', 'throttle'])->prefix('kasir')->group( function 
     Route::get('/dashboard/pos/transaction/process/invoice/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionInvoice'])->name('kasir.pos.transaction.invoice');
     Route::get('/dashboard/pos/transaction/process/invoice/receipt/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionInvoiceReceipt'])->name('kasir.pos.transaction.invoice.receipt');
 
+    Route::get('/dashboard/transaction', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionDashboard'])->name('kasir.transaction');
     Route::get('/dashboard/transaction/pending', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPending'])->name('kasir.transaction.pending');
     Route::get('/dashboard/transaction/restore/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingRestore'])->name('kasir.transaction.pending.restore');
     Route::post('/dashboard/transaction/pending/addcart', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingAddCart'])->name('kasir.transaction.pending.addCart');
@@ -224,6 +230,7 @@ Route::middleware(['auth:kasir', 'throttle'])->prefix('kasir')->group( function 
     Route::get('/dashboard/transaction/pending/payment', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingPayment'])->name('kasir.transaction.pending.payment');
     Route::get('/dashboard/transaction/finish', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionFinish'])->name('kasir.transaction.finish');
 
+    Route::get('settings', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'kasirSettings'])->name('kasir.settings');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profile'])->name('kasir.profile');
     Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profileAccountUpdate'])->name('kasir.profile.account.update');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profileInfoUpdate'])->name('kasir.profile.info.update');

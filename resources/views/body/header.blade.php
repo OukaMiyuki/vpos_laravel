@@ -203,12 +203,6 @@
                             <span>Rekening</span>
                         </a>
                     @endauth
-                    <!-- item-->
-                    <a href="#" class="dropdown-item notify-item">
-                        <i class="fe-settings"></i>
-                        <span>Settings</span>
-                    </a>
-                    <!-- item-->
                     <a href="
                         @auth('admin')
                             {{ route('admin.password') }}
@@ -225,6 +219,17 @@
                     " class="dropdown-item notify-item">
                         <i class="fe-lock"></i>
                         <span>Change Password</span>
+                    </a>
+                    <a href="
+                        @auth('tenant')
+                            {{ route('tenant.settings') }}
+                        @endauth
+                        @auth('kasir')
+                            {{ route('kasir.settings') }}
+                    @endauth
+                    " class="dropdown-item notify-item">
+                        <i class="fe-settings"></i>
+                        <span>Settings</span>
                     </a>
                     <div class="dropdown-divider"></div>
                     @auth('admin')

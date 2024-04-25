@@ -227,6 +227,28 @@ class KasirController extends Controller {
         }
     }
 
+    public function transactionDashboard(){
+        $transaction = Invoice::where('id_kasir', auth()->user()->id)
+                                ->where('id_tenant', auth()->user()->id_tenant)
+                                ->count();
+        $transactionPending = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                                        ->where('id_kasir', auth()->user()->id)
+                                        ->where('jenis_pembayaran', NULL)
+                                        ->where('status_pembayaran', 0)
+                                        ->count();
+        $transactionPendingPayment = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                                        ->where('id_kasir', auth()->user()->id)
+                                        ->where('jenis_pembayaran', "Qris")
+                                        ->where('status_pembayaran', 0)
+                                        ->count();
+        $transactionFinish = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                                        ->where('id_kasir', auth()->user()->id)
+                                        ->where('status_pembayaran', 1)
+                                        ->count();
+        return view('kasir.kasir_transaction', compact('transaction', 'transactionPending', 'transactionPendingPayment', 'transactionFinish'));
+        
+    }
+
     public function transactionPending(){
         $invoice = Invoice::with('customer')
                             ->where('id_tenant', auth()->user()->id_tenant)

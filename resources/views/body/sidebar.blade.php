@@ -279,6 +279,9 @@
                         <div class="collapse" id="toko">
                             <ul class="nav-second-level">
                                 <li>
+                                    <a href="{{ route('tenant.toko') }}">Dashboard Toko</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('tenant.supplier.list') }}">Supplier</a>
                                 </li>
                                 <li>
@@ -305,6 +308,9 @@
                         <div class="collapse" id="transaksi">
                             <ul class="nav-second-level">
                                 <li>
+                                    <a href="{{ route('tenant.transaction') }}">Dashboard Transaksi</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('tenant.transaction.list') }}">Semua Transaksi</a>
                                 </li>
                                 <li>
@@ -324,6 +330,9 @@
                         </a>
                         <div class="collapse" id="karyawan">
                             <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('tenant.kasir') }}">Dashboard Kasir</a>
+                                </li>
                                 <li>
                                     <a href="{{ route('tenant.kasir.list') }}">Manager Kasir</a>
                                 </li>

@@ -7,20 +7,11 @@
                 <div class="col-12">
                     <div class="page-title-box">
                         <div class="page-title-right">
-                            <form class="d-flex align-items-center mb-3">
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control border-0" id="dash-daterange">
-                                    <span class="input-group-text bg-blue border-blue text-white">
-                                    <i class="mdi mdi-calendar-range"></i>
-                                    </span>
-                                </div>
-                                <a href="#" class="btn btn-blue btn-sm ms-2">
-                                <i class="mdi mdi-autorenew"></i>
-                                </a>
-                                <a href="#" class="btn btn-blue btn-sm ms-1">
-                                <i class="mdi mdi-filter-variant"></i>
-                                </a>
-                            </form>
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="">Toko</a></li>
+                                <li class="breadcrumb-item active">Batch Code</li>
+                            </ol>
                         </div>
                         <h4 class="page-title">Data Kode Batch Barang</h4>
                     </div>

@@ -1,5 +1,19 @@
 <x-tenant-layout>
     <div class="content">
+        @php
+            $umi = "";
+            if($tenantStore->status_umi == NULL || $tenantStore->status_umi == "" || empty($tenantStore->status_umi) || is_null($tenantStore->status_umi)){
+                $umi = "Belum Terdaftar";
+            } else {
+                if($tenantStore->status_umi == 0) {
+                    $umi = "Belum Disetujui";
+                } else if($tenantStore->status_umi == 1){
+                    $umi = "Terdaftar";
+                } else if($tenantStore->status_umi == 2){
+                    $umi = "Ditolak";
+                }
+            }
+        @endphp
         <!-- Start Content-->
         <div class="container-fluid">
             <!-- start page title -->
@@ -8,9 +22,9 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="#">Settings</a></li>
-                                <li class="breadcrumb-item active">Profile</li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}">Settings</a></li>
+                                <li class="breadcrumb-item active">Store Settings</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Profile</h4>
@@ -29,6 +43,20 @@
                             <p class="text-muted">
                                 Toko
                             </p>
+                            @php
+                                $umi = "";
+                                if($tenantStore->status_umi == NULL || $tenantStore->status_umi == "" || empty($tenantStore->status_umi) || is_null($tenantStore->status_umi)){
+                                    echo "<button type='button' class='btn btn-info btn-xs waves-effect mb-2 waves-light'>Belum Terdaftar</button>";
+                                } else {
+                                    if($tenantStore->status_umi == 0) {
+                                        echo "<button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>Belum Disetujui</button>";
+                                    } else if($tenantStore->status_umi == 1){
+                                        echo "<button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar UMI</button>";
+                                    } else if($tenantStore->status_umi == 2){
+                                        echo "<button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>Ditolak</button>";
+                                    }
+                                }
+                            @endphp
                         </div>
                     </div>
                 </div>
@@ -69,28 +97,6 @@
                                                 <div class="mb-3">
                                                     <label for="jenis" class="form-label">Jenis Usaha</label>
                                                     <input type="text" class="form-control" name="jenis" id="jenis" required value="{{ $tenantStore->jenis_usaha }}" placeholder="Masukkan jenis usaha">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label for="umi" class="form-label">Status UMI</label>
-                                                    @php
-                                                        $umi = "";
-                                                        if($tenantStore->status_umi == NULL || $tenantStore->status_umi == "" || empty($tenantStore->status_umi) || is_null($tenantStore->status_umi)){
-                                                            $umi = "Belum Terdaftar";
-                                                        } else {
-                                                            if($tenantStore->status_umi == 0) {
-                                                                $umi = "Belum Disetujui";
-                                                            } else if($tenantStore->status_umi == 1){
-                                                                $umi = "Terdaftar";
-                                                            } else if($tenantStore->status_umi == 2){
-                                                                $umi = "Ditolak";
-                                                            }
-                                                        }
-                                                    @endphp
-                                                    <input type="text" class="form-control" name="umi" id="umi" required value="{{ $umi }}" placeholder="Masukkan status UMI" readonly>
                                                 </div>
                                             </div>
                                         </div>
