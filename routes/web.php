@@ -78,22 +78,23 @@ Route::middleware(['auth:marketing', 'throttle'])->prefix('marketing')->group( f
     Route::post('logout', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'destroy'])->name('marketing.logout');
 });
 
-Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle'])->prefix('marketing')->group( function () {
+Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'isMarketingActive'])->prefix('marketing')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'index'])->name('marketing.dashboard');
 
+    Route::get('settings', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'marketingSettings'])->name('marketing.settings');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profile'])->name('marketing.profile');
     Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profileAccountUpdate'])->name('marketing.profile.account.update');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profileInfoUpdate'])->name('marketing.profile.info.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'password'])->name('marketing.password');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'passwordUpdate'])->name('marketing.password.update');
 
-    Route::get('/dashboard/data/code/list', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeList'])->name('marketing.dashboard.invitationcode.list');
-    Route::post('/dashboard/data/code/insert', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeInsert'])->name('marketing.dashboard.invitationcode.insert');
-    Route::get('/dashboard/data/code/cashout/info', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutList'])->name('marketing.dashboard.invitationcode.cashout.list');
-    Route::get('/dashboard/data/code/cashout/invoice', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutInvoice'])->name('marketing.dashboard.invitationcode.cashout.invoice');
+    Route::get('/dashboard/code', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeDashboard'])->name('marketing.dashboard.invitationcode');
+    Route::post('/dashboard/code/insert', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeInsert'])->name('marketing.dashboard.invitationcode.insert');
+    Route::get('/dashboard/code/cashout/info', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutList'])->name('marketing.dashboard.invitationcode.cashout.list');
+    Route::get('/dashboard/code/cashout/invoice', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutInvoice'])->name('marketing.dashboard.invitationcode.cashout.invoice');
 
-    Route::get('/dashboard/data/tenant/list', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantList'])->name('marketing.dashboard.tenant.list');
-    Route::get('/dashboard/data/tenant/detail/{inv_code}/{id}', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantDetail'])->name('marketing.dashboard.tenant.detail');
+    Route::get('/dashboard/tenant/list', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantList'])->name('marketing.dashboard.tenant.list');
+    Route::get('/dashboard/tenant/detail/{inv_code}/{id}', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantDetail'])->name('marketing.dashboard.tenant.detail');
 });
 
 Route::middleware(['guest:tenant', 'throttle'])->prefix('tenant')->group( function () {
@@ -118,7 +119,7 @@ Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( functio
     Route::post('logout', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'destroy'])->name('tenant.logout');
 });
 
-Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle'])->prefix('tenant')->group( function () {
+Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive'])->prefix('tenant')->group( function () {
     Route::get('check-payment', function () { event(new App\Events\PaymentCheck('Someone')); return "Event has been sent!";});
     Route::get('test', function () {
         event(new App\Events\PaymentCheck('Someone'));
@@ -127,6 +128,8 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle'])->prefix('t
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'index'])->name('tenant.dashboard');
     Route::get('/dashboard/kasir', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantKasirDashboard'])->name('tenant.kasir');
     Route::get('/dashboard/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');
+    Route::get('/dashboard/kasir/list/active', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirListActive'])->name('tenant.kasir.list.active');
+    Route::get('/dashboard/kasir/list/non-aktif', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirListNonActive'])->name('tenant.kasir.list.non.active');
     Route::get('/dashboard/kasir/info/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirDetail'])->name('tenant.kasir.detail');
     Route::post('/kasir/register', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirRegister'])->name('tenant.register.kasir');
     
@@ -161,21 +164,26 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle'])->prefix('t
     Route::get('/dashboard/toko/stock/barcode/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockBarcode'])->name('tenant.product.stock.barcode.show');
 
     Route::get('/dashboard/transaction', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantTransaction'])->name('tenant.transaction');
+    Route::get('/dashboard/transaction/list/today', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantThisDayTransaction'])->name('tenant.transaction.today');
+    Route::get('/dashboard/transaction/list/finish', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionFinishList'])->name('tenant.transaction.finish');
+    Route::get('/dashboard/transaction/list/finish/payment', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionQrisFinishList'])->name('tenant.transaction.finish.qris');
     Route::get('/dashboard/transaction/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionList'])->name('tenant.transaction.list');
     Route::get('/dashboard/transaction/list/pending', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPending'])->name('tenant.transaction.list.pending');
     Route::get('/dashboard/transaction/list/pending/payment', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPendingPayment'])->name('tenant.transaction.list.pending.payment');
     Route::get('/dashboard/transaction/list/invoice/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionInvoiceView'])->name('tenant.transaction.invoice');
 
-    Route::get('/dashboard/data/saldo', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'saldoData'])->name('tenant.saldo');
-
-    Route::get('/dashboard/store/settings/discount', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModify'])->name('tenant.discount.modify');
-    Route::post('/dashboard/store/settings/discount/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModifyInsert'])->name('tenant.discount.insert');
-
-    Route::get('/dashboard/store/settings/pajak', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pajakModify'])->name('tenant.pajak.modify');
-    Route::post('/dashboard/store/settings/pajak/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pajakModifyInsert'])->name('tenant.pajak.modify.insert');
-
-    Route::get('/dashboard/store/settings/custom_fields', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'customField'])->name('tenant.customField.modify');
-    Route::post('/dashboard/store/settings/custom_fields/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'customFieldInsert'])->name('tenant.customField.modify.insert');
+    Route::get('/dashboard/finance', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'financeDashboard'])->name('tenant.finance');
+    Route::get('/dashboard/finance/pemasukan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'financePemasukan'])->name('tenant.finance.pemasukan');
+    Route::get('/dashboard/finance/saldo', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'saldoData'])->name('tenant.saldo');
+    Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'historyPenarikan'])->name('tenant.finance.history_penarikan');
+    
+    Route::get('/dashboard/management', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'storeManagement'])->name('tenant.store.management');
+    Route::get('/dashboard/management/discount', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModify'])->name('tenant.discount.modify');
+    Route::post('/dashboard/management/discount/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModifyInsert'])->name('tenant.discount.insert');
+    Route::get('/dashboard/management/pajak', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pajakModify'])->name('tenant.pajak.modify');
+    Route::post('/dashboard/management/pajak/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pajakModifyInsert'])->name('tenant.pajak.modify.insert');
+    Route::get('/dashboard/management/custom_fields', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'customField'])->name('tenant.customField.modify');
+    Route::post('/dashboard/management/custom_fields/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'customFieldInsert'])->name('tenant.customField.modify.insert');
     
     Route::get('settings', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tenantSettings'])->name('tenant.settings');
     Route::get('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettings'])->name('tenant.store.profile');
@@ -201,7 +209,7 @@ Route::middleware(['guest:kasir', 'throttle'])->prefix('kasir')->group( function
 
 });
 
-Route::middleware(['auth:kasir', 'throttle'])->prefix('kasir')->group( function () {
+Route::middleware(['auth:kasir', 'throttle', 'isKasirActive'])->prefix('kasir')->group( function () {
 
     Route::post('logout', [App\Http\Controllers\Auth\Kasir\LoginController::class, 'destroy'])->name('kasir.logout');
 
@@ -218,6 +226,7 @@ Route::middleware(['auth:kasir', 'throttle'])->prefix('kasir')->group( function 
     Route::get('/dashboard/pos/transaction/process/invoice/receipt/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionInvoiceReceipt'])->name('kasir.pos.transaction.invoice.receipt');
 
     Route::get('/dashboard/transaction', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionDashboard'])->name('kasir.transaction');
+    Route::get('/dashboard/transaction/list', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionList'])->name('kasir.transaction.list');
     Route::get('/dashboard/transaction/pending', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPending'])->name('kasir.transaction.pending');
     Route::get('/dashboard/transaction/restore/{id}', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingRestore'])->name('kasir.transaction.pending.restore');
     Route::post('/dashboard/transaction/pending/addcart', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingAddCart'])->name('kasir.transaction.pending.addCart');

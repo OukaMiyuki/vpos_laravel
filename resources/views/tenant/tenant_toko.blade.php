@@ -71,7 +71,7 @@
                                 </div>
                                 <div class="col-7">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">30</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $categoryCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Categories</p>
                                         <a href="{{ route('tenant.category.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -93,7 +93,7 @@
                                 </div>
                                 <div class="col-7">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $categoryCount }}</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $batchProductCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Batch Product</p>
                                         <a href="{{ route('tenant.product.batch.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -116,7 +116,7 @@
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $batchProductCount }}</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $barcodeCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Barcode Stock</p>
                                         <a href="{{ route('tenant.product.stock.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>

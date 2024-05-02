@@ -73,5 +73,8 @@ class Kernel extends HttpKernel
         'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
         'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
         'custom.restrict' => \App\Http\Middleware\RestrictMiddleware::class,
+        'isKasirActive' => \App\Http\Middleware\IsKasirActive::class,
+        'isMarketingActive' => \App\Http\Middleware\IsMarketingActive::class,
+        'isTenantActive' => \App\Http\Middleware\IsTenantActive::class,
     ];
 }

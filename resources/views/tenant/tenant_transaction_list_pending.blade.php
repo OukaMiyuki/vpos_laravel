@@ -13,7 +13,7 @@
                                 <li class="breadcrumb-item active">Pending</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Transaksi Pending</h4>
+                        <h4 class="page-title">Data Transaksi Pending (Belum Diproses)</h4>
                     </div>
                 </div>
             </div>

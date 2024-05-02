@@ -10,10 +10,10 @@
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.transaction') }}">Transaction</a></li>
-                                <li class="breadcrumb-item active">Semua Transaksi</li>
+                                <li class="breadcrumb-item active">Payment Finish</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Semua Transaksi</h4>
+                        <h4 class="page-title">Data Transaksi Qris Selesai</h4>
                     </div>
                 </div>
             </div>
@@ -29,52 +29,36 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel All Transaction List</h4>
+                            <h4 class="header-title mb-3">Tabel Transaction Qris Selesai</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th>Action</th>
                                             <th>No.</th>
                                             <th>Invoice</th>
                                             <th>Kasir</th>
                                             <th>Tanggal Transaksi</th>
                                             <th>Pembayaran</th>
                                             <th>Status Transaksi</th>
-                                            <th>Status Pembayaran</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
-                                        @foreach($invoice as $invoice)
+                                        @foreach($invoiceQrisFinish as $invoice)
                                             <tr>
-                                                <td>
-                                                    <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
-                                                    </a>
-                                                </td>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
                                                 <td>{{ $invoice->kasir->name }}</td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
                                                 <td>{{ $invoice->jenis_pembayaran }}</td>
                                                 <td>
-                                                    @if (!empty($invoice->jenis_pembayaran) || !is_null($invoice->jenis_pembayaran) || $invoice->jenis_pembayaran != "")
-                                                        @if($invoice->status_pembayaran == 0)
-                                                            <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
-                                                        @elseif($invoice->status_pembayaran == 1)
-                                                            <span class="badge bg-soft-success text-success">Selesai</span>
-                                                        @endif
-                                                    @else
-                                                        <span class="badge bg-soft-danger text-danger">Belum Diproses</span>
-                                                    @endif
+                                                    <span class="badge bg-soft-success text-success">Selesai</span>
                                                 </td>
                                                 <td>
-                                                    @if($invoice->status_pembayaran == 0)
-                                                        <span class="badge bg-soft-warning text-warning">Belum Bayar</span>
-                                                    @elseif($invoice->status_pembayaran == 1)
-                                                        <span class="badge bg-soft-success text-success">Dibayar</span>
-                                                    @endif
+                                                    <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
+                                                        <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                    </a>
                                                 </td>
                                             </tr>
                                         @endforeach

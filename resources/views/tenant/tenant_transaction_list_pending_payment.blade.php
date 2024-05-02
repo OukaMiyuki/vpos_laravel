@@ -13,7 +13,7 @@
                                 <li class="breadcrumb-item active">Payment Pending</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Transaksi Payment Pending</h4>
+                        <h4 class="page-title">Data Transaksi Payment Pending (Pembayaran Qris Belum Masuk)</h4>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Transaction Pending List</h4>
+                            <h4 class="header-title mb-3">Tabel Transaction Qris Pending List</h4>
                             <div class="table-responsive">
                                 <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
@@ -39,7 +39,7 @@
                                             <th>Kasir</th>
                                             <th>Tanggal Transaksi</th>
                                             <th>Pembayaran</th>
-                                            <th>Status Transaksi</th>
+                                            <th>Status Pembayaran</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -53,7 +53,7 @@
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
                                                 <td>{{ $invoice->jenis_pembayaran }}</td>
                                                 <td>
-                                                    <span class="badge bg-soft-warning text-warning">Pending</span>
+                                                    <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
                                                 </td>
                                                 <td>
                                                     <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">

@@ -198,7 +198,7 @@
                         </a>
                     @endauth
                     @auth('marketing')
-                        <a href="{{ route('tenant.store.profile') }}" class="dropdown-item notify-item">
+                        <a href="" class="dropdown-item notify-item">
                             <i class="mdi mdi-credit-card-outline"></i>
                             <span>Rekening</span>
                         </a>
@@ -221,12 +221,15 @@
                         <span>Change Password</span>
                     </a>
                     <a href="
+                        @auth('marketing')
+                            {{ route('marketing.settings') }}
+                        @endauth
                         @auth('tenant')
                             {{ route('tenant.settings') }}
                         @endauth
                         @auth('kasir')
                             {{ route('kasir.settings') }}
-                    @endauth
+                        @endauth
                     " class="dropdown-item notify-item">
                         <i class="fe-settings"></i>
                         <span>Settings</span>
@@ -341,6 +344,30 @@
                             <span>Settings</span>
                         </a>
                     @endauth
+                    @auth('tenant')
+                        <a href="{{ route('tenant.kasir.list') }}" class="dropdown-item">
+                            <i class="mdi mdi-account-multiple-outline"></i>
+                            <span>Tambah Kasir</span>
+                        </a>
+                        <a href="{{ route('tenant.product.batch.add') }}" class="dropdown-item">
+                            <i class="mdi mdi-bank-plus"></i>
+                            <span>Tambah Produk</span>
+                        </a>
+                        <a href="{{ route('tenant.product.stock.add') }}" class="dropdown-item">
+                            <i class="mdi mdi-book-plus"></i>
+                            <span>Tambah Stok Barang</span>
+                        </a>
+                    @endauth
+                    @auth('kasir')
+                        <a href="{{ route('kasir.pos') }}" class="dropdown-item">
+                            <i class="mdi mdi-point-of-sale"></i>
+                            <span>Tambah Transaksi</span>
+                        </a>
+                        <a href="{{ route('kasir.transaction') }}" class="dropdown-item">
+                            <i class="mdi mdi-folder-open"></i>
+                            <span>Dashboard Transaksi</span>
+                        </a>
+                    @endauth
                     <div class="dropdown-divider"></div>
                     <!-- item-->
                     <a href="#" class="dropdown-item">
@@ -349,90 +376,155 @@
                     </a>
                 </div>
             </li>
+            @auth('tenant')
+                <li class="dropdown dropdown-mega d-none d-xl-block">
+                    <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                    Mnager Toko
+                    <i class="mdi mdi-chevron-down"></i> 
+                    </a>
+                    <div class="dropdown-menu dropdown-megamenu">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <h5 class="text-dark mt-0">Menu Toko</h5>
+                                        <ul class="list-unstyled megamenu-list">
+                                            <li>
+                                                <a href="{{ route('tenant.supplier.list') }}">Supplier</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('tenant.batch.list') }}">Batch Code</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('tenant.category.list') }}">Kategori</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('tenant.product.batch.list') }}">Batch Product</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('tenant.product.stock.list') }}">Stock Manager</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-dark mt-0">Transaksi</h5>
+                                        <ul class="list-unstyled megamenu-list">
+                                            <li>
+                                                <a href="{{ route('tenant.transaction.list') }}">Semua Transaksi</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('tenant.transaction.list.pending') }}">Transaction Pending</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('tenant.transaction.list.pending.payment') }}">Payment Qris Pending</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-dark mt-0">Menu Karyawan</h5>
+                                        <ul class="list-unstyled megamenu-list">
+                                            <li>
+                                                <a href="{{ route('tenant.kasir.list') }}">Manager Kasir</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-dark mt-0">Store Manager</h5>
+                                        <ul class="list-unstyled megamenu-list">
+                                            <li>
+                                                <a href="{{ route('tenant.discount.modify') }}">Pengaturan Diskon</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('tenant.pajak.modify') }}">Pengaturan Pajak</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('tenant.customField.modify') }}">Cutom Fields</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="text-center mt-3">
+                                    {{-- <h3 class="text-dark">Special Discount Sale!</h3>
+                                    <h4>Save up to 70% off.</h4>
+                                    <button class="btn btn-primary rounded-pill mt-3">Download Now</button> --}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="dropdown dropdown-mega d-none d-xl-block">
+                    <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                    Other Menu
+                    <i class="mdi mdi-chevron-down"></i> 
+                    </a>
+                    <div class="dropdown-menu dropdown-megamenu">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <h5 class="text-dark mt-0">Finance</h5>
+                                        <ul class="list-unstyled megamenu-list">
+                                            <li>
+                                                <a href="{{ route('tenant.finance.pemasukan') }}">Pemasukan</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-dark mt-0">Role Manager</h5>
+                                        <ul class="list-unstyled megamenu-list">
+                                            <li>
+                                                <a href="#">Pengaturan Hak Akses</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Backup Database</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="text-center mt-3">
+                                    {{-- <h3 class="text-dark">Special Discount Sale!</h3>
+                                    <h4>Save up to 70% off.</h4>
+                                    <button class="btn btn-primary rounded-pill mt-3">Download Now</button> --}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            @endauth
+            @auth('kasir')
             <li class="dropdown dropdown-mega d-none d-xl-block">
                 <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                Mega Menu
+                Menu Transaksi
                 <i class="mdi mdi-chevron-down"></i> 
                 </a>
                 <div class="dropdown-menu dropdown-megamenu">
                     <div class="row">
                         <div class="col-sm-8">
                             <div class="row">
-                                <div class="col-md-4">
-                                    <h5 class="text-dark mt-0">UI Components</h5>
+                                <div class="col-md-3">
+                                    <h5 class="text-dark mt-0">Transaksi</h5>
                                     <ul class="list-unstyled megamenu-list">
                                         <li>
-                                            <a href="#">Widgets</a>
+                                            <a href="{{ route('kasir.transaction.list') }}">Semua Transaksi</a>
                                         </li>
                                         <li>
-                                            <a href="#">Nestable List</a>
+                                            <a href="{{ route('kasir.transaction.pending') }}">Transaction Pending</a>
                                         </li>
                                         <li>
-                                            <a href="#">Range Sliders</a>
+                                            <a href="{{ route('kasir.transaction.pending.payment') }}">Payment Qris Pending</a>
                                         </li>
                                         <li>
-                                            <a href="#">Masonry Items</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Sweet Alerts</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Treeview Page</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Tour Page</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-md-4">
-                                    <h5 class="text-dark mt-0">Applications</h5>
-                                    <ul class="list-unstyled megamenu-list">
-                                        <li>
-                                            <a href="#">eCommerce Pages</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">CRM Pages</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Email</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Calendar</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Team Contacts</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Task Board</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Email Templates</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-md-4">
-                                    <h5 class="text-dark mt-0">Extra Pages</h5>
-                                    <ul class="list-unstyled megamenu-list">
-                                        <li>
-                                            <a href="#">Left Sidebar with User</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Menu Collapsed</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Small Left Sidebar</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">New Header Style</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Search Result</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Gallery Pages</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Maintenance & Coming Soon</a>
+                                            <a href="{{ route('kasir.transaction.finish') }}">Transaction finish</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -440,14 +532,15 @@
                         </div>
                         <div class="col-sm-4">
                             <div class="text-center mt-3">
-                                <h3 class="text-dark">Special Discount Sale!</h3>
+                                {{-- <h3 class="text-dark">Special Discount Sale!</h3>
                                 <h4>Save up to 70% off.</h4>
-                                <button class="btn btn-primary rounded-pill mt-3">Download Now</button>
+                                <button class="btn btn-primary rounded-pill mt-3">Download Now</button> --}}
                             </div>
                         </div>
                     </div>
                 </div>
             </li>
+        @endauth
         </ul>
         <div class="clearfix"></div>
     </div>

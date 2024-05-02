@@ -12,6 +12,10 @@ use App\Models\Marketing;
 use App\Models\DetailMarketing;
 
 class ProfileController extends Controller {
+    public function marketingSettings(){
+        return view('marketing.marketing_settings');
+    }
+
     public function profile(){
         return view('marketing.marketing_profile');
     }

@@ -58,8 +58,7 @@ class LoginController extends Controller {
         return Str::transliterate(Str::lower(request()->email).'|'.request()->ip);
     }
 
-    public function destroy(Request $request): RedirectResponse
-    {
+    public function destroy(Request $request): RedirectResponse {
         Auth::guard('tenant')->logout();
 
         $request->session()->invalidate();

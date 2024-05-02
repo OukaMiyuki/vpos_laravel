@@ -33,62 +33,10 @@
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-primary border-primary border shadow">
-                                        <i class="mdi mdi-format-list-checks font-22 avatar-title text-white"></i>
-                                    </div>
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/today-transaction.png') }}" class="img-fluid" alt="">
                                 </div>
-                                <div class="col-9">
-                                    <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $stock }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Stok Barang</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row-->
-                        </div>
-                    </div>
-                    <!-- end widget-rounded-circle-->
-                </div>
-                <!-- end col-->
-                <div class="col-md-6 col-xl-3">
-                    <div class="widget-rounded-circle card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-success border-success border shadow">
-                                        <i class="mdi mdi-file-cabinet font-22 avatar-title text-white"></i>
-                                    </div>
-                                </div>
-                                <div class="col-9">
-                                    <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $product }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Banyak Produk</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row-->
-                        </div>
-                    </div>
-                    <!-- end widget-rounded-circle-->
-                </div>
-                <!-- end col-->
-                <div class="col-md-6 col-xl-3">
-                    <div class="widget-rounded-circle card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-warning border-warning border shadow">
-                                        <i class="mdi mdi-folder-open-outline font-22 avatar-title text-white"></i>
-                                    </div>
-                                </div>
-                                <div class="col-9">
+                                <div class="col-8">
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $totalInvoiceHariIni }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Transaksi Hari Ini</p>
@@ -103,17 +51,14 @@
                     </div>
                     <!-- end widget-rounded-circle-->
                 </div>
-                <!-- end col-->
                 <div class="col-md-6 col-xl-3">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-2">
-                                    <div class="avatar-lg rounded-circle bg-danger border-danger border shadow">
-                                        <i class="mdi mdi-folder-multiple-outline font-22 avatar-title text-white"></i>
-                                    </div>
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/transaction-data.png') }}" class="img-fluid" alt="">
                                 </div>
-                                <div class="col-10">
+                                <div class="col-8">
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $totalInvoice }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Transaksi</p>
@@ -128,22 +73,16 @@
                     </div>
                     <!-- end widget-rounded-circle-->
                 </div>
-                <!-- end col-->
-            </div>
-            <div class="row">
-                <!-- end col-->
-                <div class="col-md-6 col-xl-6">
+                <div class="col-md-6 col-xl-3">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-2">
-                                    <div class="avatar-lg rounded-circle bg-info border-info border shadow">
-                                        <i class="mdi mdi-cash font-22 avatar-title text-white"></i>
-                                    </div>
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/salary.png') }}" class="img-fluid" alt="">
                                 </div>
-                                <div class="col-10">
+                                <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $pemasukanHariIni }}</span></h3>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $pemasukanHariIni }}</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Pemasukan Hari Ini</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -156,19 +95,16 @@
                     </div>
                     <!-- end widget-rounded-circle-->
                 </div>
-                <!-- end col-->
-                <div class="col-md-6 col-xl-6">
+                <div class="col-md-6 col-xl-3">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-2">
-                                    <div class="avatar-lg rounded-circle bg-success border-success border shadow">
-                                        <i class="mdi mdi-cash-multiple font-22 avatar-title text-white"></i>
-                                    </div>
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/money.png') }}" class="img-fluid" alt="">
                                 </div>
-                                <div class="col-10">
+                                <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukan }}</span></h3>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukan }}</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Total Pemasukan</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -181,7 +117,6 @@
                     </div>
                     <!-- end widget-rounded-circle-->
                 </div>
-                <!-- end col-->
             </div>
             <!-- end row-->
             <div class="row">

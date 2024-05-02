@@ -20,8 +20,6 @@ use Mike42\Escpos\Printer;
 
 class KasirController extends Controller {
     public function index(){
-        $product = Product::where('id_tenant', auth()->user()->id_tenant)->count();
-        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->count();
         $totalInvoiceHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
                                         ->where('id_tenant', auth()->user()->id_tenant)
                                         ->where('id_kasir', auth()->user()->id)
@@ -38,7 +36,7 @@ class KasirController extends Controller {
                                     ->where('id_kasir', auth()->user()->id)
                                     ->where('status_pembayaran', 1)
                                     ->sum(\DB::raw('sub_total + pajak'));
-        return view('kasir.dashboard', compact(['product', 'stock', 'totalInvoiceHariIni', 'totalInvoice', 'pemasukanHariIni', 'totalPemasukan']));
+        return view('kasir.dashboard', compact(['totalInvoiceHariIni', 'totalInvoice', 'pemasukanHariIni', 'totalPemasukan']));
     }
 
     public function kasirPos(){
@@ -247,6 +245,15 @@ class KasirController extends Controller {
                                         ->count();
         return view('kasir.kasir_transaction', compact('transaction', 'transactionPending', 'transactionPendingPayment', 'transactionFinish'));
         
+    }
+
+    public function transactionList(){
+        $invoice = Invoice::with('customer')
+                            ->where('id_tenant', auth()->user()->id_tenant)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->latest()
+                            ->get();
+        return view('kasir.kasir_transaction_list', compact('invoice'));
     }
 
     public function transactionPending(){

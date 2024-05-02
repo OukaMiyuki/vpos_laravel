@@ -46,7 +46,7 @@
                                             <th>No.</th>
                                             <th>Invitation Code</th>
                                             <th>Nama Tenant</th>
-                                            <th>Email</th>
+                                            <th>Tanggal Bergabung</th>
                                             <th>Phone</th>
                                             <th>Action</th>
                                         </tr>
@@ -59,7 +59,7 @@
                                                     <td>{{ $no+=1 }}</td>
                                                     <td>{{ $userTenant->invitationCode->inv_code }}</td>
                                                     <td>{{ $userTenant->name }}</td>
-                                                    <td>{{ $userTenant->email }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($userTenant->tanggal_bergabung)->format('d-m-Y') }}</td>
                                                     <td>{{ $userTenant->phone }}</td>
                                                     <td>
                                                         <a href="{{ route('marketing.dashboard.tenant.detail', ['inv_code' => $userTenant->invitationCode->id, 'id' => $userTenant->id_tenant]) }}">

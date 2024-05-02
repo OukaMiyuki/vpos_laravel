@@ -13,7 +13,7 @@
                                 <li class="breadcrumb-item active">Data Kasir</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Kasir Toko</h4>
+                        <h4 class="page-title">Data Kasir Semua Toko</h4>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Invitation List&nbsp;&nbsp;&nbsp;<button data-bs-toggle="modal" data-bs-target="#staticBackdrop" title="Tambah kode baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan kasir baru</button></h4>
+                            <h4 class="header-title mb-3">Tabel Daftar Semua Kasir&nbsp;&nbsp;&nbsp;<button data-bs-toggle="modal" data-bs-target="#staticBackdrop" title="Tambah kode baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan kasir baru</button></h4>
                             <div class="table-responsive">
                                 <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>

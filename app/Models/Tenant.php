@@ -37,6 +37,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
     ];
 
     protected $hidden = [
+        'email',
         'password',
         'remember_token',
     ];
@@ -126,6 +127,16 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
     public function fieldInsert($model){
         $TenantField = new TenantField();
         $TenantField->id_tenant = $model->id;
+        $TenantField->baris1 = "Nama Pelanggan";
+        $TenantField->baris2 = "Kota Asal";
+        $TenantField->baris3 = "Alamat Pelanggan";
+        $TenantField->baris4 = "Email Pelanggan";
+        $TenantField->baris5 = "No. Telp./WA";
+        $TenantField->baris_1_activation = 1;
+        $TenantField->baris_2_activation = 2;
+        $TenantField->baris_3_activation = 3;
+        $TenantField->baris_4_activation = 4;
+        $TenantField->baris_5_activation = 5;
         $TenantField->save();
     }
 

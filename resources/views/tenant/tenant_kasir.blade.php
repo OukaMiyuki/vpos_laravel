@@ -27,9 +27,9 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">23</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $kasirAktifCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Kasir Aktif</p>
-                                        <a href="{{ route('tenant.product.batch.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.kasir.list.active') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -49,9 +49,9 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">23</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $kasirNonAktiFCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Kasir Non-Aktif</p>
-                                        <a href="{{ route('tenant.product.batch.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.kasir.list.non.active') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -71,9 +71,9 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">30</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $semuaKasirCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Kasir</p>
-                                        <a href="{{ route('tenant.supplier.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.kasir.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>

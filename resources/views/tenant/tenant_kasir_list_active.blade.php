@@ -1,4 +1,4 @@
-<x-kasir-layout>
+<x-tenant-layout>
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
@@ -8,12 +8,12 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('kasir.transaction') }}">Transaction</a></li>
-                                <li class="breadcrumb-item active">Finish</li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.kasir') }}">Kasir</a></li>
+                                <li class="breadcrumb-item active">Data Kasir Aktif</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Transaksi Selesai</h4>
+                        <h4 class="page-title">Data Kasir Aktif</h4>
                     </div>
                 </div>
             </div>
@@ -29,31 +29,41 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Transaction FInish List</h4>
+                            <h4 class="header-title mb-3">Tabel Daftar Kasir Aktif</h4>
                             <div class="table-responsive">
-                                <table id="datatable-buttons" class="table table-striped dt-responsive nowrap w-100">
+                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Invoice</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Pembayaran</th>
+                                            <th>Nama</th>
+                                            <th>Email</th>
+                                            <th>Posisi</th>
+                                            <th>Jenis Kelamin</th>
+                                            <th>No. KTP</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
-                                        @foreach($invoice as $invoice)
+                                        @foreach($kasirListActive as $kasir)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
-                                                <td><span class="badge bg-soft-success text-success">Selesai</span></td>
+                                                <td>{{ $kasir->name }}</td>
+                                                <td>{{ $kasir->email }}</td>
+                                                <td>Kasir</td>
+                                                <td>{{ $kasir->detail->jenis_kelamin }}</td>
+                                                <td>{{ $kasir->detail->no_ktp }}</td>
                                                 <td>
-                                                    <a href="{{ route('kasir.pos.transaction.invoice', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                    @if($kasir->is_active == 1)
+                                                        <span class="badge bg-soft-success text-success">Aktif</span>
+                                                    @else
+                                                        <span class="badge bg-soft-danger text-danger">Non Aktif</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('tenant.kasir.detail', ['id' => $kasir->id]) }}">
+                                                        <button title="Lihat data kasir" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                 </td>
                                             </tr>
@@ -69,4 +79,4 @@
         </div>
         <!-- container -->
     </div>
-</x-kasir-layout>
+</x-tenant-layout>

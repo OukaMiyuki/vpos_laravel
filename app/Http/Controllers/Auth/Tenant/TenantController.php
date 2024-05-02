@@ -54,7 +54,14 @@ class TenantController extends Controller {
     }
 
     public function tenantKasirDashboard(){
-        return view('tenant.tenant_kasir');
+        $semuaKasirCount = Kasir::where('id_tenant', auth()->user()->id)->count();
+        $kasirAktifCount = Kasir::where('id_tenant', auth()->user()->id)
+                                    ->where('is_active', 1)
+                                    ->count();
+        $kasirNonAktiFCount = Kasir::where('id_tenant', auth()->user()->id)
+                                    ->where('is_active', 0)
+                                    ->count();
+        return view('tenant.tenant_kasir', compact('semuaKasirCount', 'kasirAktifCount', 'kasirNonAktiFCount'));
     }
 
     public function kasirList(){
@@ -64,6 +71,26 @@ class TenantController extends Controller {
                         ->latest()
                         ->get();
         return view('tenant.tenant_kasir_list', compact('kasir'));
+    }
+
+    public function kasirListActive(){
+        $kasirListActive = Kasir::where('id_tenant', auth()->user()->id)
+                                    ->where('is_active', 1)
+                                    ->select(['id', 'name', 'email', 'is_active'])
+                                    ->with('detail')
+                                    ->latest()
+                                    ->get();
+        return view('tenant.tenant_kasir_list_active', compact('kasirListActive'));
+    }
+
+    public function kasirListNonActive(){
+        $kasirListNonActive = Kasir::where('id_tenant', auth()->user()->id)
+                                    ->where('is_active', 0)
+                                    ->select(['id', 'name', 'email', 'is_active'])
+                                    ->with('detail')
+                                    ->latest()
+                                    ->get();
+        return view('tenant.tenant_kasir_list_non_active', compact('kasirListNonActive'));
     }
 
     public function kasirRegister(Request $request){
@@ -109,7 +136,7 @@ class TenantController extends Controller {
 
     public function tenantMenuToko(){
         $supplierCount = Supplier::where('id_tenant', auth()->user()->id)->count();
-        $batchCount = Supplier::where('id_tenant', auth()->user()->id)->count();
+        $batchCount = Batch::where('id_tenant', auth()->user()->id)->count();
         $categoryCount = ProductCategory::where('id_tenant', auth()->user()->id)->count();
         $batchProductCount = Product::where('id_tenant', auth()->user()->id)->count();
         $barcodeCount = ProductStock::where('id_tenant', auth()->user()->id)->count();
@@ -479,6 +506,10 @@ class TenantController extends Controller {
         return view('tenant.tenant_barcode_show', compact('stok'));
     }
 
+    public function storeManagement(){
+        return view('tenant.tenant_dashboard_store_management');
+    }
+
     public function discountModify(){
         $diskon = Discount::where('id_tenant', auth()->user()->id)->first();
         return view('tenant.tenant_discount_modify', compact('diskon'));
@@ -607,14 +638,61 @@ class TenantController extends Controller {
     }
 
     public function transactionList(){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id)->latest()->get();
+        $invoice = Invoice::where('id_tenant', auth()->user()->id)
+                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
+                            ->with(['kasir' => function($query){
+                                $query->select(['kasirs.id', 'kasirs.name']);
+                            }])
+                            ->latest()
+                            ->get();
         return view('tenant.tenant_transaction_list', compact('invoice'));
+    }
+
+    public function tenantThisDayTransaction(){
+        $transaksiHariIni= Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                                    ->where('id_tenant', auth()->user()->id)
+                                    ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
+                                    ->with(['kasir' => function($query){
+                                        $query->select(['kasirs.id', 'kasirs.name']);
+                                    }])
+                                    ->latest()
+                                    ->get();
+        return view('tenant.tenant_transaction_transaksi_hari_ini', compact('transaksiHariIni'));
+    }
+
+    public function transactionFinishList(){
+        $invoiceFinish = Invoice::where('id_tenant', auth()->user()->id)
+                                    ->where('status_pembayaran', 1)
+                                    ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
+                                    ->with(['kasir' => function($query){
+                                        $query->select(['kasirs.id', 'kasirs.name']);
+                                    }])
+                                    ->latest()
+                                    ->get();
+        return view('tenant.tenant_transaction_finish_list', compact('invoiceFinish'));
+    }
+
+    public function transactionQrisFinishList(){
+        $invoiceQrisFinish = Invoice::where('id_tenant', auth()->user()->id)
+                                    ->where('jenis_pembayaran', 'Qris')
+                                    ->where('status_pembayaran', 1)
+                                    ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
+                                    ->with(['kasir' => function($query){
+                                        $query->select(['kasirs.id', 'kasirs.name']);
+                                    }])
+                                    ->latest()
+                                    ->get();
+        return view('tenant.tenant_transaction_qris_finish_list', compact('invoiceQrisFinish'));
     }
 
     public function transactionListPending(){
         $invoice = Invoice::where('id_tenant', auth()->user()->id)
                             ->where('jenis_pembayaran', NULL)
                             ->where('status_pembayaran', 0)
+                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
+                            ->with(['kasir' => function($query){
+                                $query->select(['kasirs.id', 'kasirs.name']);
+                            }])
                             ->latest()
                             ->get();
         return view('tenant.tenant_transaction_list_pending', compact('invoice'));
@@ -624,6 +702,10 @@ class TenantController extends Controller {
         $invoice = Invoice::where('id_tenant', auth()->user()->id)
                         ->where('jenis_pembayaran', "Qris")
                         ->where('status_pembayaran', 0)
+                        ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
+                        ->with(['kasir' => function($query){
+                            $query->select(['kasirs.id', 'kasirs.name']);
+                        }])
                         ->latest()
                         ->get();
         return view('tenant.tenant_transaction_list_pending_payment', compact('invoice'));
@@ -634,9 +716,21 @@ class TenantController extends Controller {
         return view('tenant.tenant_invoice_preview', compact('invoice'));
     }
 
+    public function financeDashboard(){
+        return view('tenant.tenant_finance');
+    }
+
+    public function financePemasukan(){
+        return view('tenant.tenant_finance_pemasukan');
+    }
+
     public function saldoData(){
         $tunai = TunaiWallet::where('id_tenant', auth()->user()->id)->first();
         $qris = QrisWallet::where('id_tenant', auth()->user()->id)->first();
-        return view('tenant.tenant_saldo', compact('tunai', 'qris'));
+        return view('tenant.tenant_finance_saldo', compact('tunai', 'qris'));
+    }
+
+    public function historyPenarikan(){
+        return view('tenant.tenant_finance_penarikan');
     }
 }

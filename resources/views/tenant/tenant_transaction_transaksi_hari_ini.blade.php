@@ -10,10 +10,10 @@
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.transaction') }}">Transaction</a></li>
-                                <li class="breadcrumb-item active">Semua Transaksi</li>
+                                <li class="breadcrumb-item active">Transaksi Hari Ini</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Semua Transaksi</h4>
+                        <h4 class="page-title">Data Trasaksi Hari Ini</h4>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel All Transaction List</h4>
+                            <h4 class="header-title mb-3">Tabel Transaksi Hari Ini</h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
@@ -46,7 +46,7 @@
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
-                                        @foreach($invoice as $invoice)
+                                        @foreach($transaksiHariIni as $invoice)
                                             <tr>
                                                 <td>
                                                     <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
@@ -71,7 +71,7 @@
                                                 </td>
                                                 <td>
                                                     @if($invoice->status_pembayaran == 0)
-                                                        <span class="badge bg-soft-warning text-warning">Belum Bayar</span>
+                                                        <span class="badge bg-soft-warning text-warning">Pending</span>
                                                     @elseif($invoice->status_pembayaran == 1)
                                                         <span class="badge bg-soft-success text-success">Dibayar</span>
                                                     @endif

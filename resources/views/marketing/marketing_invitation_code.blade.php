@@ -1,4 +1,5 @@
 <x-marketing-layout>
+
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
@@ -7,23 +8,103 @@
                 <div class="col-12">
                     <div class="page-title-box">
                         <div class="page-title-right">
-                            <form class="d-flex align-items-center mb-3">
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control border-0" id="dash-daterange">
-                                    <span class="input-group-text bg-blue border-blue text-white">
-                                    <i class="mdi mdi-calendar-range"></i>
-                                    </span>
-                                </div>
-                                <a href="#" class="btn btn-blue btn-sm ms-2">
-                                <i class="mdi mdi-autorenew"></i>
-                                </a>
-                                <a href="#" class="btn btn-blue btn-sm ms-1">
-                                <i class="mdi mdi-filter-variant"></i>
-                                </a>
-                            </form>
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item"><a href="{{ route('marketing.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Code</li>
+                            </ol>
                         </div>
-                        <h4 class="page-title">Data Invitation Code</h4>
+                        <h4 class="page-title">Dashboard Invitation Code</h4>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 col-xl-3">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/letter.png') }}" class="img-fluid" alt="">
+                                </div>
+                                <div class="col-8">
+                                    <div class="text-end">
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $code }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Kode</p>
+                                        <a href="" class="btn btn-blue btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop" title="Tambah kode baru">
+                                            <i class="mdi mdi-plus"></i>&nbsp;Tambah
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
+                </div>
+                <div class="col-md-3 col-xl-3">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/retailer.png') }}" class="img-fluid" alt="">
+                                </div>
+                                <div class="col-8">
+                                    <div class="text-end">
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $tenantNumber }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Tenant</p>
+                                        <a href="{{ route('tenant.transaction.today') }}" class="btn btn-blue btn-sm ms-2">
+                                            <i class="mdi mdi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
+                </div>
+                <div class="col-md-3 col-xl-3">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/cash-withdrawal.png') }}" class="img-fluid" alt="">
+                                </div>
+                                <div class="col-8">
+                                    <div class="text-end">
+                                        <h4 class="text-dark mt-1">RP.<span data-plugin="counterup">40000</span></h4>
+                                        <p class="text-muted mb-1 text-truncate">Pemasukan Hari Ini</p>
+                                        <a href="{{ route('tenant.transaction.list.pending') }}" class="btn btn-blue btn-sm ms-2">
+                                            <i class="mdi mdi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
+                </div>
+                <div class="col-md-3 col-xl-3">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/money.png') }}" class="img-fluid" alt="">
+                                </div>
+                                <div class="col-8">
+                                    <div class="text-end">
+                                        <h4 class="text-dark mt-1">RP.<span data-plugin="counterup">1000000</span></h4>
+                                        <p class="text-muted mb-1 text-truncate">Total Pemasukan</p>
+                                        <a href="{{ route('tenant.transaction.list.pending.payment') }}" class="btn btn-blue btn-sm ms-2">
+                                            <i class="mdi mdi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
                 </div>
             </div>
             <div class="row">
@@ -59,8 +140,8 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $code->inv_code }}</td>
                                                 <td>{{ $code->holder }}</td>
-                                                <td>{{ $code->created_at }}</td>
-                                                <td>{{ $code->attempt }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($code->created_at)->format('d-m-Y') }}</td>
+                                                <td>{{ $code->tenant->count() }}</td>
                                                 <td>
                                                     @if($code->is_active == 1)
                                                         <span class="badge bg-soft-success text-success">Aktif</span>
@@ -82,9 +163,7 @@
                     </div>
                 </div>
             </div>
-            <!-- end row -->
         </div>
-        <!-- container -->
     </div>
     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -114,4 +193,5 @@
             </div>
         </div>
     </div>
+
 </x-marketing-layout>

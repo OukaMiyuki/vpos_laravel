@@ -1,4 +1,4 @@
-<x-tenant-layout>
+<x-kasir-layout>
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
@@ -8,12 +8,12 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('tenant.transaction') }}">Transaction</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('kasir.transaction') }}">Transaction</a></li>
                                 <li class="breadcrumb-item active">Semua Transaksi</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Semua Transaksi</h4>
+                        <h4 class="page-title">Data Semua Transaksi Kasir</h4>
                     </div>
                 </div>
             </div>
@@ -31,31 +31,24 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel All Transaction List</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="datatable-buttons" class="table table-striped dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th>Action</th>
                                             <th>No.</th>
                                             <th>Invoice</th>
-                                            <th>Kasir</th>
                                             <th>Tanggal Transaksi</th>
                                             <th>Pembayaran</th>
                                             <th>Status Transaksi</th>
                                             <th>Status Pembayaran</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($invoice as $invoice)
                                             <tr>
-                                                <td>
-                                                    <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
-                                                    </a>
-                                                </td>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->kasir->name }}</td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
                                                 <td>{{ $invoice->jenis_pembayaran }}</td>
                                                 <td>
@@ -76,6 +69,11 @@
                                                         <span class="badge bg-soft-success text-success">Dibayar</span>
                                                     @endif
                                                 </td>
+                                                <td>
+                                                    <a href="{{ route('kasir.pos.transaction.invoice', ['id' => $invoice->id ]) }}">
+                                                        <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                    </a>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -89,4 +87,4 @@
         </div>
         <!-- container -->
     </div>
-</x-tenant-layout>
+</x-kasir-layout>

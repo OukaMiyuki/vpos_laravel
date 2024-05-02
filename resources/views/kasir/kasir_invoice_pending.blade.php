@@ -13,7 +13,7 @@
                                 <li class="breadcrumb-item active">Pending</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Pending Transaction</h4>
+                        <h4 class="page-title">Data Pending Transaction (Belum Dirposes)</h4>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Transaction List&nbsp;&nbsp;&nbsp;<a href="{{ route('kasir.pos') }}"><button title="Tambah transaksi baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Transaksi Baru</button></a></h4>
+                            <h4 class="header-title mb-3">Tabel Data Pending Transaction List</h4>
                             <div class="table-responsive">
                                 <table id="datatable-buttons" class="table table-striped dt-responsive nowrap w-100">
                                     <thead>
@@ -50,7 +50,7 @@
                                                 <td>{{ $invoice->nomor_invoice }}</td>
                                                 <td>{{ $invoice->customer->customer_info }}</td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td><span class="badge bg-soft-warning text-warning">Pending</span></td>
+                                                <td><span class="badge bg-soft-danger text-danger">Belum Diproses</span></td>
                                                 <td>
                                                     <a href="{{ route('kasir.transaction.pending.restore', ['id' => $invoice->id ]) }}">
                                                         <button title="Restore transaction" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;

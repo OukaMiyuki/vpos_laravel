@@ -34,9 +34,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-primary border-primary border shadow">
-                                        <i class="mdi mdi-account-tie-voice font-22 avatar-title text-white"></i>
-                                    </div>
+                                    <img src="{{ asset('assets/images/icons/today-transaction.png') }}" class="img-fluid" alt="">
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
@@ -59,9 +57,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-success border-success border shadow">
-                                        <i class="mdi mdi-qrcode font-22 avatar-title text-white"></i>
-                                    </div>
+                                    <img src="{{ asset('assets/images/icons/transaction-finish.png') }}" class="img-fluid" alt="">
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
@@ -84,9 +80,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-info border-info border shadow">
-                                        <i class="mdi mdi-account-cash-outline font-22 avatar-title text-white"></i>
-                                    </div>
+                                    <img src="{{ asset('assets/images/icons/transaction-data.png') }}" class="img-fluid" alt="">
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
@@ -111,9 +105,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-success border-success border shadow">
-                                        <i class="mdi mdi-cash font-22 avatar-title text-white"></i>
-                                    </div>
+                                    <img src="{{ asset('assets/images/icons/salary.png') }}" class="img-fluid" alt="">
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
@@ -136,9 +128,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-3">
-                                    <div class="avatar-lg rounded-circle bg-danger border-danger border shadow">
-                                        <i class="mdi mdi-cash-multiple font-22 avatar-title text-white"></i>
-                                    </div>
+                                    <img src="{{ asset('assets/images/icons/balance-sheet.png') }}" class="img-fluid" alt="">
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">

@@ -144,10 +144,20 @@
                     <li>
                         <a href="#transaction" data-bs-toggle="collapse">
                             <i class="mdi mdi-folder-open"></i>
-                            <span> Transaction </span>
+                            <span> Transaksi </span>
                             <span class="menu-arrow"></span>
                         </a>
                         <div class="collapse" id="transaction">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('kasir.transaction') }}">Dashboard Transaksi</a>
+                                </li>
+                            </ul>
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('kasir.transaction.list') }}">Semua Transaksi</a>
+                                </li>
+                            </ul>
                             <ul class="nav-second-level">
                                 <li>
                                     <a href="{{ route('kasir.transaction.pending') }}">Transaction Pending</a>
@@ -229,7 +239,16 @@
                         <div class="collapse" id="marketing">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="{{ route('marketing.dashboard.invitationcode.list') }}">Invitation Code List</a>
+                                    <a href="{{ route('marketing.dashboard.invitationcode') }}">Dashboard Code</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('marketing.dashboard.tenant.list') }}">Data Tenant</a>
+                                </li>
+                                <li>
+                                    <a href="#">Pemasukan Hari Ini</a>
+                                </li>
+                                <li>
+                                    <a href="#">Data Pemasukan</a>
                                 </li>
                             </ul>
                         </div>
@@ -243,7 +262,7 @@
                         <div class="collapse" id="sidebarCrm">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="{{ route('marketing.dashboard.tenant.list') }}">Tenant List</a>
+                                    <a href="#">Tenant List</a>
                                 </li>
                                 <li>
                                     <a href="#">Data Penarikan</a>
@@ -348,6 +367,9 @@
                         <div class="collapse" id="harga">
                             <ul class="nav-second-level">
                                 <li>
+                                    <a href="{{ route('tenant.store.management') }}">Store Menu</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('tenant.discount.modify') }}">Pengaturan Diskon</a>
                                 </li>
                                 <li>
@@ -369,19 +391,16 @@
                         <div class="collapse" id="finance">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="{{ route('tenant.saldo') }}">Dashboard Finansial</a>
+                                    <a href="{{ route('tenant.finance') }}">Dashboard Finansial</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('tenant.saldo') }}">Pemasukan</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
+                                    <a href="{{ route('tenant.finance.pemasukan') }}">Pemasukan</a>
                                 </li>
                                 <li>
                                     <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
                                 </li>
                                 <li>
-                                    <a href="#">History Penarikan</a>
+                                    <a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan</a>
                                 </li>
                             </ul>
                         </div>
