@@ -60,6 +60,10 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
 
 Route::middleware(['guest:marketing', 'throttle'])->prefix('marketing')->group( function () {
     Route::get('login', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'create'])->name('marketing.login');
+    // Route::get('otp', function () {
+    //     return view('marketing.auth.otp');
+    // });
+    Route::post('login', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'store']);
     Route::post('login', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'store']);
     Route::get('register', [App\Http\Controllers\Auth\Marketing\RegisterController::class, 'create'])->name('marketing.register');
     Route::post('register', [App\Http\Controllers\Auth\Marketing\RegisterController::class, 'store']);
@@ -68,11 +72,14 @@ Route::middleware(['guest:marketing', 'throttle'])->prefix('marketing')->group( 
 
 Route::middleware(['auth:marketing', 'throttle'])->prefix('marketing')->group( function () {
     Route::get('/verify-email', [App\Http\Controllers\Auth\Marketing\EmailVerificationPromptController::class, 'emailVerificationView'])->name('marketing.verification.notice');
-    Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Marketing\VerifyEmailController::class, 'verificationProcess'])
-                ->middleware(['signed', 'throttle:6,1'])
+    // Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Marketing\VerifyEmailController::class, 'verificationProcess'])
+    //             ->middleware(['signed', 'throttle:6,1'])
+    //             ->name('marketing.verification.verify');
+    Route::post('verify-email', [App\Http\Controllers\Auth\Marketing\VerifyEmailController::class, 'processVerification'])
+      
                 ->name('marketing.verification.verify');
     Route::post('email/verification-notification', [App\Http\Controllers\Auth\Marketing\EmailVerificationNotificationController::class, 'store'])
-                ->middleware('throttle:6,1')
+          
                 ->name('marketing.verification.send');
 
     Route::post('logout', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'destroy'])->name('marketing.logout');

@@ -10,9 +10,11 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\URL;
+use Ichtrojan\Otp\Otp;
 
 class EmailVerificationNotification extends Notification {
     use Queueable;
+    private $otp;
 
     public static $createUrlCallback;
     public static $toMailCallback;
@@ -34,20 +36,22 @@ class EmailVerificationNotification extends Notification {
      * Get the mail representation of the notification.
      */
     public function toMail($notifiable) {
+        $otp = (new Otp)->generate($notifiable->email, 'numeric', 6, 60);
         $verificationUrl = $this->verificationUrl($notifiable);
 
         if (static::$toMailCallback) {
             return call_user_func(static::$toMailCallback, $notifiable, $verificationUrl);
         }
 
-        return $this->buildMailMessage($verificationUrl);
+        return $this->buildMailMessage($verificationUrl, $otp);
     }
 
-    protected function buildMailMessage($url) {
+    protected function buildMailMessage($url, $otp) {
         return (new MailMessage)
-            ->subject(Lang::get('Verify Email Addressssss Marketing'))
-            ->line(Lang::get('Please click the TINBUT below to verify your email address.'))
-            ->action(Lang::get('Verify Email Address'), $url)
+            ->subject(Lang::get('Verify Email Addres Marketing'))
+            ->line(Lang::get('Terima Kasih Sudah mendaftar! Harap masukkan kode OTP Berikut untuk memverifikasi akun anda!'))
+            ->line('Kode OTP Akun : '.$otp->token)
+            // ->action(Lang::get('Verify Email Address'), $url)
             ->line(Lang::get('If you did not create an account, no further action is required.'));
     }
 

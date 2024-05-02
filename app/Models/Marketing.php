@@ -27,9 +27,9 @@ class Marketing extends Authenticatable implements MustVerifyEmail {
     ];
 
     protected $hidden = [
-        'email',
+        // 'email',
         'password',
-        'email_verified_at',
+        // 'email_verified_at',
         'remember_token',
         'is_active',
         'created_at',
@@ -37,7 +37,7 @@ class Marketing extends Authenticatable implements MustVerifyEmail {
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        // 'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 

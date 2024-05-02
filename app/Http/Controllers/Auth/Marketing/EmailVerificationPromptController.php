@@ -10,8 +10,11 @@ use Illuminate\View\View;
 
 class EmailVerificationPromptController extends Controller {
     public function emailVerificationView(Request $request): RedirectResponse|View {
+        // return $request->user()->hasVerifiedEmail()
+        //             ? redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD)
+        //             : view('marketing.auth.verify-email');
         return $request->user()->hasVerifiedEmail()
-                    ? redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD)
-                    : view('marketing.auth.verify-email');
+                        ? redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD)
+                        : view('marketing.auth.otp');
     }
 }
