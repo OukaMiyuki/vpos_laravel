@@ -265,7 +265,7 @@ class ProfileController extends Controller{
                     'file' => $fileSave
                 ];
                  
-                Mail::to('amarwibianto@gmail.com')->send(new SendUmiEmail($mailData));
+                Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData));
                    
                 //dd("Email is sent successfully.");
                 $notification = array(

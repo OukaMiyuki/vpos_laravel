@@ -7,10 +7,11 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Models\Product;
-use App\MOdels\StoreDetail;
+use App\Models\StoreDetail;
 use App\Models\ProductStock;
 use App\Models\ShoppingCart;
 use App\Models\Invoice;
+use App\Models\InvoiceField;
 use App\Models\Discount;
 use App\Models\Tax;
 use App\Models\TenantField;
@@ -817,12 +818,16 @@ class KasirController extends Controller {
     public function transactionDetail($id) : JsonResponse {
         $invoice = "";
         $storeDetail = "";
+        $alias = "";
         try {
             $invoice = Invoice::with(['shoppingCart' => function($query){
                                 $query->with('product')->get();
                             }
                         ])->findOrFail($id);
             $storeDetail = StoreDetail::where('id_tenant', auth()->user()->id_tenant)->firstOrFail();
+            $alias = InvoiceField::where('id_kasir', auth()->user()->id)
+                                    ->where('id_invoice', $id)
+                                    ->first();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -835,6 +840,7 @@ class KasirController extends Controller {
         return response()->json([
             'message' => 'Fetch Success',
             'transaction-data' => $invoice,
+            'data-alias' => $alias,
             'store-detail' => $storeDetail
         ]);
     }

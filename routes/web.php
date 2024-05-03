@@ -58,11 +58,12 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::post('dashboard/data/marketing/account_info_update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountInfoUpdate'])->name('admin.dashboard.marketing.info.update');
 });
 
+// Route::get('otp', function () {
+//     return view('marketing.auth.otp');
+// });
+
 Route::middleware(['guest:marketing', 'throttle'])->prefix('marketing')->group( function () {
     Route::get('login', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'create'])->name('marketing.login');
-    // Route::get('otp', function () {
-    //     return view('marketing.auth.otp');
-    // });
     Route::post('login', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'store']);
     Route::post('login', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'store']);
     Route::get('register', [App\Http\Controllers\Auth\Marketing\RegisterController::class, 'create'])->name('marketing.register');
@@ -76,10 +77,10 @@ Route::middleware(['auth:marketing', 'throttle'])->prefix('marketing')->group( f
     //             ->middleware(['signed', 'throttle:6,1'])
     //             ->name('marketing.verification.verify');
     Route::post('verify-email', [App\Http\Controllers\Auth\Marketing\VerifyEmailController::class, 'processVerification'])
-      
+                ->middleware(['throttle:6,1'])
                 ->name('marketing.verification.verify');
     Route::post('email/verification-notification', [App\Http\Controllers\Auth\Marketing\EmailVerificationNotificationController::class, 'store'])
-          
+                ->middleware(['throttle:6,1'])
                 ->name('marketing.verification.send');
 
     Route::post('logout', [App\Http\Controllers\Auth\Marketing\LoginController::class, 'destroy'])->name('marketing.logout');
@@ -87,6 +88,8 @@ Route::middleware(['auth:marketing', 'throttle'])->prefix('marketing')->group( f
 
 Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'isMarketingActive'])->prefix('marketing')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'index'])->name('marketing.dashboard');
+
+    Route::get('/testing-wa', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'whatsappNotification'])->name('testing.wa');
 
     Route::get('settings', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'marketingSettings'])->name('marketing.settings');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profile'])->name('marketing.profile');
@@ -116,9 +119,12 @@ Route::middleware(['guest:tenant', 'throttle'])->prefix('tenant')->group( functi
 
 Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( function () {
     Route::get('/verify-email', [App\Http\Controllers\Auth\Tenant\EmailVerificationPromptController::class, 'emailVerificationView'])->name('tenant.verification.notice');
-    Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Tenant\VerifyEmailController::class, 'verificationProcess'])
-                ->middleware(['signed', 'throttle:6,1'])
-                ->name('tenant.verification.verify');
+    // Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Auth\Tenant\VerifyEmailController::class, 'verificationProcess'])
+    //             ->middleware(['signed', 'throttle:6,1'])
+    //             ->name('tenant.verification.verify');
+    Route::post('verify-email', [App\Http\Controllers\Auth\Tenant\VerifyEmailController::class, 'processVerification'])
+                    ->middleware(['throttle:6,1'])
+                    ->name('tenant.verification.verify');
     Route::post('email/verification-notification', [App\Http\Controllers\Auth\Tenant\EmailVerificationNotificationController::class, 'store'])
                 ->middleware('throttle:6,1')
                 ->name('tenant.verification.send');

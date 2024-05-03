@@ -27,12 +27,12 @@
                                 {{ auth()->user()->name }}
                             </h4>
                             <p class="text-muted">
-                                Marketing
+                                Mitra Aplikasi
                             </p>
                             @if(auth()->user()->is_active == 1)
                                 <button type="button" class="btn btn-success btn-xs waves-effect mb-2 waves-light">Aktif</button>
                             @else 
-                                <button type="button" class="btn btn-danger btn-xs waves-effect mb-2 waves-light">Tidak Aktif</button>
+                                <button type="button" class="btn btn-warning btn-xs waves-effect mb-2 waves-light">Belum Diaktifkan</button>
                             @endif
                             <div class="text-start mt-3">
                                 <p class="text-muted mb-2 font-13"><strong>Mobile :</strong><span class="ms-2">{{ auth()->user()->phone }}</span></p>

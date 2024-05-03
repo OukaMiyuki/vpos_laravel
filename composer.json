@@ -28,7 +28,8 @@
         "pusher/pusher-php-server": "^7.2",
         "rawilk/laravel-printing": "^3.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
-        "staudenmeir/eloquent-has-many-deep": "1.18"
+        "staudenmeir/eloquent-has-many-deep": "1.18",
+        "twilio/sdk": "^8.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

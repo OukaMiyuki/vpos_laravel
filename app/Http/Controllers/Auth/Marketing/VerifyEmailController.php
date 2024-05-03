@@ -37,17 +37,13 @@ class VerifyEmailController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             } else {
-                // event(new Verified(auth()->user()));
-                // return redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD);
-                // return auth()->user()->email;
                 $user = Marketing::where('email', auth()->user()->email)->first();
                 $user->markEmailAsVerified();
-                // return $user;
-                return redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD);
-                // $user->update([
-                //     'email_verified_at' => now()
-                // ]);
-                // return redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD);
+                $notification = array(
+                    'message' => 'Verifikasi OTP Email Berhasil!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD)->with($notification);
             }
         }
     }
