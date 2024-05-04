@@ -243,7 +243,7 @@ class AuthController extends Controller {
                 'status' => 200
             ]);
         } else {
-            $kode = (int) $request->otp;
+            $kode = (int) $request->kode_otp;
             $otp = (new Otp)->validate(auth()->user()->phone, $kode);
             if(!$otp->status){
                 return response()->json([
@@ -258,7 +258,7 @@ class AuthController extends Controller {
                 return response()->json([
                     'message' => 'Verifikasi OTP Whatsapp Berhasil!',
                     'data' => array(
-                        'sup_email_verification' => auth()->user()->email_verified_at,
+                        'sup_phone_verification' => auth()->user()->phone_number_verified_at,
                     ),
                     'status' => 200
                 ]);
