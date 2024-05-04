@@ -89,12 +89,17 @@ Route::middleware(['auth:marketing', 'throttle'])->prefix('marketing')->group( f
 Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'isMarketingActive'])->prefix('marketing')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'index'])->name('marketing.dashboard');
 
-    Route::get('/testing-wa', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'whatsappNotification'])->name('testing.wa');
+    //Route::get('/testing-wa', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'whatsappNotification'])->name('testing.wa');
 
+    //Route::get('/testing-wa', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappNotification'])->name('testing.wa');
+
+    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappNotification'])->name('marketing.settings.whatsappotp');
+    Route::post('settings/validate/whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappOTPSubmit'])->name('marketing.settings.whatsappotp.validate');
     Route::get('settings', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'marketingSettings'])->name('marketing.settings');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profile'])->name('marketing.profile');
-    Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profileAccountUpdate'])->name('marketing.profile.account.update');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profileInfoUpdate'])->name('marketing.profile.info.update');
+    Route::get('settings/rekening', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'rekeingSetting'])->name('marketing.rekening.setting');
+    Route::post('settings/rekening', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'rekeingSettingUpdate'])->name('marketing.rekening.setting.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'password'])->name('marketing.password');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'passwordUpdate'])->name('marketing.password.update');
 
@@ -133,11 +138,11 @@ Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( functio
 });
 
 Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive'])->prefix('tenant')->group( function () {
-    Route::get('check-payment', function () { event(new App\Events\PaymentCheck('Someone')); return "Event has been sent!";});
-    Route::get('test', function () {
-        event(new App\Events\PaymentCheck('Someone'));
-        return "Event has been sent!";
-        });
+    // Route::get('check-payment', function () { event(new App\Events\PaymentCheck('Someone')); return "Event has been sent!";});
+    // Route::get('test', function () {
+    //     event(new App\Events\PaymentCheck('Someone'));
+    //     return "Event has been sent!";
+    //     });
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'index'])->name('tenant.dashboard');
     Route::get('/dashboard/kasir', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantKasirDashboard'])->name('tenant.kasir');
     Route::get('/dashboard/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');

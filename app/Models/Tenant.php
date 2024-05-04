@@ -22,6 +22,7 @@ use App\Models\TenantField;
 use App\Models\TunaiWallet;
 use App\Models\QrisWallet;
 use App\Models\UmiRequest;
+use App\Models\RekeningTenant;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -100,7 +101,11 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
     }
 
     public function saldoQris(){
-        return $this->hasOne(QrisWallet::class, 'id_user', 'id');
+        return $this->hasOne(QrisWallet::class, 'id_tenant', 'id');
+    }
+
+    public function rekening(){
+        return $this->hasOne(RekeningTenant::class, 'id_tenant', 'id');
     }
 
     public function sendEmailVerificationNotification() {
@@ -143,9 +148,12 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
     public function createWallet($model){
         $tunaiWallet = new TunaiWallet();
         $qrisWallet = new QrisWallet();
+        $rekeningTenant = new RekeningTenant();
         $tunaiWallet->id_tenant = $model->id;
         $tunaiWallet->save();
         $qrisWallet->id_tenant = $model->id;
         $qrisWallet->save();
+        $rekeningTenant->id_tenant = $model->id;
+        $rekeningTenant->save();
     }
 }

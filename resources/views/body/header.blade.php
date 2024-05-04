@@ -198,7 +198,7 @@
                         </a>
                     @endauth
                     @auth('marketing')
-                        <a href="" class="dropdown-item notify-item">
+                        <a href="{{ route('marketing.rekening.setting') }}" class="dropdown-item notify-item">
                             <i class="mdi mdi-credit-card-outline"></i>
                             <span>Rekening</span>
                         </a>

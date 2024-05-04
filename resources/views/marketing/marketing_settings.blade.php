@@ -49,7 +49,7 @@
                                         </div>
                                     </div>
                                     <div class="row mt-3">
-                                        <a href=""><button title="Pengaturan rekening bank" type="button" class="btn btn-info waves-effect waves-light">Setting</button></a>
+                                        <a href="{{ route('marketing.rekening.setting') }}"><button title="Pengaturan rekening bank" type="button" class="btn btn-info waves-effect waves-light">Setting</button></a>
                                     </div>
                                 </div>
                             </div>

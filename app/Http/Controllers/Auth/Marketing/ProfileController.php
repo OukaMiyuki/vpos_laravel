@@ -6,10 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use GuzzleHttp\Client as GuzzleHttpClient;
+use Ichtrojan\Otp\Otp;
+use Twilio\Rest\Client;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Marketing;
 use App\Models\DetailMarketing;
+use App\Models\RekeningMarketing;
 
 class ProfileController extends Controller {
     public function marketingSettings(){
@@ -38,6 +42,7 @@ class ProfileController extends Controller {
 
     public function profileInfoUpdate(Request $request){
         $profileInfo = DetailMarketing::find(auth()->user()->detail->id);
+        $accountInfo = Marketing::find(auth()->user()->id);
 
         if($request->hasFile('photo')){
             $file = $request->file('photo');
@@ -67,6 +72,10 @@ class ProfileController extends Controller {
                 'updated_at' => Carbon::now()
             ]);
 
+            $accountInfo->update([
+                'name' => $request->name
+            ]);
+
             $notification = array(
                 'message' => 'Data akun berhasil diupdate!',
                 'alert-type' => 'success',
@@ -83,6 +92,10 @@ class ProfileController extends Controller {
                 'updated_at' => Carbon::now()
             ]);
 
+            $accountInfo->update([
+                'name' => $request->name
+            ]);
+
             $notification = array(
                 'message' => 'Data akun berhasil diupdate!',
                 'alert-type' => 'success',
@@ -97,26 +110,199 @@ class ProfileController extends Controller {
 
     public function passwordUpdate(Request $request){
         $request->validate([
+            'otp' => 'required',
             'old_password' => 'required',
             'new_password' => 'required|confirmed',
         ]);
 
-        if(!Hash::check($request->old_password, auth::user()->password)){
+        $otp = (new Otp)->validate(auth()->user()->phone, $request->otp);
+        if(!$otp->status){
             $notification = array(
-                'message' => 'Password lama tidak sesuai!',
+                'message' => 'OTP salah atau tidak sesuai!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            if(!Hash::check($request->old_password, auth::user()->password)){
+                $notification = array(
+                    'message' => 'Password lama tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            }
+    
+            Marketing::whereId(auth()->user()->id)->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+    
+            $notification = array(
+                'message' => 'Password berhasil diperbarui!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        }
+    } 
+
+    public function whatsappNotificationTwilio(Request $request){
+        $sid    = getenv("TWILIO_AUTH_SID");
+        $token  = getenv("TWILIO_AUTH_TOKEN");
+        $wa_from= getenv("TWILIO_WHATSAPP_FROM");
+        $twilio = new Client($sid, $token);
+        $resultMessage = "";
+        $result = ['success' => false, 'data' => [], 'message' => ''];
+        $nohp = auth()->user()->phone;
+        $hp = "";
+        if(!preg_match("/[^+0-9]/",trim($nohp))){
+            if(substr(trim($nohp), 0, 2)=="62"){
+                $hp    =trim($nohp);
+            }
+            else if(substr(trim($nohp), 0, 1)=="0"){
+                $hp    ="62".substr(trim($nohp), 1);
+            }
+        }
+        
+        $otp = (new Otp)->generate(auth()->user()->phone, 'numeric', 6, 5);
+        $body = "Berikut adalah kode OTP untuk akun VIsioner POS anda : "."*".$otp->token."*";
+        try {
+            $resultMessage = $twilio->messages->create("whatsapp:$hp",["from" => "whatsapp:$wa_from", "body" => $body]);
+            $result['data'] = $resultMessage->toArray();
+            if(!empty($result['data']['errorCode'])) {
+                throw new Exception('Send SMS request failed');
+            }
+            $result['success'] = true;
+            $result['message'] = 'SMS request success';
+        } catch(Exception $ex){
+            $result['success'] = false;
+            $result['message'] = $ex->getMessage();
+        }
+        if($result['success']){
+            $notification = array(
+                'message' => 'OTP Sukses dikirim!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            $notification = array(
+                'message' => 'OTP Gagal dikirim!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
+    public function whatsappNotification(Request $request){
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $nohp = auth()->user()->phone;
+        $hp = "";
+        $postResponse = "";
+        $otp = (new Otp)->generate(auth()->user()->phone, 'numeric', 6, 5);
+        $body = "Berikut adalah kode OTP untuk akun Visioner POS anda : "."*".$otp->token."*"."\n\n\n"."*Harap berhati hati, jangan membagikan kode OTP pada pihak manapun!, Admin dan Tim dari Visioner POS tidak akan pernah meminta OTP kepada User!*";
+        if(!preg_match("/[^+0-9]/",trim($nohp))){
+            if(substr(trim($nohp), 0, 2)=="62"){
+                $hp    =trim($nohp);
+            }
+            else if(substr(trim($nohp), 0, 1)=="0"){
+                $hp    ="62".substr(trim($nohp), 1);
+            }
+        }
+        $url = 'https://whatzapp.my.id/send-message';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            'api_key' => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            'message' => $body
+        ];
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            return $ex;
+        }
+        $responseCode = $postResponse->getStatusCode();
+        
+        if($responseCode == 200){
+            $notification = array(
+                'message' => 'OTP Sukses dikirim!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            $notification = array(
+                'message' => 'OTP Gagal dikirim!',
                 'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
         }
 
-        Marketing::whereId(auth()->user()->id)->update([
-            'password' => Hash::make($request->new_password),
-        ]);
+    }
 
-        $notification = array(
-            'message' => 'Password berhasil diperbarui!',
-            'alert-type' => 'success',
-        );
-        return redirect()->back()->with($notification);
-    } 
+    public function whatsappOTPSubmit(Request $request){
+        if(!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "") {
+            return redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD);
+        } else {
+            $kode = (int) $request->otp;
+            $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+            if(!$otp->status){
+                $notification = array(
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $user = Marketing::find(auth()->user()->id);
+                $user->update([
+                    'phone_number_verified_at' => now()
+                ]);
+                $notification = array(
+                    'message' => 'Nomor anda telah diverifikasi!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            }
+        }
+    }
+    public function rekeingSetting(){
+        $rekening = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
+        $client = new GuzzleHttpClient();
+        $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
+        $postResponse = $client->request('POST',  $url);
+        $responseCode = $postResponse->getStatusCode();
+        $data = json_decode($postResponse->getBody());
+        $dataBankList = $data->bankSwiftList;
+        return view('marketing.marketing_rekening_setting', compact('rekening', 'dataBankList'));
+    }
+
+    public function rekeingSettingUpdate(Request $request){
+        $kode = (int) $request->otp;
+        $swift_code = $request->swift_code;
+        $rekening = $request->no_rekening;
+
+        $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+        if(!$otp->status){
+            $notification = array(
+                'message' => 'OTP salah atau tidak sesuai!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            $rekeningAkun = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
+            $rekeningAkun->update([
+                'no_rekening' => $rekening,
+                'swift_code' => $swift_code,
+                'is_confirmed' => 1
+            ]);
+            $notification = array(
+                'message' => 'Update nomor rekening berhasil!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
 }
