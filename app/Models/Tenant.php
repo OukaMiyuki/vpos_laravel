@@ -33,6 +33,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         'name',
         'email',
         'phone',
+        'phone_number_verified_at',
         'password',
         'id_inv_code'
     ];

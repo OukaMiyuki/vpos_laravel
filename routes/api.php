@@ -54,6 +54,12 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throt
 // });
 
 Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:90,1', 'custom.restrict'])->prefix('tenant')->group(function () {
+    Route::post('/send-mail-otp', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'sendMailOTP']);
+    Route::post('/verify-email-otp', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'verifyMailOTP']);
+
+    Route::post('/send-whatsapp-otp', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'sendWhatsappOTP']);
+    Route::post('/verify-whatsapp-otp', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'verifyWhatsappOTP']);
+
     Route::post('/user/detail', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userDetail']);
     Route::post('/user/update', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userUpdate']);
     Route::post('/user/update-store', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userUpdateStore']);

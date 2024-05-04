@@ -198,7 +198,7 @@ class ProfileController extends Controller {
         $hp = "";
         $postResponse = "";
         $otp = (new Otp)->generate(auth()->user()->phone, 'numeric', 6, 5);
-        $body = "Berikut adalah kode OTP untuk akun Visioner POS anda : "."*".$otp->token."*"."\n\n\n"."*Harap berhati hati, jangan membagikan kode OTP pada pihak manapun!, Admin dan Tim dari Visioner POS tidak akan pernah meminta OTP kepada User!*";
+        $body = "Berikut adalah kode OTP untuk akun Visioner POS anda : "."*".$otp->token."*"."\n\n\n"."*Harap berhati-hati dan jangan membagikan kode OTP pada pihak manapun!, Admin dan Tim dari Visioner POS tidak akan pernah meminta OTP kepada User!*";
         if(!preg_match("/[^+0-9]/",trim($nohp))){
             if(substr(trim($nohp), 0, 2)=="62"){
                 $hp    =trim($nohp);

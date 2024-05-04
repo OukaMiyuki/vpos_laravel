@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
+use Ichtrojan\Otp\Otp;
+use GuzzleHttp\Client as GuzzleHttpClient;
 use Exception;
 
 class AuthController extends Controller {
@@ -88,6 +90,8 @@ class AuthController extends Controller {
                 'sup_user_name'         => $tenant->name,
                 'sup_user_referal_code' => $invitationcodeid->id,
                 'sup_user_email'        => $request->email,
+                'sup_email_verification' => $tenant->email_verified_at,
+                'sup_phone_verification' => $tenant->phone_number_verified_at,
                 'sup_user_token'        => $token,
             ),
         ]);
@@ -117,12 +121,149 @@ class AuthController extends Controller {
                 'sup_user_referal_code' => $tenant->id_inv_code,
                 'sup_user_company'      => null,
                 'sup_user_email'        => $tenant->email,
+                'sup_email_verification' => $tenant->email_verified_at,
+                'sup_phone_verification' => $tenant->phone_number_verified_at,
                 'sup_user_type'         => 'owner',
                 'sup_user_token'        => $token
             ),
         ]);
 
         //EDIT DISINI
+    }
+
+    public function sendMailOTP(Request $request){
+        try {
+            auth()->user()->sendEmailVerificationNotification();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to send Email!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        return response()->json([
+            'message' => 'Email Sent!',
+            'status' => 200
+        ]);
+    }
+
+    public function verifyMailOTP(Request $request){
+        if(!empty(auth()->user()->email_verified_at) || !is_null(auth()->user()->email_verified_at) || auth()->user()->email_verified_at != NULL || auth()->user()->email_verified_at != "") {
+            return response()->json([
+                'message' => 'Your Email has been verified!',
+                'status' => 200
+            ]);
+        } else {
+            $kode = (int) $request->kode_otp;
+            $otp = (new Otp)->validate(auth()->user()->email, $kode);
+            if(!$otp->status){
+                return response()->json([
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'status' => 200
+                ]);
+            } else {
+                $user = Tenant::where('email', auth()->user()->email)->first();
+                $user->markEmailAsVerified();
+                return response()->json([
+                    'message' => 'Verifikasi OTP Email Berhasil!',
+                    'data' => array(
+                        'sup_email_verification' => auth()->user()->email_verified_at,
+                    ),
+                    'status' => 200
+                ]);
+            }
+        }
+    }
+
+    public function sendWhatsappOTP(Request $request){
+        try {
+            $api_key    = getenv("WHATZAPP_API_KEY");
+            $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+            $client = new GuzzleHttpClient();
+            $nohp = auth()->user()->phone;
+            $hp = "";
+            $postResponse = "";
+            $otp = (new Otp)->generate(auth()->user()->phone, 'numeric', 6, 5);
+            $body = "Berikut adalah kode OTP untuk akun Visioner POS anda : "."*".$otp->token."*"."\n\n\n"."*Harap berhati-hati dan jangan membagikan kode OTP pada pihak manapun!, Admin dan Tim dari Visioner POS tidak akan pernah meminta OTP kepada User!*";
+            if(!preg_match("/[^+0-9]/",trim($nohp))){
+                if(substr(trim($nohp), 0, 2)=="62"){
+                    $hp    =trim($nohp);
+                }
+                else if(substr(trim($nohp), 0, 1)=="0"){
+                    $hp    ="62".substr(trim($nohp), 1);
+                }
+            }
+            $url = 'https://whatzapp.my.id/send-message';
+            $headers = [
+                'Content-Type' => 'application/json',
+            ];
+            $data = [
+                'api_key' => $api_key,
+                'sender' => $sender,
+                'number' => $hp,
+                'message' => $body
+            ];
+            try {
+                $postResponse = $client->post($url, [
+                    'headers' => $headers,
+                    'json' => $data,
+                ]);
+            } catch(Exception $ex){
+                return $ex;
+            }
+            $responseCode = $postResponse->getStatusCode();
+            
+            if($responseCode == 200){
+                return response()->json([
+                    'message' => 'OTP Sent!',
+                    'status' => 200
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'OTP Send Failed!',
+                    'status' => 200
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to send Whatsapp OTP!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+    }
+
+    public function verifyWhatsappOTP(Request $request){
+        if(!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "") {
+            return response()->json([
+                'message' => 'Your Whatsapp Number has been verified!',
+                'status' => 200
+            ]);
+        } else {
+            $kode = (int) $request->otp;
+            $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+            if(!$otp->status){
+                return response()->json([
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'status' => 200
+                ]);
+            } else {
+                $user = Tenant::find(auth()->user()->id);
+                $user->update([
+                    'phone_number_verified_at' => now()
+                ]);
+                return response()->json([
+                    'message' => 'Verifikasi OTP Whatsapp Berhasil!',
+                    'data' => array(
+                        'sup_email_verification' => auth()->user()->email_verified_at,
+                    ),
+                    'status' => 200
+                ]);
+            }
+        }
     }
 
     public function user(){

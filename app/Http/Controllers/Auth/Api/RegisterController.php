@@ -66,6 +66,8 @@ class RegisterController extends Controller {
                 'sup_user_name'         => $tenant->name,
                 'sup_user_referal_code' => $invitationcodeid->id,
                 'sup_user_email'        => $request->email,
+                'sup_email_verification' => $tenant->email_verified_at,
+                'sup_phone_verification' => $tenant->phone_number_verified_at,
                 'sup_user_token'        => $token,
             ),
         ]);

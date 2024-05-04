@@ -52,6 +52,8 @@ class LoginController extends Controller {
                 'sup_user_referal_code' => $tenant->id_inv_code,
                 'sup_user_company'      => null,
                 'sup_user_email'        => $tenant->email,
+                'sup_email_verification' => $tenant->email_verified_at,
+                'sup_phone_verification' => $tenant->phone_number_verified_at,
                 'sup_user_type'         => 'owner',
                 'sup_user_token'        => $token
             ),
