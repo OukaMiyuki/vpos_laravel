@@ -110,5 +110,6 @@
                 }
             @endif 
         </script>
+        <Script type="text/javascript" src="{{ asset('assets/js/pages/getUserLocation.js') }}"></Script>
     </body>
 </html>

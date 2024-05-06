@@ -274,7 +274,8 @@ class AuthController extends Controller {
     public function userDetail(Request $request) : JsonResponse {
         $user = "";
         try {
-            $user = Tenant::with(['detail', 'storeDetail'])
+            $user = Tenant::select(['tenants.id','tenants.name', 'tenants.email as mail', 'tenants.phone'])
+                                ->with(['detail', 'storeDetail'])
                                 ->whereHas('detail', function($q) {
                                     $q->select(
                                         'detail_tenants.id as detail_id',

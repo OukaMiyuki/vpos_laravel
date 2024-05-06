@@ -270,10 +270,6 @@ class ProfileController extends Controller {
         }
     }
     public function rekeningSetting(Request $request){
-        $location = new Location();
-
-        $record = $location->get(request()->getClientIp());
-        return $record;
         // $rekening = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
         //$client = new GuzzleHttpClient();
         // $url = 'https://erp.pt-best.com/api/testing-get-swift-code';

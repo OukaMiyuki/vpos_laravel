@@ -95,6 +95,8 @@
                 </div>
                 <!-- end row-->
                 <div class="row">
+                    {{-- <button onclick="getLocation()">Try It</button>
+                    <p id="demo"></p> --}}
                     <div class="col-xl-6">
                         <div class="card">
                             <div class="card-body">
