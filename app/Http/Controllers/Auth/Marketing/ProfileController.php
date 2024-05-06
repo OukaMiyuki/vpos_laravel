@@ -270,7 +270,7 @@ class ProfileController extends Controller {
         }
     }
     public function rekeningSetting(Request $request){
-        $location = new \Stevebauman\Location\Location();
+        $location = new Location();
 
         $record = $location->get(request()->getClientIp());
         return $record;
