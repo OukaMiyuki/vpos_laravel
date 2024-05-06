@@ -22,6 +22,7 @@
                                 </form>
                             </div>
                             <h4 class="page-title">Dashboard</h4>
+                            <p id="locationData"></p>
                         </div>
                     </div>
                 </div>
