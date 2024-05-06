@@ -284,8 +284,8 @@ class ProfileController extends Controller {
         // Extract user information
         $location = $data->loc;
         $country = $data->country;
-        $currency = $data->currency;
-        return $location;
+        //$currency = $data->currency;
+        return $data;
         //return view('marketing.marketing_rekening_setting', compact('rekening', 'dataBankList'));
     }
 
