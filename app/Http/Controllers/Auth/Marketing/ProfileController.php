@@ -233,13 +233,13 @@ class ProfileController extends Controller {
                 'message' => 'OTP Sukses dikirim!',
                 'alert-type' => 'success',
             );
-            return redirect()->back()->with($notification);
+            return redirect()->route('marketing.profile')->with($notification);
         } else {
             $notification = array(
                 'message' => 'OTP Gagal dikirim!',
                 'alert-type' => 'error',
             );
-            return route('marketing.profile')->with($notification);
+            return redirect()->route('marketing.profile')->with($notification);
         }
 
     }
