@@ -272,7 +272,7 @@ class ProfileController extends Controller {
     public function rekeningSetting(Request $request){
         $ip = $request->ip();
         $currentUserInfo = Location::get($ip);
-        return $ip;
+        return $currentUserInfo;
         $rekening = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
         $client = new GuzzleHttpClient();
         $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
