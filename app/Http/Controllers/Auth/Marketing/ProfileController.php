@@ -239,7 +239,7 @@ class ProfileController extends Controller {
                 'message' => 'OTP Gagal dikirim!',
                 'alert-type' => 'error',
             );
-            return redirect()->route('tenant.profile')->with($notification);
+            return route('marketing.profile')->with($notification);
         }
 
     }
