@@ -17,6 +17,12 @@
         <link href="{{ asset('assets/libs/fullcalendar/main.min.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
+        {{-- Custom Form --}}
+        <link href="{{ asset('assets/libs/mohithg-switchery/switchery.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/multiselect/css/multi-select.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- Bootstrap css -->
         <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- App css -->
@@ -83,6 +89,17 @@
         <script src="{{ asset('assets/js/pages/datatables.init.js') }}"></script>
         <script src="{{ asset('assets/libs/moment/min/moment.min.js') }}"></script>
         <script src="{{ asset('assets/libs/fullcalendar/main.min.js') }}"></script>
+
+        {{-- Custom Form --}}
+        <script src="{{ asset('assets/libs/selectize/js/standalone/selectize.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/mohithg-switchery/switchery.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/multiselect/js/jquery.multi-select.js') }}"></script>
+        <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/jquery-mockjax/jquery.mockjax.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/devbridge-autocomplete/jquery.autocomplete.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
+
         {{-- <script src="{{ asset('assets/js/pages/calendar.init.js') }}"></script> --}}
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
         {{-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script> --}}
@@ -110,6 +127,7 @@
                 }
             @endif 
         </script>
+        <script src="{{ asset('assets/js/pages/form-advanced.init.js') }}"></script>
         <Script type="text/javascript" src="{{ asset('assets/js/pages/getUserLocation.js') }}"></Script>
     </body>
 </html>

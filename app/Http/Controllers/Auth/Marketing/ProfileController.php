@@ -233,13 +233,13 @@ class ProfileController extends Controller {
                 'message' => 'OTP Sukses dikirim!',
                 'alert-type' => 'success',
             );
-            return redirect()->route('marketing.profile')->with($notification);
+            return redirect()->back()->with($notification);
         } else {
             $notification = array(
                 'message' => 'OTP Gagal dikirim!',
                 'alert-type' => 'error',
             );
-            return redirect()->route('marketing.profile')->with($notification);
+            return redirect()->back()->with($notification);
         }
 
     }
@@ -270,14 +270,37 @@ class ProfileController extends Controller {
         }
     }
     public function rekeningSetting(Request $request){
-        // $rekening = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
-        //$client = new GuzzleHttpClient();
-        // $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
-        // $postResponse = $client->request('POST',  $url);
-        // $responseCode = $postResponse->getStatusCode();
-        // $data = json_decode($postResponse->getBody());
-        // $dataBankList = $data->bankSwiftList;
-        //return view('marketing.marketing_rekening_setting', compact('rekening', 'dataBankList'));
+        $rekening = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
+        if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
+            // $rekClient = new GuzzleHttpClient();
+            // $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
+            // try {
+            //     $rekClient = $client->request('POST',  $urlRek, [
+            //         'form_params' => [
+            //             'latitude' => $model->nominal_bayar,
+            //             'longitude' => $generate_nomor_invoice,
+            //             'bankCode' => "VP",
+            //             'accountNo' => 
+            //             'secret_key' => "Vpos71237577"
+            //         ]
+            //     ]);
+            //     $responseCode = $postResponse->getStatusCode();
+            //     $data = json_decode($postResponse->getBody());
+            //     $model->qris_data = $data->data->data->qrisData;
+            // } catch (Exception $e) {
+            //     return $e;
+            //     exit;
+            // }
+            $clientIP = \Request::getClientIp(true);
+            return \Request::ip();
+        }
+        $client = new GuzzleHttpClient();
+        $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
+        $postResponse = $client->request('POST',  $url);
+        $responseCode = $postResponse->getStatusCode();
+        $data = json_decode($postResponse->getBody());
+        $dataBankList = $data->bankSwiftList;
+        return view('marketing.marketing_rekening_setting', compact('rekening', 'dataBankList'));
     }
 
     public function rekeningSettingUpdate(Request $request){

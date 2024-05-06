@@ -1,4 +1,4 @@
-<x-tenant-layout>
+<x-marketing-layout>
 
     <div class="content">
         <!-- Start Content-->
@@ -20,6 +20,7 @@
             </div>
             <!-- end page title -->
             <div class="row">
+                {{-- <strong><p class="sub-header" id="locationData"></p></strong> --}}
                 <div class="col-lg-7 col-xl-7">
                     <div class="card">
                         <div class="card-body">
@@ -66,6 +67,8 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <input readonly type="hidden" class="d-none" name="long" id="long" required value="">
+                                        <input readonly type="hidden" class="d-none" name="lat" id="lat" required value="">
                                     </form>
                                     <form action="{{ route('marketing.settings.whatsappotp') }}" method="POST" id="sendOtp">@csrf</form>
                                     <div class="text-end">
@@ -122,4 +125,4 @@
         <!-- container -->
     </div>
 
-</x-tenant-layout>
+</x-marketing-layout>
