@@ -93,6 +93,8 @@ Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'isMa
 
     //Route::get('/testing-wa', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappNotification'])->name('testing.wa');
 
+    Route::get('ip-testing', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'ipTesting']);
+
     Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappNotification'])->name('marketing.settings.whatsappotp');
     Route::post('settings/validate/whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappOTPSubmit'])->name('marketing.settings.whatsappotp.validate');
     Route::get('settings', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'marketingSettings'])->name('marketing.settings');

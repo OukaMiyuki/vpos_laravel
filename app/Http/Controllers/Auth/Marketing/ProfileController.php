@@ -329,4 +329,9 @@ class ProfileController extends Controller {
             return redirect()->back()->with($notification);
         }
     }
+
+    public function ipTesting(){
+        $clientIP = \Request::getClientIp(true);
+        return \Request::ip();
+    }
 }
