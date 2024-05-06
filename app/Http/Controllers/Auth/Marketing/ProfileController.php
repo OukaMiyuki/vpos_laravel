@@ -270,22 +270,17 @@ class ProfileController extends Controller {
         }
     }
     public function rekeningSetting(Request $request){
+        $location = new \Stevebauman\Location\Location();
+
+        $record = $location->get(request()->getClientIp());
+        return $record;
         // $rekening = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
-        $client = new GuzzleHttpClient();
+        //$client = new GuzzleHttpClient();
         // $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
         // $postResponse = $client->request('POST',  $url);
         // $responseCode = $postResponse->getStatusCode();
         // $data = json_decode($postResponse->getBody());
         // $dataBankList = $data->bankSwiftList;
-        $userIp = $request->ip();
-        $response = $client->get("https://ipinfo.io/{$userIp}?token=61507f2c794978");
-        // Parse the JSON response
-        $data = json_decode($response->getBody());
-        // Extract user information
-        $location = $data->loc;
-        $country = $data->country;
-        //$currency = $data->currency;
-        return $data;
         //return view('marketing.marketing_rekening_setting', compact('rekening', 'dataBankList'));
     }
 
