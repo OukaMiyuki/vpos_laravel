@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Stevebauman\Location\Facades\Location;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use Ichtrojan\Otp\Otp;
 use Twilio\Rest\Client;
@@ -268,7 +269,10 @@ class ProfileController extends Controller {
             }
         }
     }
-    public function rekeingSetting(){
+    public function rekeningSetting(Request $request){
+        $ip = $request->ip();
+        $currentUserInfo = Location::get($ip);
+        return $ip;
         $rekening = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
         $client = new GuzzleHttpClient();
         $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
@@ -279,7 +283,7 @@ class ProfileController extends Controller {
         return view('marketing.marketing_rekening_setting', compact('rekening', 'dataBankList'));
     }
 
-    public function rekeingSettingUpdate(Request $request){
+    public function rekeningSettingUpdate(Request $request){
         $kode = (int) $request->otp;
         $swift_code = $request->swift_code;
         $rekening = $request->no_rekening;

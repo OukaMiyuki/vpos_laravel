@@ -98,8 +98,8 @@ Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'isMa
     Route::get('settings', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'marketingSettings'])->name('marketing.settings');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profile'])->name('marketing.profile');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profileInfoUpdate'])->name('marketing.profile.info.update');
-    Route::get('settings/rekening', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'rekeingSetting'])->name('marketing.rekening.setting');
-    Route::post('settings/rekening', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'rekeingSettingUpdate'])->name('marketing.rekening.setting.update');
+    Route::get('settings/rekening', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'rekeningSetting'])->name('marketing.rekening.setting');
+    Route::post('settings/rekening', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'rekeningSettingUpdate'])->name('marketing.rekening.setting.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'password'])->name('marketing.password');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'passwordUpdate'])->name('marketing.password.update');
 
