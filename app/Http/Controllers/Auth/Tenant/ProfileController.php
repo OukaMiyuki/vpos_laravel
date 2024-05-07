@@ -12,13 +12,16 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use GuzzleHttp\Client as GuzzleHttpClient;
+use Ichtrojan\Otp\Otp;
+use Twilio\Rest\Client;
 use Carbon\Carbon;
 use App\Models\Tenant;
 use App\Models\DetailTenant;
 use App\Models\StoreDetail;
 use App\Models\RekeningTenant;
 use App\Models\UmiRequest;
-use GuzzleHttp\Client;
+// use GuzzleHttp\Client;
 use App\Mail\SendUmiEmail;
 use File;
 use Mail;
@@ -196,7 +199,7 @@ class ProfileController extends Controller{
 
     public function rekeingSetting(){
         $rekening = RekeningTenant::where('id_tenant', auth()->user()->id)->first();
-        $client = new Client();
+        $client = new GuzzleHttpClient();
         $url = 'http://erp.pt-best.com/api/testing-get-swift-code';
         $postResponse = $client->request('POST',  $url);
         $responseCode = $postResponse->getStatusCode();
@@ -279,6 +282,84 @@ class ProfileController extends Controller{
             }
         } else {
             return redirect()->back();
+        }
+    }
+
+    public function whatsappNotification(Request $request){
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $nohp = auth()->user()->phone;
+        $hp = "";
+        $postResponse = "";
+        $otp = (new Otp)->generate(auth()->user()->phone, 'numeric', 6, 5);
+        $body = "Berikut adalah kode OTP untuk akun Visioner POS anda : "."*".$otp->token."*"."\n\n\n"."*Harap berhati-hati dan jangan membagikan kode OTP pada pihak manapun!, Admin dan Tim dari Visioner POS tidak akan pernah meminta OTP kepada User!*";
+        if(!preg_match("/[^+0-9]/",trim($nohp))){
+            if(substr(trim($nohp), 0, 2)=="62"){
+                $hp    =trim($nohp);
+            }
+            else if(substr(trim($nohp), 0, 1)=="0"){
+                $hp    ="62".substr(trim($nohp), 1);
+            }
+        }
+        $url = 'https://whatzapp.my.id/send-message';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            'api_key' => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            'message' => $body
+        ];
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            return $ex;
+        }
+        $responseCode = $postResponse->getStatusCode();
+        
+        if($responseCode == 200){
+            $notification = array(
+                'message' => 'OTP Sukses dikirim!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            $notification = array(
+                'message' => 'OTP Gagal dikirim!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
+    public function whatsappOTPSubmit(Request $request){
+        if(!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "") {
+            return redirect()->intended(RouteServiceProvider::TENANT_DASHBOARD);
+        } else {
+            $kode = (int) $request->otp;
+            $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+            if(!$otp->status){
+                $notification = array(
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $user = Tenant::find(auth()->user()->id);
+                $user->update([
+                    'phone_number_verified_at' => now()
+                ]);
+                $notification = array(
+                    'message' => 'Nomor anda telah diverifikasi!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            }
         }
     }
 }

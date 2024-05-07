@@ -64,21 +64,20 @@
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane show active" id="settings">
-                                    <form method="post" action="{{ route('tenant.profile.account.update') }}">
+                                    <form method="post">
                                         @csrf
                                         <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Modify Account</h5>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="name" class="form-label">Nama Lengkap</label>
-                                                    <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ auth()->user()->id }}">
-                                                    <input type="text" class="form-control" name="name" id="name" required value="{{ auth()->user()->name }}" placeholder="Masukkan nama lengkap">
+                                                    <input readonly type="text" class="form-control" name="name" id="name" required value="{{ auth()->user()->name }}" placeholder="Masukkan nama lengkap">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="email" class="form-label">Email</label>
-                                                    <input type="email" class="form-control" name="email" id="email" required value="{{ auth()->user()->email }}" placeholder="Masukkan email akun">
+                                                    <input readonly type="email" class="form-control" name="email" id="email" required value="{{ auth()->user()->email }}" placeholder="Masukkan email akun">
                                                 </div>
                                             </div>
                                             <!-- end col -->
@@ -87,81 +86,114 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="phone" class="form-label">Phone Number</label>
-                                                    <input type="text" class="form-control" name="phone" id="phone" required value="{{ auth()->user()->phone }}" placeholder="Enter email">
+                                                    <input readonly type="text" class="form-control" name="phone" id="phone" required value="{{ auth()->user()->phone }}" placeholder="Enter email">
                                                 </div>
                                             </div>
-                                        </div>
-                                        <!-- end row -->
-                                        <div class="text-end">
-                                            <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>
                                         </div>
                                     </form>
                                 </div>
                                 <div class="tab-pane" id="aboutme">
-                                    <form method="post" action="{{ route('tenant.profile.info.update') }}" enctype="multipart/form-data">
-                                        @csrf
-                                        <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Update Informasi User</h5>
+                                    @if (is_null(auth()->user()->phone_number_verified_at) || empty(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == "")
+                                        <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Verifikasi Nomor Whatsapp</h5>
+                                        <p class="sub-header"><strong>*Note : Anda tidak bisa melakukan proses apapun sebelum melakukan verifikasi nomor Whatsapp, silahkan Verifikasikan nomor WA sebelum melakukan proses selanjutnya!</strong></p>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="no_ktp" class="form-label">Nomor KTP</label>
-                                                    <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ auth()->user()->detail->id }}">
-                                                    <input type="text" class="form-control" name="no_ktp" id="no_ktp" required value="{{auth()->user()->detail->no_ktp}}" placeholder="Masukkan nomor KTP">
+                                                    <label for="no_wa" class="form-label">Nomor Whatsapp</label>
+                                                    <div class="row">
+                                                        <div class="col-8">
+                                                            <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ auth()->user()->phone }}" placeholder="Masukkan nomor Whatsapp"> 
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <form method="post" action="{{ route('tenant.settings.whatsappotp') }}">
+                                                                @csrf
+                                                                <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-email-outline"></i> Kirim Kode OTP</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
-                                                    <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="{{ auth()->user()->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
+                                        <form method="post" action="{{ route('tenant.settings.whatsappotp.validate') }}">
+                                            @csrf
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="otp" class="form-label">Kode OTP</label>
+                                                        <input type="text" class="form-control" name="otp" id="otp" required value="" placeholder="Masukkan kode OTP"> 
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                                                    <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ auth()->user()->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" required>
+                                            <div class="text-end">
+                                                <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Verifikasi Kode OTP</button>
+                                            </div>
+                                        </form>
+                                    @else
+                                        <form method="post" action="{{ route('tenant.profile.info.update') }}" enctype="multipart/form-data">
+                                            @csrf
+                                            <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Update Informasi User</h5>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="no_ktp" class="form-label">Nomor KTP</label>
+                                                        <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ auth()->user()->detail->id }}">
+                                                        <input type="text" class="form-control" name="no_ktp" id="no_ktp" required value="{{auth()->user()->detail->no_ktp}}" placeholder="Masukkan nomor KTP">
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
-                                                    <select class="form-select @error('jenis_kelamin') is-invalid @enderror" id="jenis_kelamin" name="jenis_kelamin" required>
-                                                        <option value="">- Pilih jenis kelamin -</option>
-                                                        <option @if(auth()->user()->detail->jenis_kelamin == "Laki-laki") selected @endif value="Laki-laki">Laki-laki</option>
-                                                        <option @if(auth()->user()->detail->jenis_kelamin == "Perempuan") selected @endif value="Perempuan">Perempuan</option>
-                                                    </select>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
+                                                        <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="{{ auth()->user()->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
+                                                        <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ auth()->user()->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" required>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label for="alamat" class="form-label">Alamat</label>
-                                                    <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! auth()->user()->detail->alamat !!}</textarea>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
+                                                        <select class="form-select @error('jenis_kelamin') is-invalid @enderror" id="jenis_kelamin" name="jenis_kelamin" required>
+                                                            <option value="">- Pilih jenis kelamin -</option>
+                                                            <option @if(auth()->user()->detail->jenis_kelamin == "Laki-laki") selected @endif value="Laki-laki">Laki-laki</option>
+                                                            <option @if(auth()->user()->detail->jenis_kelamin == "Perempuan") selected @endif value="Perempuan">Perempuan</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label for="photo" class="form-label">Upload Foto Profil</label>
-                                                    <input type="file" id="image" class="form-control" name="photo" accept="image/*">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="alamat" class="form-label">Alamat</label>
+                                                        <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! auth()->user()->detail->alamat !!}</textarea>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label for="example-fileinput" class="form-label"></label>
-                                                    <img id="showImage" src="{{ asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="photo" class="form-label">Upload Foto Profil</label>
+                                                        <input type="file" id="image" class="form-control" name="photo" accept="image/*">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="example-fileinput" class="form-label"></label>
+                                                        <img id="showImage" src="{{ asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="text-end">
-                                            <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>
-                                        </div>
-                                    </form>
+                                            <div class="text-end">
+                                                <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>
+                                            </div>
+                                        </form>
+                                    @endif
                                 </div>
                                 <div class="tab-pane" id="saldo">
                                     <h5 class="mb-4 text-uppercase"><i class="mdi mdi-cash-multiple me-1"></i> Proses Penarikan Saldo</h5>

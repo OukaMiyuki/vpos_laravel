@@ -271,28 +271,34 @@ class ProfileController extends Controller {
     }
     public function rekeningSetting(Request $request){
         $rekening = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
+        $dataRekening = "";
         if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
-            // $rekClient = new GuzzleHttpClient();
-            // $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
-            // try {
-            //     $rekClient = $client->request('POST',  $urlRek, [
-            //         'form_params' => [
-            //             'latitude' => $model->nominal_bayar,
-            //             'longitude' => $generate_nomor_invoice,
-            //             'bankCode' => "VP",
-            //             'accountNo' => 
-            //             'secret_key' => "Vpos71237577"
-            //         ]
-            //     ]);
-            //     $responseCode = $postResponse->getStatusCode();
-            //     $data = json_decode($postResponse->getBody());
-            //     $model->qris_data = $data->data->data->qrisData;
-            // } catch (Exception $e) {
-            //     return $e;
-            //     exit;
-            // }
-            $clientIP = \Request::getClientIp(true);
-            return \Request::ip();
+            $ip = "180.254.52.209";
+            $PublicIP = $this->get_client_ip();
+            $getLoc = Location::get($ip);
+            $lat = $getLoc->latitude;
+            $long = $getLoc->longitude;
+            $rekClient = new GuzzleHttpClient();
+            $urlRek = "http://erp.pt-best.com/api/rek_inquiry";
+            try {
+                $getRek = $rekClient->request('POST',  $urlRek, [
+                    'form_params' => [
+                        'latitude' => $lat,
+                        'longitude' => $long,
+                        'bankCode' => $rekening->swift_code,
+                        'accountNo' => $rekening->no_rekening,
+                        'secret_key' => "Vpos71237577Inquiry"
+                    ]
+                ]);
+                $responseCode = $getRek->getStatusCode();
+                $dataRekening = json_decode($getRek->getBody());
+                // return view('marketing.marketing_rekening_setting', compact('rekening', 'dataBankList', 'dataRekening'));
+            } catch (Exception $e) {
+                return $e;
+                exit;
+            }
+            // $clientIP = \Request::getClientIp(true);
+            // return \Request::ip();
         }
         $client = new GuzzleHttpClient();
         $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
@@ -300,7 +306,7 @@ class ProfileController extends Controller {
         $responseCode = $postResponse->getStatusCode();
         $data = json_decode($postResponse->getBody());
         $dataBankList = $data->bankSwiftList;
-        return view('marketing.marketing_rekening_setting', compact('rekening', 'dataBankList'));
+        return view('marketing.marketing_rekening_setting', compact('rekening', 'dataBankList', 'dataRekening'));
     }
 
     public function rekeningSettingUpdate(Request $request){
@@ -330,8 +336,38 @@ class ProfileController extends Controller {
         }
     }
 
+    function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
     public function ipTesting(){
-        $clientIP = \Request::getClientIp(true);
-        return \Request::ip();
+        $PublicIP = $this->get_client_ip();
+        $ip = "180.254.52.209";
+        $getLoc = Location::get($ip);
+        return $getLoc->latitude;
+        // $json     = file_get_contents("http://ipinfo.io/$PublicIP/geo");
+        // $json     = json_decode($json, true);
+        // $country  = $json['country'];
+        // $region   = $json['region'];
+        // $city     = $json['loc'];
+
+        // return $city;
     }
 }
