@@ -36,7 +36,7 @@
                                     </div>
                                     <div class="col-7">
                                         <div class="text-end">
-                                            <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $code }}</span></h3>
+                                            <h4 class="text-dark mt-1"><span data-plugin="counterup">{{ $code }}</span></h4>
                                             <p class="text-muted mb-1 text-truncate">Invitation Code</p>
                                             <a href="{{ route('marketing.dashboard.invitationcode') }}" class="btn btn-blue btn-sm ms-2">
                                                 <i class="mdi mdi-eye"></i>
@@ -56,7 +56,7 @@
                                     </div>
                                     <div class="col-7">
                                         <div class="text-end">
-                                            <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $tenantNumber }}</span></h3>
+                                            <h4 class="text-dark mt-1"><span data-plugin="counterup">{{ $tenantNumber }}</span></h4>
                                             <p class="text-muted mb-1 text-truncate">Redeemed Code</p>
                                             <a href="{{ route('marketing.dashboard.tenant.list') }}" class="btn btn-blue btn-sm ms-2">
                                                 <i class="mdi mdi-eye"></i>
@@ -79,7 +79,7 @@
                                     </div>
                                     <div class="col-7">
                                         <div class="text-end">
-                                            <h3 class="text-dark mt-1">RP.&nbsp;<span data-plugin="counterup">10000000</span></h3>
+                                            <h4 class="text-dark mt-1">RP.&nbsp;<span data-plugin="counterup">10000000</span></h4>
                                             <p class="text-muted mb-1 text-truncate">Saldo</p>
                                             <a href="" class="btn btn-blue btn-sm ms-2">
                                                 <i class="mdi mdi-eye"></i>
@@ -128,25 +128,18 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                               @foreach ($tenantTerbaru as $tenants)
-                                                   @foreach ($tenants->invitationCodeTenant as $tenantInfo)
-                                                       <tr>
-                                                            <td><a href="#" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a></td>
-                                                            <td>{{ $tenantInfo->name }}</td>
-                                                            <td>{{ \Carbon\Carbon::parse($tenantInfo->created_at)->format('d-m-Y') }}</td>
-                                                            <td>{{ $tenantInfo->phone }}</td>
-                                                            <td>{{ $tenantInfo->invitationCode->inv_code }}</td>
-                                                            <td>{{ $tenantInfo->invitationCode->holder }}</td>
-                                                       </tr>
-                                                   @endforeach
-                                               @endforeach
-                                                {{-- <tr>
-                                                    <td>{{ $tenant-> }}</td> --}}
-                                                    {{-- <td>{{ \Carbon\Carbon::parse($tenant->created_at)->format('d/m/Y') }}</td>
-                                                    <td>{{ $tenant->phone }}</td>
-                                                    <td>{{ $tenant->invitationCode->inv_code }}</td> --}}
-                                                {{-- </tr> --}}
-              
+                                            @foreach ($tenantTerbaru as $tenants)
+                                                @foreach ($tenants->invitationCodeTenant as $tenantInfo)
+                                                    <tr>
+                                                        <td><a href="#" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a></td>
+                                                        <td>{{ $tenantInfo->name }}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($tenantInfo->created_at)->format('d-m-Y') }}</td>
+                                                        <td>{{ $tenantInfo->phone }}</td>
+                                                        <td>{{ $tenantInfo->invitationCode->inv_code }}</td>
+                                                        <td>{{ $tenantInfo->invitationCode->holder }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>

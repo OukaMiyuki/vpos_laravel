@@ -215,6 +215,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('settings/password', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'password'])->name('tenant.password');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'passwordUpdate'])->name('tenant.password.update');
     Route::get('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeingSetting'])->name('tenant.rekening.setting');
+    Route::post('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeningSettingUpdate'])->name('tenant.rekening.setting.update');
 
     Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestForm'])->name('tenant.request.umi');
     Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');

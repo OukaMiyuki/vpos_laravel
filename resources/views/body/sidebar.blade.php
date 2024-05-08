@@ -400,7 +400,7 @@
                                     <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan</a>
+                                    <a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan Anda</a>
                                 </li>
                             </ul>
                         </div>

@@ -85,43 +85,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {{-- <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="t_beli" class="form-label">Tanggal Beli</label>
-                                                <input type="date" class="form-control" name="t_beli" id="t_beli" required value="{{ old('t_beli') }}" placeholder="Masukkan tanggal beli">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="t_expired" class="form-label">Tanggal Expired (kosongi jika bukan peroduk makanan)</label>
-                                                <input type="date" class="form-control" name="t_expired" id="t_expired" value="{{ old('t_expired') }}" placeholder="Masukkan tanggal expired">
-                                            </div>
-                                        </div>
-                                    </div> --}}
                                     <div class="row">
-                                        {{-- <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="h_beli" class="form-label">Harga beli <strong>(Rp.)</strong></label>
-                                                <input type="text" class="form-control" name="h_beli" id="h_beli" required value="{{ old('h_beli') }}" placeholder="Masukkan nominal harga beli">
-                                            </div>
-                                        </div> --}}
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="h_jual" class="form-label">Harga jual <strong>(Rp.)</strong></label>
                                                 <input type="number" class="form-control" name="h_jual" id="h_jual" required value="{{ old('h_jual') }}" placeholder="Masukkan nominal harga jual">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <label for="j_produk" class="form-label">Jenis Produk</label>
-                                                <select class="form-select @error('j_produk') is-invalid @enderror" id="j_produk" name="j_produk" required>
-                                                    <option value="">- Pilih Jenis -</option>
-                                                    <option value="Fixed">Fixed Price</option>
-                                                    <option value="Custom">Custom Price</option>
-                                                </select>
                                             </div>
                                         </div>
                                     </div>

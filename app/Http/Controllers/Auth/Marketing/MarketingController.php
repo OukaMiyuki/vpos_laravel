@@ -80,14 +80,22 @@ class MarketingController extends Controller {
                     'alert-type' => 'error',
                 );
                 Auth::guard('marketing')->logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
+                request()->session()->invalidate();
+                request()->session()->regenerateToken();
                 return redirect('/marketing/login')->with($notification);
             }
         }
     }
 
     public function invitationCodeInsert(Request $request){
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+ 
         $inv_code = Str::upper($request->code);
         InvitationCode::create([
             'id_marketing' => auth()->user()->id,
@@ -118,8 +126,8 @@ class MarketingController extends Controller {
                     'alert-type' => 'error',
                 );
                 Auth::guard('marketing')->logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
+                request()->session()->invalidate();
+                request()->session()->regenerateToken();
                 return redirect('/marketing/login')->with($notification);
             }
         }
@@ -141,8 +149,8 @@ class MarketingController extends Controller {
                     'alert-type' => 'error',
                 );
                 Auth::guard('marketing')->logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
+                request()->session()->invalidate();
+                request()->session()->regenerateToken();
                 return redirect('/marketing/login')->with($notification);
             }
         }
@@ -171,8 +179,8 @@ class MarketingController extends Controller {
                     'alert-type' => 'error',
                 );
                 Auth::guard('marketing')->logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
+                request()->session()->invalidate();
+                request()->session()->regenerateToken();
                 return redirect('/marketing/login')->with($notification);
             }
         }
@@ -203,8 +211,8 @@ class MarketingController extends Controller {
                     'alert-type' => 'error',
                 );
                 Auth::guard('marketing')->logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
+                request()->session()->invalidate();
+                request()->session()->regenerateToken();
                 return redirect('/marketing/login')->with($notification);
             }
         }

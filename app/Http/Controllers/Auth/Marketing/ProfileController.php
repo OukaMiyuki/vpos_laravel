@@ -273,13 +273,13 @@ class ProfileController extends Controller {
         $rekening = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
         $dataRekening = "";
         if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
-            $ip = "180.254.52.209";
+            $ip = "36.84.106.3";
             $PublicIP = $this->get_client_ip();
             $getLoc = Location::get($ip);
             $lat = $getLoc->latitude;
             $long = $getLoc->longitude;
             $rekClient = new GuzzleHttpClient();
-            $urlRek = "http://erp.pt-best.com/api/rek_inquiry";
+            $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
             try {
                 $getRek = $rekClient->request('POST',  $urlRek, [
                     'form_params' => [
@@ -292,13 +292,10 @@ class ProfileController extends Controller {
                 ]);
                 $responseCode = $getRek->getStatusCode();
                 $dataRekening = json_decode($getRek->getBody());
-                // return view('marketing.marketing_rekening_setting', compact('rekening', 'dataBankList', 'dataRekening'));
             } catch (Exception $e) {
                 return $e;
                 exit;
             }
-            // $clientIP = \Request::getClientIp(true);
-            // return \Request::ip();
         }
         $client = new GuzzleHttpClient();
         $url = 'https://erp.pt-best.com/api/testing-get-swift-code';

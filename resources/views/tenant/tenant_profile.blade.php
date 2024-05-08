@@ -31,7 +31,7 @@
                             </p>
                             @if(auth()->user()->is_active == 1)
                                 <button type="button" class="btn btn-success btn-xs waves-effect mb-2 waves-light">Aktif</button>
-                            @else 
+                            @else
                                 <button type="button" class="btn btn-danger btn-xs waves-effect mb-2 waves-light">Tidak Aktif</button>
                             @endif
                             <div class="text-start mt-3">
@@ -95,14 +95,14 @@
                                 <div class="tab-pane" id="aboutme">
                                     @if (is_null(auth()->user()->phone_number_verified_at) || empty(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == "")
                                         <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Verifikasi Nomor Whatsapp</h5>
-                                        <p class="sub-header"><strong>*Note : Anda tidak bisa melakukan proses apapun sebelum melakukan verifikasi nomor Whatsapp, silahkan Verifikasikan nomor WA sebelum melakukan proses selanjutnya!</strong></p>
+                                        <p class="sub-header text-danger"><strong>*Note : Anda tidak bisa melakukan proses apapun sebelum melakukan verifikasi nomor Whatsapp, silahkan Verifikasikan nomor WA sebelum melakukan proses selanjutnya!</strong></p>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="no_wa" class="form-label">Nomor Whatsapp</label>
                                                     <div class="row">
                                                         <div class="col-8">
-                                                            <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ auth()->user()->phone }}" placeholder="Masukkan nomor Whatsapp"> 
+                                                            <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ auth()->user()->phone }}" placeholder="Masukkan nomor Whatsapp">
                                                         </div>
                                                         <div class="col-4">
                                                             <form method="post" action="{{ route('tenant.settings.whatsappotp') }}">
@@ -120,7 +120,7 @@
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
                                                         <label for="otp" class="form-label">Kode OTP</label>
-                                                        <input type="text" class="form-control" name="otp" id="otp" required value="" placeholder="Masukkan kode OTP"> 
+                                                        <input type="text" class="form-control" name="otp" id="otp" required value="" placeholder="Masukkan kode OTP">
                                                     </div>
                                                 </div>
                                             </div>
@@ -196,30 +196,37 @@
                                     @endif
                                 </div>
                                 <div class="tab-pane" id="saldo">
-                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-cash-multiple me-1"></i> Proses Penarikan Saldo</h5>
-                                    <div class="col-md-12">
-                                        <div class="mb-3">
-                                            <label for="saldo" class="form-label">Saldo Anda (Rp.)</label>
-                                            <input readonly type="text" class="form-control" name="saldo" id="saldo" required value="1000000" placeholder="Masukkan jumlah saldo">
+                                    @if (empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == "")
+                                        <div class="message">
+                                            <h1 class="acces-denied">Access to this page is restricted</h1>
+                                            <p class="sub-header text-danger"><strong>Lakukan verifikasi nomor Whatsapp sebelum melakukan penarikan saldo.</strong></p>
                                         </div>
-                                    </div>
-                                    <form method="post" action="">
-                                        @csrf
-                                        <div class="row">
-                                            <input type="hidden" class="form-control" name="id" id="id" required value="{{auth()->user()->detail->id}}">
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label for="tempat_lahir" class="form-label">Nominal Tarik</label>
-                                                    <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="" placeholder="Masukkan nominal tarik dana">
-                                                </div>
+                                    @else
+                                        <h5 class="mb-4 text-uppercase"><i class="mdi mdi-cash-multiple me-1"></i> Proses Penarikan Saldo</h5>
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="saldo" class="form-label">Saldo Anda (Rp.)</label>
+                                                <input readonly type="text" class="form-control" name="saldo" id="saldo" required value="1000000" placeholder="Masukkan jumlah saldo">
                                             </div>
                                         </div>
-                                        <div class="text-end">
-                                            <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Tarik</button>
-                                        </div>
-                                    </form>
+                                        <form method="post" action="">
+                                            @csrf
+                                            <div class="row">
+                                                <input type="hidden" class="form-control" name="id" id="id" required value="{{auth()->user()->detail->id}}">
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="tempat_lahir" class="form-label">Nominal Tarik</label>
+                                                        <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="" placeholder="Masukkan nominal tarik dana">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-end">
+                                                <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Tarik</button>
+                                            </div>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                             <!-- end tab-content -->

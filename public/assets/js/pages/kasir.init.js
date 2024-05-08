@@ -20,15 +20,6 @@ $(document).ready(function(){
         $("#show #keterangan").val(keterangan);
     });
 
-    $(document).on("click", "#add_custom_product", function() {
-        var id = $(this).data('id');
-        var barcode = $(this).data('barcode');
-        var pd_name = $(this).data('pd_name');
-        $("#show #id_id").val(id);
-        $("#show #barcode_barcode").val(barcode);
-        $("#show #name_name").val(pd_name);
-    });
-
     $(document).on("click", "#editsupplier", function() {
         var id = $(this).data('id');
         var nama_supplier = $(this).data('nama');

@@ -27,13 +27,13 @@
                             @if (auth()->user()->is_active == 0)
                                 <div class="message">
                                     <h1 class="acces-denied">Access to this page is restricted</h1>
-                                    <p class="sub-header">Saat ini akun anda belum diaktifkan dan diverifikasi oleh Admin.<br> silahkan hubungi admin kami untuk melanjutkan ke proses selanjutnya, Terima Kasih!.</p>
+                                    <p class="sub-header text-danger"><strong>Saat ini akun anda belum diaktifkan dan diverifikasi oleh Admin.<br> silahkan hubungi admin kami untuk melanjutkan ke proses selanjutnya, Terima Kasih!.</strong></p>
                                 </div>
                             @else
                                 @if (empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == "")
                                     <div class="message">
                                         <h1 class="acces-denied">Access to this page is restricted</h1>
-                                        <p class="sub-header">Lakukan verifikasi nomor Whatsapp sebelum memasukkan nomor rekening anda.</p>
+                                        <p class="sub-header text-danger"><strong>Lakukan verifikasi nomor Whatsapp sebelum memasukkan nomor rekening anda.</strong></p>
                                     </div>
                                 @else
                                     <form method="post" action="{{ route('marketing.rekening.setting.update') }}" id="submitRekening">

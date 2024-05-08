@@ -13,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client as GuzzleHttpClient;
+use Stevebauman\Location\Facades\Location;
 use Ichtrojan\Otp\Otp;
 use Twilio\Rest\Client;
 use Carbon\Carbon;
@@ -21,7 +22,6 @@ use App\Models\DetailTenant;
 use App\Models\StoreDetail;
 use App\Models\RekeningTenant;
 use App\Models\UmiRequest;
-// use GuzzleHttp\Client;
 use App\Mail\SendUmiEmail;
 use File;
 use Mail;
@@ -112,27 +112,37 @@ class ProfileController extends Controller{
 
     public function passwordUpdate(Request $request){
         $request->validate([
+            'otp' => 'required',
             'old_password' => 'required',
             'new_password' => 'required|confirmed',
         ]);
 
-        if(!Hash::check($request->old_password, auth::user()->password)){
+        $otp = (new Otp)->validate(auth()->user()->phone, $request->otp);
+        if(!$otp->status){
             $notification = array(
-                'message' => 'Password lama tidak sesuai!',
+                'message' => 'OTP salah atau tidak sesuai!',
                 'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
+        } else {
+            if(!Hash::check($request->old_password, auth::user()->password)){
+                $notification = array(
+                    'message' => 'Password lama tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            }
+    
+            Tenant::whereId(auth()->user()->id)->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+    
+            $notification = array(
+                'message' => 'Password berhasil diperbarui!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
         }
-
-        Tenant::whereId(auth()->user()->id)->update([
-            'password' => Hash::make($request->new_password),
-        ]);
-
-        $notification = array(
-            'message' => 'Password berhasil diperbarui!',
-            'alert-type' => 'success',
-        );
-        return redirect()->back()->with($notification);
     }
     
     public function storeProfileSettings(){
@@ -199,14 +209,67 @@ class ProfileController extends Controller{
 
     public function rekeingSetting(){
         $rekening = RekeningTenant::where('id_tenant', auth()->user()->id)->first();
+        $dataRekening = "";
+        if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
+            $ip = "36.84.106.3";
+            $PublicIP = $this->get_client_ip();
+            $getLoc = Location::get($ip);
+            $lat = $getLoc->latitude;
+            $long = $getLoc->longitude;
+            $rekClient = new GuzzleHttpClient();
+            $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
+            try {
+                $getRek = $rekClient->request('POST',  $urlRek, [
+                    'form_params' => [
+                        'latitude' => $lat,
+                        'longitude' => $long,
+                        'bankCode' => $rekening->swift_code,
+                        'accountNo' => $rekening->no_rekening,
+                        'secret_key' => "Vpos71237577Inquiry"
+                    ]
+                ]);
+                $responseCode = $getRek->getStatusCode();
+                $dataRekening = json_decode($getRek->getBody());
+            } catch (Exception $e) {
+                return $e;
+                exit;
+            }
+        }
         $client = new GuzzleHttpClient();
-        $url = 'http://erp.pt-best.com/api/testing-get-swift-code';
+        $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
         $postResponse = $client->request('POST',  $url);
         $responseCode = $postResponse->getStatusCode();
         $data = json_decode($postResponse->getBody());
         $dataBankList = $data->bankSwiftList;
         //dd($data->bankSwiftList);
-        return view('tenant.tenant_rekening_setting', compact('rekening', 'dataBankList'));
+        return view('tenant.tenant_rekening_setting', compact('rekening', 'dataBankList', 'dataRekening'));
+    }
+
+    public function rekeningSettingUpdate(Request $request){
+        $kode = (int) $request->otp;
+        $swift_code = $request->swift_code;
+        $rekening = $request->no_rekening;
+
+        $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+        if(!$otp->status){
+            $notification = array(
+                'message' => 'OTP salah atau tidak sesuai!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            $rekeningAkun = RekeningTenant::where('id_tenant', auth()->user()->id)->first();
+            $rekeningAkun->update([
+                'no_rekening' => $rekening,
+                'swift_code' => $swift_code,
+                'is_confirmed' => 1
+            ]);
+            $notification = array(
+                'message' => 'Update nomor rekening berhasil!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        }
     }
 
     public function umiRequestForm(){
@@ -361,5 +424,26 @@ class ProfileController extends Controller{
                 return redirect()->back()->with($notification);
             }
         }
+    }
+
+    function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
     }
 }

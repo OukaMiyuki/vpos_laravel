@@ -76,7 +76,7 @@
                                     @if (empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == "")
                                         <div class="message">
                                             <h1 class="acces-denied">Access to this page is restricted</h1>
-                                            <p class="sub-header">Lakukan verifikasi nomor Whatsapp sebelum mengupdate data toko anda.</p>
+                                            <p class="sub-header text-danger"><strong>Lakukan verifikasi nomor Whatsapp sebelum mengupdate data toko anda.</strong></p>
                                         </div>
                                     @else
                                         <form method="post" action="{{ route('tenant.store.profile.update') }}" enctype="multipart/form-data">

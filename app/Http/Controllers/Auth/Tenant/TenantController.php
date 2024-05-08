@@ -94,6 +94,14 @@ class TenantController extends Controller {
     }
 
     public function kasirRegister(Request $request){
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+        
         // $request->validate([
         //     'name' => ['required', 'string', 'max:255'],
         //     'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
@@ -149,21 +157,28 @@ class TenantController extends Controller {
     }
 
     public function supplierInsert(Request $request){
-        Supplier::create([
-            'id_tenant' => auth()->user()->id,
-            'nama_supplier' => $request->nama_supplier,
-            'email_supplier' => $request->email,
-            'phone_supplier' => $request->phone,
-            'alamat_supplier' => $request->alamat,
-            'keterangan' => $request->keterangan
-        ]);
-
-        $notification = array(
-            'message' => 'Data berhasil ditambahkan!',
-            'alert-type' => 'info',
-        );
-
-        return redirect()->back()->with($notification);
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            Supplier::create([
+                'id_tenant' => auth()->user()->id,
+                'nama_supplier' => $request->nama_supplier,
+                'email_supplier' => $request->email,
+                'phone_supplier' => $request->phone,
+                'alamat_supplier' => $request->alamat,
+                'keterangan' => $request->keterangan
+            ]);
+    
+            $notification = array(
+                'message' => 'Data berhasil diinput!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        }
     }
 
     public function supplierUpdate(Request $request) {
@@ -203,6 +218,14 @@ class TenantController extends Controller {
     }
 
     public function batchInsert(Request $request){
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+
         Batch::create([
             'id_tenant' => auth()->user()->id,
             'batch_code' => $request->name,
@@ -252,6 +275,14 @@ class TenantController extends Controller {
     }
 
     public function categoryInsert(Request $request) {
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+
         ProductCategory::create([
             'id_tenant' => auth()->user()->id,
             'name' => $request->category
@@ -280,7 +311,7 @@ class TenantController extends Controller {
     }
 
     public function categoryDelete($id){
-        $category = ProductCategory::find($request->id);
+        $category = ProductCategory::find($id);
         $category->delete();
 
         $notification = array(
@@ -301,21 +332,19 @@ class TenantController extends Controller {
     }
 
     public function batchProductInsert(Request $request){
-        $harga = "";
-        if($request->j_produk == "Fixed"){
-            $harga = $request->h_jual;
-        } else if($request->j_produk == "Custom"){
-            $harga = 0;
-            //return $harga;
-        } else {
-            return "salah";
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
+
         $file = $request->file('photo');
         $namaFile = $request->p_name;
         $storagePath = Storage::path('public/images/product');
         $ext = $file->getClientOriginalExtension();
         $filename = $namaFile.'-'.time().'.'.$ext;
-        $harga = "";
 
         try {
             $file->move($storagePath, $filename);
@@ -334,7 +363,7 @@ class TenantController extends Controller {
             'nomor_rak' => $request->rak,
             'tanggal_beli' => $request->t_beli,
             'tanggal_expired' => $request->t_expired,
-            'harga_jual' => (int) $harga
+            'harga_jual' => (int) $request->h_jual
         ]);
 
         $notification = array(
@@ -414,6 +443,10 @@ class TenantController extends Controller {
 
     public function batchProductDelete($id){
         $product = Product::where('id_tenant', auth()->user()->id)->find($id);
+        $stok = ProductStock::where('id_batch_product', $product->id)->get();
+        foreach($stok as $stock){
+            $stock->delete();
+        }
         $product->delete();
         $notification = array(
             'message' => 'Data produk berhasil dihapus!',
@@ -432,7 +465,15 @@ class TenantController extends Controller {
     }
 
     public function productStockInsert(Request $request){
-        $stokProduct = ProductStock::create([
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+
+        ProductStock::create([
             'id_tenant' => auth()->user()->id,
             'id_batch_product' => $request->id_batch_product,
             'barcode' => $request->barcode,
@@ -441,10 +482,6 @@ class TenantController extends Controller {
             'harga_beli' => $request->h_beli,
             'stok' => $request->stok
         ]);
-
-        // if(!is_null($stokProduct)) {
-        //     $stokProduct->productStockInsert($stokProduct);
-        // }
 
         $notification = array(
             'message' => 'Data produk berhasil ditambahkan!',
@@ -460,7 +497,6 @@ class TenantController extends Controller {
 
     public function productStockUpdate(Request $request){
         $stock = ProductStock::where('id_tenant', auth()->user()->id)->find($request->id);
-        $stock_temp = $stock->stok;
         $stock->update([
             'barcode' => $request->barcode,
             'tanggal_beli' => $request->t_beli,
@@ -468,12 +504,6 @@ class TenantController extends Controller {
             'harga_beli' => $request->h_beli,
             'stok' => $request->stok
         ]);
-
-        // if(!is_null($stock)) {
-        //     $stock->productStockUpdate($stock, $stock_temp);
-        // }
-
-        // dd($stock_temp);
 
         $notification = array(
             'message' => 'Data produk berhasil diupdate!',
@@ -484,16 +514,7 @@ class TenantController extends Controller {
 
     public function productStockDelete($id){
         $stock = ProductStock::where('id_tenant', auth()->user()->id)->find($id);
-        $stock_temp = $stock->stok;
-
         $stock->delete();
-
-        // if(!is_null($stock)) {
-        //     $stock->productStockDelete($stock, $stock_temp);
-        // }
-
-        // dd($stock_temp);
-
         $notification = array(
             'message' => 'Data produk berhasil dihapus!',
             'alert-type' => 'success',
@@ -516,6 +537,14 @@ class TenantController extends Controller {
     }
 
     public function discountModifyInsert(Request $request){
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+
         $diskon = Discount::where('id_tenant', auth()->user()->id)->first();
         if(empty($diskon)){
             Discount::create([
@@ -550,6 +579,14 @@ class TenantController extends Controller {
     }
 
     public function pajakModifyInsert(Request $request){
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+
         $tax = Tax::where('id_tenant', auth()->user()->id)->find($request->id);
         if(empty($tax)){
             Tax::create([
@@ -578,21 +615,34 @@ class TenantController extends Controller {
     }
 
     public function customFieldInsert(Request $request) {
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+
         $customField = TenantField::where('id_tenant', auth()->user()->id)->find($request->id);
+        $aktivasi_baris_1 = $request->aktivasi_baris_1;
+        $aktivasi_baris_2 = $request->aktivasi_baris_2;
+        $aktivasi_baris_3 = $request->aktivasi_baris_3;
+        $aktivasi_baris_4 = $request->aktivasi_baris_4;
+        $aktivasi_baris_5 = $request->aktivasi_baris_5;
         if(is_null($request->baris1)){
-            $request->aktivasi_baris_1 = 0;
+            $aktivasi_baris_1 = 0;
         }
         if(is_null($request->baris2)){
-            $request->aktivasi_baris_2 = 0;
+            $aktivasi_baris_2 = 0;
         }
         if(is_null($request->baris3)){
-            $request->aktivasi_baris_3 = 0;
+            $aktivasi_baris_3 = 0;
         }
         if(is_null($request->baris4)){
-            $request->aktivasi_baris_4 = 0;
+            $aktivasi_baris_4 = 0;
         }
         if(is_null($request->baris5)){
-            $request->aktivasi_baris_5 = 0;
+            $aktivasi_baris_5 = 0;
         }
 
         $customField->update([
@@ -601,11 +651,11 @@ class TenantController extends Controller {
             'baris3' => $request->baris3,
             'baris4' => $request->baris4,
             'baris5' => $request->baris5,
-            'baris_1_activation' => $request->aktivasi_baris_1,
-            'baris_2_activation' => $request->aktivasi_baris_2,
-            'baris_3_activation' => $request->aktivasi_baris_3,
-            'baris_4_activation' => $request->aktivasi_baris_4,
-            'baris_5_activation' => $request->aktivasi_baris_5,
+            'baris_1_activation' => $aktivasi_baris_1,
+            'baris_2_activation' => $aktivasi_baris_2,
+            'baris_3_activation' => $aktivasi_baris_3,
+            'baris_4_activation' => $aktivasi_baris_4,
+            'baris_5_activation' => $aktivasi_baris_5,
         ]);
 
         $notification = array(

@@ -96,7 +96,7 @@
                                 <div class="tab-pane" id="aboutme">
                                     @if (is_null(auth()->user()->phone_number_verified_at) || empty(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == "")
                                         <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Verifikasi Nomor Whatsapp</h5>
-                                        <p class="sub-header"><strong>*Note : Anda tidak bisa melakukan proses apapun sebelum melakukan verifikasi nomor Whatsapp, silahkan Verifikasikan nomor WA sebelum melakukan proses selanjutnya!</strong></p>
+                                        <p class="sub-header text-danger"><strong>*Note : Anda tidak bisa melakukan proses apapun sebelum melakukan verifikasi nomor Whatsapp, silahkan Verifikasikan nomor WA sebelum melakukan proses selanjutnya!</strong></p>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
@@ -216,7 +216,7 @@
                                         @if (empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == "")
                                             <div class="message">
                                                 <h1 class="acces-denied">Access to this page is restricted</h1>
-                                                <p class="sub-header">Lakukan verifikasi nomor Whatsapp sebelum melakukan penarikan saldo.</p>
+                                                <p class="sub-header text-danger"><strong>Lakukan verifikasi nomor Whatsapp sebelum melakukan penarikan saldo.</strong></p>
                                             </div>
                                         @else
                                             <div class="col-md-12">
