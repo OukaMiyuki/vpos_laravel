@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('tenant_qris_accounts', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('id_tenant')->unique();
+            $table->bigInteger('id_tenant');
+            $table->string('email')->unique();
             $table->string('qris_login_user');
             $table->string('qris_password');
             $table->string('qris_merchant_id');

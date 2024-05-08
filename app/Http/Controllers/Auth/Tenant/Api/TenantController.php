@@ -33,10 +33,10 @@ class TenantController extends Controller {
             exit;
         }
 
-        if($store->count() == 0 || $stock == "" || empty($stock) || is_null($stock)){
+        if($store->count() == 0 || $store == "" || empty($store) || is_null($store)){
             return response()->json([
                 'message' => 'Fetch Success!',
-                'data-status' => 'No data found in this collection!',
+                'data-status' => 'Data toko masih kosong!',
                 'storeData' => $store,
                 'status' => 200
             ]);

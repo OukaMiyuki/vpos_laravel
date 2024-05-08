@@ -10,11 +10,13 @@ use App\Models\ShoppingCart;
 use App\Models\Kasir;
 use App\Models\Tenant;
 use App\Models\InvoiceField;
+use Exception;
 use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\TunaiWallet;
 use App\Models\QrisWallet;
 use App\Models\CustomerIdentifier;
+use App\Models\TenantQrisAccount;
 
 class Invoice extends Model {
     use HasFactory;
@@ -163,6 +165,12 @@ class Invoice extends Model {
             $generate_nomor_invoice = $invoice_code.$date.str_pad($index_number, 9, '0', STR_PAD_LEFT);
             $model->nomor_invoice = $generate_nomor_invoice;
             if($model->jenis_pembayaran == "Qris"){
+                $qrisAccount = TenantQrisAccount::where('id_tenant', auth()->user()->id)
+                                                    ->where('email', auth()->user()->email)
+                                                    ->first();
+                if(!empty($qrisAccount) || !is_null($qrisAccount)){
+
+                }
                 try {
                     $postResponse = $client->request('POST',  $url, [
                         'form_params' => [

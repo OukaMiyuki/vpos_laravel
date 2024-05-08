@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
-use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 use App\Models\ProductStock;
 use App\Models\ShoppingCart;
 use App\Models\Invoice;
@@ -17,6 +17,7 @@ use Rawilk\Printing\Receipts\ReceiptPrinter;
 use GuzzleHttp\Client;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
+use App\Models\TenantQrisAccount;
 
 class KasirController extends Controller {
     public function index(){
@@ -31,21 +32,15 @@ class KasirController extends Controller {
                                     ->where('id_tenant', auth()->user()->id_tenant)
                                     ->where('id_kasir', auth()->user()->id)
                                     ->where('status_pembayaran', 1)
-                                    ->sum(\DB::raw('sub_total + pajak'));
+                                    ->sum(DB::raw('sub_total + pajak'));
         $totalPemasukan = Invoice::where('id_tenant', auth()->user()->id_tenant)
                                     ->where('id_kasir', auth()->user()->id)
                                     ->where('status_pembayaran', 1)
-                                    ->sum(\DB::raw('sub_total + pajak'));
+                                    ->sum(DB::raw('sub_total + pajak'));
         return view('kasir.dashboard', compact(['totalInvoiceHariIni', 'totalInvoice', 'pemasukanHariIni', 'totalPemasukan']));
     }
 
     public function kasirPos(){
-        // session()->forget('cart');
-        // $stock = Product::with('productStock')->where('id_tenant', auth()->user()->id_tenant)
-        //                     ->where(function ($query) {
-        //                         $query->where('stok', '!=', 0);
-        //                     })->latest()->get();
-        // dd($stock);
         $stock = ProductStock::with('product')
                         ->where(function ($query) {
                                 $query->where('stok', '!=', 0);
