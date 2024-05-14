@@ -9,9 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\DetailKasir;
 use App\Models\Invoice;
-use App\Models\InvoiceField;
-use App\Models\Tenant;
-use App\Models\CustomerIdentifier;
+use App\Models\StoreDetail;
 
 class Kasir extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -19,7 +17,7 @@ class Kasir extends Authenticatable implements MustVerifyEmail {
     protected $guard = 'kasir';
 
     protected $fillable = [
-        'id_tenant',
+        'id_store',
         'name',
         'email',
         'phone',
@@ -40,25 +38,18 @@ class Kasir extends Authenticatable implements MustVerifyEmail {
         return $this->hasOne(DetailKasir::class, 'id_kasir', 'id');
     }
 
-    public function tenant(){
-        return $this->belongsTo(Tenant::class, 'id_tenant', 'id');
+    public function store(){
+        return $this->belongsTo(StoreDetail::class, 'id_store', 'store_identifier');
     }
 
     public function invoice(){
         return $this->hasMany(Invoice::class, 'id_kasir', 'id');
     }
 
-    public function invoiceField(){
-        return $this->hasMany(InvoiceField::class, 'id_kasir', 'id');
-    }
-
-    public function customer(){
-        return $this->hasMany(CustomerIdentifier::class, 'id_kasir', 'id');
-    }
-
     public function detailKasirStore($model){
         $DetailKasir = new DetailKasir();
         $DetailKasir->id_kasir = $model->id;
+        $DetailKasir->email = $model->email;
         $DetailKasir->no_ktp = request()->no_ktp;
         $DetailKasir->tempat_lahir = request()->tempat_lahir;
         $DetailKasir->tanggal_lahir = request()->tanggal_lahir;

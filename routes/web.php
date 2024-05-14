@@ -153,6 +153,17 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/kasir/info/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirDetail'])->name('tenant.kasir.detail');
     Route::post('/kasir/register', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirRegister'])->name('tenant.register.kasir');
     
+    Route::get('/dashboard/pos', [App\Http\Controllers\Auth\Tenant\PosController::class, 'pos'])->name('tenant.pos');
+    Route::post('/dashboard/pos/addcart', [App\Http\Controllers\Auth\Tenant\PosController::class, 'addCart'])->name('tenant.pos.addcart');
+    Route::post('/dashboard/pos/update', [App\Http\Controllers\Auth\Tenant\PosController::class, 'updateCart'])->name('tenant.pos.updateCart');
+    Route::get('/dashboard/pos/delete/{id}', [App\Http\Controllers\Auth\Tenant\PosController::class, 'removeCart'])->name('tenant.pos.deleteCart');
+    Route::post('/dashboard/pos/process', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionProcess'])->name('tenant.pos.process');
+    Route::get('/dashboard/pos/invoice/{id}', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionInvoice'])->name('tenant.pos.invoice');
+    Route::get('/dashboard/pos/invoice/receipt/{id}', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionInvoiceReceipt'])->name('tenant.pos.invoice.receipt');
+    Route::post('/dashboard/pos/invoice/change-payment', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionPendingChangePayment'])->name('tenant.pos.invoice.changePayment');
+    Route::post('/dashboard/pos/invoice/save', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionSave'])->name('tenant.pos.invoice.save');
+    Route::post('/dashboard/pos/invoice/clear', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionClear'])->name('tenant.pos.invoice.clear');
+
     Route::get('/dashboard/toko', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantMenuToko'])->name('tenant.toko');
     Route::get('/dashboard/toko/supplier', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierList'])->name('tenant.supplier.list');
     Route::post('/dashboard/toko/supplier/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'supplierInsert'])->name('tenant.supplier.insert');
@@ -189,6 +200,13 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/transaction/list/finish/payment', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionQrisFinishList'])->name('tenant.transaction.finish.qris');
     Route::get('/dashboard/transaction/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionList'])->name('tenant.transaction.list');
     Route::get('/dashboard/transaction/list/pending', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPending'])->name('tenant.transaction.list.pending');
+    Route::get('/dashboard/transaction/list/pending/delete/{id}', [App\Http\Controllers\Auth\Tenant\PosController::class, 'transactionPendingDelete'])->name('tenant.transaction.pending.delete');
+    Route::get('/dashboard/transaction/list/pending/restore/{id}', [App\Http\Controllers\Auth\Tenant\PosController::class, 'transactionPendingRestore'])->name('tenant.transaction.list.pending.restore');
+    Route::post('/dashboard/transaction/list/pending/addcart', [App\Http\Controllers\Auth\Tenant\PosController::class, 'transactionPendingAddCart'])->name('tenant.transaction.pending.addCart');
+    Route::post('/dashboard/transaction/list/pending/updatecart', [App\Http\Controllers\Auth\Tenant\PosController::class, 'transactionPendingUpdateCart'])->name('tenant.transaction.pending.updateCart');
+    Route::post('/dashboard/transaction/list/pending/deletecart', [App\Http\Controllers\Auth\Tenant\PosController::class, 'transactionPendingDeleteCart'])->name('tenant.transaction.pending.deleteCart');
+    Route::post('/dashboard/transaction/list/pending/process', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionPendingProcess'])->name('tenant.pos.transaction.pending.process');
+
     Route::get('/dashboard/transaction/list/pending/payment', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPendingPayment'])->name('tenant.transaction.list.pending.payment');
     Route::get('/dashboard/transaction/list/invoice/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionInvoiceView'])->name('tenant.transaction.invoice');
 
@@ -263,7 +281,6 @@ Route::middleware(['auth:kasir', 'throttle', 'isKasirActive'])->prefix('kasir')-
 
     Route::get('settings', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'kasirSettings'])->name('kasir.settings');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profile'])->name('kasir.profile');
-    Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profileAccountUpdate'])->name('kasir.profile.account.update');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'profileInfoUpdate'])->name('kasir.profile.info.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'password'])->name('kasir.password');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Kasir\ProfileController::class, 'passwordUpdate'])->name('kasir.password.update');

@@ -17,27 +17,47 @@ class ProfileController extends Controller {
     }
 
     public function profile(){
-        return view('kasir.kasir_profile');
+        $profilKasir = Kasir::select(['kasirs.id', 'kasirs.name', 'kasirs.email', 'kasirs.phone', 'kasirs.is_active', 'kasirs.id_store'])
+        ->with(['detail' => function($query){
+            $query->select(['detail_kasirs.id', 
+                            'detail_kasirs.id_kasir', 
+                            'detail_kasirs.no_ktp',
+                            'detail_kasirs.tempat_lahir',
+                            'detail_kasirs.tanggal_lahir',
+                            'detail_kasirs.jenis_kelamin',
+                            'detail_kasirs.alamat',
+                            'detail_kasirs.photo'])
+                    ->where('detail_kasirs.id_kasir', auth()->user()->id)
+                    ->where('detail_kasirs.email', auth()->user()->email)
+                    ->first();
+        }
+        ])
+        ->find(auth()->user()->id);
+        return view('kasir.kasir_profile', compact('profilKasir'));
     }
 
+    // Tidak digunakan karena akun tidak bisa diubah
     public function profileAccountUpdate(Request $request){
-        $profileInfo = Kasir::find(auth()->user()->id);
+        $profileInfo = Kasir::where('email', auth()->user()->email)
+                        ->find(auth()->user()->id);
 
         $profileInfo->update([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
         ]);
-        
+
         $notification = array(
             'message' => 'Data akun berhasil diupdate!',
             'alert-type' => 'success',
         );
         return redirect()->back()->with($notification);
     }
+    // Tidak digunakan karena akun tidak bisa diubah
 
     public function profileInfoUpdate(Request $request){
-        $profileInfo = DetailKasir::find(auth()->user()->detail->id);
+        $profileInfo = DetailKasir::where('email', auth()->user()->email)
+                                ->find(auth()->user()->detail->id);
 
         if($request->hasFile('photo')){
             $file = $request->file('photo');

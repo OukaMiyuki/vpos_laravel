@@ -82,8 +82,8 @@
                             <div class="col-md-12">
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Batch Name</label>
-                                    <input type="hidden" class="form-control @error('id') is-invalid @enderror" name="id" id="id" required value="{{ old('id') }}">
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" required value="{{ old('name') }}" placeholder="Masukkan nama batch">
+                                    <small id="emailHelp" class="form-text text-muted">Isi dengan kode unik untuk product contoh : Produk Mie Goreng isi dengan MGR</small>
                                     @error('name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -95,6 +95,7 @@
                                 <div class="mb-3">
                                     <label for="keterangan" class="form-label">Keterangan</label>
                                     <textarea placeholder="Masukkan keterangan" class="form-control" id="keterangan" name="keterangan" rows="5" spellcheck="false" required>{!! old('keterangan') !!}</textarea>
+                                    <small id="emailHelp" class="form-text text-muted">Isi dengan keterangan dari kode diatas contoh : kode MGR isi dengan Kode Produk untuk Mie Goreng</small>
                                 </div>
                             </div>
                         </div>
@@ -124,6 +125,7 @@
                                     <label for="name" class="form-label">Batch Name</label>
                                     <input type="hidden" readonly class="form-control @error('id') is-invalid @enderror" name="id" id="id" required value="{{ old('id') }}">
                                     <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" required value="{{ old('name') }}" placeholder="Masukkan nama batch">
+                                    <small id="emailHelp" class="form-text text-muted">Isi dengan kode unik untuk product contoh : Produk Mie Goreng isi dengan MGR</small>
                                     @error('name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -135,6 +137,7 @@
                                 <div class="mb-3">
                                     <label for="keterangan" class="form-label">Keterangan</label>
                                     <textarea placeholder="Masukkan keterangan" class="form-control" id="keterangan" name="keterangan" rows="5" spellcheck="false" required>{!! old('keterangan') !!}</textarea>
+                                    <small id="emailHelp" class="form-text text-muted">Isi dengan keterangan dari kode diatas contoh : kode MGR isi dengan Produk Mie Goreng</small>
                                 </div>
                             </div>
                         </div>

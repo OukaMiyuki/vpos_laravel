@@ -42,6 +42,7 @@
                                             <div class="mb-3">
                                                 <label for="barcode" class="form-label">Barcode</label>
                                                 <input required type="text" class="form-control" name="barcode" id="barcode" readonly value="{{ $stock->barcode }}" placeholder="Masukkan barcode">
+                                                <small id="emailHelp" class="form-text text-muted">Barcode tidak boleh sama dengan data stok lain</small>
                                             </div>
                                         </div>
                                         <div class="col-md-6">

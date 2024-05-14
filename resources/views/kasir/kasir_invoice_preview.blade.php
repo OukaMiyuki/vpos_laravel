@@ -105,7 +105,7 @@
                                 <div class="col-sm-6">
                                     <h6>Info Transaksi</h6>
                                     @php
-                                        $field = App\Models\TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
+                                        $field = App\Models\TenantField::where('store_identifier', auth()->user()->id_store)->first();
                                     @endphp
                                     @if (!empty($field))
                                         <address>
@@ -182,8 +182,8 @@
                                 </div> <!-- end col -->
                                 <div class="col-sm-6">
                                     @php
-                                        $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
-                                        $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                                        $diskon = App\Models\Discount::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();
+                                        $pajak =  App\Models\Tax::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();
                                     @endphp
                                     <div class="float-end">
                                         <p><b>Sub-total (Rp.):</b> <span class="float-end">{{ $total }}</span></p>

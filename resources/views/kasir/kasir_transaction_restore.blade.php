@@ -80,8 +80,8 @@
                                 @php
                                     $nominaldiskon=0;
                                     $sub_total_belanja=0;
-                                    $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
-                                    $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                                    $diskon = App\Models\Discount::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();
+                                    $pajak =  App\Models\Tax::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();
                                 @endphp
                                 <p class="pos-price-text">Total Item Quantity : {{ $totalqty }} </p>
                                 <p class="pos-price-text">Diskon (

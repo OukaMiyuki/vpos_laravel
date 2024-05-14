@@ -10,6 +10,7 @@ class DetailKasir extends Model {
     use HasFactory;
     protected $fillable = [
         'id_kasir',
+        'email',
         'no_ktp',
         'tempat_lahir',
         'tanggal_lahir',

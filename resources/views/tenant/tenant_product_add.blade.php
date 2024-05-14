@@ -35,12 +35,18 @@
                                                 <input type="text" class="form-control" name="p_name" id="p_name" required value="{{ old('p_name') }}" placeholder="Masukkan nama produk">
                                             </div>
                                         </div>
+                                        @php
+                                            $store = App\Models\StoreDetail::select(['store_identifier'])
+                                                                ->where('id_tenant', auth()->user()->id)
+                                                                ->where('email', auth()->user()->email)
+                                                                ->first();
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="category" class="form-label">Category</label>
                                                 <select class="form-select @error('category') is-invalid @enderror" id="category" name="category" required>
                                                     <option value="">- Pilih Kategori Barang -</option>
-                                                    @foreach (App\Models\ProductCategory::where('id_tenant', auth()->user()->id)->latest()->get() as $cat)
+                                                    @foreach (App\Models\ProductCategory::where('store_identifier', $store->store_identifier)->latest()->get() as $cat)
                                                         <option value="{{ $cat->id }}"@if (old('category') == $cat->id) selected="selected" @endif>{{ $cat->name }}</option>
                                                     @endforeach
                                                 </select>
@@ -53,7 +59,7 @@
                                                 <label for="batch" class="form-label">Batch ID</label>
                                                 <select class="form-select @error('batch') is-invalid @enderror" id="batch" name="batch" required>
                                                     <option value="">- Pilih Batch ID -</option>
-                                                    @foreach (App\Models\Batch::where('id_tenant', auth()->user()->id)->latest()->get() as $batch)
+                                                    @foreach (App\Models\Batch::where('store_identifier', $store->store_identifier)->latest()->get() as $batch)
                                                         <option value="{{ $batch->id }}"@if (old('batch') == $batch->id) selected="selected" @endif>{{ $batch->batch_code }} -  {{ $batch->keterangan }}</option>
                                                     @endforeach
                                                 </select>
@@ -64,7 +70,7 @@
                                                 <label for="supplier" class="form-label">Supplier</label>
                                                 <select class="form-select @error('supplier') is-invalid @enderror" id="supplier" name="supplier" required>
                                                     <option value="">- Pilih Supplier -</option>
-                                                    @foreach (App\Models\Supplier::where('id_tenant', auth()->user()->id)->latest()->get() as $sup)
+                                                    @foreach (App\Models\Supplier::where('store_identifier', $store->store_identifier)->latest()->get() as $sup)
                                                         <option value="{{ $sup->id }}"@if (old('supplier') == $sup->id) selected="selected" @endif>{{ $sup->nama_supplier }}</option>
                                                     @endforeach
                                                 </select>
@@ -76,12 +82,14 @@
                                             <div class="mb-3">
                                                 <label for="gudang" class="form-label">Nomor Gudang (Opsional)</label>
                                                 <input type="text" class="form-control" name="gudang" id="gudang" value="{{ old('gudang') }}" placeholder="Masukkan nomor gudang">
+                                                <small id="emailHelp" class="form-text text-muted">Tidak wajib diisi atau boleh dikosongi</small>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="rak" class="form-label">Nomor Rak (Opsional)</label>
                                                 <input type="text" class="form-control" name="rak" id="rak" value="{{ old('rak') }}" placeholder="Masukkan nomor rak">
+                                                <small id="emailHelp" class="form-text text-muted">Tidak wajib diisi atau boleh dikosongi</small>
                                             </div>
                                         </div>
                                     </div>

@@ -11,12 +11,12 @@
             <center id="top">
                 <div class="logo"></div>
                 <div class="info">
-                    <h2 class="storeTitle">@if(!empty(auth()->user()->tenant->storeDetail->name)){{ auth()->user()->tenant->storeDetail->name }}@endif</h2>
-					<p  class="storeAddress">@if(!empty(auth()->user()->tenant->storeDetail->alamat)){{ auth()->user()->tenant->storeDetail->alamat }}@endif</p>
+                    <h2 class="storeTitle">@if(!empty(auth()->user()->store->name)){{ auth()->user()->store->name }}@endif</h2>
+					<p  class="storeAddress">@if(!empty(auth()->user()->store->alamat)){{ auth()->user()->store->alamat }}@endif</p>
                 </div>
             </center>
             @php
-                $field = App\Models\TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
+                $field = App\Models\TenantField::where('store_identifier', auth()->user()->id_store)->first();
             @endphp
             @if(!empty($field->id))
                 @if ( !empty($invoice->invoiceField->content1) || !empty($invoice->invoiceField->content2) || !empty($invoice->invoiceField->content3) || !empty($invoice->invoiceField->content4) || !empty($invoice->invoiceField->content5))
@@ -110,8 +110,8 @@
                         @endforeach
                     </table>
                     @php
-                        $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
-                        $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                        $diskon = App\Models\Discount::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();
+                        $pajak =  App\Models\Tax::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();
                     @endphp
                     <table class="payments">
                         <colgroup>

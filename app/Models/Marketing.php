@@ -10,10 +10,10 @@ use App\Notifications\Marketing\EmailVerificationNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\DetailMarketing;
 use App\Models\InvitationCode;
-use App\Models\MarketingWallet;
 use App\Models\Tenant;
 use App\Models\StoreDetail;
-use App\Models\RekeningMarketing;
+use App\Models\Rekening;
+use App\Models\QrisWallet;
 
 class Marketing extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable, \Staudenmeir\EloquentHasManyDeep\HasRelationships;
@@ -79,14 +79,6 @@ class Marketing extends Authenticatable implements MustVerifyEmail {
         );
     }
 
-    public function saldoQris(){
-        return $this->hasOne(MarketingWallet::class, 'id_marketing', 'id');
-    }
-
-    public function rekening(){
-        return $this->hasOne(RekeningMarketing::class, 'id_marketing', 'id');
-    }
-
     public function sendEmailVerificationNotification() {
         $this->notify(new EmailVerificationNotification);
     }
@@ -103,11 +95,14 @@ class Marketing extends Authenticatable implements MustVerifyEmail {
     }
 
     public function createWallet($model){
-        $marketingWallet = new MarketingWallet();
-        $marketingWallet->id_marketing = $model->id;
-        $marketingWallet->save();
-        $rekeningMarketing = new RekeningMarketing();
-        $rekeningMarketing->id_marketing = $model->id;
-        $rekeningMarketing->save();
+        $rekening = new Rekening();
+        $qrisWallet = new QrisWallet();
+        $rekening->id_user = $model->id;
+        $rekening->email = $model->email;
+        $rekening->save();
+        $qrisWallet->id_user = $model->id;
+        $qrisWallet->email = $model->email;
+        $qrisWallet->nominal = 0;
+        $qrisWallet->save();
     }
 }

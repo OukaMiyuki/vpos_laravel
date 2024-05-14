@@ -14,7 +14,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Marketing;
 use App\Models\DetailMarketing;
-use App\Models\RekeningMarketing;
+use App\Models\Rekening;
+use Exception;
 
 class ProfileController extends Controller {
     public function marketingSettings(){
@@ -246,7 +247,7 @@ class ProfileController extends Controller {
 
     public function whatsappOTPSubmit(Request $request){
         if(!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "") {
-            return redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD);
+            return redirect()->route('marketing.dashboard');
         } else {
             $kode = (int) $request->otp;
             $otp = (new Otp)->validate(auth()->user()->phone, $kode);
@@ -270,7 +271,9 @@ class ProfileController extends Controller {
         }
     }
     public function rekeningSetting(Request $request){
-        $rekening = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
+        $rekening = Rekening::where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
         $dataRekening = "";
         if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
             $ip = "36.84.106.3";
@@ -309,6 +312,7 @@ class ProfileController extends Controller {
     public function rekeningSettingUpdate(Request $request){
         $kode = (int) $request->otp;
         $swift_code = $request->swift_code;
+        $nama_bank = $request->nama_bank;
         $rekening = $request->no_rekening;
 
         $otp = (new Otp)->validate(auth()->user()->phone, $kode);
@@ -319,11 +323,13 @@ class ProfileController extends Controller {
             );
             return redirect()->back()->with($notification);
         } else {
-            $rekeningAkun = RekeningMarketing::where('id_marketing', auth()->user()->id)->first();
+            $rekeningAkun = Rekening::where('id_user', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
             $rekeningAkun->update([
                 'no_rekening' => $rekening,
+                'nama_bank' => $nama_bank,
                 'swift_code' => $swift_code,
-                'is_confirmed' => 1
             ]);
             $notification = array(
                 'message' => 'Update nomor rekening berhasil!',

@@ -46,27 +46,29 @@
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
-                                        @foreach($kasirListNonActive as $kasir)
-                                            <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $kasir->name }}</td>
-                                                <td>{{ $kasir->email }}</td>
-                                                <td>Kasir</td>
-                                                <td>{{ $kasir->detail->jenis_kelamin }}</td>
-                                                <td>{{ $kasir->detail->no_ktp }}</td>
-                                                <td>
-                                                    @if($kasir->is_active == 1)
-                                                        <span class="badge bg-soft-success text-success">Aktif</span>
-                                                    @else
-                                                        <span class="badge bg-soft-danger text-danger">Non Aktif</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('tenant.kasir.detail', ['id' => $kasir->id]) }}">
-                                                        <button title="Lihat data kasir" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
-                                                    </a>
-                                                </td>
-                                            </tr>
+                                        @foreach($kasirListNonActive as $key => $kasir)
+                                            @foreach ($kasir->kasir as $key => $k)
+                                                <tr>
+                                                    <td>{{ $no+=1 }}</td>
+                                                    <td>{{ $k->name }}</td>
+                                                    <td>{{ $k->email }}</td>
+                                                    <td>Kasir</td>
+                                                    <td>{{ $k->detail->jenis_kelamin }}</td>
+                                                    <td>{{ $k->detail->no_ktp }}</td>
+                                                    <td>
+                                                        @if($k->is_active == 1)
+                                                            <span class="badge bg-soft-success text-success">Aktif</span>
+                                                        @else
+                                                            <span class="badge bg-soft-danger text-danger">Non Aktif</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ route('tenant.kasir.detail', ['id' => $k->id]) }}">
+                                                            <button title="Lihat data kasir" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @endforeach
                                     </tbody>
                                 </table>

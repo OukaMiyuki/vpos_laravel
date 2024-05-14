@@ -14,6 +14,7 @@ use App\Models\InvitationCode;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -54,14 +55,16 @@ class RegisterController extends Controller {
             'id_inv_code' => $invitationcodeid->id
         ]);
 
+        $randomString = Str::random(30);
+
         // Auth::guard('tenant')->login($tenant);
 
         // return redirect(RouteServiceProvider::TENANT_DASHBOARD);
 
         if(!is_null($tenant)) {
             $tenant->detailTenantStore($tenant);
-            $tenant->fieldInsert($tenant);
-            $tenant->storeInsert($tenant);
+            $tenant->fieldInsert($randomString);
+            $tenant->storeInsert($tenant, $randomString);
             $tenant->createWallet($tenant);
         }
 

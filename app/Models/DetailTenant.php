@@ -10,6 +10,7 @@ class DetailTenant extends Model {
     use HasFactory;
     protected $fillable = [
         'id_tenant',
+        'email',
         'no_ktp',
         'tempat_lahir',
         'tanggal_lahir',

@@ -48,6 +48,8 @@
                                                             <option @if($rekening->swift_code == $bank->swiftCode) selected @endif value="{{$bank->swiftCode}}">{{$bank->bankName}}</option>
                                                         @endforeach
                                                     </select>
+                                                    <small id="emailHelp" class="form-text text-danger"><strong>Pastikan anda memasukkan data bank dan nomor rekening dengan benar!</strong></small>
+                                                    <input type="hidden" readonly class="d-none" name="nama_bank" id="nama_bank" required value="">
                                                 </div>
                                             </div>
                                         </div>

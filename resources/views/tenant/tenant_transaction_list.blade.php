@@ -40,6 +40,7 @@
                                             <th>Kasir</th>
                                             <th>Tanggal Transaksi</th>
                                             <th>Pembayaran</th>
+                                            <th>Transaksi Oleh</th>
                                             <th>Status Transaksi</th>
                                             <th>Status Pembayaran</th>
                                         </tr>
@@ -50,14 +51,27 @@
                                             <tr>
                                                 <td>
                                                     <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                        <button title="Lihat Invoice" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                 </td>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->kasir->name }}</td>
+                                                <td>
+                                                    @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
+                                                        Transaksi Oleh Tenant
+                                                    @else
+                                                        {{ $invoice->kasir->name }}
+                                                    @endif
+                                                </td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
                                                 <td>{{ $invoice->jenis_pembayaran }}</td>
+                                                <td>
+                                                    @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
+                                                        Tenant
+                                                    @else
+                                                        Kasir
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     @if (!empty($invoice->jenis_pembayaran) || !is_null($invoice->jenis_pembayaran) || $invoice->jenis_pembayaran != "")
                                                         @if($invoice->status_pembayaran == 0)

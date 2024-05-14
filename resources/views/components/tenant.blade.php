@@ -33,6 +33,7 @@
         <script src="{{ asset('assets/js/head.js') }}"></script>
         {{-- <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" > --}}
         <link href="{{ asset('assets/libs/toastr/build/toastr.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/css/pos.css') }}" rel="stylesheet" type="text/css" />
     </head>
     <!-- body start -->
     <body data-layout-mode="default" data-theme="light" data-topbar-color="dark" data-menu-position="fixed" data-leftbar-color="light" data-leftbar-size='default' data-sidebar-user='false'>
@@ -131,6 +132,10 @@
         <!-- Init js-->
         <script src="{{ asset('assets/js/pages/form-advanced.init.js') }}"></script>
         <Script type="text/javascript" src="{{ asset('assets/js/pages/tenant.init.js') }}"></Script>
+
+        @if(Route::is('tenant.product.stock.add') || Route::is('tenant.product.stock.edit') || Route::is('tenant.pos'))
+            <Script type="text/javascript" src="{{ asset('assets/js/pages/onscaninit.js') }}"></Script>
+        @endif
 
         {{-- Custom FOrm JS --}}
 

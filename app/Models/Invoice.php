@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use GuzzleHttp\Client;
@@ -10,6 +11,7 @@ use App\Models\ShoppingCart;
 use App\Models\Kasir;
 use App\Models\Tenant;
 use App\Models\InvoiceField;
+use App\Models\StoreDetail;
 use Exception;
 use App\Models\Product;
 use App\Models\ProductStock;
@@ -22,6 +24,10 @@ class Invoice extends Model {
     use HasFactory;
 
     protected $guarded = [];
+
+    public function store(){
+        return $this->belongsTo(StoreDetail::class, 'store_identifier', 'store_identifier');
+    }
 
     public function tenant(){
         return $this->belongsTo(Tenant::class, 'id_tenant', 'id');
@@ -44,7 +50,6 @@ class Invoice extends Model {
     }
 
     public function storeCart($model){
-        $ShoppingCart = new ShoppingCart();
         $cartContent = Cart::content();
         foreach($cartContent as $cart){
             ShoppingCart::create([
@@ -60,11 +65,6 @@ class Invoice extends Model {
             $stock->update([
                 'stok' => $updateStok
             ]);
-            // $stokProduct = ProductStock::with('product')->where('id_tenant', auth()->user()->id)->where('id', $cart->id)->get();
-            // $totalStok = ((int) $stokProduct->product - (int) $stok) + (int) $model->stok;
-            // $stokProduct->update([
-            //     'stok' => $totalStok
-            // ]);
         }
     }
 
@@ -93,21 +93,16 @@ class Invoice extends Model {
         }
         $InvoiceField = new InvoiceField();
         $InvoiceField->id_invoice = $model->id;
-        $InvoiceField->id_kasir = auth()->user()->id;
-        $InvoiceField->id_custom_field = auth()->user()->tenant->tenantField->id;
         $InvoiceField->content1 = $content1;
         $InvoiceField->content2 = $content2;
         $InvoiceField->content3 = $content3;
         $InvoiceField->content4 = $content4;
         $InvoiceField->content5 = $content5;
         $InvoiceField->save();
-        $CustomerIdentifier = CustomerIdentifier::where('id_kasir', auth()->user()->id)
-                                                    ->where('id_invoice', $model->id)
-                                                    ->first();
+        $CustomerIdentifier = CustomerIdentifier::where('id_invoice', $model->id)->first();
         if(empty($CustomerIdentifier) || is_null($CustomerIdentifier) || $CustomerIdentifier == NULL || $CustomerIdentifier == ""){
             $CustomerIdentifier = new CustomerIdentifier();
             $CustomerIdentifier->id_invoice = $model->id;
-            $CustomerIdentifier->id_kasir = auth()->user()->id;
             $CustomerIdentifier->customer_info = $customerInfo;
             $CustomerIdentifier->save();
         } else {
@@ -124,7 +119,6 @@ class Invoice extends Model {
         }
         $CustomerIdentifier = new CustomerIdentifier();
         $CustomerIdentifier->id_invoice = $model->id;
-        $CustomerIdentifier->id_kasir = auth()->user()->id;
         $CustomerIdentifier->customer_info = $customerInfo;
         $CustomerIdentifier->description   = request()->description;
         $CustomerIdentifier->save();
@@ -143,8 +137,18 @@ class Invoice extends Model {
     }
 
     public function updateTunaiWallet($total){
-        $tunaiWallet = TunaiWallet::where('id_tenant', auth()->user()->id_tenant)->first();
-        $totalSaldo = (int) $tunaiWallet->saldo+$total;
+        $tunaiWallet = "";
+        if(Auth::guard('tenant')->check()){
+            $tunaiWallet = TunaiWallet::where('id_tenant', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
+                                        ->first();
+        } else if(Auth::guard('kasir')->check()){
+            $tunaiWallet = TunaiWallet::where('id_tenant', auth()->user()->store->id_tenant)
+                                        ->where('email', auth()->user()->store->email)
+                                        ->first();
+        }
+
+        $totalSaldo = $tunaiWallet->saldo+$total;
         $tunaiWallet->update([
             'saldo' => $totalSaldo
         ]);
@@ -155,22 +159,20 @@ class Invoice extends Model {
 
         static::creating(function($model){
             $client = new Client();
-            $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
+            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
             $invoice_code = "VP";
             $time=time();
             $date = date('dmYHis');
-            $index_number = Invoice::where('id_tenant', auth()->user()->id_tenant)
-                                            ->where('id_kasir', auth()->user()->id)
-                                            ->max('id') + 1;
+            $index_number = Invoice::max('id') + 1;
             $generate_nomor_invoice = $invoice_code.$date.str_pad($index_number, 9, '0', STR_PAD_LEFT);
             $model->nomor_invoice = $generate_nomor_invoice;
             if($model->jenis_pembayaran == "Qris"){
-                $qrisAccount = TenantQrisAccount::where('id_tenant', auth()->user()->id)
-                                                    ->where('email', auth()->user()->email)
-                                                    ->first();
-                if(!empty($qrisAccount) || !is_null($qrisAccount)){
+                // $qrisAccount = TenantQrisAccount::where('id_tenant', auth()->user()->id)
+                //                                     ->where('email', auth()->user()->email)
+                //                                     ->first();
+                // if(!empty($qrisAccount) || !is_null($qrisAccount)){
 
-                }
+                // }
                 try {
                     $postResponse = $client->request('POST',  $url, [
                         'form_params' => [
@@ -182,6 +184,7 @@ class Invoice extends Model {
                     ]);
                     $responseCode = $postResponse->getStatusCode();
                     $data = json_decode($postResponse->getBody());
+                    //dd($data);
                     $model->qris_data = $data->data->data->qrisData;
                 } catch (Exception $e) {
                     return $e;

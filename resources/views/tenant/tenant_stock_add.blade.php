@@ -27,13 +27,19 @@
                                 <form method="post" action="{{ route('tenant.product.stock.insert') }}">
                                     @csrf
                                     <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Add Stock</h5>
+                                    @php
+                                    $store = App\Models\StoreDetail::select(['store_identifier'])
+                                                        ->where('id_tenant', auth()->user()->id)
+                                                        ->where('email', auth()->user()->email)
+                                                        ->first();
+                                    @endphp
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="id_batch_product" class="form-label">Product Name</label>
                                                 <select required class="form-control" name="id_batch_product" id="id_batch_product" data-toggle="select2" data-width="100%">
                                                     <option value="">- Pilih Batch Product -</option>
-                                                    @foreach (App\Models\Product::where('id_tenant', auth()->user()->id)->latest()->get() as $product)
+                                                    @foreach (App\Models\Product::where('store_identifier', $store->store_identifier)->latest()->get() as $product)
                                                         <option value="{{ $product->id }}"@if (old('id_batch_product') == $product->id) selected="selected" @endif>{{ $product->product_code }} - {{ $product->product_name }}</option>
                                                     @endforeach
                                                 </select>
@@ -47,6 +53,7 @@
                                                 <div class="row">
                                                     <div class="col-6">
                                                         <input required type="text" class="form-control" name="barcode" id="barcode" value="" placeholder="Masukkan barcode" readonly>
+                                                        <small id="emailHelp" class="form-text text-muted">Barcode tidak boleh sama dengan data stok lain</small>
                                                     </div>
                                                     <div class="col-6">
                                                         <button type="button" id="enable_manual_batcode" class="btn btn-success waves-effect waves-light w-100">Input Barcode Manual</button>

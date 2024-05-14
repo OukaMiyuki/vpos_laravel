@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('marketing_wallets', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('id_marketing')->unique();
-            $table->string('saldo')->default(0);
-            $table->timestamps();
+        Schema::table('tenant_fields', function (Blueprint $table) {
+            $table->string('email')->after('id_tenant')->nullable();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('marketing_wallets');
+        Schema::table('tenant_fields', function (Blueprint $table) {
+            //
+        });
     }
 };

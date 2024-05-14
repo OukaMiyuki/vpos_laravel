@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Tenant;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\File;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -20,75 +21,141 @@ use App\Models\TenantField;
 use App\Models\Invoice;
 use App\Models\QrisWallet;
 use App\Models\TunaiWallet;
+use App\Models\StoreDetail;
 
 class TenantController extends Controller {
 
+    public function getStoreIdentifier(){
+        $store = StoreDetail::select(['store_identifier'])
+                            ->where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $identifier = $store->store_identifier;
+        return $identifier;
+    }
+
     public function index(){
+        $identifier = $this->getStoreIdentifier();
         $todayTransaction = Invoice::whereDate('tanggal_transaksi', Carbon::today())
-                                    ->where('id_tenant', auth()->user()->id)
+                                    ->where('store_identifier', $identifier)
                                     ->count();
         $todayTransactionFinish = Invoice::whereDate('tanggal_transaksi', Carbon::today())
-                                    ->where('id_tenant', auth()->user()->id)
+                                    ->where('store_identifier', $identifier)
                                     ->where('status_pembayaran', 1)
                                     ->count();
         $invoice = Invoice::where('id_tenant', auth()->user()->id)->count();
         $latestInvoice = Invoice::with('kasir')
-                                ->where('id_tenant', auth()->user()->id)
+                                ->where('store_identifier', $identifier)
                                 ->where('status_pembayaran', 1)
                                 ->latest()
                                 ->take(10)
                                 ->get();
-        $qrisWallet = QrisWallet::where('id_tenant', auth()->user()->id)->first();
-        $tunaiWallet = TunaiWallet::where('id_tenant', auth()->user()->id)->first();
-        $totalSaldo = (int)filter_var($qrisWallet->saldo, FILTER_SANITIZE_NUMBER_INT) + (int) filter_var($tunaiWallet->saldo, FILTER_SANITIZE_NUMBER_INT);
+        $qrisWallet = QrisWallet::where('id_user', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
+        $tunaiWallet = TunaiWallet::where('id_tenant', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
+        $totalSaldo = $qrisWallet->saldo + $tunaiWallet->saldo;
+         
         $pemasukanHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
-                            ->where('id_tenant', auth()->user()->id)
+                            ->where('store_identifier', $identifier)
                             ->where('status_pembayaran', 1)
-                            ->sum('sub_total');
-        $pajakHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
-                            ->where('id_tenant', auth()->user()->id)
-                            ->where('status_pembayaran', 1)
-                            ->sum('pajak');
-        $totalHariIni = (int)filter_var($pemasukanHariIni, FILTER_SANITIZE_NUMBER_INT) + (int)filter_var($pajakHariIni, FILTER_SANITIZE_NUMBER_INT);
-        return view('tenant.dashboard', compact('todayTransaction', 'invoice', 'todayTransactionFinish', 'latestInvoice', 'totalSaldo', 'totalHariIni'));
+                            ->sum(DB::raw('sub_total + pajak'));
+        return view('tenant.dashboard', compact('todayTransaction', 'todayTransactionFinish', 'invoice', 'latestInvoice', 'totalSaldo', 'pemasukanHariIni'));
     }
 
     public function tenantKasirDashboard(){
-        $semuaKasirCount = Kasir::where('id_tenant', auth()->user()->id)->count();
-        $kasirAktifCount = Kasir::where('id_tenant', auth()->user()->id)
+        $store = StoreDetail::select(['store_identifier'])
+                            ->where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $semuaKasirCount = Kasir::where('id_store', $store->store_identifier)->count();
+        $kasirAktifCount = Kasir::where('id_store', $store->store_identifier)
                                     ->where('is_active', 1)
                                     ->count();
-        $kasirNonAktiFCount = Kasir::where('id_tenant', auth()->user()->id)
+        $kasirNonAktiFCount = Kasir::where('id_store', $store->store_identifier)
                                     ->where('is_active', 0)
                                     ->count();
         return view('tenant.tenant_kasir', compact('semuaKasirCount', 'kasirAktifCount', 'kasirNonAktiFCount'));
     }
 
     public function kasirList(){
-        $kasir = Kasir::with('detail')
-                        ->select(['id','name', 'email', 'is_active'])
-                        ->where('id_tenant', auth()->user()->id)
-                        ->latest()
-                        ->get();
+        $kasir = StoreDetail::select(['store_details.id', 'store_details.store_identifier'])
+                            ->where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->with(['kasir' => function($query){
+                                $query->select(['kasirs.id',
+                                                'kasirs.name',
+                                                'kasirs.email',
+                                                'kasirs.phone',
+                                                'kasirs.is_active',
+                                                'kasirs.id_store'])
+                                        ->with(['detail' => function($query){
+                                            $query->select(['detail_kasirs.id',
+                                                            'detail_kasirs.id_kasir',
+                                                            'detail_kasirs.no_ktp',
+                                                            'detail_kasirs.jenis_kelamin'
+
+                                            ])
+                                            ->get();
+                                        }])
+                                        ->get();
+                            }])
+                            ->get();
         return view('tenant.tenant_kasir_list', compact('kasir'));
     }
 
     public function kasirListActive(){
-        $kasirListActive = Kasir::where('id_tenant', auth()->user()->id)
-                                    ->where('is_active', 1)
-                                    ->select(['id', 'name', 'email', 'is_active'])
-                                    ->with('detail')
-                                    ->latest()
+        $kasirListActive = StoreDetail::select(['store_details.id', 'store_details.store_identifier'])
+                                    ->where('id_tenant', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->with(['kasir' => function($query){
+                                        $query->select(['kasirs.id',
+                                                        'kasirs.name',
+                                                        'kasirs.email',
+                                                        'kasirs.phone',
+                                                        'kasirs.is_active',
+                                                        'kasirs.id_store'])
+                                                ->with(['detail' => function($query){
+                                                    $query->select(['detail_kasirs.id',
+                                                                    'detail_kasirs.id_kasir',
+                                                                    'detail_kasirs.no_ktp',
+                                                                    'detail_kasirs.jenis_kelamin'
+
+                                                    ])
+                                                    ->get();
+                                                }])
+                                                ->where('kasirs.is_active', 1)
+                                                ->get();
+                                    }])
                                     ->get();
         return view('tenant.tenant_kasir_list_active', compact('kasirListActive'));
     }
 
     public function kasirListNonActive(){
-        $kasirListNonActive = Kasir::where('id_tenant', auth()->user()->id)
-                                    ->where('is_active', 0)
-                                    ->select(['id', 'name', 'email', 'is_active'])
-                                    ->with('detail')
-                                    ->latest()
+        $kasirListNonActive = StoreDetail::select(['store_details.id', 'store_details.store_identifier'])
+                                    ->where('id_tenant', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->with(['kasir' => function($query){
+                                        $query->select(['kasirs.id',
+                                                        'kasirs.name',
+                                                        'kasirs.email',
+                                                        'kasirs.phone',
+                                                        'kasirs.is_active',
+                                                        'kasirs.id_store'])
+                                                ->with(['detail' => function($query){
+                                                    $query->select(['detail_kasirs.id',
+                                                                    'detail_kasirs.id_kasir',
+                                                                    'detail_kasirs.no_ktp',
+                                                                    'detail_kasirs.jenis_kelamin'
+
+                                                    ])
+                                                    ->get();
+                                                }])
+                                                ->where('kasirs.is_active', 0)
+                                                ->get();
+                                    }])
                                     ->get();
         return view('tenant.tenant_kasir_list_non_active', compact('kasirListNonActive'));
     }
@@ -102,24 +169,16 @@ class TenantController extends Controller {
             return redirect()->back()->with($notification);
         }
         
-        // $request->validate([
-        //     'name' => ['required', 'string', 'max:255'],
-        //     'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
-        //     'no_ktp' => ['required', 'string', 'numeric', 'digits:16', 'unique:'.DetailAdmin::class, 'unique:'.DetailMarketing::class, 'unique:'.DetailTenant::class, 'unique:'.DetailKasir::class],
-        //     'phone' => ['required', 'string', 'numeric', 'digits_between:1,20', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
-        //     'jenis_kelamin' => ['required'],
-        //     'tempat_lahir' => ['required'],
-        //     'tanggal_lahir' => ['required'],
-        //     'alamat' => ['required', 'string', 'max:255'],
-        //     'password' => ['required', 'confirmed', 'min:8'],
-        // ]);
-
+        $store = StoreDetail::select(['store_identifier'])
+                            ->where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
         $kasir = Kasir::create([
-            'id_tenant' => auth()->user()->id,
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
+            'id_store' => $store->store_identifier
         ]);
 
         if(!is_null($kasir)) {
@@ -135,24 +194,39 @@ class TenantController extends Controller {
     }
 
     public function kasirDetail($id){
-        $kasir = Kasir::where('id_tenant', auth()->user()->id)
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $kasir = Kasir::where('id_store', $store->store_identifier)
                         ->select(['id','name', 'email', 'is_active', 'phone'])
                         ->with('detail')
                         ->find($id);
+        if(is_null($kasir) || empty($kasir)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'info',
+            );
+    
+            return redirect()->route('tenant.kasir.list')->with($notification);
+        }
         return view('tenant.tenant_kasir_detail', compact('kasir'));
     }
 
     public function tenantMenuToko(){
-        $supplierCount = Supplier::where('id_tenant', auth()->user()->id)->count();
-        $batchCount = Batch::where('id_tenant', auth()->user()->id)->count();
-        $categoryCount = ProductCategory::where('id_tenant', auth()->user()->id)->count();
-        $batchProductCount = Product::where('id_tenant', auth()->user()->id)->count();
-        $barcodeCount = ProductStock::where('id_tenant', auth()->user()->id)->count();
+        $identifier = $this->getStoreIdentifier();
+        $supplierCount = Supplier::where('store_identifier', $identifier)->count();
+        $batchCount = Batch::where('store_identifier', $identifier)->count();
+        $categoryCount = ProductCategory::where('store_identifier', $identifier)->count();
+        $batchProductCount = Product::where('store_identifier', $identifier)->count();
+        $barcodeCount = ProductStock::where('store_identifier', $identifier)->count();
         return view('tenant.tenant_toko', compact('supplierCount', 'batchCount', 'categoryCount', 'batchProductCount', 'barcodeCount'));
     }
 
     public function supplierList(){
-        $supplier = Supplier::where('id_tenant', auth()->user()->id)->latest()->get();
+        $identifier = $this->getStoreIdentifier();
+        $supplier = Supplier::where('store_identifier', $identifier)
+                            ->latest()
+                            ->get();
         return view('tenant.tenant_supplier_list', compact('supplier'));
     }
 
@@ -164,8 +238,9 @@ class TenantController extends Controller {
             );
             return redirect()->back()->with($notification);
         } else {
+            $identifier = $this->getStoreIdentifier();
             Supplier::create([
-                'id_tenant' => auth()->user()->id,
+                'store_identifier' => $identifier,
                 'nama_supplier' => $request->nama_supplier,
                 'email_supplier' => $request->email,
                 'phone_supplier' => $request->phone,
@@ -182,7 +257,18 @@ class TenantController extends Controller {
     }
 
     public function supplierUpdate(Request $request) {
-        $supplier = Supplier::find($request->id);
+        $identifier = $this->getStoreIdentifier();
+        $supplier = Supplier::where('store_identifier', $identifier)
+                            ->find($request->id);
+        
+        if(empty($supplier) || is_null($supplier)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
 
         $supplier->update([
             'nama_supplier' => $request->nama_supplier,
@@ -194,7 +280,7 @@ class TenantController extends Controller {
 
 
         $notification = array(
-            'message' => 'Data berhasil ditambahkan!',
+            'message' => 'Data berhasil diupdate!',
             'alert-type' => 'info',
         );
 
@@ -202,7 +288,17 @@ class TenantController extends Controller {
     }
 
     public function supplierDelete($id){
-        $supplier = Supplier::find($id);
+        $identifier = $this->getStoreIdentifier();
+        $supplier = Supplier::where('store_identifier', $identifier)
+                            ->find($id);
+        if(empty($supplier) || is_null($supplier)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
         $supplier->delete();
         $notification = array(
             'message' => 'Data berhasil dihapus!',
@@ -213,7 +309,10 @@ class TenantController extends Controller {
     }
 
     public function batchList(){
-        $batch = Batch::where('id_tenant', auth()->user()->id)->latest()->get();
+        $identifier = $this->getStoreIdentifier();
+        $batch = Batch::where('store_identifier', $identifier)
+                        ->latest()
+                        ->get();
         return view('tenant.tenant_batch_list', compact('batch'));
     }
 
@@ -225,9 +324,9 @@ class TenantController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-
+        $identifier = $this->getStoreIdentifier();
         Batch::create([
-            'id_tenant' => auth()->user()->id,
+            'store_identifier' => $identifier,
             'batch_code' => $request->name,
             'keterangan' => $request->keterangan
         ]);
@@ -241,7 +340,18 @@ class TenantController extends Controller {
     }
 
     public function batchUpdate(Request $request){
-        $batch = Batch::find($request->id);
+        $identifier = $this->getStoreIdentifier();
+        $batch = Batch::where('store_identifier', $identifier)
+                        ->find($request->id);
+        
+        if(empty($batch) || is_null($batch)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
 
         $batch->update([
             'batch_code' => $request->name,
@@ -258,7 +368,19 @@ class TenantController extends Controller {
     }
 
     public function batchDelete($id){
-        $batch = Batch::find($id);
+        $identifier = $this->getStoreIdentifier();
+        $batch = Batch::where('store_identifier', $identifier)
+                        ->find($id);
+        
+        if(empty($batch) || is_null($batch)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
+
         $batch->delete();
 
         $notification = array(
@@ -270,7 +392,10 @@ class TenantController extends Controller {
     }
 
     public function categoryList(){
-        $category = ProductCategory::where('id_tenant', auth()->user()->id)->latest()->get();
+        $identifier = $this->getStoreIdentifier();
+        $category = ProductCategory::where('store_identifier', $identifier)
+                                    ->latest()
+                                    ->get();
         return view('tenant.tenant_category_list', compact('category'));
     }
 
@@ -282,9 +407,10 @@ class TenantController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-
+        
+        $identifier = $this->getStoreIdentifier();
         ProductCategory::create([
-            'id_tenant' => auth()->user()->id,
+            'store_identifier' => $identifier,
             'name' => $request->category
         ]);
 
@@ -297,7 +423,19 @@ class TenantController extends Controller {
     }
 
     public function categoryUpdate(Request $request){
-        $category = ProductCategory::find($request->id);
+        $identifier = $this->getStoreIdentifier();
+        $category = ProductCategory::where('store_identifier', $identifier)
+                                ->find($request->id);
+
+        if(empty($category) || is_null($category)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
+
         $category->update([
             'name'  => $request->category
         ]);
@@ -311,7 +449,19 @@ class TenantController extends Controller {
     }
 
     public function categoryDelete($id){
-        $category = ProductCategory::find($id);
+        $identifier = $this->getStoreIdentifier();
+        $category = ProductCategory::where('store_identifier', $identifier)
+                                ->find($id);
+
+        if(empty($category) || is_null($category)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
+
         $category->delete();
 
         $notification = array(
@@ -323,7 +473,10 @@ class TenantController extends Controller {
     }
 
     public function batchProductList(){
-        $product = Product::where('id_tenant', auth()->user()->id)->latest()->get();
+        $identifier = $this->getStoreIdentifier();
+        $product = Product::where('store_identifier', $identifier)
+                            ->latest()
+                            ->get();
         return view('tenant.tenant_product_list', compact('product'));
     }
 
@@ -340,6 +493,7 @@ class TenantController extends Controller {
             return redirect()->back()->with($notification);
         }
 
+        $identifier = $this->getStoreIdentifier();
         $file = $request->file('photo');
         $namaFile = $request->p_name;
         $storagePath = Storage::path('public/images/product');
@@ -353,7 +507,7 @@ class TenantController extends Controller {
         }
 
         Product::create([
-            'id_tenant' => auth()->user()->id,
+            'store_identifier' => $identifier,
             'id_batch' => $request->batch,
             'id_category' => $request->category,
             'product_name' => $request->p_name,
@@ -374,18 +528,53 @@ class TenantController extends Controller {
     }
 
     public function batchProductDetail($id){
-        $product = Product::where('id_tenant', auth()->user()->id)->find($id);
-        $stockList = ProductStock::with('product')->where('id_tenant', auth()->user()->id)->where('id_batch_product', $id)->latest()->get();
+        $identifier = $this->getStoreIdentifier();
+        $product = Product::where('store_identifier', $identifier)
+                            ->find($id);
+        
+        if(empty($product) || is_null($product)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
+        
+        $stockList = ProductStock::with('product')->where('store_identifier', $identifier)->where('id_batch_product', $id)->latest()->get();
         return view('tenant.tenant_product_detail', compact('product', 'stockList'));
     }
 
     public function batchProductEdit($id){
-        $product = Product::where('id_tenant', auth()->user()->id)->find($id);
+        $identifier = $this->getStoreIdentifier();
+        $product = Product::where('store_identifier', $identifier)
+                            ->find($id);
+
+        if(empty($product) || is_null($product)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
+
         return view('tenant.tenant_product_edit', compact('product'));
     }
 
     public function batchProductUpdate(Request $request){
-        $product = Product::find($request->id);
+        $identifier = $this->getStoreIdentifier();
+        $product = Product::where('store_identifier', $identifier)
+                            ->find($request->id);
+
+        if(empty($product) || is_null($product)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
 
         if($request->hasFile('photo')){
             $file = $request->file('photo');
@@ -442,8 +631,22 @@ class TenantController extends Controller {
     }
 
     public function batchProductDelete($id){
-        $product = Product::where('id_tenant', auth()->user()->id)->find($id);
-        $stok = ProductStock::where('id_batch_product', $product->id)->get();
+        $identifier = $this->getStoreIdentifier();
+        $product = Product::where('store_identifier', $identifier)
+                            ->find($id);
+        
+        if(empty($product) || is_null($product)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+
+            return redirect()->back()->with($notification);
+        }
+
+        $stok = ProductStock::where('id_batch_product', $product->id)
+                            ->where('store_identifier', $identifier)
+                            ->get();
         foreach($stok as $stock){
             $stock->delete();
         }
@@ -456,7 +659,11 @@ class TenantController extends Controller {
     }
 
     public function productStockList(){
-        $stock = ProductStock::with('product')->where('id_tenant', auth()->user()->id)->latest()->get();
+        $identifier = $this->getStoreIdentifier();
+        $stock = ProductStock::with('product')
+                            ->where('store_identifier', $identifier)
+                            ->latest()
+                            ->get();
         return view('tenant.tenant_stock_list', compact('stock'));
     }
 
@@ -473,8 +680,10 @@ class TenantController extends Controller {
             return redirect()->back()->with($notification);
         }
 
+        $identifier = $this->getStoreIdentifier();
+
         ProductStock::create([
-            'id_tenant' => auth()->user()->id,
+            'store_identifier' => $identifier,
             'id_batch_product' => $request->id_batch_product,
             'barcode' => $request->barcode,
             'tanggal_beli' => $request->t_beli,
@@ -491,12 +700,37 @@ class TenantController extends Controller {
     }
 
     public function productStockEdit($id){
-        $stock = ProductStock::with('product')->where('id_tenant', auth()->user()->id)->find($id);
+        $identifier = $this->getStoreIdentifier();
+        $stock = ProductStock::with('product')
+                            ->where('store_identifier', $identifier)
+                            ->find($id);
+
+        if(empty($stock) || is_null($stock)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
+
         return view('tenant.tenant_stock_edit', compact('stock'));
     }
 
     public function productStockUpdate(Request $request){
-        $stock = ProductStock::where('id_tenant', auth()->user()->id)->find($request->id);
+        $identifier = $this->getStoreIdentifier();
+        $stock = ProductStock::where('store_identifier', $identifier)
+                            ->find($request->id);
+        
+        if(empty($stock) || is_null($stock)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
+
         $stock->update([
             'barcode' => $request->barcode,
             'tanggal_beli' => $request->t_beli,
@@ -513,7 +747,19 @@ class TenantController extends Controller {
     }
 
     public function productStockDelete($id){
-        $stock = ProductStock::where('id_tenant', auth()->user()->id)->find($id);
+        $identifier = $this->getStoreIdentifier();
+        $stock = ProductStock::where('store_identifier', $identifier)
+                            ->find($id);
+        
+        if(empty($stock) || is_null($stock)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
+        
         $stock->delete();
         $notification = array(
             'message' => 'Data produk berhasil dihapus!',
@@ -523,7 +769,20 @@ class TenantController extends Controller {
     }
 
     public function productStockBarcode($id){
-        $stok = ProductStock::where('id_tenant', auth()->user()->id)->find($id);
+        $identifier = $this->getStoreIdentifier();
+        $stok = ProductStock::select(['barcode'])
+                            ->where('store_identifier', $identifier)
+                            ->find($id);
+                        
+        if(empty($stok) || is_null($stok)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
+
         return view('tenant.tenant_barcode_show', compact('stok'));
     }
 
@@ -532,7 +791,9 @@ class TenantController extends Controller {
     }
 
     public function discountModify(){
-        $diskon = Discount::where('id_tenant', auth()->user()->id)->first();
+        $identifier = $this->getStoreIdentifier();
+        $diskon = Discount::where('store_identifier', $identifier)
+                            ->first();
         return view('tenant.tenant_discount_modify', compact('diskon'));
     }
 
@@ -545,25 +806,27 @@ class TenantController extends Controller {
             return redirect()->back()->with($notification);
         }
 
-        $diskon = Discount::where('id_tenant', auth()->user()->id)->first();
-        if(empty($diskon)){
-            Discount::create([
-                'id_tenant' => auth()->user()->id,
-                'min_harga' => $request->min_harga,
-                'diskon' => $request->diskon,
-                'start_date' => $request->t_mulai,
-                'end_date' => $request->t_akhir,
-                'is_active' => $request->status
-            ]);
-        } else {
-            $diskon->update([
-                'min_harga' => $request->min_harga,
-                'diskon' => $request->diskon,
-                'start_date' => $request->t_mulai,
-                'end_date' => $request->t_akhir,
-                'is_active' => $request->status
-            ]);
+        $identifier = $this->getStoreIdentifier();
+
+        $diskon = Discount::where('store_identifier', $identifier)
+                            ->first();
+        
+        if(empty($diskon) || is_null($diskon)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
         }
+
+        $diskon->update([
+            'min_harga' => $request->min_harga,
+            'diskon' => $request->diskon,
+            'start_date' => $request->t_mulai,
+            'end_date' => $request->t_akhir,
+            'is_active' => $request->status
+        ]);
 
         $notification = array(
             'message' => 'Data diskon berhasil dimodifikasi!',
@@ -574,7 +837,9 @@ class TenantController extends Controller {
     }
 
     public function pajakModify(){
-        $tax = Tax::where('id_tenant', auth()->user()->id)->first();
+        $identifier = $this->getStoreIdentifier();
+        $tax = Tax::where('store_identifier', $identifier)
+                    ->first();
         return view('tenant.tenant_tax_modify', compact('tax'));
     }
 
@@ -586,20 +851,23 @@ class TenantController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
+        $identifier = $this->getStoreIdentifier();
+        $tax = Tax::where('store_identifier', $identifier)
+                    ->first();
 
-        $tax = Tax::where('id_tenant', auth()->user()->id)->find($request->id);
-        if(empty($tax)){
-            Tax::create([
-                'id_tenant' => auth()->user()->id,
-                'pajak' => $request->pajak,
-                'is_active' => $request->status,
-            ]);
-        } else {
-            $tax->update([
-                'pajak' => $request->pajak,
-                'is_active' => $request->status,
-            ]);
+        if(empty($tax) || is_null($tax)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
         }
+
+        $tax->update([
+            'pajak' => $request->pajak,
+            'is_active' => $request->status,
+        ]);
 
         $notification = array(
             'message' => 'Data pajak berhasil dimodifikasi!',
@@ -610,7 +878,9 @@ class TenantController extends Controller {
     }
 
     public function customField(){
-        $customField = TenantField::where('id_tenant', auth()->user()->id)->first();
+        $identifier = $this->getStoreIdentifier();
+        $customField = TenantField::where('store_identifier', $identifier)
+                                    ->first();
         return view('tenant.tenant_custom_field_list', compact('customField'));
     }
 
@@ -623,7 +893,20 @@ class TenantController extends Controller {
             return redirect()->back()->with($notification);
         }
 
-        $customField = TenantField::where('id_tenant', auth()->user()->id)->find($request->id);
+        $identifier = $this->getStoreIdentifier();
+
+        $customField = TenantField::where('store_identifier', $identifier)
+                                    ->find($request->id);
+
+        if(empty($customField) || is_null($customField)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+    
+            return redirect()->back()->with($notification);
+        }
+
         $aktivasi_baris_1 = $request->aktivasi_baris_1;
         $aktivasi_baris_2 = $request->aktivasi_baris_2;
         $aktivasi_baris_3 = $request->aktivasi_baris_3;
@@ -667,20 +950,22 @@ class TenantController extends Controller {
     }
 
     public function tenantTransaction(){
-        $allTransaksiCount = Invoice::where('id_tenant', auth()->user()->id)->count();
-        $transaksiHariIniCount= Invoice::whereDate('tanggal_transaksi', Carbon::today())
-                                    ->where('id_tenant', auth()->user()->id)
+        $identifier = $this->getStoreIdentifier();
+        $allTransaksiCount = Invoice::where('store_identifier', $identifier)
                                     ->count();
-        $transaksiPendingCount= Invoice::where('id_tenant', auth()->user()->id)
+        $transaksiHariIniCount= Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                                    ->where('store_identifier', $identifier)
+                                    ->count();
+        $transaksiPendingCount= Invoice::where('store_identifier', $identifier)
                                     ->whereNull('jenis_pembayaran')
                                     ->count();
-        $paymentPendingCount= Invoice::where('id_tenant', auth()->user()->id)
+        $paymentPendingCount= Invoice::where('store_identifier', $identifier)
                                     ->where('status_pembayaran', 0)
                                     ->count();
-        $invoiceFinishCount = Invoice::where('id_tenant', auth()->user()->id)
+        $invoiceFinishCount = Invoice::where('store_identifier', $identifier)
                                     ->where('status_pembayaran', 1)
                                     ->count();
-        $invoicePaymentQrisFinish = Invoice::where('id_tenant', auth()->user()->id)
+        $invoicePaymentQrisFinish = Invoice::where('store_identifier', $identifier)
                                     ->where('jenis_pembayaran', 'Qris')
                                     ->where('status_pembayaran', 1)
                                     ->count();
@@ -688,7 +973,8 @@ class TenantController extends Controller {
     }
 
     public function transactionList(){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id)
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::where('store_identifier', $identifier)
                             ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
                             ->with(['kasir' => function($query){
                                 $query->select(['kasirs.id', 'kasirs.name']);
@@ -699,8 +985,9 @@ class TenantController extends Controller {
     }
 
     public function tenantThisDayTransaction(){
+        $identifier = $this->getStoreIdentifier();
         $transaksiHariIni= Invoice::whereDate('tanggal_transaksi', Carbon::today())
-                                    ->where('id_tenant', auth()->user()->id)
+                                    ->where('store_identifier', $identifier)
                                     ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
                                     ->with(['kasir' => function($query){
                                         $query->select(['kasirs.id', 'kasirs.name']);
@@ -711,7 +998,8 @@ class TenantController extends Controller {
     }
 
     public function transactionFinishList(){
-        $invoiceFinish = Invoice::where('id_tenant', auth()->user()->id)
+        $identifier = $this->getStoreIdentifier();
+        $invoiceFinish = Invoice::where('store_identifier', $identifier)
                                     ->where('status_pembayaran', 1)
                                     ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
                                     ->with(['kasir' => function($query){
@@ -723,7 +1011,8 @@ class TenantController extends Controller {
     }
 
     public function transactionQrisFinishList(){
-        $invoiceQrisFinish = Invoice::where('id_tenant', auth()->user()->id)
+        $identifier = $this->getStoreIdentifier();
+        $invoiceQrisFinish = Invoice::where('store_identifier', $identifier)
                                     ->where('jenis_pembayaran', 'Qris')
                                     ->where('status_pembayaran', 1)
                                     ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
@@ -736,12 +1025,16 @@ class TenantController extends Controller {
     }
 
     public function transactionListPending(){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id)
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::with(['customer' => function($query){
+                                $query->select(['customer_identifiers.id_invoice', 'customer_identifiers.customer_info', 'customer_identifiers.description']);
+                            }])
+                            ->where('store_identifier', $identifier)
                             ->where('jenis_pembayaran', NULL)
                             ->where('status_pembayaran', 0)
                             ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
                             ->with(['kasir' => function($query){
-                                $query->select(['kasirs.id', 'kasirs.name']);
+                                $query->select(['kasirs.id', 'kasirs.name', 'kasirs.id_store']);
                             }])
                             ->latest()
                             ->get();
@@ -749,7 +1042,8 @@ class TenantController extends Controller {
     }
 
     public function transactionListPendingPayment(){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id)
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::where('store_identifier', $identifier)
                         ->where('jenis_pembayaran', "Qris")
                         ->where('status_pembayaran', 0)
                         ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
@@ -762,8 +1056,22 @@ class TenantController extends Controller {
     }
 
     public function transactionInvoiceView($id){
-        $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
-        return view('tenant.tenant_invoice_preview', compact('invoice'));
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::with('shoppingCart', 'invoiceField', 'kasir')
+                            ->where('store_identifier', $identifier)
+                            ->whereNotNull('jenis_pembayaran')
+                            ->find($id);
+
+        if(is_null($invoice) || empty($invoice)){
+            $notification = array(
+                'message' => 'Transaksi tidak ditemukan atau belum diproses!',
+                'alert-type' => 'warning',
+            );
+
+            return redirect()->route('tenant.transaction.list')->with($notification);
+        }
+
+        return view('tenant.tenant_invoice_detail', compact('invoice'));
     }
 
     public function financeDashboard(){
@@ -776,7 +1084,9 @@ class TenantController extends Controller {
 
     public function saldoData(){
         $tunai = TunaiWallet::where('id_tenant', auth()->user()->id)->first();
-        $qris = QrisWallet::where('id_tenant', auth()->user()->id)->first();
+        $qris = QrisWallet::where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
         return view('tenant.tenant_finance_saldo', compact('tunai', 'qris'));
     }
 

@@ -3,14 +3,14 @@
         @php
             $umi = "";
             if($tenantStore->status_umi == NULL || $tenantStore->status_umi == "" || empty($tenantStore->status_umi) || is_null($tenantStore->status_umi)){
-                $umi = "Belum Terdaftar";
+                $umi = "<button type='button' class='btn btn-info btn-xs waves-effect mb-2 waves-light'>UMI Belum Terdaftar</button>";
             } else {
                 if($tenantStore->status_umi == 0) {
-                    $umi = "Belum Disetujui";
+                    $umi = "<button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>UMI Belum Disetujui</button>";
                 } else if($tenantStore->status_umi == 1){
-                    $umi = "Terdaftar";
+                    $umi = "<button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar UMI</button>";
                 } else if($tenantStore->status_umi == 2){
-                    $umi = "Ditolak";
+                    $umi = "<button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>UMI Ditolak</button>";
                 }
             }
         @endphp
@@ -44,18 +44,7 @@
                                 Toko
                             </p>
                             @php
-                                $umi = "";
-                                if($tenantStore->status_umi == NULL || $tenantStore->status_umi == "" || empty($tenantStore->status_umi) || is_null($tenantStore->status_umi)){
-                                    echo "<button type='button' class='btn btn-info btn-xs waves-effect mb-2 waves-light'>Belum Terdaftar</button>";
-                                } else {
-                                    if($tenantStore->status_umi == 0) {
-                                        echo "<button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>Belum Disetujui</button>";
-                                    } else if($tenantStore->status_umi == 1){
-                                        echo "<button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar UMI</button>";
-                                    } else if($tenantStore->status_umi == 2){
-                                        echo "<button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>Ditolak</button>";
-                                    }
-                                }
+                                echo htmlspecialchars_decode($umi);
                             @endphp
                         </div>
                     </div>
@@ -109,7 +98,7 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
-                                                        <label for="alamat" class="form-label">Alamat</label>
+                                                        <label for="alamat" class="form-label">Alamat Toko</label>
                                                         <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $tenantStore->alamat !!}</textarea>
                                                     </div>
                                                 </div>
@@ -125,7 +114,7 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
-                                                        <label for="kode_pos" class="form-label">Kode Pos</label>
+                                                        <label for="kode_pos" class="form-label">Kode Pos Toko</label>
                                                         <input type="text" class="form-control" name="kode_pos" id="kode_pos" required value="{{ $tenantStore->kode_pos }}" placeholder="Masukkan kode pos">
                                                     </div>
                                                 </div>
@@ -133,16 +122,18 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
-                                                        <label for="catatan" class="form-label">Catatan Kaki Nota</label>
-                                                        <textarea placeholder="Masukkan catatan kaki" class="form-control" id="catatan" name="catatan" rows="5" spellcheck="false" required>{!! $tenantStore->catatan_kaki !!}</textarea>
+                                                        <label for="catatan" class="form-label">Catatan Kaki Nota (Opsional)</label>
+                                                        <textarea placeholder="Masukkan catatan kaki" class="form-control" id="catatan" name="catatan" rows="5" spellcheck="false">{!! $tenantStore->catatan_kaki !!}</textarea>
+                                                        <small id="emailHelp" class="form-text text-muted">Kata-kata yang akan ditampilkan pada nota pembayaran. Field ini bersifat opsional dan tidak wajib diisi atau boleh dikosongi</small>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
-                                                        <label for="photo" class="form-label">Upload Foto Profil</label>
+                                                        <label for="photo" class="form-label">Upload Logo Toko (Opsional)</label>
                                                         <input type="file" id="image" class="form-control" name="photo" accept="image/*">
+                                                        <small id="emailHelp" class="form-text text-muted">Logo toko tidak wajib diisi atau boleh dikosongi</small>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12">

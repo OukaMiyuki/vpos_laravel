@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('rekening_tenants', function (Blueprint $table) {
-            $table->string('swift_code')->after('no_rekening')->nullable();
+        Schema::table('batches', function (Blueprint $table) {
+            $table->string('store_identifier')->after('id')->nullable();
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('rekening_tenants', function (Blueprint $table) {
+        Schema::table('batches', function (Blueprint $table) {
             //
         });
     }

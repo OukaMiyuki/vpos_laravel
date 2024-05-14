@@ -124,6 +124,14 @@
                         <span> Dashboards </span>
                     </a>
                 </li>
+                @auth('tenant')
+                    <li>
+                        <a href="{{ route('tenant.pos') }}">
+                            <i class="mdi mdi-point-of-sale"></i>
+                            <span> POS </span>
+                        </a>
+                    </li>
+                @endauth
                 @auth('kasir')
                     <li>
                         <a href="{{ route('kasir.pos') }}">

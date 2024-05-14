@@ -11,12 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('qris_wallets', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('id_tenant')->unique();
-            $table->string('saldo')->default(0);
-            $table->timestamps();
-        });
+        Schema::dropIfExists('discounts');
     }
 
     /**
@@ -24,6 +19,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('qris_wallets');
+        Schema::table('discounts', function (Blueprint $table) {
+            //
+        });
     }
 };

@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('rekening_marketings', function (Blueprint $table) {
-            $table->string('swift_code')->after('no_rekening')->nullable();
-        });
+        Schema::dropIfExists('tunai_wallets');
     }
 
     /**
@@ -21,7 +19,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('rekening_marketings', function (Blueprint $table) {
+        Schema::table('tunai_wallets', function (Blueprint $table) {
             //
         });
     }

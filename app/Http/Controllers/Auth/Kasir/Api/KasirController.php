@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Models\Product;
 use App\Models\StoreDetail;
+use App\Models\TunaiWallet;
 use App\Models\ProductStock;
 use App\Models\ShoppingCart;
 use App\Models\Invoice;
@@ -32,7 +33,7 @@ class KasirController extends Controller {
                                         $query->where('stok', '!=', 0)
                                               ->where('harga_beli', '!=', 0);
                                 })
-                                ->where('id_tenant', auth()->user()->id_tenant)
+                                ->where('store_identifier', auth()->user()->id_store)
                                 ->latest()
                                 ->get();
         } catch (Exception $e) {
@@ -69,7 +70,7 @@ class KasirController extends Controller {
                     }])
                     ->where(function ($query){
                             $query->where('stok', '!=', 0);
-                    })->where('id_tenant', auth()->user()->id_tenant)
+                    })->where('store_identifier', auth()->user()->id_store)
                     ->findOrFail($id);
         } catch (Exception $e) {
             return response()->json([
@@ -90,7 +91,7 @@ class KasirController extends Controller {
     public function productCategory() : JsonResponse {
         $productCategory = "";
         try {
-            $productCategory = ProductCategory::select(['id','name'])->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
+            $productCategory = ProductCategory::select(['id','name'])->where('store_identifier', auth()->user()->id_store)->latest()->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -124,7 +125,7 @@ class KasirController extends Controller {
                                 $q->where('id_category', $category);
                         })->where(function ($query){
                                 $query->where('stok', '!=', 0);
-                        })->where('id_tenant', auth()->user()->id_tenant)
+                        })->where('store_identifier', auth()->user()->id_store)
                         ->latest()
                         ->get();
         } catch (Exception $e) {
@@ -201,7 +202,7 @@ class KasirController extends Controller {
                                             $query->where('stok', '!=', 0);
                                     })
                                     ->where('barcode', $barcode)
-                                    ->where('id_tenant', auth()->user()->id_tenant)
+                                    ->where('store_identifier', auth()->user()->id_store)
                                     ->first();
             } catch (Exception $e) {
                 return response()->json([
@@ -210,6 +211,14 @@ class KasirController extends Controller {
                     'status' => 500,
                 ]);
                 exit;
+            }
+
+            if(is_null($stock) || empty($stock)){
+                return response()->json([
+                    'message' => "Product Not Found!",
+                    'dataStokProduk' => $stock,
+                    'status' => 200
+                ]);
             }
 
             return response()->json([
@@ -239,7 +248,7 @@ class KasirController extends Controller {
         }
 
         try {
-            $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->where('stok', '!=', 0)->findOrFail($request->id_stok);
+            $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->where('stok', '!=', 0)->findOrFail($request->id_stok);
             $stoktemp = $stock->stok;
         } catch (Exception $e) {
             return response()->json([
@@ -256,7 +265,7 @@ class KasirController extends Controller {
                 'status' => 200,
             ]);
         } else {
-            if($cartCheckup->count() == 0 || $cartCheckup == ""){
+            if($cartCheckup->count() == 0 || $cartCheckup == "" || is_null($cartCheckup) || empty($cartCheckup)){
                 try {
                     $cart = ShoppingCart::create([
                         'id_kasir' => auth()->user()->id,
@@ -326,7 +335,7 @@ class KasirController extends Controller {
         try {
             $cart = ShoppingCart::where('id_kasir', auth()->user()->id)->findOrFail($id_cart);
             $qty = $cart->qty;
-            $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->findOrFail($cart->id_product);
+            $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->findOrFail($cart->id_product);
             $stoktemp = $stock->stok;
             $stock->update([
                 'stok' => (int) $stoktemp+$qty
@@ -349,7 +358,26 @@ class KasirController extends Controller {
     public function listCart() : JsonResponse {
         $cartContent = "";
         try {
-            $cartContent = ShoppingCart::with('product')
+            $cartContent = ShoppingCart::select(['shopping_carts.id', 
+                                                    'shopping_carts.id_invoice', 
+                                                    'shopping_carts.id_product',
+                                                    'shopping_carts.product_name',
+                                                    'shopping_carts.qty',
+                                                    'shopping_carts.harga',
+                                                    'shopping_carts.sub_total',
+                                                    'shopping_carts.id_kasir',
+                                                    'shopping_carts.id_tenant',
+                                                    ])
+                                    ->with(['stock' => function ($query){
+                                        $query->select(['product_stocks.id',
+                                                        'product_stocks.id_batch_product'
+                                        ])
+                                        ->with(['product' => function ($query){
+                                            $query->select(['products.id',
+                                                            'products.photo'
+                                            ])->get();
+                                        }])->get();
+                                    }])
                                     ->where('id_kasir', auth()->user()->id)
                                     ->whereNull('id_invoice')
                                     ->latest()
@@ -382,10 +410,29 @@ class KasirController extends Controller {
     public function listCartInvoice(Request $request) : JsonResponse {
         $cartContent = "";
         try {
-            $cartContent = ShoppingCart::with('product')
+            $cartContent = ShoppingCart::select(['shopping_carts.id', 
+                                                    'shopping_carts.id_invoice', 
+                                                    'shopping_carts.id_product',
+                                                    'shopping_carts.product_name',
+                                                    'shopping_carts.qty',
+                                                    'shopping_carts.harga',
+                                                    'shopping_carts.sub_total',
+                                                    'shopping_carts.id_kasir',
+                                                    'shopping_carts.id_tenant',
+                                                    ])
+                                    ->with(['stock' => function ($query){
+                                        $query->select(['product_stocks.id',
+                                                        'product_stocks.id_batch_product'
+                                        ])
+                                        ->with(['product' => function ($query){
+                                            $query->select(['products.id',
+                                                            'products.photo'
+                                            ])->get();
+                                        }])->get();
+                                    }])
                                     ->where('id_kasir', auth()->user()->id)
                                     ->where('id_invoice', $request->id_invoice)
-                                    // ->latest()
+                                    ->latest()
                                     ->get();
         } catch (Exception $e) {
             return response()->json([
@@ -415,7 +462,7 @@ class KasirController extends Controller {
     public function getAlias() : JsonResponse {
         $alias = "";
         try {
-            $alias = TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
+            $alias = TenantField::where('store_identifier', auth()->user()->id_store)->first();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -450,11 +497,11 @@ class KasirController extends Controller {
         $temptotal = 0;
         $nominalpajak = 0;
         $total = 0;
-        $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
-                 ->where('is_active', 1)->first();
+        $diskon = Discount::where('store_identifier', auth()->user()->id_store)
+                            ->where('is_active', 1)->first();
         $disc = 0;
-        $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
-                ->where('is_active', 1)->first();
+        $tax = Tax::where('store_identifier', auth()->user()->id_store)
+                            ->where('is_active', 1)->first();
         $pajak = 0;
 
         if(!empty($tax)){
@@ -469,15 +516,35 @@ class KasirController extends Controller {
             $disc = 0;
         }
 
-        $cartContent = ShoppingCart::with('product')
-                            ->where('id_kasir', auth()->user()->id)
-                            ->whereNull('id_invoice')
-                            ->latest()
-                            ->get();
-        
-        foreach($cartContent as $cart){
-            $subtotal+= (int) $cart->sub_total;
-        }
+        $cartContent = ShoppingCart::select(['shopping_carts.id', 
+                                                'shopping_carts.id_invoice', 
+                                                'shopping_carts.id_product',
+                                                'shopping_carts.product_name',
+                                                'shopping_carts.qty',
+                                                'shopping_carts.harga',
+                                                'shopping_carts.sub_total',
+                                                'shopping_carts.id_kasir',
+                                                'shopping_carts.id_tenant',
+                                                ])
+                                ->with(['stock' => function ($query){
+                                    $query->select(['product_stocks.id',
+                                                    'product_stocks.id_batch_product'
+                                    ])
+                                    ->with(['product' => function ($query){
+                                        $query->select(['products.id',
+                                                        'products.photo'
+                                        ])->get();
+                                    }])->get();
+                                }])
+                                ->where('id_kasir', auth()->user()->id)
+                                ->whereNull('id_invoice')
+                                ->latest()
+                                ->get();
+        $subtotal = $cartContent->sum('sub_total');
+
+        // foreach($cartContent as $cart){
+        //     $subtotal+= (int) $cart->sub_total;
+        // }
         
         if($subtotal>=$disc){
             $nominaldiskon = ($disc/100)*$subtotal;
@@ -488,7 +555,9 @@ class KasirController extends Controller {
         $total = $temptotal+$nominalpajak;
 
         $invoice = Invoice::create([
-            'id_tenant' => auth()->user()->id_tenant,
+            'store_identifier' => auth()->user()->id_store,
+            'email' => auth()->user()->email,
+            'id_tenant' => auth()->user()->store->id_tenant,
             'id_kasir' => auth()->user()->id,
             'jenis_pembayaran' => "Qris",
             'status_pembayaran' => 0,
@@ -526,7 +595,7 @@ class KasirController extends Controller {
 
         if($tgl_awal && $tgl_akhir) {
             try {
-                $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
                                     ->whereBetween('tanggal_transaksi', [$tgl_awal, $tgl_akhir])
                                     ->latest()
@@ -559,7 +628,7 @@ class KasirController extends Controller {
 
         } else {
             try {
-                $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+                $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
                                     ->whereDate('tanggal_transaksi', Carbon::today())
                                     ->latest()
@@ -596,7 +665,7 @@ class KasirController extends Controller {
         $invoice = "";
         try {
             $invoice = Invoice::where('status_pembayaran', 0)
-                                ->where('id_tenant', auth()->user()->id_tenant)
+                                ->where('store_identifier', auth()->user()->id_store)
                                 ->where('id_kasir', auth()->user()->id)
                                 ->latest()
                                 ->get();
@@ -617,9 +686,10 @@ class KasirController extends Controller {
 
     public function transactionCartAdd(Request $request) : JsonResponse {
         $cart = "";
+        $tempqty = "";
         try {
             $invoice = Invoice::with('shoppingCart')
-                                ->where('id_tenant', auth()->user()->id_tenant)
+                                ->where('store_identifier', auth()->user()->id_store)
                                 ->where('id_kasir', auth()->user()->id)
                                 ->find($request->id_invoice);
             $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
@@ -632,11 +702,7 @@ class KasirController extends Controller {
             exit;
         }
 
-        // $cartCheckup = ShoppingCart::where('id_kasir', auth()->user()->id)
-        //                         ->where('id_invoice', $request->id_invoice)
-        //                         ->get();
-
-        if(empty($cart) || $cart->count() == 0 || $cart = ""){
+        if(empty($cart) || $cart->count() == 0 || $cart == "" || is_null($cart)){
             $cart = ShoppingCart::create([
                 'id_kasir' => auth()->user()->id,
                 'id_invoice' =>  $request->id_invoice,
@@ -654,7 +720,7 @@ class KasirController extends Controller {
             ]);
         }
 
-        $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($request->id_stok);
+        $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($request->id_stok);
         $stoktemp = $stock->stok;
         $stock->update([
             'stok' => (int) $stoktemp-$request->qty
@@ -669,14 +735,14 @@ class KasirController extends Controller {
     //Try Catch Not Yet Applied
     public function transactionPendingUpdate(Request $request) : JsonResponse {
         $invoice = Invoice::with('shoppingCart')
-                        ->where('id_tenant', auth()->user()->id_tenant)
-                        ->where('id_kasir', auth()->user()->id)
-                        ->find($request->id_invoice);
+                            ->where('store_identifier', auth()->user()->id_store)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->find($request->id_invoice);
 
-        $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
+        $diskon = Discount::where('store_identifier', auth()->user()->id_store)
                             ->where('is_active', 1)->first();
         $disc = 0;
-        $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
+        $tax = Tax::where('store_identifier', auth()->user()->id_store)
                     ->where('is_active', 1)->first();
         $pajak = 0;
 
@@ -696,7 +762,7 @@ class KasirController extends Controller {
         $nominalpajak = 0;
         $nominaldiskon = 0;
         foreach($invoice->shoppingCart as $cart){
-            $subtotal+= (int) $cart->sub_total;
+            $subtotal+= $cart->sub_total;
         }
         $nominaldiskon = 0;
         if($subtotal>=$disc){
@@ -707,7 +773,7 @@ class KasirController extends Controller {
         $total = $temptotal+$nominalpajak;
 
         $client = new Client();
-        $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
+        $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
         $postResponse = $client->request('POST',  $url, [
             'form_params' => [
                 'amount' => $total,
@@ -738,13 +804,12 @@ class KasirController extends Controller {
     public function transactionCartDelete(Request $request) : JsonResponse {
         try {
             $invoice = Invoice::with('shoppingCart')
-                                ->where('id_tenant', auth()->user()->id_tenant)
+                                ->where('store_identifier', auth()->user()->id_store)
                                 ->where('id_kasir', auth()->user()->id)
                                 ->find($request->id_invoice);
-            // $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
             $cart = $invoice->shoppingCart->find($request->id_cart);
             $qty = $cart->qty;
-            $stock = ProductStock::where('id_tenant', auth()->user()->id_tenant)->find($cart->id_product);
+            $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($cart->id_product);
             $stoktemp = $stock->stok;
             $stock->update([
                 'stok' => (int) $stoktemp+$qty
@@ -767,9 +832,8 @@ class KasirController extends Controller {
     public function transactionPendingDelete(Request $request) : JsonResponse {
         try {
             $invoice = Invoice::where('status_pembayaran', 0)->find($request->id_invoice);
-            $cartContent = ShoppingCart::with('product')->where('id_invoice', $request->id_invoice)->get();
+            $cartContent = ShoppingCart::with('stock')->where('id_invoice', $request->id_invoice)->get();
             foreach($cartContent as $cart){
-                $tempqty = $cart->qty;
                 $productStock = ProductStock::find($cart->id_product);
                 $stok = $cart->qty + $productStock->stok;
                 $productStock->update([
@@ -801,6 +865,13 @@ class KasirController extends Controller {
                 'qris_data' => NULL,
                 'status_pembayaran' => 1
             ]);
+            $tunaiWallet = TunaiWallet::where('id_tenant', auth()->user()->store->id_tenant)
+                                        ->where('email', auth()->user()->store->email)
+                                        ->first();
+            $totalSaldo = $tunaiWallet->saldo+$invoice->nominal_bayar;
+            $tunaiWallet->update([
+                'saldo' => $totalSaldo
+            ]);
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to update data!',
@@ -821,12 +892,14 @@ class KasirController extends Controller {
         $alias = "";
         try {
             $invoice = Invoice::with(['shoppingCart' => function($query){
-                                $query->with('product')->get();
+                                $query->with(['stock' => function($query){
+                                    $query->with(['product'])->get();
+                                }
+                                ])->get();
                             }
                         ])->findOrFail($id);
-            $storeDetail = StoreDetail::where('id_tenant', auth()->user()->id_tenant)->firstOrFail();
-            $alias = InvoiceField::where('id_kasir', auth()->user()->id)
-                                    ->where('id_invoice', $id)
+            $storeDetail = StoreDetail::where('store_identifier', auth()->user()->id_store)->firstOrFail();
+            $alias = InvoiceField::where('id_invoice', $id)
                                     ->first();
         } catch (Exception $e) {
             return response()->json([

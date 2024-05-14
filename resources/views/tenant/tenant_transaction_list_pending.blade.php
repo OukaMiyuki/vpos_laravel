@@ -31,32 +31,51 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Transaction Pending List</h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
+                                            <th>Action</th>
                                             <th>No.</th>
+                                            <th>Customer</th>
                                             <th>Invoice</th>
                                             <th>Kasir</th>
+                                            <th>Transaksi Oleh</th>
                                             <th>Tanggal Transaksi</th>
                                             <th>Status Transaksi</th>
-                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($invoice as $invoice)
                                             <tr>
+                                                <td>
+                                                    <a href="{{ route('tenant.transaction.list.pending.restore', ['id' => $invoice->id ]) }}">
+                                                        <button title="Restore transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-history"></span></button>&nbsp;
+                                                    </a>
+                                                    <a href="{{ route('tenant.transaction.pending.delete', ['id' => $invoice->id ]) }}">
+                                                        <button title="Hapus transaksi pending" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                    </a>
+                                                </td>
                                                 <td>{{ $no+=1 }}</td>
+                                                <td>{{ $invoice->customer->customer_info }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->kasir->name }}</td>
+                                                <td>
+                                                    @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
+                                                        Transaksi Oleh Tenant
+                                                    @else
+                                                        {{ $invoice->kasir->name }}
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
+                                                        Tenant
+                                                    @else
+                                                        Kasir
+                                                    @endif
+                                                </td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
                                                 <td>
                                                     <span class="badge bg-soft-danger text-danger">Belum Diproses</span>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
-                                                    </a>
                                                 </td>
                                             </tr>
                                         @endforeach

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\ProductCategory;
 use App\Models\Batch;
 use App\Models\ProductStock;
-use App\Models\Tenant;
+use App\Models\StoreDetail;
 use App\Models\Supplier;
 use App\Models\ShoppingCart;
 
@@ -15,7 +15,7 @@ class Product extends Model {
     use HasFactory;
 
     protected $fillable = [
-        'id_tenant',
+        'store_identifier',
         'id_batch',
         'id_category',
         'index_number',
@@ -28,8 +28,8 @@ class Product extends Model {
         'harga_jual',
     ];
 
-    public function tenant() {
-        return $this->belongsTo(Tenant::class, 'id_tenant', 'id');
+    public function store() {
+        return $this->belongsTo(StoreDetail::class, 'store_identifier', 'store_identifier');
     }
     
     
@@ -57,7 +57,7 @@ class Product extends Model {
         parent::boot();
 
         static::creating(function($model){
-            $model->index_number = Product::where('id_tenant', auth()->user()->id)
+            $model->index_number = Product::where('store_identifier', $model->store_identifier)
                                             ->where('id_batch', $model->id_batch)->max('index_number') + 1;
             $model->product_code = $model->batch->batch_code.'-'.str_pad($model->index_number, 6, '0', STR_PAD_LEFT);
         });

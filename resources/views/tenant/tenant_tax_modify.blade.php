@@ -9,7 +9,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="">Store Management</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.store.management') }}">Store Management</a></li>
                                 <li class="breadcrumb-item active">Tax Settings</li>
                             </ol>
                         </div>
@@ -30,9 +30,9 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
-                                                <label for="pajak" class="form-label">Pajak</label>
-                                                <input type="hidden" class="form-control" name="id" id="id" value="@if(!empty( $tax->id)){{$tax->id}}@endif">
-                                                <input required type="text" class="form-control" name="pajak" id="pajak" value="@if(!empty( $tax->pajak)){{$tax->pajak}}@endif" placeholder="Masukkan presentase pajak">
+                                                <label for="pajak" class="form-label">Pajak (%)</label>
+                                                <input type="hidden" class="form-control" name="id" id="id" value="{{$tax->id}}">
+                                                <input required type="text" class="form-control" name="pajak" id="pajak" value="{{$tax->pajak}}" placeholder="Masukkan presentase pajak">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -40,8 +40,8 @@
                                                 <label for="status" class="form-label">Status</label>
                                                 <select class="form-select" id="" name="status" required>
                                                     <option value="">- Pilih status pajak -</option>
-                                                    <option @if(!empty( $tax->is_active)) @if($tax->is_active == 0) selected  @endif @endif value="0">Non-Aktif</option>
-                                                    <option @if(!empty( $tax->is_active)) @if($tax->is_active == 1) selected  @endif @endif value="1">Aktif</option>
+                                                    <option @if($tax->is_active == 0) selected  @endif value="0">Non-Aktif</option>
+                                                    <option @if($tax->is_active == 1) selected  @endif value="1">Aktif</option>
                                                 </select>
                                             </div>
                                         </div>

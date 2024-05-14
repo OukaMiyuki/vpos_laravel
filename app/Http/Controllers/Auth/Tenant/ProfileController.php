@@ -20,11 +20,12 @@ use Carbon\Carbon;
 use App\Models\Tenant;
 use App\Models\DetailTenant;
 use App\Models\StoreDetail;
-use App\Models\RekeningTenant;
+use App\Models\Rekening;
 use App\Models\UmiRequest;
 use App\Mail\SendUmiEmail;
 use File;
 use Mail;
+use Exception;
 
 class ProfileController extends Controller{
     public function tenantSettings(){
@@ -32,9 +33,26 @@ class ProfileController extends Controller{
     }
 
     public function profile(){
-        return view('tenant.tenant_profile');
+        $profilTenant = Tenant::select(['tenants.id', 'tenants.name', 'tenants.email', 'tenants.phone', 'tenants.is_active', 'tenants.phone_number_verified_at', 'tenants.email_verified_at'])
+                                ->with(['detail' => function($query){
+                                    $query->select(['detail_tenants.id', 
+                                                    'detail_tenants.id_tenant', 
+                                                    'detail_tenants.no_ktp',
+                                                    'detail_tenants.tempat_lahir',
+                                                    'detail_tenants.tanggal_lahir',
+                                                    'detail_tenants.jenis_kelamin',
+                                                    'detail_tenants.alamat',
+                                                    'detail_tenants.photo'])
+                                            ->where('detail_tenants.id_tenant', auth()->user()->id)
+                                            ->where('detail_tenants.email', auth()->user()->email)
+                                            ->first();
+                                }
+                                ])
+                                ->find(auth()->user()->id);
+        return view('tenant.tenant_profile', compact('profilTenant'));
     }
 
+    // tidak dipakai karena info akun tidak bisa diupdate
     public function profileAccountUpdate(Request $request){
         $profileInfo = Tenant::find(auth()->user()->id);
 
@@ -50,9 +68,15 @@ class ProfileController extends Controller{
         );
         return redirect()->back()->with($notification);
     }
+    // tidak dipakai karena info akun tidak bisa diupdate
 
     public function profileInfoUpdate(Request $request){
-        $profileInfo = DetailTenant::find(auth()->user()->detail->id);
+        $profileInfo = DetailTenant::where('id_tenant', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->find(auth()->user()->detail->id);
+        $account = Tenant::where('id', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
 
         if($request->hasFile('photo')){
             $file = $request->file('photo');
@@ -82,6 +106,10 @@ class ProfileController extends Controller{
                 'updated_at' => Carbon::now()
             ]);
 
+            $account->update([
+                'name' => $request->name
+            ]);
+
             $notification = array(
                 'message' => 'Data akun berhasil diupdate!',
                 'alert-type' => 'success',
@@ -96,6 +124,10 @@ class ProfileController extends Controller{
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'alamat' => $request->alamat,
                 'updated_at' => Carbon::now()
+            ]);
+
+            $account->update([
+                'name' => $request->name
             ]);
 
             $notification = array(
@@ -146,12 +178,25 @@ class ProfileController extends Controller{
     }
     
     public function storeProfileSettings(){
-        $tenantStore = StoreDetail::where('id_tenant', auth()->user()->id)->first();
+        $tenantStore = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         return view('tenant.tenant_store_detail', compact('tenantStore'));
     }
 
     public function storeProfileSettingsUPdate(Request $request) {
-        $tenantStore = StoreDetail::where('id_tenant', auth()->user()->id)->first();
+        $tenantStore = StoreDetail::where('id_tenant', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
+
+        if(is_null($tenantStore) || empty($tenantStore)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        } 
+
         if($request->hasFile('photo')){
             $file = $request->file('photo');
             $namaFile = $request->nama;
@@ -208,7 +253,9 @@ class ProfileController extends Controller{
     }
 
     public function rekeingSetting(){
-        $rekening = RekeningTenant::where('id_tenant', auth()->user()->id)->first();
+        $rekening = Rekening::where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
         $dataRekening = "";
         if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
             $ip = "36.84.106.3";
@@ -258,11 +305,12 @@ class ProfileController extends Controller{
             );
             return redirect()->back()->with($notification);
         } else {
-            $rekeningAkun = RekeningTenant::where('id_tenant', auth()->user()->id)->first();
+            $rekeningAkun = Rekening::where('id_user', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
             $rekeningAkun->update([
                 'no_rekening' => $rekening,
                 'swift_code' => $swift_code,
-                'is_confirmed' => 1
             ]);
             $notification = array(
                 'message' => 'Update nomor rekening berhasil!',
@@ -402,7 +450,7 @@ class ProfileController extends Controller{
 
     public function whatsappOTPSubmit(Request $request){
         if(!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "") {
-            return redirect()->intended(RouteServiceProvider::TENANT_DASHBOARD);
+            return redirect()->route('tenant.dashboard');
         } else {
             $kode = (int) $request->otp;
             $otp = (new Otp)->validate(auth()->user()->phone, $kode);

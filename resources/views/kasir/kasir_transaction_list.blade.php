@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel All Transaction List</h4>
                             <div class="table-responsive">
-                                <table id="datatable-buttons" class="table table-striped dt-responsive nowrap w-100">
+                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>

@@ -274,35 +274,73 @@ class AuthController extends Controller {
     public function userDetail(Request $request) : JsonResponse {
         $user = "";
         try {
+            // $user = Tenant::select(['tenants.id','tenants.name', 'tenants.email as mail', 'tenants.phone', 'tenants.email_verified_at', 'tenants.phone_number_verified_at', 'tenants.is_active'])
+            //                     ->with(['detail', 'storeDetail'])
+            //                     ->whereHas('detail', function($q) {
+            //                         $q->select(
+            //                             'detail_tenants.id as detail_id',
+            //                             'detail_tenants.id_tenant as id_detail_tenant',
+            //                             'no_ktp',
+            //                             'tempat_lahir',
+            //                             'tanggal_lahir',
+            //                             'jenis_kelamin',
+            //                             'detail_tenants.alamat as alamat_tenant',
+            //                             'detail_tenants.photo as tenant_photo_profile'
+            //                         );
+            //                     })
+            //                     ->whereHas('storeDetail', function($q) {
+            //                         $q->select(
+            //                             'store_details.id as store_detail_id',
+            //                             'store_details.id_tenant as id_store_detail_tenant',
+            //                             'store_details.name as nama_toko',
+            //                             'store_details.alamat as alamat_toko',
+            //                             'store_details.no_telp_toko as no_telp_toko',
+            //                             'jenis_usaha',
+            //                             'status_umi',
+            //                             'catatan_kaki',
+            //                             'store_details.photo as photo_toko'
+            //                         );
+            //                     })
+            //                     ->where('id', Auth::user()->id)
+            //                     ->firstOrFail();
             $user = Tenant::select(['tenants.id','tenants.name', 'tenants.email as mail', 'tenants.phone', 'tenants.email_verified_at', 'tenants.phone_number_verified_at', 'tenants.is_active'])
-                                ->with(['detail', 'storeDetail'])
-                                ->whereHas('detail', function($q) {
-                                    $q->select(
-                                        'detail_tenants.id as detail_id',
-                                        'detail_tenants.id_tenant as id_detail_tenant',
-                                        'no_ktp',
-                                        'tempat_lahir',
-                                        'tanggal_lahir',
-                                        'jenis_kelamin',
-                                        'detail_tenants.alamat as alamat_tenant',
-                                        'detail_tenants.photo as tenant_photo_profile'
-                                    );
-                                })
-                                ->whereHas('storeDetail', function($q) {
-                                    $q->select(
-                                        'store_details.id as store_detail_id',
-                                        'store_details.id_tenant as id_store_detail_tenant',
-                                        'store_details.name as nama_toko',
-                                        'store_details.alamat as alamat_toko',
-                                        'store_details.no_telp_toko as no_telp_toko',
-                                        'jenis_usaha',
-                                        'status_umi',
-                                        'catatan_kaki',
-                                        'store_details.photo as photo_toko'
-                                    );
-                                })
-                                ->where('id', Auth::user()->id)
-                                ->firstOrFail();
+                            ->with(['detail' => function($query){
+                                    $query->select(['detail_tenants.id',
+                                                    'detail_tenants.id_tenant',
+                                                    'detail_tenants.no_ktp',
+                                                    'detail_tenants.tempat_lahir',
+                                                    'detail_tenants.tanggal_lahir',
+                                                    'detail_tenants.jenis_kelamin',
+                                                    'detail_tenants.alamat',
+                                                    'detail_tenants.photo',
+                                    ])
+                                    ->where('id_tenant', Auth::user()->id)
+                                    ->where('email', Auth::user()->email)
+                                    ->first();
+                            }, 
+                            'storeDetail' => function($query){
+                                $query->select([
+                                    'store_details.id',
+                                    'store_details.store_identifier',
+                                    'store_details.id_tenant',
+                                    'store_details.email',
+                                    'store_details.name',
+                                    'store_details.alamat',
+                                    'store_details.kabupaten',
+                                    'store_details.kode_pos',
+                                    'store_details.no_telp_toko',
+                                    'store_details.jenis_usaha',
+                                    'store_details.status_umi',
+                                    'store_details.catatan_kaki',
+                                    'store_details.photo',
+                                ])
+                                ->where('id_tenant', Auth::user()->id)
+                                ->where('email', Auth::user()->email)
+                                ->first();
+                            }])
+                            ->where('id', Auth::user()->id)
+                            ->where('email', Auth::user()->email)
+                            ->firstOrFail();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -350,8 +388,7 @@ class AuthController extends Controller {
         $tenant = "";
         $store_detail = "";
         try {
-            //$tenant = Tenant::with('detail')->where('id', Auth::user()->id)->firstOrFail();// ->where('id', $id)->firstOrFail();
-            $store_detail = StoreDetail::where('id_tenant', auth()->user()->id)->firstOrFail();// ->where('id', $id)->firstOrFail();
+            $store_detail = StoreDetail::where('email', auth()->user()->email)->firstOrFail();
             $store_detail->update([
                 'name' => $nama_toko,
                 'alamat' => $alamat_toko,

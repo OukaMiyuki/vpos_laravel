@@ -22,21 +22,21 @@
                 <div class="col-lg-4 col-xl-4">
                     <div class="card text-center">
                         <div class="card-body">
-                            <img src="{{ !empty(auth()->user()->detail->photo) ? Storage::url('images/profile/'.auth()->user()->detail->photo) : asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                            <img src="{{ !empty($profilTenant->detail->photo) ? Storage::url('images/profile/'.$profilTenant->detail->photo) : asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
                             <h4 class="mb-0">
-                                {{ auth()->user()->name }}
+                                {{ $profilTenant->name }}
                             </h4>
                             <p class="text-muted">
                                 Tenant
                             </p>
-                            @if(auth()->user()->is_active == 1)
+                            @if($profilTenant->is_active == 1)
                                 <button type="button" class="btn btn-success btn-xs waves-effect mb-2 waves-light">Aktif</button>
                             @else
                                 <button type="button" class="btn btn-danger btn-xs waves-effect mb-2 waves-light">Tidak Aktif</button>
                             @endif
                             <div class="text-start mt-3">
-                                <p class="text-muted mb-2 font-13"><strong>Mobile :</strong><span class="ms-2">{{ auth()->user()->phone }}</span></p>
-                                <p class="text-muted mb-2 font-13"><strong>Email :</strong> <span class="ms-2">{{ auth()->user()->email }}</span></p>
+                                <p class="text-muted mb-2 font-13"><strong>Mobile :</strong><span class="ms-2">{{ $profilTenant->phone }}</span></p>
+                                <p class="text-muted mb-2 font-13"><strong>Email :</strong> <span class="ms-2">{{ $profilTenant->email }}</span></p>
                             </div>
                         </div>
                     </div>
@@ -71,13 +71,13 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="name" class="form-label">Nama Lengkap</label>
-                                                    <input readonly type="text" class="form-control" name="name" id="name" required value="{{ auth()->user()->name }}" placeholder="Masukkan nama lengkap">
+                                                    <input readonly type="text" class="form-control" name="name" id="name" required value="{{ $profilTenant->name }}" placeholder="Masukkan nama lengkap">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="email" class="form-label">Email</label>
-                                                    <input readonly type="email" class="form-control" name="email" id="email" required value="{{ auth()->user()->email }}" placeholder="Masukkan email akun">
+                                                    <input readonly type="email" class="form-control" name="email" id="email" required value="{{ $profilTenant->email }}" placeholder="Masukkan email akun">
                                                 </div>
                                             </div>
                                             <!-- end col -->
@@ -86,14 +86,14 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="phone" class="form-label">Phone Number</label>
-                                                    <input readonly type="text" class="form-control" name="phone" id="phone" required value="{{ auth()->user()->phone }}" placeholder="Enter email">
+                                                    <input readonly type="text" class="form-control" name="phone" id="phone" required value="{{ $profilTenant->phone }}" placeholder="Enter email">
                                                 </div>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                                 <div class="tab-pane" id="aboutme">
-                                    @if (is_null(auth()->user()->phone_number_verified_at) || empty(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == "")
+                                    @if (is_null($profilTenant->phone_number_verified_at) || empty($profilTenant->phone_number_verified_at) || $profilTenant->phone_number_verified_at == "")
                                         <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Verifikasi Nomor Whatsapp</h5>
                                         <p class="sub-header text-danger"><strong>*Note : Anda tidak bisa melakukan proses apapun sebelum melakukan verifikasi nomor Whatsapp, silahkan Verifikasikan nomor WA sebelum melakukan proses selanjutnya!</strong></p>
                                         <div class="row">
@@ -102,7 +102,7 @@
                                                     <label for="no_wa" class="form-label">Nomor Whatsapp</label>
                                                     <div class="row">
                                                         <div class="col-8">
-                                                            <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ auth()->user()->phone }}" placeholder="Masukkan nomor Whatsapp">
+                                                            <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ $profilTenant->phone }}" placeholder="Masukkan nomor Whatsapp">
                                                         </div>
                                                         <div class="col-4">
                                                             <form method="post" action="{{ route('tenant.settings.whatsappotp') }}">
@@ -135,9 +135,17 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
+                                                        <label for="name" class="form-label">Nama Lengkap</label>
+                                                        <input type="text" class="form-control" name="name" id="name" required value="{{$profilTenant->name}}" placeholder="Masukkan nama lengkap">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
                                                         <label for="no_ktp" class="form-label">Nomor KTP</label>
-                                                        <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ auth()->user()->detail->id }}">
-                                                        <input type="text" class="form-control" name="no_ktp" id="no_ktp" required value="{{auth()->user()->detail->no_ktp}}" placeholder="Masukkan nomor KTP">
+                                                        <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ $profilTenant->detail->id }}">
+                                                        <input type="text" class="form-control" name="no_ktp" id="no_ktp" required value="{{$profilTenant->detail->no_ktp}}" placeholder="Masukkan nomor KTP">
                                                     </div>
                                                 </div>
                                             </div>
@@ -145,13 +153,13 @@
                                                 <div class="col-md-6">
                                                     <div class="mb-3">
                                                         <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
-                                                        <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="{{ auth()->user()->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
+                                                        <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="{{ $profilTenant->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="mb-3">
                                                         <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                                                        <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ auth()->user()->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" required>
+                                                        <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ $profilTenant->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -161,8 +169,8 @@
                                                         <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
                                                         <select class="form-select @error('jenis_kelamin') is-invalid @enderror" id="jenis_kelamin" name="jenis_kelamin" required>
                                                             <option value="">- Pilih jenis kelamin -</option>
-                                                            <option @if(auth()->user()->detail->jenis_kelamin == "Laki-laki") selected @endif value="Laki-laki">Laki-laki</option>
-                                                            <option @if(auth()->user()->detail->jenis_kelamin == "Perempuan") selected @endif value="Perempuan">Perempuan</option>
+                                                            <option @if($profilTenant->detail->jenis_kelamin == "Laki-laki") selected @endif value="Laki-laki">Laki-laki</option>
+                                                            <option @if($profilTenant->detail->jenis_kelamin == "Perempuan") selected @endif value="Perempuan">Perempuan</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -171,7 +179,7 @@
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
                                                         <label for="alamat" class="form-label">Alamat</label>
-                                                        <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! auth()->user()->detail->alamat !!}</textarea>
+                                                        <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $profilTenant->detail->alamat !!}</textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -196,7 +204,7 @@
                                     @endif
                                 </div>
                                 <div class="tab-pane" id="saldo">
-                                    @if (empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == "")
+                                    @if (empty($profilTenant->phone_number_verified_at) || is_null($profilTenant->phone_number_verified_at) || $profilTenant->phone_number_verified_at == NULL || $profilTenant->phone_number_verified_at == "")
                                         <div class="message">
                                             <h1 class="acces-denied">Access to this page is restricted</h1>
                                             <p class="sub-header text-danger"><strong>Lakukan verifikasi nomor Whatsapp sebelum melakukan penarikan saldo.</strong></p>
@@ -212,7 +220,7 @@
                                         <form method="post" action="">
                                             @csrf
                                             <div class="row">
-                                                <input type="hidden" class="form-control" name="id" id="id" required value="{{auth()->user()->detail->id}}">
+                                                <input type="hidden" class="form-control" name="id" id="id" required value="{{$profilTenant->detail->id}}">
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-12">

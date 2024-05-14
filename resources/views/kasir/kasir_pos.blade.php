@@ -62,8 +62,8 @@
                             </div> <!-- end .table-responsive-->
                             <div class="bg-primary pt-3 pb-2">
                                 @php
-                                    $diskon = App\Models\Discount::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
-                                    $pajak =  App\Models\Tax::where('id_tenant', auth()->user()->id_tenant)->where('is_active', 1)->first();
+                                    $diskon = App\Models\Discount::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();
+                                    $pajak =  App\Models\Tax::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();
                                 @endphp
                                 <p class="pos-price-text">Total Item Quantity : {{ Cart::count() }} </p>
                                 <p class="pos-price-text">Diskon (

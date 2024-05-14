@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Transaction Qris Pending List</h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -39,6 +39,7 @@
                                             <th>Kasir</th>
                                             <th>Tanggal Transaksi</th>
                                             <th>Pembayaran</th>
+                                            <th>Transaksi Oleh</th>
                                             <th>Status Pembayaran</th>
                                             <th>Action</th>
                                         </tr>
@@ -49,9 +50,22 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->kasir->name }}</td>
+                                                <td>
+                                                    @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
+                                                        Transaksi Oleh Tenant
+                                                    @else
+                                                        {{ $invoice->kasir->name }}
+                                                    @endif
+                                                </td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
                                                 <td>{{ $invoice->jenis_pembayaran }}</td>
+                                                <td>
+                                                    @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
+                                                        Tenant
+                                                    @else
+                                                        Kasir
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
                                                 </td>

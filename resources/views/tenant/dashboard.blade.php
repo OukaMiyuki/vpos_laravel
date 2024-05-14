@@ -109,7 +109,7 @@
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalHariIni }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $pemasukanHariIni }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Pemasukan hari ini</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -180,7 +180,7 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->kasir->name }}</td>
+                                                <td>@if(!empty($invoice->kasir) || !is_null($invoice->kasir)) {{ $invoice->kasir->name }} @else Transaction by Tenant @endif</td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
                                                 <td>{{ $invoice->jenis_pembayaran }}</td>
                                                 <td>{{ $invoice->sub_total+$invoice->pajak }}</td>

@@ -38,6 +38,8 @@ use Illuminate\Support\Facades\Route;
 //     Route::get('/user', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'user']);
 // });
 
+Route::post('payment-qris-success', [\App\Http\Controllers\Api\PaymentQrisConfirm::class, 'qrisConfirmPayment']);
+
 Route::middleware(['guest:tenant', 'guest:kasir', 'throttle:90,1', 'custom.restrict'])->group( function () {
     Route::post('register', [\App\Http\Controllers\Auth\Api\RegisterController::class, 'registerTenant']);
     Route::post('login', [\App\Http\Controllers\Auth\Api\LoginController::class, 'login']);

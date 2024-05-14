@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rekening_tenants', function (Blueprint $table) {
+        Schema::create('tunai_wallets', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('id_tenant')->unique();
-            $table->string('no_rekening')->nullable();
-            $table->integer('is_confirmed')->default(0);
+            $table->bigInteger('id_tenant')->nullable();
+            $table->string('email')->unique()->nullable();
+            $table->string('saldo');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rekening_tenants');
+        //
     }
 };

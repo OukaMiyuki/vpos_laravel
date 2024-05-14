@@ -22,21 +22,39 @@ use App\Models\TenantQrisAccount;
 class KasirController extends Controller {
     public function index(){
         $totalInvoiceHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
-                                        ->where('id_tenant', auth()->user()->id_tenant)
+                                        ->where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
                                         ->count();
-        $totalInvoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+        $totalInvoice = Invoice::where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
                                     ->count();
         $pemasukanHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
-                                    ->where('id_tenant', auth()->user()->id_tenant)
+                                    ->where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
                                     ->where('status_pembayaran', 1)
                                     ->sum(DB::raw('sub_total + pajak'));
-        $totalPemasukan = Invoice::where('id_tenant', auth()->user()->id_tenant)
+        $totalPemasukan = Invoice::where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
                                     ->where('status_pembayaran', 1)
                                     ->sum(DB::raw('sub_total + pajak'));
+        $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->latest()
+                            ->take(10)
+                            ->get();
+        $invoicePaymentPending = Invoice::where('store_identifier', auth()->user()->id_store)
+                                        ->where('id_kasir', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
+                                        ->where('jenis_pembayaran', 'Qris')
+                                        ->where('status_pembayaran', 0)
+                                        ->latest()
+                                        ->take(10)
+                                        ->get();
         return view('kasir.dashboard', compact(['totalInvoiceHariIni', 'totalInvoice', 'pemasukanHariIni', 'totalPemasukan']));
     }
 
@@ -44,16 +62,16 @@ class KasirController extends Controller {
         $stock = ProductStock::with('product')
                         ->where(function ($query) {
                                 $query->where('stok', '!=', 0);
-                        })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
-        $customField = TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
+                        })->where('store_identifier', auth()->user()->id_store)->latest()->get();
+        $customField = TenantField::where('store_identifier', auth()->user()->id_store)->first();
         return view('kasir.kasir_pos', compact('stock', 'customField'));
     }
 
     public function addCart(Request $request){
-        $diskon = Discount::where('id_tenant', auth()->user()->id_tenant)
+        $diskon = Discount::where('store_identifier', auth()->user()->id_store)
                     ->where('is_active', 1)->first();
 
-        $tax = Tax::where('id_tenant', auth()->user()->id_tenant)
+        $tax = Tax::where('store_identifier', auth()->user()->id_store)
                     ->where('is_active', 1)->first();
 
         if(!empty($tax)){
@@ -102,7 +120,8 @@ class KasirController extends Controller {
                 Cart::setGlobalDiscount(0);
             }
         }
-        $update = Cart::update($rowId, $qty);
+        
+        Cart::update($rowId, $qty);
 
         $notification = array(
             'message' => 'Sukses diupdate!',
@@ -120,7 +139,8 @@ class KasirController extends Controller {
                 Cart::setGlobalDiscount(0);
             }
         }
-        $remove = Cart::remove($id);
+        
+        Cart::remove($id);
 
         $notification = array(
             'message' => 'Sukses dihapus!',
@@ -131,7 +151,9 @@ class KasirController extends Controller {
 
     public function cartTransactionSave(Request $request){
         $invoice = Invoice::create([
-            'id_tenant' => auth()->user()->id_tenant,
+            'store_identifier' => auth()->user()->id_store,
+            'email' => auth()->user()->email,
+            'id_tenant' => auth()->user()->store->id_tenant,
             'id_kasir' => auth()->user()->id,
             'tanggal_transaksi' => Carbon::now()
         ]);
@@ -158,14 +180,20 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionProcess(Request $request){
-        $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
-        $total = (int) substr(str_replace([',', '.'], '', Cart::total()), 0, -2);
-        $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
-        $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
+        // $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
+        // $total = (int) substr(str_replace([',', '.'], '', Cart::total()), 0, -2);
+        // $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
+        // $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
+        $subtotal = Cart::subtotal();
+        $total = Cart::total();
+        $tax = Cart::tax();
+        $diskon = Cart::discount();
         $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
         if($request->jenisPembayaran == "Tunai"){
             $invoice = Invoice::create([
-                'id_tenant' => auth()->user()->id_tenant,
+                'store_identifier' => auth()->user()->id_store,
+                'email' => auth()->user()->email,
+                'id_tenant' => auth()->user()->store->id_tenant,
                 'id_kasir' => auth()->user()->id,
                 'jenis_pembayaran' => $request->jenisPembayaran,
                 'nominal_bayar' => $request->nominalText,
@@ -193,7 +221,9 @@ class KasirController extends Controller {
             return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
         } else if($request->jenisPembayaran == "Qris"){
             $invoice = Invoice::create([
-                'id_tenant' => auth()->user()->id_tenant,
+                'store_identifier' => auth()->user()->id_store,
+                'email' => auth()->user()->email,
+                'id_tenant' => auth()->user()->store->id_tenant,
                 'id_kasir' => auth()->user()->id,
                 'jenis_pembayaran' => $request->jenisPembayaran,
                 'status_pembayaran' => 0,
@@ -221,31 +251,42 @@ class KasirController extends Controller {
     }
 
     public function transactionDashboard(){
-        $transaction = Invoice::where('id_kasir', auth()->user()->id)
-                                ->where('id_tenant', auth()->user()->id_tenant)
+        $transaction = Invoice::where('store_identifier', auth()->user()->id_store)
+                                ->where('id_kasir', auth()->user()->id)
+                                ->where('id_tenant', auth()->user()->store->id_tenant)
+                                ->where('email', auth()->user()->email)
                                 ->count();
-        $transactionPending = Invoice::where('id_tenant', auth()->user()->id_tenant)
+        $transactionPending = Invoice::where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
+                                        ->where('id_tenant', auth()->user()->store->id_tenant)
+                                        ->where('email', auth()->user()->email)
                                         ->where('jenis_pembayaran', NULL)
                                         ->where('status_pembayaran', 0)
                                         ->count();
-        $transactionPendingPayment = Invoice::where('id_tenant', auth()->user()->id_tenant)
+        $transactionPendingPayment = Invoice::where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
+                                        ->where('id_tenant', auth()->user()->store->id_tenant)
+                                        ->where('email', auth()->user()->email)
                                         ->where('jenis_pembayaran', "Qris")
                                         ->where('status_pembayaran', 0)
                                         ->count();
-        $transactionFinish = Invoice::where('id_tenant', auth()->user()->id_tenant)
+        $transactionFinish = Invoice::where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
+                                        ->where('id_tenant', auth()->user()->store->id_tenant)
+                                        ->where('email', auth()->user()->email)
                                         ->where('status_pembayaran', 1)
                                         ->count();
+        //dd($transactionFinish);
         return view('kasir.kasir_transaction', compact('transaction', 'transactionPending', 'transactionPendingPayment', 'transactionFinish'));
         
     }
 
     public function transactionList(){
         $invoice = Invoice::with('customer')
-                            ->where('id_tenant', auth()->user()->id_tenant)
+                            ->where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
+                            ->where('id_tenant', auth()->user()->store->id_tenant)
+                            ->where('email', auth()->user()->email)
                             ->latest()
                             ->get();
         return view('kasir.kasir_transaction_list', compact('invoice'));
@@ -253,8 +294,10 @@ class KasirController extends Controller {
 
     public function transactionPending(){
         $invoice = Invoice::with('customer')
-                            ->where('id_tenant', auth()->user()->id_tenant)
+                            ->where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
+                            ->where('id_tenant', auth()->user()->store->id_tenant)
+                            ->where('email', auth()->user()->email)
                             ->where('jenis_pembayaran', NULL)
                             ->where('status_pembayaran', 0)
                             ->latest()
@@ -263,8 +306,10 @@ class KasirController extends Controller {
     }
 
     public function transactionPendingPayment(){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+        $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                         ->where('id_kasir', auth()->user()->id)
+                        ->where('id_tenant', auth()->user()->store->id_tenant)
+                        ->where('email', auth()->user()->email)
                         ->where('jenis_pembayaran', "Qris")
                         ->where('status_pembayaran', 0)
                         ->latest()
@@ -273,18 +318,26 @@ class KasirController extends Controller {
     }
 
     public function transactionPendingRestore($id){
-        //session()->forget('cart');
         $invoice = Invoice::with('shoppingCart', 'customer')
-                            ->where('id_tenant', auth()->user()->id_tenant)
+                            ->where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
+                            ->where('id_tenant', auth()->user()->store->id_tenant)
+                            ->where('email', auth()->user()->email)
                             ->whereNull('jenis_pembayaran')
                             ->where('status_pembayaran', 0)
                             ->find($id);
+        if(is_null($invoice) || empty($invoice)){
+            $notification = array(
+                'message' => 'Transaksi tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('kasir.transaction.pending')->with($notification);
+        }
         $stock = ProductStock::with('product')
                             ->where(function ($query) {
                                     $query->where('stok', '!=', 0);
-                            })->where('id_tenant', auth()->user()->id_tenant)->latest()->get();
-        $customField = TenantField::where('id_tenant', auth()->user()->id_tenant)->first();
+                            })->where('store_identifier', auth()->user()->id_store)->latest()->get();
+        $customField = TenantField::where('store_identifier', auth()->user()->id_store)->first();
         $shoppingCart = $invoice->shoppingCart;
         $notification = array(
             'message' => 'Transaction restored!',
@@ -310,7 +363,6 @@ class KasirController extends Controller {
 
         if(empty($shoppingCart) || $shoppingCart->count() == 0 || $shoppingCart == ""){
             ShoppingCart::create([
-                'id_kasir' => auth()->user()->id,
                 'id_invoice' => $request->id_invoice,
                 'id_product' => $request->id_product,
                 'product_name' => $request->name,
@@ -416,10 +468,21 @@ class KasirController extends Controller {
     }
 
     public function transactionPendingDelete($id) {
-        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
-                ->where('id_kasir', auth()->user()->id)
-                ->where('jenis_pembayaran', NULL)
-                ->find($id);
+        $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->where('id_tenant', auth()->user()->store->id_tenant)
+                            ->where('jenis_pembayaran', NULL)
+                            ->find($id);
+
+        if(is_null($invoice) || empty($invoice)){
+            $notification = array(
+                'message' => 'Transaksi tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('kasir.transaction.pending')->with($notification);
+        }
+
         session()->forget('cart');
         if(!is_null($invoice)) {
             $invoice->deleteCart($invoice);
@@ -433,8 +496,10 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionPendingProcess(Request $request){
-        $invoice = Invoice::where('id_kasir', auth()->user()->id)
-                            ->where('id_tenant', auth()->user()->id_tenant)
+        $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->where('id_tenant', auth()->user()->store->id_tenant)
+                            ->where('email', auth()->user()->email)
                             ->find($request->id_invoice);
         $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
         if($request->jenisPembayaran == "Tunai"){
@@ -462,7 +527,7 @@ class KasirController extends Controller {
         } else if($request->jenisPembayaran == "Qris"){
             $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
             $client = new Client();
-            $url = 'http://erp.pt-best.com/api/dynamic_qris_wt_new';
+            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
             $postResponse = $client->request('POST',  $url, [
                 'form_params' => [
                     'amount' => $total,
@@ -500,8 +565,10 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionPendingChangePayment(Request $request){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+        $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
+                            ->where('id_tenant', auth()->user()->store->id_tenant)
+                            ->where('email', auth()->user()->email)
                             ->find($request->id);
         $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalian);
         $invoice->update([
@@ -522,18 +589,42 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionInvoice($id){
-        $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
+        $invoice = Invoice::with('shoppingCart', 'invoiceField')
+                            ->where('store_identifier', auth()->user()->id_store)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->where('id_tenant', auth()->user()->store->id_tenant)
+                            ->where('email', auth()->user()->email)
+                            ->whereNotNull('jenis_pembayaran')
+                            ->find($id);
+
+        if(is_null($invoice) || empty($invoice)){
+            $notification = array(
+                'message' => 'Transaksi tidak ditemukan atau belum diproses!',
+                'alert-type' => 'warning',
+            );
+
+            return redirect()->route('kasir.transaction.list')->with($notification);
+        }
+
         return view('kasir.kasir_invoice_preview', compact('invoice'));
     }
 
     public function cartTransactionInvoiceReceipt($id){
-        $invoice = Invoice::with('shoppingCart', 'invoiceField')->find($id);
+        $invoice = Invoice::with('shoppingCart', 'invoiceField')    
+                            ->where('store_identifier', auth()->user()->id_store)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->where('id_tenant', auth()->user()->store->id_tenant)
+                            ->where('email', auth()->user()->email)
+                            ->whereNotNull('jenis_pembayaran')
+                            ->find($id);
         return view('kasir.printer', compact('invoice'));
     }
 
     public function transactionFinish(){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id_tenant)
+        $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
+                            ->where('id_tenant', auth()->user()->store->id_tenant)
+                            ->where('email', auth()->user()->email)
                             ->where('status_pembayaran', 1)
                             ->latest()
                             ->get();

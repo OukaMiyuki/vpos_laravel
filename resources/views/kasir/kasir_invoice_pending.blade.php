@@ -53,7 +53,7 @@
                                                 <td><span class="badge bg-soft-danger text-danger">Belum Diproses</span></td>
                                                 <td>
                                                     <a href="{{ route('kasir.transaction.pending.restore', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restore transaction" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
+                                                        <button title="Restore transaction" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-history"></span></button>&nbsp;
                                                     </a>
                                                     <a href="{{ route('kasir.transaction.pending.delete', ['id' => $invoice->id ]) }}">
                                                         <button title="Hapus transaksi pending" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>

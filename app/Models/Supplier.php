@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Model\Tenant;
+use App\Models\StoreDetail;
 use App\Models\Product;
 
 class Supplier extends Model {
     use HasFactory;
 
     protected $fillable = [
-        'id_tenant',
+        'store_identifier',
         'nama_supplier',
         'email_supplier',
         'phone_supplier',
@@ -19,8 +19,8 @@ class Supplier extends Model {
         'keterangan'
     ];
 
-    public function tenant(){
-        return $this->belongsTo(Tenant::class, 'id_tenant', 'id');
+    public function store(){
+        return $this->belongsTo(StoreDetail::class, 'store_identifier', 'store_identifier');
     }
 
     public function product() {

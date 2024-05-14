@@ -87,23 +87,116 @@ $(document).ready(function(){
 
 });
 
-onScan.attachTo(document, {
-    suffixKeyCodes: [13], // enter-key expected at the end of a scan
-    reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
-    onScan: function(sCode, iQty) { // Alternative to document.addEventListener('scan')
-        alert('Scanned: ' + iQty + 'x ' + sCode);
-        let barcode = document.getElementById("barcode");
-        // $("#nominal").val(sCode);
-        // $('#pos').DataTable().search(sCode).draw();
-        // var theTbl = document.getElementById('pos');
-        // var Cells = theTbl.getElementsByTagName("td");
-        // console.log(Cells[2].innerText);
-        // if(Cells[2].innerText == sCode){
-        //     document.getElementById('cartForm').submit();
-        // }
-        barcode.value = sCode;
-    },
-    onKeyDetect: function(iKeyCode){ // output all potentially relevant key events - great for debugging!
-        console.log('Pressed: ' + iKeyCode);
-    }
+$("#tunai_text").hide();
+$("#nominal").attr("disabled", "disabled");
+$("#kembalian").attr("disabled", "disabled");
+$(document).ready(function(){
+    $('#pembayaran').on('change', function() {
+        if ( this.value == 'Tunai') {
+            $("#tunai_text").show();
+            $("#nominal").removeAttr("disabled");
+            $("#kembalian").removeAttr("disabled");
+        }
+        else {
+            $("#tunai_text").hide();
+            $("#nominal").val("");
+            $("#nominal").attr("disabled", "disabled");
+            $("#kembalian").attr("disabled", "disabled");
+        }
+    });
 });
+
+$(document).ready(function() {
+    let kembaliantxt = document.getElementById("kembalian");
+    $('#nominal').on("input", function() {
+        let nominal = $('#nominal').val();
+        let subttl = $('#subbttl').val();
+        let angka_sub_total = subttl.replace(/[^0-9.-]+/g,"");
+        let subtotal = parseInt(angka_sub_total);
+        let kembalian = nominal-subtotal;
+        if (kembalian >= 0){
+            // $('#kembalian').val(kembalian);
+            kembaliantxt.value = formatRupiah(kembalian, "Rp. ");
+        } else {
+            $('#kembalian').val(0);
+        }
+    });
+});
+
+$(document).ready(function() {
+    let kmbtxtt = document.getElementById("kem");
+    $('#nom').on("input", function() {
+        let nom = $('#nom').val();
+        let subtl = $('#ttl').val();
+        let angka_sub_total = subtl.replace(/[^0-9.-]+/g,"");
+        let sbtotal = parseInt(angka_sub_total);
+        let kembl = nom-sbtotal;
+        if (kembl >= 0){
+            // $('#kembalian').val(kembalian);
+            kmbtxtt.value = formatRupiah(kembl, "Rp. ");
+        } else {
+            $('#kem').val(0);
+        }
+    });
+});
+
+function formatRupiah(angka, prefix) {
+    var number_string = angka.toString().replace(/[^,\d]/g, ""),
+        split = number_string.split(","),
+        sisa = split[0].length % 3,
+        rupiah = split[0].substr(0, sisa),
+        ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    if (ribuan) {
+        separator = sisa ? "." : "";
+        rupiah += separator + ribuan.join(".");
+    }
+
+    rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+    return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
+}
+
+$(document).ready(function() {
+    $("#pembayaran").on('change', function() {
+        if ($(this).val() == ''){
+            $("#formCheckout").attr('disabled',true);
+        } else {
+            $("#formCheckout").attr('disabled',false);
+            $('#formCheckout').on('click', function(e){
+                if($("#pembayaran").val() == 'Tunai'){
+                    if($("#nominal").val().length > 0 && $("#kembalian").val().length > 0){
+                        $("#checkoutProcess #jenisPembayaran").val($("#pembayaran").val());
+                        $("#checkoutProcess #nominalText").val($("#nominal").val());
+                        $("#checkoutProcess #kembalianText").val($("#kembalian").val());
+                        $('#processInvoice').modal('show');
+                        e.preventDefault();
+                    }
+                } else if($("#pembayaran").val() == 'Qris'){
+                    $("#checkoutProcess #jenisPembayaran").val($("#pembayaran").val());
+                    $('#processInvoice').modal('show');
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+});
+
+// onScan.attachTo(document, {
+//     suffixKeyCodes: [13], // enter-key expected at the end of a scan
+//     reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
+//     onScan: function(sCode, iQty) { // Alternative to document.addEventListener('scan')
+//         alert('Scanned: ' + iQty + 'x ' + sCode);
+//         let barcode = document.getElementById("barcode");
+//         // $("#nominal").val(sCode);
+//         // $('#pos').DataTable().search(sCode).draw();
+//         // var theTbl = document.getElementById('pos');
+//         // var Cells = theTbl.getElementsByTagName("td");
+//         // console.log(Cells[2].innerText);
+//         // if(Cells[2].innerText == sCode){
+//         //     document.getElementById('cartForm').submit();
+//         // }
+//         barcode.value = sCode;
+//     },
+//     onKeyDetect: function(iKeyCode){ // output all potentially relevant key events - great for debugging!
+//         console.log('Pressed: ' + iKeyCode);
+//     }
+// });

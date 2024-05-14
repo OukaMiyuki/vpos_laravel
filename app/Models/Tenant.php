@@ -20,9 +20,10 @@ use App\Models\Tax;
 use App\Models\Discount;
 use App\Models\TenantField;
 use App\Models\TunaiWallet;
+use App\Models\Rekening;
 use App\Models\QrisWallet;
 use App\Models\UmiRequest;
-use App\Models\RekeningTenant;
+use App\Models\Kasir;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -65,48 +66,12 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         return $this->hasOne(UmiRequest::class, 'id_tenant', 'id');
     }
 
-    public function supplier(){
-        return $this->hasMany(Supplier::class, 'id_tenant', 'id');
-    }
-
-    public function productCategory(){
-        return $this->hasMany(ProductCategory::class, 'id_tenant', 'id');
-    }
-
-    public function product(){
-        return $this->hasMany(Product::class, 'id_tenant', 'id');
-    }
-
-    public function productStock() {
-        return $this->hasMany(ProductStock::class, 'id_tenant', 'id');
-    }
-
     public function invoice(){
-        return $this->hasMany(Invoice::class, 'id_tenant', 'id');
-    }
-
-    public function tax(){
-        return $this->hasOne(Tax::class, 'id_tenant', 'id');
-    }
-
-    public function discount(){
-        return $this->hasOne(Discount::class, 'id_tenant', 'id');
-    }
-
-    public function tenantField(){
-        return $this->hasOne(TenantField::class, 'id_tenant', 'id');
+        return $this->hasMany(Invoice::class, 'id_tenant', 'id')->where('email', auth()->user()->email);
     }
 
     public function saldoTunai(){
-        return $this->hasOne(TunaiWallet::class, 'id_tenant', 'id');
-    }
-
-    public function saldoQris(){
-        return $this->hasOne(QrisWallet::class, 'id_tenant', 'id');
-    }
-
-    public function rekening(){
-        return $this->hasOne(RekeningTenant::class, 'id_tenant', 'id');
+        return $this->hasOne(TunaiWallet::class, 'id_tenant', 'id')->where('email', auth()->user()->email);
     }
 
     public function sendEmailVerificationNotification() {
@@ -116,6 +81,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
     public function detailTenantStore($model){
         $DetailTenant = new DetailTenant();
         $DetailTenant->id_tenant = $model->id;
+        $DetailTenant->email = $model->email;
         $DetailTenant->no_ktp = request()->no_ktp;
         $DetailTenant->tempat_lahir = request()->tempat_lahir;
         $DetailTenant->tanggal_lahir = request()->tanggal_lahir;
@@ -124,37 +90,50 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         $DetailTenant->save();
     }
 
-    public function storeInsert($model){
+    public function storeInsert($model, $randomString){
         $StoreDetail = new StoreDetail();
+        $tax = new Tax();
+        $discount = new Discount();
+        $StoreDetail->store_identifier = $randomString;
         $StoreDetail->id_tenant = $model->id;
+        $StoreDetail->email = $model->email;
         $StoreDetail->save();
+        $tax->store_identifier = $randomString;
+        $tax->save();
+        $discount->store_identifier = $randomString;
+        $discount->save();
     }
 
-    public function fieldInsert($model){
+    public function fieldInsert($randomString){
         $TenantField = new TenantField();
-        $TenantField->id_tenant = $model->id;
+        $TenantField->store_identifier = $randomString;
         $TenantField->baris1 = "Nama Pelanggan";
         $TenantField->baris2 = "Kota Asal";
         $TenantField->baris3 = "Alamat Pelanggan";
         $TenantField->baris4 = "Email Pelanggan";
         $TenantField->baris5 = "No. Telp./WA";
         $TenantField->baris_1_activation = 1;
-        $TenantField->baris_2_activation = 2;
-        $TenantField->baris_3_activation = 3;
-        $TenantField->baris_4_activation = 4;
-        $TenantField->baris_5_activation = 5;
+        $TenantField->baris_2_activation = 1;
+        $TenantField->baris_3_activation = 1;
+        $TenantField->baris_4_activation = 1;
+        $TenantField->baris_5_activation = 1;
         $TenantField->save();
     }
 
     public function createWallet($model){
         $tunaiWallet = new TunaiWallet();
+        $rekening = new Rekening();
         $qrisWallet = new QrisWallet();
-        $rekeningTenant = new RekeningTenant();
         $tunaiWallet->id_tenant = $model->id;
+        $tunaiWallet->email = $model->email;
+        $tunaiWallet->saldo = 0;
         $tunaiWallet->save();
-        $qrisWallet->id_tenant = $model->id;
+        $rekening->id_user = $model->id;
+        $rekening->email = $model->email;
+        $rekening->save();
+        $qrisWallet->id_user = $model->id;
+        $qrisWallet->email = $model->email;
+        $qrisWallet->saldo = 0;
         $qrisWallet->save();
-        $rekeningTenant->id_tenant = $model->id;
-        $rekeningTenant->save();
     }
 }

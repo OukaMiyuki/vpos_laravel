@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rekening_marketings', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('id_marketing')->unique();
-            $table->string('no_rekening')->nullable();
-            $table->integer('is_confirmed')->default(0);
-            $table->timestamps();
+        Schema::table('detail_tenants', function (Blueprint $table) {
+            $table->string('id_tenant')->unique(false)->nullable()->change();
+            $table->string('email')->unique()->after('id_tenant');
         });
     }
 
@@ -25,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rekening_marketings');
+        Schema::table('detail_tenants', function (Blueprint $table) {
+            //
+        });
     }
 };

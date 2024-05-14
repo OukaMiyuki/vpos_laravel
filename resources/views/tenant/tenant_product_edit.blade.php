@@ -36,12 +36,18 @@
                                                 <input type="text" class="form-control" name="p_name" id="p_name" required value="{{ $product->product_name }}" placeholder="Masukkan nama produk">
                                             </div>
                                         </div>
+                                        @php
+                                        $store = App\Models\StoreDetail::select(['store_identifier'])
+                                                            ->where('id_tenant', auth()->user()->id)
+                                                            ->where('email', auth()->user()->email)
+                                                            ->first();
+                                        @endphp
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="category" class="form-label">Product Category</label>
                                                 <select class="form-select @error('category') is-invalid @enderror" id="category" name="category" required>
                                                     <option value="">- Pilih Kategori Barang -</option>
-                                                    @foreach (App\Models\ProductCategory::where('id_tenant', auth()->user()->id)->latest()->get() as $cat)
+                                                    @foreach (App\Models\ProductCategory::where('store_identifier', $store->store_identifier)->latest()->get() as $cat)
                                                         <option value="{{ $cat->id }}" @if ($product->id_category == $cat->id) selected="selected" @endif>{{ $cat->name }}</option>
                                                     @endforeach
                                                 </select>
@@ -54,7 +60,7 @@
                                                 <label for="batch" class="form-label">Batch ID</label>
                                                 <select class="form-select @error('batch') is-invalid @enderror" id="batch" name="batch" required>
                                                     <option value="">- Pilih Batch ID -</option>
-                                                    @foreach (App\Models\Batch::where('id_tenant', auth()->user()->id)->latest()->get() as $batch)
+                                                    @foreach (App\Models\Batch::where('store_identifier', $store->store_identifier)->latest()->get() as $batch)
                                                         <option value="{{ $batch->id }}"@if ($product->id_batch == $batch->id) selected="selected" @endif>{{ $batch->batch_code }} -  {{ $batch->keterangan }}</option>
                                                     @endforeach
                                                 </select>
@@ -65,7 +71,7 @@
                                                 <label for="supplier" class="form-label">Supplier</label>
                                                 <select class="form-select @error('supplier') is-invalid @enderror" id="supplier" name="supplier" required>
                                                     <option value="">- Pilih Supplier -</option>
-                                                    @foreach (App\Models\Supplier::where('id_tenant', auth()->user()->id)->latest()->get() as $sup)
+                                                    @foreach (App\Models\Supplier::where('store_identifier', $store->store_identifier)->latest()->get() as $sup)
                                                         <option value="{{ $sup->id }}"@if ($product->id_supplier == $sup->id) selected="selected" @endif>{{ $sup->nama_supplier }}</option>
                                                     @endforeach
                                                 </select>
@@ -86,27 +92,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    {{-- <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="t_beli" class="form-label">Tanggal Beli</label>
-                                                <input type="date" class="form-control" name="t_beli" id="t_beli" required value="{{ $product->tanggal_beli }}" placeholder="Masukkan tanggal beli">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="t_expired" class="form-label">Tanggal Expired (kosongi jika bukan peroduk makanan)</label>
-                                                <input type="date" class="form-control" name="t_expired" id="t_expired" value="{{ $product->tanggal_expired }}" placeholder="Masukkan tanggal expired">
-                                            </div>
-                                        </div>
-                                    </div> --}}
                                     <div class="row">
-                                        {{-- <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="h_beli" class="form-label">Harga beli <strong>(Rp.)</strong></label>
-                                                <input type="text" class="form-control" name="h_beli" id="h_beli" required value="{{ $product->harga_beli }}" placeholder="Masukkan nominal harga beli">
-                                            </div>
-                                        </div> --}}
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="h_jual" class="form-label">Harga jual <strong>(Rp.)</strong></label>

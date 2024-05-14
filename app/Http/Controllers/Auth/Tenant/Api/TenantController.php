@@ -85,9 +85,13 @@ class TenantController extends Controller {
     }
 
     public function aliasList() : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         $alias = "";
+
         try {
-            $alias = TenantField::where('id_tenant', auth()->user()->id)->first();
+            $alias = TenantField::where('store_identifier', $store->store_identifier)->first();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -114,9 +118,13 @@ class TenantController extends Controller {
     }
 
     public function aliasUpdate(Request $request) : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
+
         $alias = "";
         try {
-            $alias = TenantField::where('id_tenant', auth()->user()->id)->first();
+            $alias = TenantField::where('store_identifier', $store->store_identifier)->first();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Checkup Failed!',
@@ -192,9 +200,12 @@ class TenantController extends Controller {
 
     public function kasirList() : JsonResponse {
         $kasir = "";
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         try {
             $kasir = Kasir::select(['id','name', 'email', 'is_active'])
-                            ->where('id_tenant', auth()->user()->id)
+                            ->where('id_store', $store->store_identifier)
                             ->latest()
                             ->get();
         } catch (Exception $e) {
@@ -224,9 +235,14 @@ class TenantController extends Controller {
 
     public function kasirDetail(Request $request) : JsonResponse {
         $id = $request->id_kasir;
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         $kasir = "";
         try {
-            $kasir = Kasir::with('detail')->findOrFail($id);
+            $kasir = Kasir::with('detail')
+                            ->where('id_store', $store->store_identifier)
+                            ->findOrFail($id);
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -244,6 +260,9 @@ class TenantController extends Controller {
     }
 
     public function kasirRegister(Request $request) : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
@@ -252,7 +271,7 @@ class TenantController extends Controller {
         ]);
         try {
             $kasir = Kasir::create([
-                'id_tenant' => auth()->user()->id,
+                'id_store' => $store->store_identifier,
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
@@ -277,9 +296,14 @@ class TenantController extends Controller {
     }
 
     public function productList() : JsonResponse{
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         $product = "";
         try {
-            $product = Product::where('id_tenant', auth()->user()->id)->latest()->get();
+            $product = Product::where('store_identifier', $store->store_identifier)
+                                ->latest()
+                                ->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -306,9 +330,12 @@ class TenantController extends Controller {
     }
 
     public function productCategory() : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         $productCategory = "";
         try {
-            $productCategory = ProductCategory::select(['id','name'])->where('id_tenant', auth()->user()->id)->latest()->get();
+            $productCategory = ProductCategory::select(['id','name'])->where('store_identifier', $store->store_identifier)->latest()->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -334,11 +361,14 @@ class TenantController extends Controller {
     }
 
     public function filterCategory(Request $request) : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         $category = $request->id_category;
         $product = "";
         try {
             $product = Product::where('id_category', $category)
-                                ->where('id_tenant', auth()->user()->id)
+                                ->where('store_identifier', $store->store_identifier)
                                 ->latest()
                                 ->get();
         } catch (Exception $e) {
@@ -367,11 +397,14 @@ class TenantController extends Controller {
     }
 
     public function searchProduct(Request $request) : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         $keyword = $request->product_name;
         $product = "";
         if($keyword){
             try {
-                $product = Product::where('id_tenant', auth()->user()->id)
+                $product = Product::where('store_identifier', $store->store_identifier)
                                     ->where('product_name', 'LIKE', '%'.$keyword.'%')
                                     ->latest()
                                     ->get();
