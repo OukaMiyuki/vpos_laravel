@@ -5,15 +5,40 @@ namespace App\Http\Controllers\Auth\Kasir;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Stevebauman\Location\Facades\Location;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Kasir;
 use App\Models\DetailKasir;
+use App\Models\History;
+use Exception;
 
 class ProfileController extends Controller {
     public function kasirSettings(){
         return view('kasir.kasir_settings');
+    }
+
+    function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
     }
 
     public function profile(){
@@ -56,56 +81,88 @@ class ProfileController extends Controller {
     // Tidak digunakan karena akun tidak bisa diubah
 
     public function profileInfoUpdate(Request $request){
-        $profileInfo = DetailKasir::where('email', auth()->user()->email)
-                                ->find(auth()->user()->detail->id);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        if($request->hasFile('photo')){
-            $file = $request->file('photo');
-            $namaFile = $profileInfo->name;
-            $storagePath = Storage::path('public/images/profile');
-            $ext = $file->getClientOriginalExtension();
-            $filename = $namaFile.'-'.time().'.'.$ext;
+        try{
+            $profileInfo = DetailKasir::where('email', auth()->user()->email)
+                                        ->find(auth()->user()->detail->id);
 
-            if(empty($profileInfo->detail->photo)){
-                try {
+            $account = Kasir::where('id', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
+            if($request->hasFile('photo')){
+                $file = $request->file('photo');
+                $namaFile = $profileInfo->name;
+                $storagePath = Storage::path('public/images/profile');
+                $ext = $file->getClientOriginalExtension();
+                $filename = $namaFile.'-'.time().'.'.$ext;
+
+                if(empty($profileInfo->detail->photo)){
+                    try {
+                        $file->move($storagePath, $filename);
+                    } catch (\Exception $e) {
+                        return $e->getMessage();
+                    }
+                } else {
+                    Storage::delete('public/images/profile/'.$profileInfo->detail->photo);
                     $file->move($storagePath, $filename);
-                } catch (\Exception $e) {
-                    return $e->getMessage();
                 }
+
+                $profileInfo->update([
+                    'no_ktp' => $request->no_ktp,
+                    'tempat_lahir' => $request->tempat_lahir,
+                    'tanggal_lahir' => $request->tanggal_lahir,
+                    'jenis_kelamin' => $request->jenis_kelamin,
+                    'alamat' => $request->alamat,
+                    'photo' => $filename,
+                    'updated_at' => Carbon::now()
+                ]);
             } else {
-                Storage::delete('public/images/profile/'.$profileInfo->detail->photo);
-                $file->move($storagePath, $filename);
+                $profileInfo->update([
+                    'no_ktp' => $request->no_ktp,
+                    'tempat_lahir' => $request->tempat_lahir,
+                    'tanggal_lahir' => $request->tanggal_lahir,
+                    'jenis_kelamin' => $request->jenis_kelamin,
+                    'alamat' => $request->alamat,
+                    'updated_at' => Carbon::now()
+                ]);
             }
-
-            $profileInfo->update([
-                'no_ktp' => $request->no_ktp,
-                'tempat_lahir' => $request->tempat_lahir,
-                'tanggal_lahir' => $request->tanggal_lahir,
-                'jenis_kelamin' => $request->jenis_kelamin,
-                'alamat' => $request->alamat,
-                'photo' => $filename,
-                'updated_at' => Carbon::now()
+            $account->update([
+                'name' => $request->name
             ]);
-
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Change profile information : Success",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
             $notification = array(
                 'message' => 'Data akun berhasil diupdate!',
                 'alert-type' => 'success',
             );
             return redirect()->back()->with($notification);
-
-        } else {
-            $profileInfo->update([
-                'no_ktp' => $request->no_ktp,
-                'tempat_lahir' => $request->tempat_lahir,
-                'tanggal_lahir' => $request->tanggal_lahir,
-                'jenis_kelamin' => $request->jenis_kelamin,
-                'alamat' => $request->alamat,
-                'updated_at' => Carbon::now()
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Change profile information : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
             ]);
 
             $notification = array(
-                'message' => 'Data akun berhasil diupdate!',
-                'alert-type' => 'success',
+                'message' => 'Error data gagal diupdate!',
+                'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
         }
@@ -116,27 +173,60 @@ class ProfileController extends Controller {
     }
 
     public function passwordUpdate(Request $request){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
         $request->validate([
             'old_password' => 'required',
             'new_password' => 'required|confirmed',
         ]);
 
-        if(!Hash::check($request->old_password, auth::user()->password)){
+        try{
+            if(!Hash::check($request->old_password, auth::user()->password)){
+                $notification = array(
+                    'message' => 'Password lama tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            }
+    
+            Kasir::whereId(auth()->user()->id)->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Change Password : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
             $notification = array(
-                'message' => 'Password lama tidak sesuai!',
+                'message' => 'Password berhasil diperbarui!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Change Password : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Update Password Error!',
                 'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
         }
-
-        Kasir::whereId(auth()->user()->id)->update([
-            'password' => Hash::make($request->new_password),
-        ]);
-
-        $notification = array(
-            'message' => 'Password berhasil diperbarui!',
-            'alert-type' => 'success',
-        );
-        return redirect()->back()->with($notification);
     }
 }

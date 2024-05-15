@@ -9,7 +9,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="">Finance</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.finance') }}">Finance</a></li>
                                 <li class="breadcrumb-item active">Saldo</li>
                             </ol>
                         </div>
@@ -29,7 +29,7 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $tunai->saldo }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Saldo Transaksi Tunai</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.finance.pemasukan.tunai') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -52,12 +52,12 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qris->saldo }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Saldo Transaksi Qris</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.finance.pemasukan.qris') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
-                                        <a title="Tarik Saldo" href="" class="btn btn-blue btn-sm ms-2">
+                                        {{-- <a title="Tarik Saldo" href="" class="btn btn-blue btn-sm ms-2">
                                             Tarik Saldo
-                                        </a>
+                                        </a> --}}
                                     </div>
                                 </div>
                             </div>

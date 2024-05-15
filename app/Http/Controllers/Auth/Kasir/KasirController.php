@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Stevebauman\Location\Facades\Location;
 use Illuminate\Support\Facades\DB;
 use App\Models\ProductStock;
 use App\Models\ShoppingCart;
@@ -18,8 +19,31 @@ use GuzzleHttp\Client;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
 use App\Models\TenantQrisAccount;
+use App\Models\History;
+use Exception;
 
 class KasirController extends Controller {
+    function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
     public function index(){
         $totalInvoiceHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
                                         ->where('store_identifier', auth()->user()->id_store)
@@ -150,23 +174,61 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionSave(Request $request){
-        $invoice = Invoice::create([
-            'store_identifier' => auth()->user()->id_store,
-            'email' => auth()->user()->email,
-            'id_tenant' => auth()->user()->store->id_tenant,
-            'id_kasir' => auth()->user()->id,
-            'tanggal_transaksi' => Carbon::now()
-        ]);
-        if(!is_null($invoice)) {
-            $invoice->storeCart($invoice);
-            $invoice->customerIdentifier($invoice);
-            session()->forget('cart');
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        $invoice = "";
+
+        try{
+
+            $invoice = Invoice::create([
+                'store_identifier' => auth()->user()->id_store,
+                'email' => auth()->user()->email,
+                'id_tenant' => auth()->user()->store->id_tenant,
+                'id_kasir' => auth()->user()->id,
+                'tanggal_transaksi' => Carbon::now()
+            ]);
+            if(!is_null($invoice)) {
+                $invoice->storeCart($invoice);
+                $invoice->customerIdentifier($invoice);
+                session()->forget('cart');
+            }
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Create Transaction Save : ".$invoice->nomor_invoice,
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+            $notification = array(
+                'message' => 'Sukses disimpan!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Create Transaction Save : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Transaksi gagal disimpan!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
-        $notification = array(
-            'message' => 'Sukses disimpan!',
-            'alert-type' => 'success',
-        );
-        return redirect()->back()->with($notification);
     }
 
     public function cartTransactionClear(Request $request){
@@ -184,33 +246,72 @@ class KasirController extends Controller {
         // $total = (int) substr(str_replace([',', '.'], '', Cart::total()), 0, -2);
         // $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
         // $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
-        $subtotal = Cart::subtotal();
-        $total = Cart::total();
-        $tax = Cart::tax();
-        $diskon = Cart::discount();
-        $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
-        if($request->jenisPembayaran == "Tunai"){
-            $invoice = Invoice::create([
-                'store_identifier' => auth()->user()->id_store,
-                'email' => auth()->user()->email,
-                'id_tenant' => auth()->user()->store->id_tenant,
-                'id_kasir' => auth()->user()->id,
-                'jenis_pembayaran' => $request->jenisPembayaran,
-                'nominal_bayar' => $request->nominalText,
-                'kembalian' => $kembalian,
-                'status_pembayaran' => 1,
-                'sub_total' => $subtotal,
-                'pajak' => $tax,
-                'diskon' => $diskon,
-                'tanggal_pelunasan' => Carbon::now(),
-                'tanggal_transaksi' => Carbon::now()
-            ]);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+        $invoice = "";
 
-            if(!is_null($invoice)) {
-                $invoice->storeCart($invoice);
-                $invoice->fieldSave($invoice);
-                $invoice->updateTunaiWallet($total);
+        try{
+            $subtotal = Cart::subtotal();
+            $total = Cart::total();
+            $tax = Cart::tax();
+            $diskon = Cart::discount();
+            $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
+            if($request->jenisPembayaran == "Tunai"){
+                $invoice = Invoice::create([
+                    'store_identifier' => auth()->user()->id_store,
+                    'email' => auth()->user()->email,
+                    'id_tenant' => auth()->user()->store->id_tenant,
+                    'id_kasir' => auth()->user()->id,
+                    'jenis_pembayaran' => $request->jenisPembayaran,
+                    'nominal_bayar' => $request->nominalText,
+                    'kembalian' => $kembalian,
+                    'status_pembayaran' => 1,
+                    'sub_total' => $subtotal,
+                    'pajak' => $tax,
+                    'diskon' => $diskon,
+                    'tanggal_pelunasan' => Carbon::now(),
+                    'tanggal_transaksi' => Carbon::now()
+                ]);
+
+                if(!is_null($invoice)) {
+                    $invoice->storeCart($invoice);
+                    $invoice->fieldSave($invoice);
+                    $invoice->updateTunaiWallet($total);
+                }
+            } else if($request->jenisPembayaran == "Qris"){
+                $invoice = Invoice::create([
+                    'store_identifier' => auth()->user()->id_store,
+                    'email' => auth()->user()->email,
+                    'id_tenant' => auth()->user()->store->id_tenant,
+                    'id_kasir' => auth()->user()->id,
+                    'jenis_pembayaran' => $request->jenisPembayaran,
+                    'status_pembayaran' => 0,
+                    'sub_total' => $subtotal,
+                    'pajak' => $tax,
+                    'diskon' => $diskon,
+                    'nominal_bayar' => $total,
+                    'tanggal_transaksi' => Carbon::now()
+                ]);
+
+                if(!is_null($invoice)) {
+                    $invoice->storeCart($invoice);
+                    $invoice->fieldSave($invoice);
+                }
             }
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Create Transaction Success : ".$invoice->nomor_invoice,
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
 
             session()->forget('cart');
 
@@ -219,34 +320,22 @@ class KasirController extends Controller {
                 'alert-type' => 'success',
             );
             return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
-        } else if($request->jenisPembayaran == "Qris"){
-            $invoice = Invoice::create([
-                'store_identifier' => auth()->user()->id_store,
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
                 'email' => auth()->user()->email,
-                'id_tenant' => auth()->user()->store->id_tenant,
-                'id_kasir' => auth()->user()->id,
-                'jenis_pembayaran' => $request->jenisPembayaran,
-                'status_pembayaran' => 0,
-                'sub_total' => $subtotal,
-                'pajak' => $tax,
-                'diskon' => $diskon,
-                'nominal_bayar' => $total,
-                'tanggal_transaksi' => Carbon::now()
+                'action' => "Transaksi Gagal : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
             ]);
 
-            if(!is_null($invoice)) {
-                $invoice->storeCart($invoice);
-                $invoice->fieldSave($invoice);
-            }
-
-            session()->forget('cart');
-
             $notification = array(
-                'message' => 'Transaksi berhasil diproses!',
-                'alert-type' => 'success',
+                'message' => 'Transaksi Gagal di proses!',
+                'alert-type' => 'error',
             );
-            // return view('kasir.kasir_invoice_preview', compact('invoice'))->with($notification);
-            return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
+            return redirect()->back()->with($notification);
         }
     }
 
@@ -468,124 +557,223 @@ class KasirController extends Controller {
     }
 
     public function transactionPendingDelete($id) {
-        $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
-                            ->where('id_kasir', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->where('id_tenant', auth()->user()->store->id_tenant)
-                            ->where('jenis_pembayaran', NULL)
-                            ->find($id);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        if(is_null($invoice) || empty($invoice)){
-            $notification = array(
-                'message' => 'Transaksi tidak ditemukan!',
-                'alert-type' => 'warning',
-            );
-            return redirect()->route('kasir.transaction.pending')->with($notification);
-        }
-
-        session()->forget('cart');
-        if(!is_null($invoice)) {
-            $invoice->deleteCart($invoice);
-        }
-        $invoice->delete();
-        $notification = array(
-            'message' => 'Transaction Deleted Successfully!',
-            'alert-type' => 'success',
-        );
-        return redirect()->back()->with($notification);
-    }
-
-    public function cartTransactionPendingProcess(Request $request){
-        $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
-                            ->where('id_kasir', auth()->user()->id)
-                            ->where('id_tenant', auth()->user()->store->id_tenant)
-                            ->where('email', auth()->user()->email)
-                            ->find($request->id_invoice);
-        $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
-        if($request->jenisPembayaran == "Tunai"){
-            $invoice->update([
-                'jenis_pembayaran' => $request->jenisPembayaran,
-                'tanggal_pelunasan' => Carbon::now(),
-                'status_pembayaran' => 1,
-                'sub_total' => $request->sub_total_belanja,
-                'pajak' => $request->nominal_pajak,
-                'diskon' => $request->nominal_diskon,
-                'nominal_bayar' => $request->nominalText,
-                'kembalian' => $kembalian,
-            ]);
-            $total = $request->sub_total_belanja+$request->nominal_pajak;
-            if(!is_null($invoice)) {
-                $invoice->fieldSave($invoice);
-                $invoice->updateTunaiWallet($total);
-            }
-            //session()->forget('cart');
-            $notification = array(
-                'message' => 'Transaksi berhasil diproses!',
-                'alert-type' => 'success',
-            );
-            return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
-        } else if($request->jenisPembayaran == "Qris"){
-            $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
-            $client = new Client();
-            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
-            $postResponse = $client->request('POST',  $url, [
-                'form_params' => [
-                    'amount' => $total,
-                    'transactionNo' => $invoice->nomor_invoice,
-                    'pos_id' => "VP",
-                    'secret_key' => "Vpos71237577"
-                ]
-            ]);
-            $responseCode = $postResponse->getStatusCode();
-            $data = json_decode($postResponse->getBody());
-
-            $invoice->update([
-                'jenis_pembayaran' => $request->jenisPembayaran,
-                'tanggal_pelunasan' => Carbon::now(),
-                'status_pembayaran' => 0,
-                'qris_data' => $data->data->data->qrisData,
-                'sub_total' => $request->sub_total_belanja,
-                'pajak' => $request->nominal_pajak,
-                'diskon' => $request->nominal_diskon,
-                'nominal_bayar' => $total,
-            ]);
-
-            if(!is_null($invoice)) {
-                $invoice->fieldSave($invoice);
+        try{
+            $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
+                                ->where('id_kasir', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->where('id_tenant', auth()->user()->store->id_tenant)
+                                ->where('jenis_pembayaran', NULL)
+                                ->find($id);
+            $invoiceTemp = $invoice->nomor_invoice;
+            if(is_null($invoice) || empty($invoice)){
+                $notification = array(
+                    'message' => 'Transaksi tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->route('kasir.transaction.pending')->with($notification);
             }
 
             session()->forget('cart');
+            if(!is_null($invoice)) {
+                $invoice->deleteCart($invoice);
+            }
+            $invoice->delete();
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Delete Pending Transaction : ".$invoiceTemp,
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+            $notification = array(
+                'message' => 'Transaction Deleted Successfully!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Delete Pending Transaction : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Transaksi gagal dihapus!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
+    public function cartTransactionPendingProcess(Request $request){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        $invoice = "";
+
+        try{
+            $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
+                                ->where('id_kasir', auth()->user()->id)
+                                ->where('id_tenant', auth()->user()->store->id_tenant)
+                                ->where('email', auth()->user()->email)
+                                ->find($request->id_invoice);
+            $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
+            if($request->jenisPembayaran == "Tunai"){
+                $invoice->update([
+                    'jenis_pembayaran' => $request->jenisPembayaran,
+                    'tanggal_pelunasan' => Carbon::now(),
+                    'status_pembayaran' => 1,
+                    'sub_total' => $request->sub_total_belanja,
+                    'pajak' => $request->nominal_pajak,
+                    'diskon' => $request->nominal_diskon,
+                    'nominal_bayar' => $request->nominalText,
+                    'kembalian' => $kembalian,
+                ]);
+                $total = $request->sub_total_belanja+$request->nominal_pajak;
+                if(!is_null($invoice)) {
+                    $invoice->fieldSave($invoice);
+                    $invoice->updateTunaiWallet($total);
+                }
+            } else if($request->jenisPembayaran == "Qris"){
+                $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
+                $client = new Client();
+                $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+                $postResponse = $client->request('POST',  $url, [
+                    'form_params' => [
+                        'amount' => $total,
+                        'transactionNo' => $invoice->nomor_invoice,
+                        'pos_id' => "VP",
+                        'secret_key' => "Vpos71237577"
+                    ]
+                ]);
+                $responseCode = $postResponse->getStatusCode();
+                $data = json_decode($postResponse->getBody());
+
+                $invoice->update([
+                    'jenis_pembayaran' => $request->jenisPembayaran,
+                    'tanggal_pelunasan' => Carbon::now(),
+                    'status_pembayaran' => 0,
+                    'qris_data' => $data->data->data->qrisData,
+                    'sub_total' => $request->sub_total_belanja,
+                    'pajak' => $request->nominal_pajak,
+                    'diskon' => $request->nominal_diskon,
+                    'nominal_bayar' => $total,
+                ]);
+
+                if(!is_null($invoice)) {
+                    $invoice->fieldSave($invoice);
+                }
+            }
+            session()->forget('cart');
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Transaction Pending Process : ".$invoice->nomor_invoice,
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
 
             $notification = array(
                 'message' => 'Transaksi berhasil diproses!',
                 'alert-type' => 'success',
             );
             return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Transaction Pending Process : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Transaksi gagal diproses!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
     }
 
     public function cartTransactionPendingChangePayment(Request $request){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
         $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('id_tenant', auth()->user()->store->id_tenant)
                             ->where('email', auth()->user()->email)
                             ->find($request->id);
-        $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalian);
-        $invoice->update([
-            'tanggal_pelunasan' => Carbon::now(),
-            'jenis_pembayaran' => "Tunai",
-            'qris_data' => NULL,
-            'status_pembayaran' => 1,
-            'nominal_bayar' => $request->nominal,
-            'kembalian' => $kembalian,
-        ]);
+        try{
+            $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalian);
+            $invoice->update([
+                'tanggal_pelunasan' => Carbon::now(),
+                'jenis_pembayaran' => "Tunai",
+                'qris_data' => NULL,
+                'status_pembayaran' => 1,
+                'nominal_bayar' => $request->nominal,
+                'kembalian' => $kembalian,
+            ]);
 
-        $notification = array(
-            'message' => 'Transaksi berhasil diproses!',
-            'alert-type' => 'success',
-        );
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Change Payment For Transaction : ".$invoice->nomor_invoice,
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
 
-        return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
+            $notification = array(
+                'message' => 'Transaksi berhasil diproses!',
+                'alert-type' => 'success',
+            );
+
+            return redirect()->route('kasir.pos.transaction.invoice', array('id' => $invoice->id))->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Change Payment : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Pembayaran gagal diubah!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
     }
 
     public function cartTransactionInvoice($id){

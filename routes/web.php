@@ -213,6 +213,8 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/finance', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'financeDashboard'])->name('tenant.finance');
     Route::get('/dashboard/finance/pemasukan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'financePemasukan'])->name('tenant.finance.pemasukan');
     Route::get('/dashboard/finance/saldo', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'saldoData'])->name('tenant.saldo');
+    Route::get('/dashboard/finance/saldo/tunai', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanTunai'])->name('tenant.finance.pemasukan.tunai');
+    Route::get('/dashboard/finance/saldo/qris', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQris'])->name('tenant.finance.pemasukan.qris');
     Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'historyPenarikan'])->name('tenant.finance.history_penarikan');
     
     Route::get('/dashboard/management', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'storeManagement'])->name('tenant.store.management');

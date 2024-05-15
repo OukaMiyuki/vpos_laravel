@@ -9,6 +9,7 @@ use Illuminate\Http\File;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Stevebauman\Location\Facades\Location;
 use App\Models\Kasir;
 use App\Models\Supplier;
 use App\Models\ProductCategory;
@@ -22,6 +23,9 @@ use App\Models\Invoice;
 use App\Models\QrisWallet;
 use App\Models\TunaiWallet;
 use App\Models\StoreDetail;
+use App\Models\Withdrawal;
+use App\Models\History;
+use Exception;
 
 class TenantController extends Controller {
 
@@ -32,6 +36,27 @@ class TenantController extends Controller {
                             ->first();
         $identifier = $store->store_identifier;
         return $identifier;
+    }
+
+    function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
     }
 
     public function index(){
@@ -168,29 +193,64 @@ class TenantController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-        
-        $store = StoreDetail::select(['store_identifier'])
-                            ->where('id_tenant', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
-        $kasir = Kasir::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'id_store' => $store->store_identifier
-        ]);
 
-        if(!is_null($kasir)) {
-            $kasir->detailKasirStore($kasir);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try {
+            $store = StoreDetail::select(['store_identifier'])
+                                ->where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
+            $kasir = Kasir::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'password' => Hash::make($request->password),
+                'id_store' => $store->store_identifier
+            ]);
+
+            if(!is_null($kasir)) {
+                $kasir->detailKasirStore($kasir);
+            }
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Tambah Kasir Baru : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+
+            $notification = array(
+                'message' => 'Akun kasir telah ditambahkan!',
+                'alert-type' => 'info',
+            );
+    
+            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Tambah Kasir Baru : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Tambah Kasir Baru Error!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
-
-        $notification = array(
-            'message' => 'Akun kasir telah ditambahkan!',
-            'alert-type' => 'info',
-        );
-
-        return redirect()->back()->with($notification);
     }
 
     public function kasirDetail($id){
@@ -238,9 +298,82 @@ class TenantController extends Controller {
             );
             return redirect()->back()->with($notification);
         } else {
+            $ip = "125.164.244.223";
+            $PublicIP = $this->get_client_ip();
+            $getLoc = Location::get($ip);
+            $lat = $getLoc->latitude;
+            $long = $getLoc->longitude;
+            DB::connection()->enableQueryLog();
+
+            try{
+                $identifier = $this->getStoreIdentifier();
+                Supplier::create([
+                    'store_identifier' => $identifier,
+                    'nama_supplier' => $request->nama_supplier,
+                    'email_supplier' => $request->email,
+                    'phone_supplier' => $request->phone,
+                    'alamat_supplier' => $request->alamat,
+                    'keterangan' => $request->keterangan
+                ]);
+
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Add Supplier : Success!",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                    'status' => 1
+                ]);
+        
+                $notification = array(
+                    'message' => 'Data berhasil diinput!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            } catch(Exception $e){
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Add Supplier : Error",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => $e,
+                    'status' => 0
+                ]);
+    
+                $notification = array(
+                    'message' => 'Tambah Supplier Gagal!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            }
+        }
+    }
+
+    public function supplierUpdate(Request $request) {
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try{
             $identifier = $this->getStoreIdentifier();
-            Supplier::create([
-                'store_identifier' => $identifier,
+            $supplier = Supplier::where('store_identifier', $identifier)
+                                ->find($request->id);
+            
+            if(empty($supplier) || is_null($supplier)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+        
+                return redirect()->back()->with($notification);
+            }
+    
+            $supplier->update([
                 'nama_supplier' => $request->nama_supplier,
                 'email_supplier' => $request->email,
                 'phone_supplier' => $request->phone,
@@ -248,64 +381,94 @@ class TenantController extends Controller {
                 'keterangan' => $request->keterangan
             ]);
     
-            $notification = array(
-                'message' => 'Data berhasil diinput!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
-        }
-    }
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Supplier : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
 
-    public function supplierUpdate(Request $request) {
-        $identifier = $this->getStoreIdentifier();
-        $supplier = Supplier::where('store_identifier', $identifier)
-                            ->find($request->id);
-        
-        if(empty($supplier) || is_null($supplier)){
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data berhasil diupdate!',
+                'alert-type' => 'info',
             );
     
             return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Supplier : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Update Supplier Error!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
-
-        $supplier->update([
-            'nama_supplier' => $request->nama_supplier,
-            'email_supplier' => $request->email,
-            'phone_supplier' => $request->phone,
-            'alamat_supplier' => $request->alamat,
-            'keterangan' => $request->keterangan
-        ]);
-
-
-        $notification = array(
-            'message' => 'Data berhasil diupdate!',
-            'alert-type' => 'info',
-        );
-
-        return redirect()->back()->with($notification);
     }
 
     public function supplierDelete($id){
-        $identifier = $this->getStoreIdentifier();
-        $supplier = Supplier::where('store_identifier', $identifier)
-                            ->find($id);
-        if(empty($supplier) || is_null($supplier)){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $supplier = Supplier::where('store_identifier', $identifier)
+                                ->find($id);
+            if(empty($supplier) || is_null($supplier)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+        
+                return redirect()->back()->with($notification);
+            }
+            $supplier->delete();
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Delete Supplier : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data berhasil dihapus!',
+                'alert-type' => 'info',
             );
     
             return redirect()->back()->with($notification);
-        }
-        $supplier->delete();
-        $notification = array(
-            'message' => 'Data berhasil dihapus!',
-            'alert-type' => 'info',
-        );
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Delete Supplier : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
 
-        return redirect()->back()->with($notification);
+            $notification = array(
+                'message' => 'Delete Supplier Error!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
     }
 
     public function batchList(){
@@ -324,71 +487,174 @@ class TenantController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-        $identifier = $this->getStoreIdentifier();
-        Batch::create([
-            'store_identifier' => $identifier,
-            'batch_code' => $request->name,
-            'keterangan' => $request->keterangan
-        ]);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        $notification = array(
-            'message' => 'Data berhasil ditambahkan!',
-            'alert-type' => 'info',
-        );
+        try{
+            $identifier = $this->getStoreIdentifier();
+            Batch::create([
+                'store_identifier' => $identifier,
+                'batch_code' => $request->name,
+                'keterangan' => $request->keterangan
+            ]);
+            
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Add Batch Code : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
 
-        return redirect()->back()->with($notification);
+            $notification = array(
+                'message' => 'Data berhasil ditambahkan!',
+                'alert-type' => 'info',
+            );
+            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Add Batch Code : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Add Batch Code Error!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
     }
 
     public function batchUpdate(Request $request){
-        $identifier = $this->getStoreIdentifier();
-        $batch = Batch::where('store_identifier', $identifier)
-                        ->find($request->id);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $batch = Batch::where('store_identifier', $identifier)
+                            ->find($request->id);
+            
+            if(empty($batch) || is_null($batch)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
         
-        if(empty($batch) || is_null($batch)){
+                return redirect()->back()->with($notification);
+            }
+    
+            $batch->update([
+                'batch_code' => $request->name,
+                'keterangan' => $request->keterangan
+            ]);
+    
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Batch Update : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data berhasil diupdate!',
+                'alert-type' => 'info',
             );
     
             return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Batch Update : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Data Batch gagal diupdate!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
-
-        $batch->update([
-            'batch_code' => $request->name,
-            'keterangan' => $request->keterangan
-        ]);
-
-
-        $notification = array(
-            'message' => 'Data berhasil ditambahkan!',
-            'alert-type' => 'info',
-        );
-
-        return redirect()->back()->with($notification);
     }
 
     public function batchDelete($id){
-        $identifier = $this->getStoreIdentifier();
-        $batch = Batch::where('store_identifier', $identifier)
-                        ->find($id);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $batch = Batch::where('store_identifier', $identifier)
+                            ->find($id);
+            
+            if(empty($batch) || is_null($batch)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
         
-        if(empty($batch) || is_null($batch)){
+                return redirect()->back()->with($notification);
+            }
+    
+            $batch->delete();
+            
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Batch Delete : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data berhasil dihapus!',
+                'alert-type' => 'info',
             );
     
             return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Batch Delete : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Data gagal dihapus!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
-
-        $batch->delete();
-
-        $notification = array(
-            'message' => 'Data berhasil dihapus!',
-            'alert-type' => 'info',
-        );
-
-        return redirect()->back()->with($notification);
     }
 
     public function categoryList(){
@@ -407,69 +673,174 @@ class TenantController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-        
-        $identifier = $this->getStoreIdentifier();
-        ProductCategory::create([
-            'store_identifier' => $identifier,
-            'name' => $request->category
-        ]);
 
-        $notification = array(
-            'message' => 'Data berhasil ditambahkan!',
-            'alert-type' => 'info',
-        );
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        return redirect()->back()->with($notification);
+        try{
+            $identifier = $this->getStoreIdentifier();
+            ProductCategory::create([
+                'store_identifier' => $identifier,
+                'name' => $request->category
+            ]);
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Add Category : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+    
+            $notification = array(
+                'message' => 'Data berhasil ditambahkan!',
+                'alert-type' => 'info',
+            );
+    
+            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Add Category : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Tambah data kategori gagal!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
     }
 
     public function categoryUpdate(Request $request){
-        $identifier = $this->getStoreIdentifier();
-        $category = ProductCategory::where('store_identifier', $identifier)
-                                ->find($request->id);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        if(empty($category) || is_null($category)){
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $category = ProductCategory::where('store_identifier', $identifier)
+                                    ->find($request->id);
+    
+            if(empty($category) || is_null($category)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+        
+                return redirect()->back()->with($notification);
+            }
+    
+            $category->update([
+                'name'  => $request->category
+            ]);
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Category : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+    
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data berhasil diupdate!',
+                'alert-type' => 'info',
             );
     
             return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Category : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Update data kategori gagal!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
-
-        $category->update([
-            'name'  => $request->category
-        ]);
-
-        $notification = array(
-            'message' => 'Data berhasil diupdate!',
-            'alert-type' => 'info',
-        );
-
-        return redirect()->back()->with($notification);
     }
 
     public function categoryDelete($id){
-        $identifier = $this->getStoreIdentifier();
-        $category = ProductCategory::where('store_identifier', $identifier)
-                                ->find($id);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        if(empty($category) || is_null($category)){
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $category = ProductCategory::where('store_identifier', $identifier)
+                                    ->find($id);
+    
+            if(empty($category) || is_null($category)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+        
+                return redirect()->back()->with($notification);
+            }
+    
+            $category->delete();
+            
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Delete Category : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data berhasil dihapus!',
+                'alert-type' => 'info',
             );
     
             return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Delete Category : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Hapus data kategori gagal!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
-
-        $category->delete();
-
-        $notification = array(
-            'message' => 'Data berhasil dihapus!',
-            'alert-type' => 'info',
-        );
-
-        return redirect()->back()->with($notification);
     }
 
     public function batchProductList(){
@@ -493,38 +864,73 @@ class TenantController extends Controller {
             return redirect()->back()->with($notification);
         }
 
-        $identifier = $this->getStoreIdentifier();
-        $file = $request->file('photo');
-        $namaFile = $request->p_name;
-        $storagePath = Storage::path('public/images/product');
-        $ext = $file->getClientOriginalExtension();
-        $filename = $namaFile.'-'.time().'.'.$ext;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        try {
-            $file->move($storagePath, $filename);
-        } catch (\Exception $e) {
-            return $e->getMessage();
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $file = $request->file('photo');
+            $namaFile = $request->p_name;
+            $storagePath = Storage::path('public/images/product');
+            $ext = $file->getClientOriginalExtension();
+            $filename = $namaFile.'-'.time().'.'.$ext;
+    
+            try {
+                $file->move($storagePath, $filename);
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+    
+            Product::create([
+                'store_identifier' => $identifier,
+                'id_batch' => $request->batch,
+                'id_category' => $request->category,
+                'product_name' => $request->p_name,
+                'id_supplier' => $request->supplier,
+                'photo' => $filename,
+                'nomor_gudang' => $request->gudang,
+                'nomor_rak' => $request->rak,
+                'tanggal_beli' => $request->t_beli,
+                'tanggal_expired' => $request->t_expired,
+                'harga_jual' => (int) $request->h_jual
+            ]);
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Add Data Batch Product : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+    
+            $notification = array(
+                'message' => 'Data produk berhasil ditambahkan!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('tenant.product.batch.list')->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Add Data Batch Product : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Tambah Batch Produk baru gagal!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
-
-        Product::create([
-            'store_identifier' => $identifier,
-            'id_batch' => $request->batch,
-            'id_category' => $request->category,
-            'product_name' => $request->p_name,
-            'id_supplier' => $request->supplier,
-            'photo' => $filename,
-            'nomor_gudang' => $request->gudang,
-            'nomor_rak' => $request->rak,
-            'tanggal_beli' => $request->t_beli,
-            'tanggal_expired' => $request->t_expired,
-            'harga_jual' => (int) $request->h_jual
-        ]);
-
-        $notification = array(
-            'message' => 'Data produk berhasil ditambahkan!',
-            'alert-type' => 'success',
-        );
-        return redirect()->route('tenant.product.batch.list')->with($notification);
     }
 
     public function batchProductDetail($id){
@@ -563,46 +969,75 @@ class TenantController extends Controller {
     }
 
     public function batchProductUpdate(Request $request){
-        $identifier = $this->getStoreIdentifier();
-        $product = Product::where('store_identifier', $identifier)
-                            ->find($request->id);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        if(empty($product) || is_null($product)){
-            $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
-            );
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $product = Product::where('store_identifier', $identifier)
+                                ->find($request->id);
     
-            return redirect()->back()->with($notification);
-        }
-
-        if($request->hasFile('photo')){
-            $file = $request->file('photo');
-            $namaFile = $product->p_name;
-            $storagePath = Storage::path('public/images/product');
-            $ext = $file->getClientOriginalExtension();
-            $filename = $namaFile.'-'.time().'.'.$ext;
-
-            if(empty($product->photo)){
-                try {
-                    $file->move($storagePath, $filename);
-                } catch (\Exception $e) {
-                    return $e->getMessage();
-                }
-            } else {
-                Storage::delete('public/images/product/'.$product->photo);
-                $file->move($storagePath, $filename);
+            if(empty($product) || is_null($product)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+        
+                return redirect()->back()->with($notification);
             }
 
-            $product->update([
-                'id_batch' => $request->batch,
-                'id_category' => $request->category,
-                'product_name' => $request->p_name,
-                'id_supplier' => $request->supplier,
-                'photo' => $filename,
-                'nomor_gudang' => $request->gudang,
-                'nomor_rak' => $request->rak,
-                'harga_jual' => $request->h_jual
+            if($request->hasFile('photo')){
+                $file = $request->file('photo');
+                $namaFile = $product->p_name;
+                $storagePath = Storage::path('public/images/product');
+                $ext = $file->getClientOriginalExtension();
+                $filename = $namaFile.'-'.time().'.'.$ext;
+    
+                if(empty($product->photo)){
+                    try {
+                        $file->move($storagePath, $filename);
+                    } catch (\Exception $e) {
+                        return $e->getMessage();
+                    }
+                } else {
+                    Storage::delete('public/images/product/'.$product->photo);
+                    $file->move($storagePath, $filename);
+                }
+    
+                $product->update([
+                    'id_batch' => $request->batch,
+                    'id_category' => $request->category,
+                    'product_name' => $request->p_name,
+                    'id_supplier' => $request->supplier,
+                    'photo' => $filename,
+                    'nomor_gudang' => $request->gudang,
+                    'nomor_rak' => $request->rak,
+                    'harga_jual' => $request->h_jual
+                ]);    
+            } else {
+                $product->update([
+                    'id_batch' => $request->batch,
+                    'id_category' => $request->category,
+                    'product_name' => $request->p_name,
+                    'id_supplier' => $request->supplier,
+                    'nomor_gudang' => $request->gudang,
+                    'nomor_rak' => $request->rak,
+                    'harga_jual' => $request->h_jual
+                ]);
+            }
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Data Batch Product : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
             ]);
 
             $notification = array(
@@ -610,52 +1045,85 @@ class TenantController extends Controller {
                 'alert-type' => 'success',
             );
             return redirect()->route('tenant.product.batch.list')->with($notification);
-
-        } else {
-            $product->update([
-                'id_batch' => $request->batch,
-                'id_category' => $request->category,
-                'product_name' => $request->p_name,
-                'id_supplier' => $request->supplier,
-                'nomor_gudang' => $request->gudang,
-                'nomor_rak' => $request->rak,
-                'harga_jual' => $request->h_jual
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Data Batch Product : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
             ]);
 
             $notification = array(
-                'message' => 'Data produk berhasil diupdate!',
-                'alert-type' => 'success',
+                'message' => 'Update data Batch Product gagal!',
+                'alert-type' => 'error',
             );
-            return redirect()->route('tenant.product.batch.list')->with($notification);
+            return redirect()->back()->with($notification);
         }
     }
 
     public function batchProductDelete($id){
-        $identifier = $this->getStoreIdentifier();
-        $product = Product::where('store_identifier', $identifier)
-                            ->find($id);
-        
-        if(empty($product) || is_null($product)){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $product = Product::where('store_identifier', $identifier)
+                                ->find($id);
+            
+            if(empty($product) || is_null($product)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+    
+                return redirect()->back()->with($notification);
+            }
+    
+            $stok = ProductStock::where('id_batch_product', $product->id)
+                                ->where('store_identifier', $identifier)
+                                ->get();
+            foreach($stok as $stock){
+                $stock->delete();
+            }
+            $product->delete();
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Batch Product Delete : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data produk berhasil dihapus!',
+                'alert-type' => 'success',
             );
+            return redirect()->route('tenant.product.batch.list')->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Batch Product Delete : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
 
-            return redirect()->back()->with($notification);
+            $notification = array(
+                'message' => 'Data produk gagal dihapus!',
+                'alert-type' => 'error',
+            );
+            return redirect()->route('tenant.product.batch.list')->with($notification);
         }
-
-        $stok = ProductStock::where('id_batch_product', $product->id)
-                            ->where('store_identifier', $identifier)
-                            ->get();
-        foreach($stok as $stock){
-            $stock->delete();
-        }
-        $product->delete();
-        $notification = array(
-            'message' => 'Data produk berhasil dihapus!',
-            'alert-type' => 'success',
-        );
-        return redirect()->route('tenant.product.batch.list')->with($notification);
     }
 
     public function productStockList(){
@@ -680,23 +1148,57 @@ class TenantController extends Controller {
             return redirect()->back()->with($notification);
         }
 
-        $identifier = $this->getStoreIdentifier();
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        ProductStock::create([
-            'store_identifier' => $identifier,
-            'id_batch_product' => $request->id_batch_product,
-            'barcode' => $request->barcode,
-            'tanggal_beli' => $request->t_beli,
-            'tanggal_expired' => $request->t_expired,
-            'harga_beli' => $request->h_beli,
-            'stok' => $request->stok
-        ]);
+        try{
+            $identifier = $this->getStoreIdentifier();
+            ProductStock::create([
+                'store_identifier' => $identifier,
+                'id_batch_product' => $request->id_batch_product,
+                'barcode' => $request->barcode,
+                'tanggal_beli' => $request->t_beli,
+                'tanggal_expired' => $request->t_expired,
+                'harga_beli' => $request->h_beli,
+                'stok' => $request->stok
+            ]);
 
-        $notification = array(
-            'message' => 'Data produk berhasil ditambahkan!',
-            'alert-type' => 'success',
-        );
-        return redirect()->route('tenant.product.stock.list')->with($notification);
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Add Data Product Stock : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+    
+            $notification = array(
+                'message' => 'Data produk stok berhasil ditambahkan!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('tenant.product.stock.list')->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Add Data Product Stock : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Data produk stok gagal ditambahkan',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
     }
 
     public function productStockEdit($id){
@@ -718,54 +1220,123 @@ class TenantController extends Controller {
     }
 
     public function productStockUpdate(Request $request){
-        $identifier = $this->getStoreIdentifier();
-        $stock = ProductStock::where('store_identifier', $identifier)
-                            ->find($request->id);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $stock = ProductStock::where('store_identifier', $identifier)
+                                ->find($request->id);
+            
+            if(empty($stock) || is_null($stock)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
         
-        if(empty($stock) || is_null($stock)){
-            $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
-            );
+                return redirect()->back()->with($notification);
+            }
     
+            $stock->update([
+                'barcode' => $request->barcode,
+                'tanggal_beli' => $request->t_beli,
+                'tanggal_expired' => $request->t_expired,
+                'harga_beli' => $request->h_beli,
+                'stok' => $request->stok
+            ]);
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Stock Product : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+    
+            $notification = array(
+                'message' => 'Data stok produk berhasil diupdate!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('tenant.product.stock.list')->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Stock Product : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Data stok produk gagal dihapus!',
+                'alert-type' => 'error',
+            );
             return redirect()->back()->with($notification);
         }
-
-        $stock->update([
-            'barcode' => $request->barcode,
-            'tanggal_beli' => $request->t_beli,
-            'tanggal_expired' => $request->t_expired,
-            'harga_beli' => $request->h_beli,
-            'stok' => $request->stok
-        ]);
-
-        $notification = array(
-            'message' => 'Data produk berhasil diupdate!',
-            'alert-type' => 'success',
-        );
-        return redirect()->route('tenant.product.stock.list')->with($notification);
     }
 
     public function productStockDelete($id){
-        $identifier = $this->getStoreIdentifier();
-        $stock = ProductStock::where('store_identifier', $identifier)
-                            ->find($id);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $stock = ProductStock::where('store_identifier', $identifier)
+                                ->find($id);
+            
+            if(empty($stock) || is_null($stock)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
         
-        if(empty($stock) || is_null($stock)){
+                return redirect()->back()->with($notification);
+            }
+            
+            $stock->delete();
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Delete Product Stock Data : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data produk stok berhasil dihapus!',
+                'alert-type' => 'success',
             );
-    
+            return redirect()->route('tenant.product.stock.list')->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Delete Product Stock Data : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Data produk stok gagal dihapus!',
+                'alert-type' => 'error',
+            );
             return redirect()->back()->with($notification);
         }
-        
-        $stock->delete();
-        $notification = array(
-            'message' => 'Data produk berhasil dihapus!',
-            'alert-type' => 'success',
-        );
-        return redirect()->route('tenant.product.stock.list')->with($notification);
     }
 
     public function productStockBarcode($id){
@@ -806,34 +1377,68 @@ class TenantController extends Controller {
             return redirect()->back()->with($notification);
         }
 
-        $identifier = $this->getStoreIdentifier();
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        $diskon = Discount::where('store_identifier', $identifier)
-                            ->first();
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $diskon = Discount::where('store_identifier', $identifier)
+                                ->first();
+            
+            if(empty($diskon) || is_null($diskon)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
         
-        if(empty($diskon) || is_null($diskon)){
+                return redirect()->back()->with($notification);
+            }
+    
+            $diskon->update([
+                'min_harga' => $request->min_harga,
+                'diskon' => $request->diskon,
+                'start_date' => $request->t_mulai,
+                'end_date' => $request->t_akhir,
+                'is_active' => $request->status
+            ]);
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Data Discount : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+    
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data diskon berhasil dimodifikasi!',
+                'alert-type' => 'success',
             );
     
             return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Data Discount : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Data diskon gagal dimodifikasi!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
-
-        $diskon->update([
-            'min_harga' => $request->min_harga,
-            'diskon' => $request->diskon,
-            'start_date' => $request->t_mulai,
-            'end_date' => $request->t_akhir,
-            'is_active' => $request->status
-        ]);
-
-        $notification = array(
-            'message' => 'Data diskon berhasil dimodifikasi!',
-            'alert-type' => 'success',
-        );
-
-        return redirect()->back()->with($notification);
     }
 
     public function pajakModify(){
@@ -851,30 +1456,64 @@ class TenantController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-        $identifier = $this->getStoreIdentifier();
-        $tax = Tax::where('store_identifier', $identifier)
-                    ->first();
 
-        if(empty($tax) || is_null($tax)){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $tax = Tax::where('store_identifier', $identifier)
+                        ->first();
+
+            if(empty($tax) || is_null($tax)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+        
+                return redirect()->back()->with($notification);
+            }
+
+            $tax->update([
+                'pajak' => $request->pajak,
+                'is_active' => $request->status,
+            ]);
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Data Tax : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data pajak berhasil dimodifikasi!',
+                'alert-type' => 'success',
             );
-    
+
+            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Data Tax : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Data pajak gagal dimodifikasi!',
+                'alert-type' => 'error',
+            );
             return redirect()->back()->with($notification);
         }
-
-        $tax->update([
-            'pajak' => $request->pajak,
-            'is_active' => $request->status,
-        ]);
-
-        $notification = array(
-            'message' => 'Data pajak berhasil dimodifikasi!',
-            'alert-type' => 'success',
-        );
-
-        return redirect()->back()->with($notification);
     }
 
     public function customField(){
@@ -893,60 +1532,94 @@ class TenantController extends Controller {
             return redirect()->back()->with($notification);
         }
 
-        $identifier = $this->getStoreIdentifier();
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        $customField = TenantField::where('store_identifier', $identifier)
-                                    ->find($request->id);
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $customField = TenantField::where('store_identifier', $identifier)
+                                        ->find($request->id);
+    
+            if(empty($customField) || is_null($customField)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+        
+                return redirect()->back()->with($notification);
+            }
+    
+            $aktivasi_baris_1 = $request->aktivasi_baris_1;
+            $aktivasi_baris_2 = $request->aktivasi_baris_2;
+            $aktivasi_baris_3 = $request->aktivasi_baris_3;
+            $aktivasi_baris_4 = $request->aktivasi_baris_4;
+            $aktivasi_baris_5 = $request->aktivasi_baris_5;
+            if(is_null($request->baris1)){
+                $aktivasi_baris_1 = 0;
+            }
+            if(is_null($request->baris2)){
+                $aktivasi_baris_2 = 0;
+            }
+            if(is_null($request->baris3)){
+                $aktivasi_baris_3 = 0;
+            }
+            if(is_null($request->baris4)){
+                $aktivasi_baris_4 = 0;
+            }
+            if(is_null($request->baris5)){
+                $aktivasi_baris_5 = 0;
+            }
+    
+            $customField->update([
+                'baris1' => $request->baris1,
+                'baris2' => $request->baris2,
+                'baris3' => $request->baris3,
+                'baris4' => $request->baris4,
+                'baris5' => $request->baris5,
+                'baris_1_activation' => $aktivasi_baris_1,
+                'baris_2_activation' => $aktivasi_baris_2,
+                'baris_3_activation' => $aktivasi_baris_3,
+                'baris_4_activation' => $aktivasi_baris_4,
+                'baris_5_activation' => $aktivasi_baris_5,
+            ]);
 
-        if(empty($customField) || is_null($customField)){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Custom Fields : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+    
             $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
+                'message' => 'Data berhasil diupdate!',
+                'alert-type' => 'success',
             );
     
             return redirect()->back()->with($notification);
-        }
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Custom Fields : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
 
-        $aktivasi_baris_1 = $request->aktivasi_baris_1;
-        $aktivasi_baris_2 = $request->aktivasi_baris_2;
-        $aktivasi_baris_3 = $request->aktivasi_baris_3;
-        $aktivasi_baris_4 = $request->aktivasi_baris_4;
-        $aktivasi_baris_5 = $request->aktivasi_baris_5;
-        if(is_null($request->baris1)){
-            $aktivasi_baris_1 = 0;
+            $notification = array(
+                'message' => 'Data gagal diupdate!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
-        if(is_null($request->baris2)){
-            $aktivasi_baris_2 = 0;
-        }
-        if(is_null($request->baris3)){
-            $aktivasi_baris_3 = 0;
-        }
-        if(is_null($request->baris4)){
-            $aktivasi_baris_4 = 0;
-        }
-        if(is_null($request->baris5)){
-            $aktivasi_baris_5 = 0;
-        }
-
-        $customField->update([
-            'baris1' => $request->baris1,
-            'baris2' => $request->baris2,
-            'baris3' => $request->baris3,
-            'baris4' => $request->baris4,
-            'baris5' => $request->baris5,
-            'baris_1_activation' => $aktivasi_baris_1,
-            'baris_2_activation' => $aktivasi_baris_2,
-            'baris_3_activation' => $aktivasi_baris_3,
-            'baris_4_activation' => $aktivasi_baris_4,
-            'baris_5_activation' => $aktivasi_baris_5,
-        ]);
-
-        $notification = array(
-            'message' => 'Data berhasil diupdate!',
-            'alert-type' => 'success',
-        );
-
-        return redirect()->back()->with($notification);
     }
 
     public function tenantTransaction(){
@@ -1079,7 +1752,95 @@ class TenantController extends Controller {
     }
 
     public function financePemasukan(){
-        return view('tenant.tenant_finance_pemasukan');
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::where('store_identifier', $identifier)
+                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran', 'invoices.sub_total', 'invoices.pajak'])
+                            ->with(['kasir' => function($query){
+                                $query->select(['kasirs.id', 'kasirs.name']);
+                            }])
+                            ->where('status_pembayaran', 1)
+                            ->latest()
+                            ->get();
+
+        $totalPemasukan = Invoice::where('store_identifier', $identifier)
+                            ->where('status_pembayaran', 1)
+                            ->sum(DB::raw('sub_total + pajak'));
+
+        $totalPemasukanHariini = Invoice::where('store_identifier', $identifier)
+                                    ->where('status_pembayaran', 1)
+                                    ->whereDate('tanggal_transaksi', Carbon::today())
+                                    ->sum(DB::raw('sub_total + pajak'));
+
+        $totalPemasukanBulanIni = Invoice::where('store_identifier', $identifier)
+                                    ->where('status_pembayaran', 1)
+                                    ->whereMonth('tanggal_transaksi', Carbon::now()->month)
+                                    ->sum(DB::raw('sub_total + pajak'));
+
+        return view('tenant.tenant_finance_pemasukan', compact(['invoice', 'totalPemasukan', 'totalPemasukanHariini', 'totalPemasukanBulanIni']));
+    }
+
+    public function pemasukanTunai(){
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::where('store_identifier', $identifier)
+                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran', 'invoices.sub_total', 'invoices.pajak'])
+                            ->with(['kasir' => function($query){
+                                $query->select(['kasirs.id', 'kasirs.name']);
+                            }])
+                            ->where('invoices.jenis_pembayaran', 'Tunai')
+                            ->where('status_pembayaran', 1)
+                            ->latest()
+                            ->get();
+
+        $totalPemasukanTunai = Invoice::where('store_identifier', $identifier)
+                                        ->where('invoices.jenis_pembayaran', 'Tunai')
+                                        ->where('status_pembayaran', 1)
+                                        ->sum(DB::raw('sub_total + pajak'));
+
+        $totalPemasukanTunaiHariini = Invoice::where('store_identifier', $identifier)
+                                                ->where('invoices.jenis_pembayaran', 'Tunai')
+                                                ->where('status_pembayaran', 1)
+                                                ->whereDate('tanggal_transaksi', Carbon::today())
+                                                ->sum(DB::raw('sub_total + pajak'));
+
+        $totalPemasukanTunaiBulanIni = Invoice::where('store_identifier', $identifier)
+                                                ->where('invoices.jenis_pembayaran', 'Tunai')
+                                                ->where('status_pembayaran', 1)
+                                                ->whereMonth('tanggal_transaksi', Carbon::now()->month)
+                                                ->sum(DB::raw('sub_total + pajak'));
+        
+        return view('tenant.tenant_finnance_pemasukan_tunai', compact(['invoice', 'totalPemasukanTunai', 'totalPemasukanTunaiHariini', 'totalPemasukanTunaiBulanIni']));
+    }
+
+    public function pemasukanQris(){
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::where('store_identifier', $identifier)
+                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran', 'invoices.sub_total', 'invoices.pajak'])
+                            ->with(['kasir' => function($query){
+                                $query->select(['kasirs.id', 'kasirs.name']);
+                            }])
+                            ->where('status_pembayaran', 1)
+                            ->where('invoices.jenis_pembayaran', 'Qris')
+                            ->latest()
+                            ->get();
+
+        $totalPemasukanQris = Invoice::where('store_identifier', $identifier)
+                                        ->where('invoices.jenis_pembayaran', 'Qris')
+                                        ->where('status_pembayaran', 1)
+                                        ->sum(DB::raw('sub_total + pajak'));
+
+        $totalPemasukanQrisHariini = Invoice::where('store_identifier', $identifier)
+                                                ->where('invoices.jenis_pembayaran', 'Qris')
+                                                ->where('status_pembayaran', 1)
+                                                ->whereDate('tanggal_transaksi', Carbon::today())
+                                                ->sum(DB::raw('sub_total + pajak'));
+
+        $totalPemasukanQrisBulanIni = Invoice::where('store_identifier', $identifier)
+                                                ->where('invoices.jenis_pembayaran', 'Qris')
+                                                ->where('status_pembayaran', 1)
+                                                ->whereMonth('tanggal_transaksi', Carbon::now()->month)
+                                                ->sum(DB::raw('sub_total + pajak'));
+        
+        return view('tenant.tenant_finnance_pemasukan_qris', compact(['invoice', 'totalPemasukanQris', 'totalPemasukanQrisHariini', 'totalPemasukanQrisBulanIni']));
     }
 
     public function saldoData(){
@@ -1091,6 +1852,13 @@ class TenantController extends Controller {
     }
 
     public function historyPenarikan(){
-        return view('tenant.tenant_finance_penarikan');
+        $withdrawData = Withdrawal::where('id_user', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->latest();
+        $allData = $withdrawData->get();
+        $penarikanTerbaru = $withdrawData->latest()->first();
+        $allDataSum = $withdrawData->sum('nominal');
+
+        return view('tenant.tenant_finance_penarikan', compact(['allData', 'penarikanTerbaru', 'allDataSum']));
     }
 }

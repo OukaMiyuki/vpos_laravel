@@ -95,6 +95,14 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
+                                                    <label for="name" class="form-label">Nama Lengkap</label>
+                                                    <input type="text" class="form-control" name="name" id="name" required value="{{ $profilKasir->name }}" placeholder="Masukkan nama lengkap">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
                                                     <label for="no_ktp" class="form-label">Nomor KTP</label>
                                                     <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ $profilKasir->detail->id }}">
                                                     <input type="text" class="form-control" name="no_ktp" id="no_ktp" required value="{{$profilKasir->detail->no_ktp}}" placeholder="Masukkan nomor KTP">

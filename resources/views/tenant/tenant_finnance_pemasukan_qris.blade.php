@@ -9,11 +9,12 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="">Finance</a></li>
-                                <li class="breadcrumb-item active">Pemasukan</li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.finance') }}">Finance</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.saldo') }}">Saldo</a></li>
+                                <li class="breadcrumb-item active">Qris</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Pemasukan Toko</h4>
+                        <h4 class="page-title">Data Pemasukan Qris</h4>
                     </div>
                 </div>
             </div>
@@ -27,8 +28,8 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukanHariini }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Pemasukan Hari Ini</p>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukanQrisHariini }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Pemasukan Hari Ini</p>
                                     </div>
                                 </div>
                             </div>
@@ -46,8 +47,8 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukanBulanIni }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Pemasukan Bulan Ini</p>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukanQrisBulanIni }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Pemasukan Bulan Ini</p>
                                     </div>
                                 </div>
                             </div>
@@ -65,8 +66,8 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukan }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Total Semua Pemasukan</p>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukanQris }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Pemasukan Qris</p>
                                     </div>
                                 </div>
                             </div>
@@ -88,7 +89,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Data Pemasukan Toko</h4>
+                            <h4 class="header-title mb-3">Tabel Data Pemasukan Qris Toko</h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>

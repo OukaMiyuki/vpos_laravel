@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use Stevebauman\Location\Facades\Location;
+use Illuminate\Support\Facades\DB;
 use Ichtrojan\Otp\Otp;
 use Twilio\Rest\Client;
 use Carbon\Carbon;
@@ -23,6 +24,7 @@ use App\Models\StoreDetail;
 use App\Models\Rekening;
 use App\Models\UmiRequest;
 use App\Mail\SendUmiEmail;
+use App\Models\History;
 use File;
 use Mail;
 use Exception;
@@ -71,43 +73,75 @@ class ProfileController extends Controller{
     // tidak dipakai karena info akun tidak bisa diupdate
 
     public function profileInfoUpdate(Request $request){
-        $profileInfo = DetailTenant::where('id_tenant', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
-                                    ->find(auth()->user()->detail->id);
-        $account = Tenant::where('id', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+        try {
+            $profileInfo = DetailTenant::where('id_tenant', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
+                                        ->find(auth()->user()->detail->id);
+            $account = Tenant::where('id', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
 
-        if($request->hasFile('photo')){
-            $file = $request->file('photo');
-            $namaFile = $profileInfo->name;
-            $storagePath = Storage::path('public/images/profile');
-            $ext = $file->getClientOriginalExtension();
-            $filename = $namaFile.'-'.time().'.'.$ext;
+            if($request->hasFile('photo')){
+                $file = $request->file('photo');
+                $namaFile = $profileInfo->name;
+                $storagePath = Storage::path('public/images/profile');
+                $ext = $file->getClientOriginalExtension();
+                $filename = $namaFile.'-'.time().'.'.$ext;
 
-            if(empty($profileInfo->detail->photo)){
-                try {
+                if(empty($profileInfo->detail->photo)){
+                    try {
+                        $file->move($storagePath, $filename);
+                    } catch (\Exception $e) {
+                        return $e->getMessage();
+                    }
+                } else {
+                    Storage::delete('public/images/profile/'.$profileInfo->detail->photo);
                     $file->move($storagePath, $filename);
-                } catch (\Exception $e) {
-                    return $e->getMessage();
                 }
+
+                $profileInfo->update([
+                    'no_ktp' => $request->no_ktp,
+                    'tempat_lahir' => $request->tempat_lahir,
+                    'tanggal_lahir' => $request->tanggal_lahir,
+                    'jenis_kelamin' => $request->jenis_kelamin,
+                    'alamat' => $request->alamat,
+                    'photo' => $filename,
+                    'updated_at' => Carbon::now()
+                ]);
+
+                $account->update([
+                    'name' => $request->name
+                ]);
+
             } else {
-                Storage::delete('public/images/profile/'.$profileInfo->detail->photo);
-                $file->move($storagePath, $filename);
+                $profileInfo->update([
+                    'no_ktp' => $request->no_ktp,
+                    'tempat_lahir' => $request->tempat_lahir,
+                    'tanggal_lahir' => $request->tanggal_lahir,
+                    'jenis_kelamin' => $request->jenis_kelamin,
+                    'alamat' => $request->alamat,
+                    'updated_at' => Carbon::now()
+                ]);
+
+                $account->update([
+                    'name' => $request->name
+                ]);
             }
 
-            $profileInfo->update([
-                'no_ktp' => $request->no_ktp,
-                'tempat_lahir' => $request->tempat_lahir,
-                'tanggal_lahir' => $request->tanggal_lahir,
-                'jenis_kelamin' => $request->jenis_kelamin,
-                'alamat' => $request->alamat,
-                'photo' => $filename,
-                'updated_at' => Carbon::now()
-            ]);
-
-            $account->update([
-                'name' => $request->name
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Change profile information : Success",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
             ]);
 
             $notification = array(
@@ -116,23 +150,20 @@ class ProfileController extends Controller{
             );
             return redirect()->back()->with($notification);
 
-        } else {
-            $profileInfo->update([
-                'no_ktp' => $request->no_ktp,
-                'tempat_lahir' => $request->tempat_lahir,
-                'tanggal_lahir' => $request->tanggal_lahir,
-                'jenis_kelamin' => $request->jenis_kelamin,
-                'alamat' => $request->alamat,
-                'updated_at' => Carbon::now()
-            ]);
-
-            $account->update([
-                'name' => $request->name
+        } catch (Exception $e) {
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Change profile information : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
             ]);
 
             $notification = array(
-                'message' => 'Data akun berhasil diupdate!',
-                'alert-type' => 'success',
+                'message' => 'Error data gagal diupdate!',
+                'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
         }
@@ -143,35 +174,80 @@ class ProfileController extends Controller{
     }
 
     public function passwordUpdate(Request $request){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
         $request->validate([
             'otp' => 'required',
             'old_password' => 'required',
             'new_password' => 'required|confirmed',
         ]);
 
-        $otp = (new Otp)->validate(auth()->user()->phone, $request->otp);
-        if(!$otp->status){
-            $notification = array(
-                'message' => 'OTP salah atau tidak sesuai!',
-                'alert-type' => 'error',
-            );
-            return redirect()->back()->with($notification);
-        } else {
-            if(!Hash::check($request->old_password, auth::user()->password)){
+        try{
+            $otp = (new Otp)->validate(auth()->user()->phone, $request->otp);
+            if(!$otp->status){
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Change Password : OTP Fail doesn't match",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => str_replace("'", "\'", json_encode($otp)),
+                    'status' => 0
+                ]);
+
                 $notification = array(
-                    'message' => 'Password lama tidak sesuai!',
+                    'message' => 'OTP salah atau tidak sesuai!',
                     'alert-type' => 'error',
                 );
                 return redirect()->back()->with($notification);
+            } else {
+                if(!Hash::check($request->old_password, auth::user()->password)){
+                    $notification = array(
+                        'message' => 'Password lama tidak sesuai!',
+                        'alert-type' => 'error',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+        
+                Tenant::whereId(auth()->user()->id)->update([
+                    'password' => Hash::make($request->new_password),
+                ]);
+
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Change Password : Success!",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                    'status' => 1
+                ]);
+                
+                $notification = array(
+                    'message' => 'Password berhasil diperbarui!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
             }
-    
-            Tenant::whereId(auth()->user()->id)->update([
-                'password' => Hash::make($request->new_password),
+        } catch (Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Change Password : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
             ]);
-    
+
             $notification = array(
-                'message' => 'Password berhasil diperbarui!',
-                'alert-type' => 'success',
+                'message' => 'Update Password Error!',
+                'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
         }
@@ -185,68 +261,95 @@ class ProfileController extends Controller{
     }
 
     public function storeProfileSettingsUPdate(Request $request) {
-        $tenantStore = StoreDetail::where('id_tenant', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
-                                    ->first();
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
 
-        if(is_null($tenantStore) || empty($tenantStore)){
-            $notification = array(
-                'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'warning',
-            );
-            return redirect()->back()->with($notification);
-        } 
+        try{
+            $tenantStore = StoreDetail::where('id_tenant', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
+                                        ->first();
 
-        if($request->hasFile('photo')){
-            $file = $request->file('photo');
-            $namaFile = $request->nama;
-            $storagePath = Storage::path('public/images/profile');
-            $ext = $file->getClientOriginalExtension();
-            $filename = $namaFile.'-'.time().'.'.$ext;
+            if(is_null($tenantStore) || empty($tenantStore)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            } 
 
-            if(empty($tenantStore->photo)){
-                try {
+            if($request->hasFile('photo')){
+                $file = $request->file('photo');
+                $namaFile = $request->nama;
+                $storagePath = Storage::path('public/images/profile');
+                $ext = $file->getClientOriginalExtension();
+                $filename = $namaFile.'-'.time().'.'.$ext;
+
+                if(empty($tenantStore->photo)){
+                    try {
+                        $file->move($storagePath, $filename);
+                    } catch (\Exception $e) {
+                        return $e->getMessage();
+                    }
+                } else {
+                    Storage::delete('public/images/profile/'.$tenantStore->photo);
                     $file->move($storagePath, $filename);
-                } catch (\Exception $e) {
-                    return $e->getMessage();
                 }
+
+                $tenantStore->update([
+                    'name' => $request->name,
+                    'alamat' => $request->alamat,
+                    'kabupaten' => $request->kabupaten,
+                    'kode_pos' => $request->kode_pos,
+                    'no_telp_toko' => $request->no_telp,
+                    'jenis_usaha' => $request->jenis,
+                    'catatan_kaki' => $request->catatan,
+                    'photo' => $filename
+                ]);
             } else {
-                Storage::delete('public/images/profile/'.$tenantStore->photo);
-                $file->move($storagePath, $filename);
+                $tenantStore->update([
+                    'name' => $request->name,
+                    'alamat' => $request->alamat,
+                    'kabupaten' => $request->kabupaten,
+                    'kode_pos' => $request->kode_pos,
+                    'no_telp_toko' => $request->no_telp,
+                    'jenis_usaha' => $request->jenis,
+                    'catatan_kaki' => $request->catatan,
+                ]);
             }
 
-            $tenantStore->update([
-                'name' => $request->name,
-                'alamat' => $request->alamat,
-                'kabupaten' => $request->kabupaten,
-                'kode_pos' => $request->kode_pos,
-                'no_telp_toko' => $request->no_telp,
-                'jenis_usaha' => $request->jenis,
-                //'status_umi' => $request->umi,
-                'catatan_kaki' => $request->catatan,
-                'photo' => $filename
-            ]);;
-
-            $notification = array(
-                'message' => 'Data akun berhasil diupdate!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
-        } else {
-            $tenantStore->update([
-                'name' => $request->name,
-                'alamat' => $request->alamat,
-                'kabupaten' => $request->kabupaten,
-                'kode_pos' => $request->kode_pos,
-                'no_telp_toko' => $request->no_telp,
-                'jenis_usaha' => $request->jenis,
-                //'status_umi' => $request->umi,
-                'catatan_kaki' => $request->catatan,
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Store Profile : Success",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
             ]);
 
             $notification = array(
                 'message' => 'Data berhasil diperbarui!',
                 'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Store Profile : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Error data gagal diupdate!',
+                'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
         }
@@ -297,24 +400,69 @@ class ProfileController extends Controller{
         $swift_code = $request->swift_code;
         $rekening = $request->no_rekening;
 
-        $otp = (new Otp)->validate(auth()->user()->phone, $kode);
-        if(!$otp->status){
-            $notification = array(
-                'message' => 'OTP salah atau tidak sesuai!',
-                'alert-type' => 'error',
-            );
-            return redirect()->back()->with($notification);
-        } else {
-            $rekeningAkun = Rekening::where('id_user', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
-                                    ->first();
-            $rekeningAkun->update([
-                'no_rekening' => $rekening,
-                'swift_code' => $swift_code,
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try{
+            $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+            if(!$otp->status){
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Change Rekening : OTP Fail doesn't match",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => str_replace("'", "\'", json_encode($otp)),
+                    'status' => 0
+                ]);
+                $notification = array(
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $rekeningAkun = Rekening::where('id_user', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
+                                        ->first();
+                $rekeningAkun->update([
+                    'no_rekening' => $rekening,
+                    'swift_code' => $swift_code,
+                ]);
+
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Change Rekening : Success!",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                    'status' => 1
+                ]);
+
+                $notification = array(
+                    'message' => 'Update nomor rekening berhasil!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            }
+        } catch(Exception $e) {
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Change Rekening : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
             ]);
+
             $notification = array(
-                'message' => 'Update nomor rekening berhasil!',
-                'alert-type' => 'success',
+                'message' => 'Update Rekening Error!',
+                'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
         }
@@ -346,7 +494,7 @@ class ProfileController extends Controller{
             $filename = 'Formulir Pendaftaran NOBU QRIS (NMID) PT BRAHMA ESATAMA_'.$nama_usaha.'_'.date('dmYHis').'.xlsx';
             $fileSave = $userDocsPath.'/'.$filename;
             try {
-                File::copy($templatePath, $fileSave);
+                //File::copy($templatePath, $fileSave);
                 $spreadsheet = IOFactory::load($fileSave);
                 $sheet = $spreadsheet->getActiveSheet();
                 $sheet->setCellValue('D6', $tanggal);
@@ -379,7 +527,7 @@ class ProfileController extends Controller{
                     'file' => $fileSave
                 ];
                  
-                Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData));
+                //Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData));
                    
                 //dd("Email is sent successfully.");
                 $notification = array(
@@ -449,25 +597,67 @@ class ProfileController extends Controller{
     }
 
     public function whatsappOTPSubmit(Request $request){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
         if(!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "") {
             return redirect()->route('tenant.dashboard');
         } else {
-            $kode = (int) $request->otp;
-            $otp = (new Otp)->validate(auth()->user()->phone, $kode);
-            if(!$otp->status){
-                $notification = array(
-                    'message' => 'OTP salah atau tidak sesuai!',
-                    'alert-type' => 'error',
-                );
-                return redirect()->back()->with($notification);
-            } else {
-                $user = Tenant::find(auth()->user()->id);
-                $user->update([
-                    'phone_number_verified_at' => now()
+            try{
+                $kode = (int) $request->otp;
+                $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+                if(!$otp->status){
+                    History::create([
+                        'id_user' => auth()->user()->id,
+                        'email' => auth()->user()->email,
+                        'action' => "Whatsapp Number Verification : OTP Fail doesn't match",
+                        'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                        'deteksi_ip' => $ip,
+                        'log' => str_replace("'", "\'", json_encode($otp)),
+                        'status' => 0
+                    ]);
+                    $notification = array(
+                        'message' => 'OTP salah atau tidak sesuai!',
+                        'alert-type' => 'error',
+                    );
+                    return redirect()->back()->with($notification);
+                } else {
+                    $user = Tenant::find(auth()->user()->id);
+                    $user->update([
+                        'phone_number_verified_at' => now()
+                    ]);
+                    History::create([
+                        'id_user' => auth()->user()->id,
+                        'email' => auth()->user()->email,
+                        'action' => "Whatsapp Number Verification : Success!",
+                        'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                        'deteksi_ip' => $ip,
+                        'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                        'status' => 1
+                    ]);
+                    $notification = array(
+                        'message' => 'Nomor anda telah diverifikasi!',
+                        'alert-type' => 'success',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+            } catch(Exception $e){
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Whatsapp Number Verification : Error",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => $e,
+                    'status' => 0
                 ]);
+    
                 $notification = array(
-                    'message' => 'Nomor anda telah diverifikasi!',
-                    'alert-type' => 'success',
+                    'message' => 'Whatsapp Verification Error!',
+                    'alert-type' => 'error',
                 );
                 return redirect()->back()->with($notification);
             }
