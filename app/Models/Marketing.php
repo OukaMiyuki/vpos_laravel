@@ -14,6 +14,7 @@ use App\Models\Tenant;
 use App\Models\StoreDetail;
 use App\Models\Rekening;
 use App\Models\QrisWallet;
+use App\Models\QrisWalletPending;
 
 class Marketing extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable, \Staudenmeir\EloquentHasManyDeep\HasRelationships;
@@ -97,9 +98,14 @@ class Marketing extends Authenticatable implements MustVerifyEmail {
     public function createWallet($model){
         $rekening = new Rekening();
         $qrisWallet = new QrisWallet();
+        $qrisPendingWallet = new QrisWalletPending();
         $rekening->id_user = $model->id;
         $rekening->email = $model->email;
         $rekening->save();
+        // $qrisPendingWallet->id_user = $model->id;
+        // $qrisPendingWallet->email = $model->email;
+        // $qrisPendingWallet->saldo = 0;
+        // $qrisPendingWallet->save();
         $qrisWallet->id_user = $model->id;
         $qrisWallet->email = $model->email;
         $qrisWallet->nominal = 0;

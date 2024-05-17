@@ -22,6 +22,7 @@ use App\Models\TenantField;
 use App\Models\TunaiWallet;
 use App\Models\Rekening;
 use App\Models\QrisWallet;
+use App\Models\QrisWalletPending;
 use App\Models\UmiRequest;
 use App\Models\Withdrawal;
 use App\Models\Kasir;
@@ -129,6 +130,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         $tunaiWallet = new TunaiWallet();
         $rekening = new Rekening();
         $qrisWallet = new QrisWallet();
+        $qrisPendingWallet = new QrisWalletPending();
         $tunaiWallet->id_tenant = $model->id;
         $tunaiWallet->email = $model->email;
         $tunaiWallet->saldo = 0;
@@ -136,6 +138,10 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         $rekening->id_user = $model->id;
         $rekening->email = $model->email;
         $rekening->save();
+        $qrisPendingWallet->id_user = $model->id;
+        $qrisPendingWallet->email = $model->email;
+        $qrisPendingWallet->saldo = 0;
+        $qrisPendingWallet->save();
         $qrisWallet->id_user = $model->id;
         $qrisWallet->email = $model->email;
         $qrisWallet->saldo = 0;

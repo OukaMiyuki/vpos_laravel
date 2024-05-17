@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('qris_wallet_pendings', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('id_user')->nullable();
+            $table->string('email')->nullable()->unique();
+            $table->string('saldo')->nullable();
+            $table->date('periode_transaksi')->nullable();
             $table->timestamps();
         });
     }

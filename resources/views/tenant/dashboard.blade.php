@@ -133,7 +133,7 @@
                                 <div class="col-9">
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalSaldo }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Total Saldo</p>
+                                        <p class="text-muted mb-1 text-truncate">Total Penghasilan Anda</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>

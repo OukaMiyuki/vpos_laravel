@@ -21,6 +21,7 @@ use App\Models\Discount;
 use App\Models\TenantField;
 use App\Models\Invoice;
 use App\Models\QrisWallet;
+use App\Models\QrisWalletPending;
 use App\Models\TunaiWallet;
 use App\Models\StoreDetail;
 use App\Models\Withdrawal;
@@ -1816,6 +1817,36 @@ class TenantController extends Controller {
         return view('tenant.tenant_finnance_pemasukan_tunai', compact(['invoice', 'totalPemasukanTunai', 'totalPemasukanTunaiHariini', 'totalPemasukanTunaiBulanIni']));
     }
 
+    public function pemasukanQrisPending(){
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::where('store_identifier', $identifier)
+                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran', 'invoices.sub_total', 'invoices.pajak'])
+                            ->with(['kasir' => function($query){
+                                $query->select(['kasirs.id', 'kasirs.name']);
+                            }])
+                            ->whereDate('tanggal_transaksi', Carbon::yesterday())
+                            ->where('status_pembayaran', 1)
+                            ->where('invoices.jenis_pembayaran', 'Qris')
+                            ->latest()
+                            ->get();
+        return view('tenant.tenant_finnance_pemasukan_qris_pending', compact('invoice'));
+    }
+
+    public function pemasukanQrisToday(){
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::where('store_identifier', $identifier)
+                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran', 'invoices.sub_total', 'invoices.pajak'])
+                            ->with(['kasir' => function($query){
+                                $query->select(['kasirs.id', 'kasirs.name']);
+                            }])
+                            ->whereDate('tanggal_transaksi', Carbon::now())
+                            ->where('status_pembayaran', 1)
+                            ->where('invoices.jenis_pembayaran', 'Qris')
+                            ->latest()
+                            ->get();
+        return view('tenant.tenant_finnance_pemasukan_qris_today', compact('invoice'));
+    }
+
     public function pemasukanQris(){
         $identifier = $this->getStoreIdentifier();
         $invoice = Invoice::where('store_identifier', $identifier)
@@ -1849,11 +1880,34 @@ class TenantController extends Controller {
     }
 
     public function saldoData(){
+        $identifier = $this->getStoreIdentifier();
         $tunai = TunaiWallet::where('id_tenant', auth()->user()->id)->first();
         $qris = QrisWallet::where('id_user', auth()->user()->id)
                             ->where('email', auth()->user()->email)
                             ->first();
-        return view('tenant.tenant_finance_saldo', compact('tunai', 'qris'));
+        // $qrisPending = QrisWalletPending::where('id_user', auth()->user()->id)
+        //                                 ->where('email', auth()->user()->email)
+        //                                 ->first();
+        $qrisPending = Invoice::where('store_identifier', $identifier)
+                                ->whereDate('tanggal_transaksi', Carbon::yesterday())
+                                ->where('jenis_pembayaran', 'Qris')
+                                ->where('status_pembayaran', 1)
+                                ->sum('nominal_bayar');
+        $qrisHariIni = Invoice::where('store_identifier', $identifier)
+                                ->whereDate('tanggal_transaksi', Carbon::now())
+                                ->where('jenis_pembayaran', 'Qris')
+                                ->where('status_pembayaran', 1)
+                                ->sum('nominal_bayar');
+        $invoiceQrisSukses = Invoice::where('store_identifier', $identifier)
+                                    ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
+                                    ->with(['kasir' => function($query){
+                                        $query->select(['kasirs.id', 'kasirs.name']);
+                                    }])
+                                    ->where('status_pembayaran', 1)
+                                    ->whereDate('tanggal_transaksi', Carbon::today())
+                                    ->latest()
+                                    ->get();
+        return view('tenant.tenant_finance_saldo', compact('tunai', 'qris', 'qrisPending', 'invoiceQrisSukses', 'qrisHariIni'));
     }
 
     public function historyPenarikan(){

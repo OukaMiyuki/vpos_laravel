@@ -221,7 +221,9 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/finance/pemasukan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'financePemasukan'])->name('tenant.finance.pemasukan');
     Route::get('/dashboard/finance/saldo', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'saldoData'])->name('tenant.saldo');
     Route::get('/dashboard/finance/saldo/tunai', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanTunai'])->name('tenant.finance.pemasukan.tunai');
-    Route::get('/dashboard/finance/saldo/qris', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQris'])->name('tenant.finance.pemasukan.qris');
+    Route::get('/dashboard/finance/saldo/invoice-pending-qris', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisPending'])->name('tenant.finance.pemasukan.qris.pending');
+    Route::get('/dashboard/finance/saldo/invoice-today-qris', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisToday'])->name('tenant.finance.pemasukan.qris.today');
+    Route::get('/dashboard/finance/saldo/invoice-finish-qris-all', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQris'])->name('tenant.finance.pemasukan.qris.all');
     Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'historyPenarikan'])->name('tenant.finance.history_penarikan');
     Route::get('/dashboard/finance/history-penarikan/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'invoiceTarikDana'])->name('tenant.finance.history_penarikan.invoice');
 
