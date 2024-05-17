@@ -139,7 +139,14 @@ Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( functio
     Route::post('logout', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'destroy'])->name('tenant.logout');
 });
 
-Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive'])->prefix('tenant')->group( function () {
+Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsNotMitra'])->prefix('/tenant/mitra')->group( function () {
+    //Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'index'])->name('tenant.mitra.dashboard');
+    Route::get('/dashboard', function () {
+        return "walla";
+    })->name('tenant.mitra.dashboard');
+});
+
+Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsMitra'])->prefix('tenant')->group( function () {
     // Route::get('check-payment', function () { event(new App\Events\PaymentCheck('Someone')); return "Event has been sent!";});
     // Route::get('test', function () {
     //     event(new App\Events\PaymentCheck('Someone'));

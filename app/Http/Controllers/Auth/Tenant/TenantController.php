@@ -30,6 +30,10 @@ use Exception;
 
 class TenantController extends Controller {
 
+    public function __construct() {
+        $this->middleware('isTenantIsMitra');
+    }
+
     public function getStoreIdentifier(){
         $store = StoreDetail::select(['store_identifier'])
                             ->where('id_tenant', auth()->user()->id)
