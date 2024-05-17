@@ -84,19 +84,26 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($allData as $data)
-                                            <td>{{ $data->email }}</td>
-                                            <td>{{ $data->tanggal_penarikan }}</td>
-                                            <td>{{ $data->nominal }}</td>
-                                            <td>{{ $data->tanggal_masuk }}</td>
-                                            <td>
-                                                @if ($data->status == 0)
-                                                    <span class="badge bg-soft-warning text-warning">Pending</span>
-                                                @elseif($data->status == 1)
-                                                    <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
-                                                @elseif($data->status == 2)
-                                                    <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
-                                                @endif
-                                            </td>
+                                            <tr>
+                                                <td>{{ $data->email }}</td>
+                                                <td>{{ $data->tanggal_penarikan }}</td>
+                                                <td>{{ $data->nominal }}</td>
+                                                <td>{{ $data->tanggal_masuk }}</td>
+                                                <td>
+                                                    @if ($data->status == 0)
+                                                        <span class="badge bg-soft-warning text-warning">Pending</span>
+                                                    @elseif($data->status == 1)
+                                                        <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
+                                                    @elseif($data->status == 2)
+                                                        <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('tenant.finance.history_penarikan.invoice', ['id' => $data->id]) }}">
+                                                        <button title="Lihat detail invoice" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
+                                                    </a>
+                                                </td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>

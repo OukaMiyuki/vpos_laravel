@@ -156,6 +156,7 @@ function formatRupiah(angka, prefix) {
 }
 
 $(document).ready(function() {
+    //document.getElementById("sidebaruser-check").checked = true;
     $("#pembayaran").on('change', function() {
         if ($(this).val() == ''){
             $("#formCheckout").attr('disabled',true);

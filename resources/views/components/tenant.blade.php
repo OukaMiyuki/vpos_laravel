@@ -68,6 +68,7 @@
         <!-- Vendor js -->
         <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
         <!-- Plugins js-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
         <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
         <script src="{{ asset('assets/libs/selectize/js/standalone/selectize.min.js') }}"></script>
@@ -162,5 +163,18 @@
             @endif
         </script>
         <Script type="text/javascript" src="{{ asset('assets/js/pages/getUserLocation.js') }}"></Script>
+        <script>
+            $(document).ready(function(){
+                $('a[data-bs-toggle="tab"]').click(function(e) {
+                    localStorage.setItem('activeTab', $(e.target).attr('href'));
+                });
+                var activeTab = localStorage.getItem('activeTab');
+                console.log(activeTab);
+                if(activeTab){
+                    $('#tab-profile a[href="' + activeTab + '"]').tab('show');
+                    //console.log('Walla');
+                }
+            });
+        </script>
     </body>
 </html>

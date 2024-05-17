@@ -95,7 +95,7 @@ Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'isMa
 
     Route::get('ip-testing', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'ipTesting']);
 
-    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappNotification'])->name('marketing.settings.whatsappotp');
+    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:6,1'])->name('marketing.settings.whatsappotp');
     Route::post('settings/validate/whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappOTPSubmit'])->name('marketing.settings.whatsappotp.validate');
     Route::get('settings', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'marketingSettings'])->name('marketing.settings');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profile'])->name('marketing.profile');
@@ -216,7 +216,8 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/finance/saldo/tunai', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanTunai'])->name('tenant.finance.pemasukan.tunai');
     Route::get('/dashboard/finance/saldo/qris', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQris'])->name('tenant.finance.pemasukan.qris');
     Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'historyPenarikan'])->name('tenant.finance.history_penarikan');
-    
+    Route::get('/dashboard/finance/history-penarikan/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'invoiceTarikDana'])->name('tenant.finance.history_penarikan.invoice');
+
     Route::get('/dashboard/management', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'storeManagement'])->name('tenant.store.management');
     Route::get('/dashboard/management/discount', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModify'])->name('tenant.discount.modify');
     Route::post('/dashboard/management/discount/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModifyInsert'])->name('tenant.discount.insert');
@@ -226,7 +227,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::post('/dashboard/management/custom_fields/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'customFieldInsert'])->name('tenant.customField.modify.insert');
     
     Route::get('settings', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tenantSettings'])->name('tenant.settings');
-    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappNotification'])->name('tenant.settings.whatsappotp');
+    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:10,1'])->name('tenant.settings.whatsappotp');
     Route::post('settings/validate/whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappOTPSubmit'])->name('tenant.settings.whatsappotp.validate');
     Route::get('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettings'])->name('tenant.store.profile');
     Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');
@@ -236,6 +237,9 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'passwordUpdate'])->name('tenant.password.update');
     Route::get('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeingSetting'])->name('tenant.rekening.setting');
     Route::post('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeningSettingUpdate'])->name('tenant.rekening.setting.update');
+
+    Route::post('settings/profile/tarik-dana', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tarikDanaQris'])->name('tenant.profile.tarik');
+    Route::post('settings/profile/tarik-dana/proses', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'prosesTarikDana'])->name('tenant.profile.tarik.proses');
 
     Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestForm'])->name('tenant.request.umi');
     Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');

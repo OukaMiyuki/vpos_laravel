@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\Models\InvitationCode;
 use App\Models\Marketing;
 use App\Models\Tenant;
+use App\Models\QrisWallet;
 
 class MarketingController extends Controller {
     public function index(){
@@ -19,9 +20,12 @@ class MarketingController extends Controller {
                             ->withCount('invitationCodeTenant')
                             ->where('id', auth()->user()->id)
                             ->get();
+        $qrisWallet = QrisWallet::where('id_user', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         $tenantTerbaru = Marketing::select(['marketings.id'])
                                     ->with(['invitationCodeTenant' => function($query){
-                                        $query->select('tenants.id', 'tenants.name', 'tenants.phone', 'tenants.is_active', 'tenants.id_inv_code')
+                                        $query->select('tenants.id', 'tenants.name', 'tenants.phone', 'tenants.is_active', 'tenants.id_inv_code', 'tenants.created_at')
                                                 ->with(['invitationCode' => function($query) {
                                                     $query->select('invitation_codes.id', 'invitation_codes.inv_code', 'invitation_codes.holder')->get();
                                                 }])->get();
@@ -30,6 +34,35 @@ class MarketingController extends Controller {
                                     ->latest()
                                     ->limit(5)
                                     ->get();
+                                    
+        $pemasukanTerbaru = Marketing::select(['marketings.id'])
+                                    ->with(['invitationCodeTenant' => function($query){
+                                        $query->select('tenants.id', 'tenants.name', 'tenants.phone', 'tenants.is_active', 'tenants.id_inv_code')
+                                                ->with(['withdrawal' => function($query){
+                                                    $query->select(['withdrawals.id', 'withdrawals.id_user', 'withdrawals.tanggal_penarikan', 'withdrawals.status'])
+                                                            ->with(['detailWithdraw' => function($query){
+                                                                $query->select(['detail_penarikans.id', 
+                                                                                'detail_penarikans.id_penarikan',
+                                                                                'detail_penarikans.biaya_mitra',
+                                                                            ])->get();
+                                                            }])
+                                                            ->where('withdrawals.status', 1)
+                                                            ->get();
+                                                }
+                                                ])->get();
+                                    }])
+                                    ->where('id', auth()->user()->id)
+                                    ->latest()
+                                    ->limit(5)
+                                    ->get();
+        foreach ($pemasukanTerbaru as $tenantList){
+            foreach ($tenantList->invitationCodeTenant as $tenantInfo){
+                foreach($tenantInfo->withdrawal as $detail){
+                    //dd($detail);
+                }
+            }
+        }
+        // dd($pemasukanTerbaru);
         // $daftarTenantBaru = $tenantTerbaru->toArray();
         // dd($daftarTenantBaru);
         //dd($tenantTerbaru);
@@ -37,7 +70,7 @@ class MarketingController extends Controller {
         foreach($tenant as $t){
             $tenantNumber = $t->invitation_code_tenant_count;
         }
-        return view('marketing.dashboard', compact('code', 'tenantNumber', 'tenantTerbaru'));
+        return view('marketing.dashboard', compact('code', 'tenantNumber', 'tenantTerbaru', 'qrisWallet', 'pemasukanTerbaru'));
     }
 
     public function invitationCodeDashboard(){
@@ -64,6 +97,15 @@ class MarketingController extends Controller {
                                             ->where('invitation_codes.id_marketing', auth()->user()->id)
                                             ->orderBy('id', 'DESC')
                                             ->get();
+                // $tenantTerbaru = Marketing::select(['marketings.id'])
+                //                             ->with(['invitationCodeTenant' => function($query){
+                //                                 $query->select('tenants.id', 'tenants.phone', 'tenants.is_active', 'tenants.id_inv_code', 'tenants.created_at')
+                //                                         ->with(['invitationCode' => function($query) {
+                //                                             $query->select('invitation_codes.id', 'invitation_codes.inv_code', 'invitation_codes.holder')->get();
+                //                                         }])->get();
+                //                             }])
+                //                             ->where('id', auth()->user()->id)
+                //                             ->get();
             $tenantCount = Marketing::select(['id'])
                                 ->withCount('invitationCodeTenant')
                                 ->where('id', auth()->user()->id)

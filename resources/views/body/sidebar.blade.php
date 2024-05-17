@@ -91,7 +91,7 @@
                     Super User
                 @endauth
                 @auth('marketing')
-                    Marketing
+                    Mitra Aplikasi
                 @endauth
                 @auth('tenant')
                     Tenant

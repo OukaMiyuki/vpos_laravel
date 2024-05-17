@@ -79,8 +79,8 @@
                                     </div>
                                     <div class="col-7">
                                         <div class="text-end">
-                                            <h4 class="text-dark mt-1">RP.&nbsp;<span data-plugin="counterup">10000000</span></h4>
-                                            <p class="text-muted mb-1 text-truncate">Saldo</p>
+                                            <h4 class="text-dark mt-1">RP.&nbsp;<span data-plugin="counterup">{{ $qrisWallet->saldo }}</span></h4>
+                                            <p class="text-muted mb-1 text-truncate">Saldo Anda</p>
                                             <a href="" class="btn btn-blue btn-sm ms-2">
                                                 <i class="mdi mdi-eye"></i>
                                             </a>
@@ -168,116 +168,31 @@
                                     <table class="table table-borderless table-nowrap table-hover table-centered m-0">
                                         <thead class="table-light">
                                             <tr>
-                                                <th>Marketplaces</th>
-                                                <th>Date</th>
-                                                <th>Payouts</th>
-                                                <th>Status</th>
                                                 <th>Action</th>
+                                                <th>Nama Tenant</th>
+                                                <th>Tanggal Masuk</th>
+                                                <th>Status</th>
+                                                <th>Nominal Insentif (Rp.)</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>
-                                                    <h5 class="m-0 fw-normal">Themes Market</h5>
-                                                </td>
-                                                <td>
-                                                    Oct 15, 2018
-                                                </td>
-                                                <td>
-                                                    $5848.68
-                                                </td>
-                                                <td>
-                                                    <span class="badge bg-soft-warning text-warning">Upcoming</span>
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <h5 class="m-0 fw-normal">Freelance</h5>
-                                                </td>
-                                                <td>
-                                                    Oct 12, 2018
-                                                </td>
-                                                <td>
-                                                    $1247.25
-                                                </td>
-                                                <td>
-                                                    <span class="badge bg-soft-success text-success">Paid</span>
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <h5 class="m-0 fw-normal">Share Holding</h5>
-                                                </td>
-                                                <td>
-                                                    Oct 10, 2018
-                                                </td>
-                                                <td>
-                                                    $815.89
-                                                </td>
-                                                <td>
-                                                    <span class="badge bg-soft-success text-success">Paid</span>
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <h5 class="m-0 fw-normal">Envato's Affiliates</h5>
-                                                </td>
-                                                <td>
-                                                    Oct 03, 2018
-                                                </td>
-                                                <td>
-                                                    $248.75
-                                                </td>
-                                                <td>
-                                                    <span class="badge bg-soft-danger text-danger">Overdue</span>
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <h5 class="m-0 fw-normal">Marketing Revenue</h5>
-                                                </td>
-                                                <td>
-                                                    Sep 21, 2018
-                                                </td>
-                                                <td>
-                                                    $978.21
-                                                </td>
-                                                <td>
-                                                    <span class="badge bg-soft-warning text-warning">Upcoming</span>
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <h5 class="m-0 fw-normal">Advertise Revenue</h5>
-                                                </td>
-                                                <td>
-                                                    Sep 15, 2018
-                                                </td>
-                                                <td>
-                                                    $358.10
-                                                </td>
-                                                <td>
-                                                    <span class="badge bg-soft-success text-success">Paid</span>
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                                </td>
-                                            </tr>
+                                            @foreach ($pemasukanTerbaru as $tenantList)
+                                                @foreach ($tenantList->invitationCodeTenant as $tenantInfo)
+                                                    @foreach ($tenantInfo->withdrawal as $detail)
+                                                        <tr>
+                                                            <td><a href="#" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a></td>
+                                                            <td>{{ $tenantInfo->name }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($detail->tanggal_penarikan)->format('d-m-Y') }}</td>
+                                                            <td>
+                                                                @if ($detail->status == 1)
+                                                                    <span class="badge bg-soft-success text-success">Sukses</span>
+                                                                @endif
+                                                            </td>
+                                                            <td>{{ $detail->detailWithdraw->biaya_mitra }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endforeach
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>

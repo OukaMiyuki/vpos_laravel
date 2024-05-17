@@ -81,6 +81,16 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:90,1', 'custom.
     Route::post('/filter-category', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'filterCategory']);
     Route::post('/search-product', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'searchProduct']);
     //Route::post('/setting/rekening', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'rekeningSetting']);
+
+    Route::post('/rek-list', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'rekList']);
+
+    // untuk call back qris, harusnya ga disini jadi di comment dulu
+    // Route::post('/invoice-upd', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'invoiceUpdate']);
+     // untuk call back qris, harusnya ga disini jadi di comment dulu
+
+    Route::post('/transaction', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionList']);
+    Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionListAlias']);
+    Route::get('/transaction/detail/{id}', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionDetail']);
 });
 
 // Route::middleware(['guest:kasir', 'throttle:10,1', 'custom.restrict'])->prefix('kasir')->group( function () {
@@ -105,6 +115,7 @@ Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:90,1', 'custom.r
     Route::post('/cart-process', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'processCart']);
     Route::get('/get-alias', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'getAlias']);
     Route::post('/transaction', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionList']);
+    Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionListAlias']);
     Route::get('/transaction/pending', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionPending']);
     Route::post('/transaction/pending/cart/add', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionCartAdd']);
     Route::post('/transaction/pending/cart/delete', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionCartDelete']);

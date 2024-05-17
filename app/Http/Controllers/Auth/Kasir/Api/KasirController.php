@@ -661,6 +661,51 @@ class KasirController extends Controller {
         }
     }
 
+    public function transactionListAlias(Request $request) : JsonResponse {
+        $alias1 = $request->alias1;
+        $alias2 = $request->alias2;
+        $alias3 = $request->alias3;
+        $alias4 = $request->alias4;
+        $alias5 = $request->alias5;
+        $id_user = $request->id_user;
+        $invoiceAliasSearch = "";
+        try {
+           $invoiceAliasSearch = InvoiceField::with(['invoice'])
+                                            ->where('store_identifier', auth()->user()->id_store)
+                                            ->where('id_kasir', $id_user)
+                                            ->where('content1', $alias1)
+                                            ->orWhere('content2', $alias2)
+                                            ->orWhere('content3', $alias3)
+                                            ->orWhere('content4', $alias4)
+                                            ->orWhere('content5', $alias5)
+                                            ->latest()
+                                            ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if($invoiceAliasSearch->count() == 0 || $invoiceAliasSearch == ""){
+            return response()->json([
+                'message' => 'Fetch Success',
+                'date-type' => 'Data transaksi tidak ditemukan',
+                'transaction-number' => $invoiceAliasSearch->count(),
+                'transaction-data' => $invoiceAliasSearch,
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success',
+                // 'date-type' => $showdate,
+                'transaction-number' => $invoiceAliasSearch->count(),
+                'transaction-data' => $invoiceAliasSearch,
+            ]);
+        }
+    }
+
     public function transactionPending() : JsonResponse {
         $invoice = "";
         try {
@@ -899,8 +944,7 @@ class KasirController extends Controller {
                             }
                         ])->findOrFail($id);
             $storeDetail = StoreDetail::where('store_identifier', auth()->user()->id_store)->firstOrFail();
-            $alias = InvoiceField::where('id_invoice', $id)
-                                    ->first();
+            $alias = InvoiceField::where('id_invoice', $id)->first();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',

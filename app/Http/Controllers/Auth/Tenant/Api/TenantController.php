@@ -10,20 +10,34 @@ use App\Models\Marketing;
 use App\Models\Tenant;
 use App\Models\Kasir;
 use App\Models\StoreDetail;
-use App\Models\RekeningTenant;
+use App\Models\Rekening;
 use App\Models\ProductStock;
 use App\Models\TenantField;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\Invoice;
+use App\Models\InvoiceField;
 use GuzzleHttp\Client;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Exception;
 
 class TenantController extends Controller {
+    public function getStoreIdentifier(){
+        $store = StoreDetail::select(['store_identifier'])
+                            ->where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $identifier = $store->store_identifier;
+        return $identifier;
+    }
+
     public function storeInfo() : JsonResponse {
         $store = "";
         try {
-            $store = StoreDetail::where('id_tenant', auth()->user()->id)->first();
+            $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -59,7 +73,9 @@ class TenantController extends Controller {
         $catatan_kaki = $request->catatan_kaki;
 
         try {
-            $store = StoreDetail::where('id_tenant', auth()->user()->id)->first();
+            $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
             $store->update([
                 'name' => $nama_toko,
                 'alamat' => $alamat_toko,
@@ -433,5 +449,182 @@ class TenantController extends Controller {
                 ]);
             }
         }
+    }
+
+    public function rekList() : JsonResponse {
+        $rek = "";
+        try {
+            $rek = Rekening::where('id_user', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+        if($rek->count() == 0 || $rek == "" || empty($rek) || is_null($rek)){
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'data-status' => 'No data found in this collection!',
+                'alias-data' => $rek,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'alias-data' => $rek,
+                'status' => 200
+            ]);
+        }
+    }
+
+    public function transactionList(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $tgl_awal = $request->tgl_awal;
+        $tgl_akhir = $request->tgl_akhir;
+        $invoice = "";
+        $showdate = "";
+
+        if($tgl_awal && $tgl_akhir) {
+            try {
+                $invoice = Invoice::where('store_identifier', $identifier)
+                                    ->whereBetween('tanggal_transaksi', [$tgl_awal, $tgl_akhir])
+                                    ->latest()
+                                    ->get();// ->where('id_kasir', auth()->user()->id_kasir)
+                $showdate = 'Data transaksi dari tanggal '.$tgl_awal.' s/d tanggal '.$tgl_akhir;
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to fetch data!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
+            }
+            if($invoice->count() == 0 || $invoice == ""){
+                return response()->json([
+                    'message' => 'Fetch Success',
+                    'date-type' => 'Data transaksi tidak ditemukan',
+                    'transaction-number' => $invoice->count(),
+                    'transaction-data' => $invoice,
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Fetch Success',
+                    'date-type' => $showdate,
+                    'transaction-number' => $invoice->count(),
+                    'transaction-data' => $invoice,
+                ]);
+            }
+        } else {
+            try {
+                $invoice = Invoice::where('store_identifier', $identifier)
+                                    ->whereDate('tanggal_transaksi', Carbon::today())
+                                    ->latest()
+                                    ->get();// ->where('id_kasir', auth()->user()->id_kasir)
+                $showdate = "Data transaksi per-hari ini.";
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to fetch data!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
+            }
+            if($invoice->count() == 0  || $invoice == ""){
+                return response()->json([
+                    'message' => 'Fetch Success',
+                    'date-type' => 'Data transaksi tidak ditemukan',
+                    'transaction-number' => $invoice->count(),
+                    'transaction-data' => $invoice,
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Fetch Success',
+                    'date-type' => $showdate,
+                    'transaction-number' => $invoice->count(),
+                    'transaction-data' => $invoice,
+                ]);
+            }
+        }
+    }
+
+    public function transactionListAlias(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $alias1 = $request->alias1;
+        $alias2 = $request->alias2;
+        $alias3 = $request->alias3;
+        $alias4 = $request->alias4;
+        $alias5 = $request->alias5;
+        $id_user = $request->id_user;
+        $invoiceAliasSearch = "";
+        try {
+           $invoiceAliasSearch = InvoiceField::with(['invoice'])
+                                            ->where('store_identifier', $identifier)
+                                            ->where('content1', $alias1)
+                                            ->orWhere('content2', $alias2)
+                                            ->orWhere('content3', $alias3)
+                                            ->orWhere('content4', $alias4)
+                                            ->orWhere('content5', $alias5)
+                                            ->latest()
+                                            ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if($invoiceAliasSearch->count() == 0 || $invoiceAliasSearch == ""){
+            return response()->json([
+                'message' => 'Fetch Success',
+                'date-type' => 'Data transaksi tidak ditemukan',
+                'transaction-number' => $invoiceAliasSearch->count(),
+                'transaction-data' => $invoiceAliasSearch,
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success',
+                // 'date-type' => $showdate,
+                'transaction-number' => $invoiceAliasSearch->count(),
+                'transaction-data' => $invoiceAliasSearch,
+            ]);
+        }
+    }
+
+    public function transactionDetail($id) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $invoice = "";
+        $storeDetail = "";
+        $alias = "";
+        try {
+            $invoice = Invoice::with(['shoppingCart' => function($query){
+                                $query->with(['stock' => function($query){
+                                    $query->with(['product'])->get();
+                                }
+                                ])->get();
+                            }
+                        ])->findOrFail($id);
+            $storeDetail = StoreDetail::where('store_identifier', $identifier)->firstOrFail();
+            $alias = InvoiceField::where('id_invoice', $id)->first();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        return response()->json([
+            'message' => 'Fetch Success',
+            'transaction-data' => $invoice,
+            'data-alias' => $alias,
+            'store-detail' => $storeDetail
+        ]);
     }
 }

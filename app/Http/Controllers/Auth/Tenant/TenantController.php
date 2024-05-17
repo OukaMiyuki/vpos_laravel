@@ -25,6 +25,7 @@ use App\Models\TunaiWallet;
 use App\Models\StoreDetail;
 use App\Models\Withdrawal;
 use App\Models\History;
+use App\Models\Rekening;
 use Exception;
 
 class TenantController extends Controller {
@@ -1860,5 +1861,31 @@ class TenantController extends Controller {
         $allDataSum = $withdrawData->sum('nominal');
 
         return view('tenant.tenant_finance_penarikan', compact(['allData', 'penarikanTerbaru', 'allDataSum']));
+    }
+
+    public function invoiceTarikDana($id){
+        $withdrawData = Withdrawal::select([ 'withdrawals.id',
+                                             'withdrawals.email',
+                                             'withdrawals.tanggal_penarikan',
+                                             'withdrawals.nominal',
+                                             'withdrawals.biaya_admin',
+                                             'withdrawals.tanggal_masuk',
+                                             'withdrawals.status' 
+                                            ])
+                                ->where('email', auth()->user()->email)
+                                ->find($id);
+        if(is_null($withdrawData) || empty($withdrawData)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'info',
+            );
+    
+            return redirect()->route('tenant.finance.history_penarikan')->with($notification);
+        }
+        $rekening = Rekening::select(['swift_code', 'no_rekening'])
+                            ->where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        return view('tenant.tenant_penarikan_invoice', compact(['withdrawData', 'withdrawData', 'rekening']));
     }
 }

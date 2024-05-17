@@ -23,6 +23,7 @@ use App\Models\TunaiWallet;
 use App\Models\Rekening;
 use App\Models\QrisWallet;
 use App\Models\UmiRequest;
+use App\Models\Withdrawal;
 use App\Models\Kasir;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
@@ -68,6 +69,10 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
 
     public function invoice(){
         return $this->hasMany(Invoice::class, 'id_tenant', 'id')->where('email', auth()->user()->email);
+    }
+
+    public function withdrawal(){
+        return $this->hasMany(Withdrawal::class, 'id_user', 'id');
     }
 
     public function saldoTunai(){

@@ -21,10 +21,16 @@ use Carbon\Carbon;
 use App\Models\Tenant;
 use App\Models\DetailTenant;
 use App\Models\StoreDetail;
-use App\Models\Rekening;
 use App\Models\UmiRequest;
 use App\Mail\SendUmiEmail;
 use App\Models\History;
+use App\Models\Rekening;
+use App\Models\QrisWallet;
+use App\Models\Withdrawal;
+use App\Models\NobuWithdrawFeeHistory;
+use App\Models\DetailPenarikan;
+use App\Models\AgregateWallet;
+use App\Models\InvitationCode;
 use File;
 use Mail;
 use Exception;
@@ -51,7 +57,15 @@ class ProfileController extends Controller{
                                 }
                                 ])
                                 ->find(auth()->user()->id);
-        return view('tenant.tenant_profile', compact('profilTenant'));
+        $rekening = Rekening::select(['swift_code', 'no_rekening'])
+                            ->where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $qrisWallet = QrisWallet::select(['saldo'])
+                                ->where('id_user', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
+        return view('tenant.tenant_profile', compact('profilTenant', 'rekening', 'qrisWallet'));
     }
 
     // tidak dipakai karena info akun tidak bisa diupdate
@@ -661,6 +675,312 @@ class ProfileController extends Controller{
                 );
                 return redirect()->back()->with($notification);
             }
+        }
+    }
+
+    public function tarikDanaQris(Request $request){
+        $ip = "125.164.243.227";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        
+        $nominal_tarik = $request->nominal_tarik;
+        $otp = $request->wa_otp;
+
+        try{
+            $otp = (new Otp)->validate(auth()->user()->phone, $otp);
+            if(!$otp->status){
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Tarik dana Qris : OTP Fail doesn't match",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => str_replace("'", "\'", json_encode($otp)),
+                    'status' => 0
+                ]);
+
+                $notification = array(
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $qrisWallet = QrisWallet::where('id_user', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
+                                        ->first();
+                if($qrisWallet->saldo<$nominal_tarik){
+                    History::create([
+                        'id_user' => auth()->user()->id,
+                        'email' => auth()->user()->email,
+                        'action' => "Withdraw Process : Fail (Saldo tidak mencukupi)",
+                        'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                        'deteksi_ip' => $ip,
+                        'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                        'status' => 0
+                    ]);
+                    $notification = array(
+                        'message' => 'Saldo anda tidak mencukupi!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                } else {
+                    $rekening = Rekening::where('id_user', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
+                                        ->first();
+                    $totalPenarikan = $nominal_tarik+1500;
+                    $rekClient = new GuzzleHttpClient();
+                    $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
+                    try {
+                        $getRek = $rekClient->request('POST',  $urlRek, [
+                            'form_params' => [
+                                'latitude' => $lat,
+                                'longitude' => $long,
+                                'bankCode' => $rekening->swift_code,
+                                'accountNo' => $rekening->no_rekening,
+                                'secret_key' => "Vpos71237577Inquiry"
+                            ]
+                        ]);
+                        $responseCode = $getRek->getStatusCode();
+                        $dataRekening = json_decode($getRek->getBody());
+                        return view('tenant.tenant_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan']));
+                    } catch (Exception $e) {
+                        return $e;
+                        exit;
+                    }
+                }
+            }
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Withdraw Process : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
+    public function prosesTarikDana(Request $request){
+        $url = 'https://erp.pt-best.com/api/rek_transfer';
+        $client = new GuzzleHttpClient();
+        $ip = "125.164.243.227";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $agregate = 350;
+        $aplikator = 350;
+        $mitra = 500;
+        DB::connection()->enableQueryLog();
+
+        $nominal_tarik = $request->nominal_penarikan;
+        $total_tarik = $request->total_tarik;
+        $biaya_admin = $request->biaya_admin;
+        
+        $rekening = Rekening::select(['swift_code', 'no_rekening'])
+                            ->where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $qrisWallet = QrisWallet::where('id_user', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
+        $agregateWallet = AgregateWallet::find(1);
+        $qrisAdmin = QrisWallet::where('id_user', 8)
+                                ->where('email', 'adminsu@vpos.my.id.com')
+                                ->find(6);
+        $marketing = InvitationCode::select(['invitation_codes.id',
+                                            'invitation_codes.id_marketing',
+                                        ])
+                                ->with(['marketing' => function ($query){
+                                    $query->select(['marketings.id',
+                                                    'marketings.email'
+                                    ])->get();
+                                }])
+                                ->find(auth()->user()->id_inv_code);
+        
+        $saldoMitra = QrisWallet::where('id_user', $marketing->marketing->id)
+                                ->where('email', $marketing->marketing->email)
+                                ->first();
+        $agregateSaldo = $agregateWallet->saldo;
+
+        try{
+            $nominal_penarikan = filter_var($nominal_tarik, FILTER_SANITIZE_NUMBER_INT);
+            $total_penarikan = $total_tarik;
+            $saldo = $qrisWallet->saldo;
+            if($saldo < $total_penarikan){
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Withdraw Process : Fail (Saldo tidak mencukupi)",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                    'status' => 0
+                ]);
+                $notification = array(
+                    'message' => 'Saldo anda tidak mencukupi!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                try {
+                    $postResponse = $client->request('POST',  $url, [
+                        'form_params' => [
+                            'latitude' => $lat,
+                            'longitude' => $long,
+                            'bankCode' => $rekening->swift_code,
+                            'accountNo' => $rekening->no_rekening,
+                            'amount' => $nominal_penarikan,
+                            'secret_key' => "Vpos71237577Transfer"
+                        ]
+                    ]);
+                    $responseCode = $postResponse->getStatusCode();
+                    $data = json_decode($postResponse->getBody());
+                    $responseCode = $data->responseCode;
+                    $responseMessage = $data->responseMessage;
+                    if($responseCode == 2001800 && $responseMessage == "Request has been processed successfully") {
+                        $withDraw = Withdrawal::create([
+                            'id_user' => auth()->user()->id,
+                            'email' => auth()->user()->email,
+                            'tanggal_penarikan' => Carbon::now(),
+                            'nominal' => $nominal_penarikan,
+                            'biaya_admin' => $biaya_admin,
+                            'tanggal_masuk' => Carbon::now(),
+                            'deteksi_ip_address' => $ip,
+                            'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                            'status' => 1
+                        ]);
+
+                        if(!is_null($withDraw) || !empty($withDraw)){
+                            $qrisWallet->update([
+                                'saldo' => $saldo-$total_penarikan
+                            ]);
+                            $adminSaldo = $qrisAdmin->saldo;
+                            $qrisAdmin->update([
+                                'saldo' => $adminSaldo+$aplikator
+                            ]);
+                            $mitraSaldo = $saldoMitra->saldo;
+                            $saldoMitra->update([
+                                'saldo' => $mitraSaldo+$mitra
+                            ]);
+                            $agregateWallet->update([
+                                'saldo' =>$agregateSaldo+$agregate
+                            ]);
+
+                            DetailPenarikan::create([
+                                'id_penarikan' => $withDraw->id,
+                                'nominal_penarikan' => $total_penarikan,
+                                'nominal_bersih_penarikan' => $nominal_penarikan,
+                                'total_biaya_admin' => $biaya_admin,
+                                'biaya_nobu' => 300,
+                                'biaya_mitra' => $mitra,
+                                'biaya_admin_su' => $aplikator,
+                                'biaya_agregate' => $agregate
+                            ]);
+
+                            NobuWithdrawFeeHistory::create([
+                                'id_penarikan' => $withDraw->id,
+                                'nominal' => 300
+                            ]);
+
+                            History::create([
+                                'id_user' => auth()->user()->id,
+                                'email' => auth()->user()->email,
+                                'action' => "Withdraw Process : Success!",
+                                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                                'deteksi_ip' => $ip,
+                                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                                'status' => 1
+                            ]);
+                            
+                            $notification = array(
+                                'message' => 'Penarikan dana sukses!',
+                                'alert-type' => 'success',
+                            );
+                            return redirect()->route('tenant.finance.history_penarikan.invoice', array('id' => $withDraw->id))->with($notification);
+                        } else {
+                            return "testing";
+                        }
+                    } else {
+                        $withDraw = Withdrawal::create([
+                            'id_user' => auth()->user()->id,
+                            'email' => auth()->user()->email,
+                            'tanggal_penarikan' => Carbon::now(),
+                            'nominal' => $nominal_penarikan,
+                            'biaya_admin' => $biaya_admin,
+                            'tanggal_masuk' => Carbon::now(),
+                            'deteksi_ip_address' => $ip,
+                            'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                            'status' => 0
+                        ]);
+                        DetailPenarikan::create([
+                            'id_penarikan' => $withDraw->id,
+                            'nominal_penarikan' => NULL,
+                            'nominal_bersih_penarikan' => NULL,
+                            'total_biaya_admin' => NULL,
+                            'biaya_nobu' => NULL,
+                            'biaya_mitra' => NULL,
+                            'biaya_admin_su' => NULL,
+                            'biaya_agregate' => NULL
+                        ]);
+                        History::create([
+                            'id_user' => auth()->user()->id,
+                            'email' => auth()->user()->email,
+                            'action' => "Withdraw Process : Transaction fail invalid",
+                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                            'deteksi_ip' => $ip,
+                            'log' => $responseMessage,
+                            'status' => 0
+                        ]);
+                        $notification = array(
+                            'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                            'alert-type' => 'error',
+                        );
+                        return redirect()->back()->with($notification);
+                    }
+                } catch (Exception $e) {
+                    History::create([
+                        'id_user' => auth()->user()->id,
+                        'email' => auth()->user()->email,
+                        'action' => "Withdraw Process : Error (HTTP API Error)",
+                        'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                        'deteksi_ip' => $ip,
+                        'log' => $e,
+                        'status' => 0
+                    ]);
+                    $notification = array(
+                        'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                        'alert-type' => 'error',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+            }
+        } catch (Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Withdraw Process : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
     }
 
