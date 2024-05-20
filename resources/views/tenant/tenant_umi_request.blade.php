@@ -32,6 +32,7 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="nama_pemilik" class="form-label">Nama Pemilik Usaha</label>
+                                                    <input type="hidden" class="d-none" name="store_identifier" required value="{{ auth()->user()->storeDetail->store_identifier }}" readonly>
                                                     <input type="text" class="form-control" name="nama_pemilik" id="nama_pemilik" required value="{{ auth()->user()->name }}" placeholder="Masukkan nama pemilik usaha" readonly>
                                                 </div>
                                             </div>

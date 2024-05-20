@@ -157,9 +157,6 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
 
     Route::post('settings/profile/tarik-dana', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tarikDanaQris'])->name('tenant.profile.tarik');
     Route::post('settings/profile/tarik-dana/proses', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'prosesTarikDana'])->name('tenant.profile.tarik.proses');
-
-    Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestForm'])->name('tenant.request.umi');
-    Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');
 });
 
 Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsNotMitra'])->prefix('/tenant/mitra')->group( function () {
@@ -191,6 +188,9 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
 });
 
 Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsMitra'])->prefix('tenant')->group( function () {
+    Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestForm'])->name('tenant.request.umi');
+    Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');
+    
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'index'])->name('tenant.dashboard');
     Route::get('/dashboard/kasir', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantKasirDashboard'])->name('tenant.kasir');
     Route::get('/dashboard/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');

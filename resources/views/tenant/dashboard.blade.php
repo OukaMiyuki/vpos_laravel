@@ -12,14 +12,11 @@
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control border-0" id="dash-daterange">
                                     <span class="input-group-text bg-blue border-blue text-white">
-                                    <i class="mdi mdi-calendar-range"></i>
+                                        <i class="mdi mdi-calendar-range"></i>
                                     </span>
                                 </div>
-                                <a href="#" class="btn btn-blue btn-sm ms-2">
-                                <i class="mdi mdi-autorenew"></i>
-                                </a>
-                                <a href="#" class="btn btn-blue btn-sm ms-1">
-                                <i class="mdi mdi-filter-variant"></i>
+                                <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-2">
+                                    <i class="mdi mdi-autorenew"></i>
                                 </a>
                             </form>
                         </div>

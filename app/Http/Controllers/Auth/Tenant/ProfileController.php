@@ -487,7 +487,9 @@ class ProfileController extends Controller{
     }
 
     public function umiRequestForm(){
-        $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)->first();
+        $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
         if(empty($umiRequest)){
             $umiRequest = "Empty";
         }
@@ -495,7 +497,16 @@ class ProfileController extends Controller{
     }
 
     public function umiRequestProcess(Request $request){
-        $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)->first();
+        $ip = "125.164.243.227";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+
+        $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->where('store_identifier', $request->store_identifier)
+                                ->first();
         if(empty($umiRequest) || is_null($umiRequest) || $umiRequest == ""){
             $tanggal = date("j F Y", strtotime(date('Y-m-d')));
             $nama_pemilik = $request->nama_pemilik;
@@ -512,7 +523,7 @@ class ProfileController extends Controller{
             $filename = 'Formulir Pendaftaran NOBU QRIS (NMID) PT BRAHMA ESATAMA_'.$nama_usaha.'_'.date('dmYHis').'.xlsx';
             $fileSave = $userDocsPath.'/'.$filename;
             try {
-                //File::copy($templatePath, $fileSave);
+                File::copy($templatePath, $fileSave);
                 $spreadsheet = IOFactory::load($fileSave);
                 $sheet = $spreadsheet->getActiveSheet();
                 $sheet->setCellValue('D6', $tanggal);
@@ -536,26 +547,51 @@ class ProfileController extends Controller{
                 $writer->save($newFilePath);
                 UmiRequest::create([
                     'id_tenant' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'store_identifier' => $request->store_identifier,
                     'tanggal_pengajuan' => Carbon::now(),
                     'file_path' => $filename
                 ]);
+
                 $mailData = [
                     'title' => 'Formulir Pendaftaran UMI',
                     'body' => 'This is for testing email using smtp.',
                     'file' => $fileSave
                 ];
                  
-                //Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData));
+                Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
                    
-                //dd("Email is sent successfully.");
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Umi Request : Success",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                    'status' => 1
+                ]);
+
                 $notification = array(
                     'message' => 'Permintaan UMI berhasil diajukan!',
                     'alert-type' => 'success',
                 );
                 return redirect()->back()->with($notification);
             } catch (Exception $e) {
-                return $e;
-                exit;
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Umi Request : Error!",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => $e,
+                    'status' => 1
+                ]);
+
+                $notification = array(
+                    'message' => 'Permintaan UMI gagal, silahkan hubungi admin!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
             }
         } else {
             return redirect()->back();

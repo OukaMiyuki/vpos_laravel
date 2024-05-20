@@ -193,6 +193,10 @@
                                 <i class="mdi mdi-store-outline"></i>
                                 <span>Store Settings</span>
                             </a>
+                            <a href="{{ route('tenant.request.umi') }}" class="dropdown-item notify-item">
+                                <i class="mdi mdi-card-account-mail-outline"></i>
+                                <span>Pengajuan UMI</span>
+                            </a>
                         @endif
                         <a href="{{ route('tenant.rekening.setting') }}" class="dropdown-item notify-item">
                             <i class="mdi mdi-credit-card-outline"></i>
