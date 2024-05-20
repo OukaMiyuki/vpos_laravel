@@ -161,10 +161,10 @@ class PosController extends Controller {
         DB::connection()->enableQueryLog();
         $invoice = "";
         try{
-            $subtotal = Cart::subtotal();
-            $total = Cart::total();
-            $tax = Cart::tax();
-            $diskon = Cart::discount();
+            $subtotal = Cart::subtotalFloat();
+            $total = Cart::totalFloat();
+            $tax = Cart::taxFloat();
+            $diskon = Cart::discountFloat();
             $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
             $identifier = $this->getStoreIdentifier();
             if($request->jenisPembayaran == "Tunai"){
@@ -180,6 +180,9 @@ class PosController extends Controller {
                     'sub_total' => $subtotal,
                     'pajak' => $tax,
                     'diskon' => $diskon,
+                    'mdr' => 0,
+                    'nominal_mdr' => 0,
+                    'nominal_terima_bersih' => 0,
                     'tanggal_pelunasan' => Carbon::now(),
                     'tanggal_transaksi' => Carbon::now()
                 ]);
@@ -314,6 +317,9 @@ class PosController extends Controller {
                 'status_pembayaran' => 1,
                 'nominal_bayar' => $request->nominal,
                 'kembalian' => $kembalian,
+                'mdr' => 0,
+                'nominal_mdr' => 0,
+                'nominal_terima_bersih' => 0
             ]);
 
             History::create([
@@ -673,6 +679,9 @@ class PosController extends Controller {
                     'diskon' => $request->nominal_diskon,
                     'nominal_bayar' => $request->nominalText,
                     'kembalian' => $kembalian,
+                    'mdr' => 0,
+                    'nominal_mdr' => 0,
+                    'nominal_terima_bersih' => 0,
                 ]);
                 $total = $request->sub_total_belanja+$request->nominal_pajak;
                 if(!is_null($invoice)) {
@@ -681,32 +690,58 @@ class PosController extends Controller {
                 }
             } else if($request->jenisPembayaran == "Qris"){
                 $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
-                $client = new Client();
-                $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
-                $postResponse = $client->request('POST',  $url, [
-                    'form_params' => [
-                        'amount' => $total,
-                        'transactionNo' => $invoice->nomor_invoice,
-                        'pos_id' => "VP",
-                        'secret_key' => "Vpos71237577"
-                    ]
-                ]);
-                $responseCode = $postResponse->getStatusCode();
-                $data = json_decode($postResponse->getBody());
-
-                $invoice->update([
-                    'jenis_pembayaran' => $request->jenisPembayaran,
-                    'tanggal_pelunasan' => Carbon::now(),
-                    'status_pembayaran' => 0,
-                    'qris_data' => $data->data->data->qrisData,
-                    'sub_total' => $request->sub_total_belanja,
-                    'pajak' => $request->nominal_pajak,
-                    'diskon' => $request->nominal_diskon,
-                    'nominal_bayar' => $total,
-                ]);
-
-                if(!is_null($invoice)) {
-                    $invoice->fieldSave($invoice);
+                if(auth()->user()->id_inv_code != 0){
+                    $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
+                    if($storeDetail->status_umi == 1){
+                        if($invoice->nominal_bayar <= 100000){
+                            $invoice->update([
+                                'mdr' => 0,
+                                'nominal_mdr' => 0,
+                                'nominal_terima_bersih' => $invoice->nominal_bayar
+                            ]);
+                        } else {
+                            $nominal_mdr = $total*0.007;
+                            $invoice->update([
+                                'nominal_mdr' => $nominal_mdr,
+                                'nominal_terima_bersih' => $total-$nominal_mdr
+                            ]);
+                        }   
+                    } else {
+                        $nominal_mdr = $total*0.007;
+                        $invoice->update([
+                            'nominal_mdr' => $nominal_mdr,
+                            'nominal_terima_bersih' => $total-$nominal_mdr
+                        ]);
+                    }
+                    // this first
+                    $client = new Client();
+                    $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+                    $postResponse = $client->request('POST',  $url, [
+                        'form_params' => [
+                            'amount' => $total,
+                            'transactionNo' => $invoice->nomor_invoice,
+                            'pos_id' => "VP",
+                            'secret_key' => "Vpos71237577"
+                        ]
+                    ]);
+                    $responseCode = $postResponse->getStatusCode();
+                    $data = json_decode($postResponse->getBody());
+    
+                    $invoice->update([
+                        'jenis_pembayaran' => $request->jenisPembayaran,
+                        'tanggal_pelunasan' => Carbon::now(),
+                        'status_pembayaran' => 0,
+                        'qris_data' => $data->data->data->qrisData,
+                        'sub_total' => $request->sub_total_belanja,
+                        'pajak' => $request->nominal_pajak,
+                        'diskon' => $request->nominal_diskon,
+                        'nominal_bayar' => $total,
+                    ]);
+    
+                    if(!is_null($invoice)) {
+                        $invoice->fieldSave($invoice);
+                    }
+                    // this end
                 }
             }
             session()->forget('cart');

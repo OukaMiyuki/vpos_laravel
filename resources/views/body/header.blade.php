@@ -188,10 +188,12 @@
                         <span>My Account</span>
                     </a>
                     @auth('tenant')
-                        <a href="{{ route('tenant.store.profile') }}" class="dropdown-item notify-item">
-                            <i class="mdi mdi-store-outline"></i>
-                            <span>Store Settings</span>
-                        </a>
+                        @if (auth()->user()->id_inv_code != 0)
+                            <a href="{{ route('tenant.store.profile') }}" class="dropdown-item notify-item">
+                                <i class="mdi mdi-store-outline"></i>
+                                <span>Store Settings</span>
+                            </a>
+                        @endif
                         <a href="{{ route('tenant.rekening.setting') }}" class="dropdown-item notify-item">
                             <i class="mdi mdi-credit-card-outline"></i>
                             <span>Rekening</span>

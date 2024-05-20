@@ -1,4 +1,4 @@
-<x-tenant-layout>
+<x-tenant_mitra-layout>
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
@@ -11,11 +11,70 @@
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.finance') }}">Finance</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.saldo') }}">Saldo</a></li>
-                                <li class="breadcrumb-item active">Transaksi Qris (Kemarin)</li>
+                                <li class="breadcrumb-item active">Qris</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Transaksi Qris Kemarin</h4>
+                        <h4 class="page-title">Data Pemasukan Qris</h4>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-xl-4">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/salary.png') }}" class="img-fluid" alt="">
+                                </div>
+                                <div class="col-8">
+                                    <div class="text-end">
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukanQrisHariini }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Pemasukan Hari Ini</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
+                </div>
+                <div class="col-md-4 col-xl-4">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/financial-statement.png') }}" class="img-fluid" alt="">
+                                </div>
+                                <div class="col-8">
+                                    <div class="text-end">
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukanQrisBulanIni }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Pemasukan Bulan Ini</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
+                </div>
+                <div class="col-md-4 col-xl-4">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/money.png') }}" class="img-fluid" alt="">
+                                </div>
+                                <div class="col-8">
+                                    <div class="text-end">
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukanQris }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Pemasukan Qris</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
                 </div>
             </div>
             <div class="row">
@@ -30,7 +89,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Data Transaksi Qris (Kemarin)</h4>
+                            <h4 class="header-title mb-3">Tabel Data Pemasukan Qris Toko</h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
@@ -105,4 +164,4 @@
         </div>
         <!-- container -->
     </div>
-</x-tenant-layout>
+</x-tenant_mitra-layout>

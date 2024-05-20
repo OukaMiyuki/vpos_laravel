@@ -16,12 +16,14 @@ class SendUmiEmail extends Mailable {
     use Queueable, SerializesModels;
 
     public $mailData;
+    public $store_identifier;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($mailData) {
+    public function __construct($mailData, $store_identifier) {
         $this->mailData = $mailData;
+        $this->store_identifier = $store_identifier;
     }
 
     /**
@@ -49,7 +51,11 @@ class SendUmiEmail extends Mailable {
 
      */
     public function attachments(): array {
-        $excelFile = UmiRequest::where('id_tenant', auth()->user()->id)->first();
+        $excelFile = UmiRequest::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->where('store_identifier', $this->store_identifier)
+                                ->first();
+        //dd($this->store_identifier);
         $filename = $excelFile->file_path;
         return [
             Attachment::fromStorage('public/docs/umi/user_doc/'.$filename),

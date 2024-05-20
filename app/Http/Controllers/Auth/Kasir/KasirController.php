@@ -10,6 +10,7 @@ use Stevebauman\Location\Facades\Location;
 use Illuminate\Support\Facades\DB;
 use App\Models\ProductStock;
 use App\Models\ShoppingCart;
+use App\Models\StoreDetail;
 use App\Models\Invoice;
 use App\Models\Discount;
 use App\Models\Tax;
@@ -45,6 +46,20 @@ class KasirController extends Controller {
     }
 
     public function index(){
+        // $invoiceYesterday = Invoice::select([
+        //                             'id',
+        //                             'id_tenant',
+        //                             'email',
+        //                             "store_identifier",
+        //                             'nominal_mdr',
+        //                             DB::raw("(sum(nominal_bayar)) as total_penghasilan"),
+        //                     ])
+        //                     ->whereDate('tanggal_transaksi', Carbon::yesterday())
+        //                     ->where('jenis_pembayaran', 'Qris')
+        //                     ->where('status_pembayaran', 1)
+        //                     ->groupBy(['id','store_identifier', 'email', 'id_tenant', 'nominal_mdr'])
+        //                     ->get();
+                        // dd($invoiceYesterday );
         $totalInvoiceHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
                                         ->where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
@@ -54,17 +69,34 @@ class KasirController extends Controller {
                                     ->where('id_kasir', auth()->user()->id)
                                     ->where('email', auth()->user()->email)
                                     ->count();
-        $pemasukanHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+        $pemasukanHariIniTunai = Invoice::whereDate('tanggal_transaksi', Carbon::today())
                                     ->where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
                                     ->where('email', auth()->user()->email)
+                                    ->where('jenis_pembayaran', 'Tunai')
                                     ->where('status_pembayaran', 1)
                                     ->sum(DB::raw('sub_total + pajak'));
-        $totalPemasukan = Invoice::where('store_identifier', auth()->user()->id_store)
+        $pemasukanHariIniQris = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                                    ->where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
                                     ->where('email', auth()->user()->email)
+                                    ->where('jenis_pembayaran', 'Qris')
+                                    ->where('status_pembayaran', 1)
+                                    ->sum('nominal_terima_bersih');
+        $pemasukanHariIni = $pemasukanHariIniTunai+$pemasukanHariIniQris;
+        $totalPemasukanTunai = Invoice::where('store_identifier', auth()->user()->id_store)
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->where('jenis_pembayaran', 'Tunai')
                                     ->where('status_pembayaran', 1)
                                     ->sum(DB::raw('sub_total + pajak'));
+        $totalPemasukanQris = Invoice::where('store_identifier', auth()->user()->id_store)
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->where('jenis_pembayaran', 'Qris')
+                                    ->where('status_pembayaran', 1)
+                                    ->sum('nominal_terima_bersih');
+        $totalPemasukan = $totalPemasukanTunai+$totalPemasukanQris;
         $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('email', auth()->user()->email)
@@ -255,10 +287,10 @@ class KasirController extends Controller {
         $invoice = "";
 
         try{
-            $subtotal = Cart::subtotal();
-            $total = Cart::total();
-            $tax = Cart::tax();
-            $diskon = Cart::discount();
+            $subtotal = Cart::subtotalFloat();
+            $total = Cart::totalFloat();
+            $tax = Cart::taxFloat();
+            $diskon = Cart::discountFloat();
             $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
             if($request->jenisPembayaran == "Tunai"){
                 $invoice = Invoice::create([
@@ -273,6 +305,9 @@ class KasirController extends Controller {
                     'sub_total' => $subtotal,
                     'pajak' => $tax,
                     'diskon' => $diskon,
+                    'mdr' => 0,
+                    'nominal_mdr' => 0,
+                    'nominal_terima_bersih' => 0,
                     'tanggal_pelunasan' => Carbon::now(),
                     'tanggal_transaksi' => Carbon::now()
                 ]);
@@ -645,6 +680,9 @@ class KasirController extends Controller {
                     'diskon' => $request->nominal_diskon,
                     'nominal_bayar' => $request->nominalText,
                     'kembalian' => $kembalian,
+                    'mdr' => 0,
+                    'nominal_mdr' => 0,
+                    'nominal_terima_bersih' => 0,
                 ]);
                 $total = $request->sub_total_belanja+$request->nominal_pajak;
                 if(!is_null($invoice)) {
@@ -653,6 +691,30 @@ class KasirController extends Controller {
                 }
             } else if($request->jenisPembayaran == "Qris"){
                 $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
+                // Ga perlu id_tenant dan ngecek apa invitation codenya 0
+                $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
+                if($storeDetail->status_umi == 1){
+                    if($invoice->nominal_bayar <= 100000){
+                        $invoice->update([
+                            'mdr' => 0,
+                            'nominal_mdr' => 0,
+                            'nominal_terima_bersih' => $invoice->nominal_bayar
+                        ]);
+                    } else {
+                        $nominal_mdr = $total*0.007;
+                        $invoice->update([
+                            'nominal_mdr' => $nominal_mdr,
+                            'nominal_terima_bersih' => $total-$nominal_mdr
+                        ]);
+                    }   
+                } else {
+                    $nominal_mdr = $total*0.007;
+                    $invoice->update([
+                        'nominal_mdr' => $nominal_mdr,
+                        'nominal_terima_bersih' => $total-$nominal_mdr
+                    ]);
+                }
+                // this first
                 $client = new Client();
                 $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
                 $postResponse = $client->request('POST',  $url, [
@@ -680,6 +742,7 @@ class KasirController extends Controller {
                 if(!is_null($invoice)) {
                     $invoice->fieldSave($invoice);
                 }
+                // this end
             }
             session()->forget('cart');
 
@@ -739,6 +802,9 @@ class KasirController extends Controller {
                 'status_pembayaran' => 1,
                 'nominal_bayar' => $request->nominal,
                 'kembalian' => $kembalian,
+                'mdr' => 0,
+                'nominal_mdr' => 0,
+                'nominal_terima_bersih' => 0
             ]);
 
             History::create([

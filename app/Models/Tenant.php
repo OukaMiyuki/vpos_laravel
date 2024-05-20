@@ -26,6 +26,7 @@ use App\Models\QrisWalletPending;
 use App\Models\UmiRequest;
 use App\Models\Withdrawal;
 use App\Models\Kasir;
+use App\Models\StoreList;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -64,12 +65,38 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         return $this->hasOne(StoreDetail::class, 'id_tenant', 'id');
     }
 
+    public function storeList(){
+        return $this->hasMany(StoreList::class, 'id_user', 'id');
+    }
+
     public function umi(){
         return $this->hasOne(UmiRequest::class, 'id_tenant', 'id');
     }
 
+    public function invoiceStoreList(){
+        return $this->hasManyThrough(
+            Invoice::class, 
+            StoreList::class, 
+            'store_identifier', 
+            'store_identifier',
+            'id',
+            'id'
+        );
+    }
+
+    public function invoiceStoreDetail(){
+        return $this->hasManyThrough(
+            Invoice::class, 
+            StoreDetail::class, 
+            'store_identifier', 
+            'store_identifier',
+            'id',
+            'id'
+        );
+    }
+
     public function invoice(){
-        return $this->hasMany(Invoice::class, 'id_tenant', 'id')->where('email', auth()->user()->email);
+        return $this->hasMany(Invoice::class, 'id_tenant', 'id');
     }
 
     public function withdrawal(){
@@ -77,7 +104,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
     }
 
     public function saldoTunai(){
-        return $this->hasOne(TunaiWallet::class, 'id_tenant', 'id')->where('email', auth()->user()->email);
+        return $this->hasOne(TunaiWallet::class, 'id_tenant', 'id');
     }
 
     public function sendEmailVerificationNotification() {

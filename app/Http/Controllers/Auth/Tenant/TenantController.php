@@ -89,10 +89,18 @@ class TenantController extends Controller {
                                     ->first();
         $totalSaldo = $qrisWallet->saldo + $tunaiWallet->saldo;
          
-        $pemasukanHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+        $pemasukanQrisHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
                             ->where('store_identifier', $identifier)
                             ->where('status_pembayaran', 1)
+                            ->where('jenis_pembayaran', 'Qris')
+                            ->sum('nominal_terima_bersih');
+        $pemasukanUnaiHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                            ->where('store_identifier', $identifier)
+                            ->where('status_pembayaran', 1)
+                            ->where('jenis_pembayaran', 'Tunai')
                             ->sum(DB::raw('sub_total + pajak'));
+        //dd($pemasukanQrisHariIni);
+        $pemasukanHariIni = $pemasukanQrisHariIni+$pemasukanUnaiHariIni;
         return view('tenant.dashboard', compact('todayTransaction', 'todayTransactionFinish', 'invoice', 'latestInvoice', 'totalSaldo', 'pemasukanHariIni'));
     }
 
@@ -1768,19 +1776,41 @@ class TenantController extends Controller {
                             ->latest()
                             ->get();
 
-        $totalPemasukan = Invoice::where('store_identifier', $identifier)
-                            ->where('status_pembayaran', 1)
-                            ->sum(DB::raw('sub_total + pajak'));
 
-        $totalPemasukanHariini = Invoice::where('store_identifier', $identifier)
-                                    ->where('status_pembayaran', 1)
-                                    ->whereDate('tanggal_transaksi', Carbon::today())
-                                    ->sum(DB::raw('sub_total + pajak'));
+        $pemasukanQrisHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                                        ->where('store_identifier', $identifier)
+                                        ->where('status_pembayaran', 1)
+                                        ->where('jenis_pembayaran', 'Qris')
+                                        ->sum('nominal_terima_bersih');
+        $pemasukanUnaiHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
+                                        ->where('store_identifier', $identifier)
+                                        ->where('status_pembayaran', 1)
+                                        ->where('jenis_pembayaran', 'Tunai')
+                                        ->sum(DB::raw('sub_total + pajak'));
 
-        $totalPemasukanBulanIni = Invoice::where('store_identifier', $identifier)
-                                    ->where('status_pembayaran', 1)
-                                    ->whereMonth('tanggal_transaksi', Carbon::now()->month)
-                                    ->sum(DB::raw('sub_total + pajak'));
+        $pemasukanQrisBulanIni = Invoice::whereMonth('tanggal_transaksi', Carbon::now()->month)
+                                        ->where('store_identifier', $identifier)
+                                        ->where('status_pembayaran', 1)
+                                        ->where('jenis_pembayaran', 'Qris')
+                                        ->sum('nominal_terima_bersih');
+        $pemasukanUnaiBulanIni = Invoice::whereMonth('tanggal_transaksi', Carbon::now()->month)
+                                        ->where('store_identifier', $identifier)
+                                        ->where('status_pembayaran', 1)
+                                        ->where('jenis_pembayaran', 'Tunai')
+                                        ->sum(DB::raw('sub_total + pajak'));
+
+        $totalPemasukanTunai = Invoice::where('store_identifier', $identifier)
+                                        ->where('jenis_pembayaran', 'Tunai')
+                                        ->where('status_pembayaran', 1)
+                                        ->sum(DB::raw('sub_total + pajak'));
+        $totalPemasukanQris = Invoice::where('store_identifier', $identifier)
+                                        ->where('jenis_pembayaran', 'Qris')
+                                        ->where('status_pembayaran', 1)
+                                        ->sum('nominal_terima_bersih');
+
+        $totalPemasukan = $totalPemasukanTunai+$totalPemasukanQris;
+        $totalPemasukanHariini = $pemasukanQrisHariIni+$pemasukanUnaiHariIni;
+        $totalPemasukanBulanIni = $pemasukanQrisBulanIni+$pemasukanUnaiBulanIni;
 
         return view('tenant.tenant_finance_pemasukan', compact(['invoice', 'totalPemasukan', 'totalPemasukanHariini', 'totalPemasukanBulanIni']));
     }
@@ -1862,19 +1892,19 @@ class TenantController extends Controller {
         $totalPemasukanQris = Invoice::where('store_identifier', $identifier)
                                         ->where('invoices.jenis_pembayaran', 'Qris')
                                         ->where('status_pembayaran', 1)
-                                        ->sum(DB::raw('sub_total + pajak'));
+                                        ->sum(DB::raw('nominal_terima_bersih'));
 
         $totalPemasukanQrisHariini = Invoice::where('store_identifier', $identifier)
                                                 ->where('invoices.jenis_pembayaran', 'Qris')
                                                 ->where('status_pembayaran', 1)
                                                 ->whereDate('tanggal_transaksi', Carbon::today())
-                                                ->sum(DB::raw('sub_total + pajak'));
+                                                ->sum('nominal_terima_bersih');
 
         $totalPemasukanQrisBulanIni = Invoice::where('store_identifier', $identifier)
                                                 ->where('invoices.jenis_pembayaran', 'Qris')
                                                 ->where('status_pembayaran', 1)
                                                 ->whereMonth('tanggal_transaksi', Carbon::now()->month)
-                                                ->sum(DB::raw('sub_total + pajak'));
+                                                ->sum('nominal_terima_bersih');
         
         return view('tenant.tenant_finnance_pemasukan_qris', compact(['invoice', 'totalPemasukanQris', 'totalPemasukanQrisHariini', 'totalPemasukanQrisBulanIni']));
     }
@@ -1885,19 +1915,16 @@ class TenantController extends Controller {
         $qris = QrisWallet::where('id_user', auth()->user()->id)
                             ->where('email', auth()->user()->email)
                             ->first();
-        // $qrisPending = QrisWalletPending::where('id_user', auth()->user()->id)
-        //                                 ->where('email', auth()->user()->email)
-        //                                 ->first();
         $qrisPending = Invoice::where('store_identifier', $identifier)
                                 ->whereDate('tanggal_transaksi', Carbon::yesterday())
                                 ->where('jenis_pembayaran', 'Qris')
                                 ->where('status_pembayaran', 1)
-                                ->sum('nominal_bayar');
+                                ->sum('nominal_terima_bersih');
         $qrisHariIni = Invoice::where('store_identifier', $identifier)
                                 ->whereDate('tanggal_transaksi', Carbon::now())
                                 ->where('jenis_pembayaran', 'Qris')
                                 ->where('status_pembayaran', 1)
-                                ->sum('nominal_bayar');
+                                ->sum('nominal_terima_bersih');
         $invoiceQrisSukses = Invoice::where('store_identifier', $identifier)
                                     ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
                                     ->with(['kasir' => function($query){

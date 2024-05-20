@@ -1,4 +1,4 @@
-<x-tenant-layout>
+<x-tenant_mitra-layout>
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
@@ -8,8 +8,8 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('tenant.finance') }}">Finance</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard.finance') }}">Finance</a></li>
                                 <li class="breadcrumb-item active">Saldo</li>
                             </ol>
                         </div>
@@ -18,27 +18,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-3 col-xl-3">
-                    <div class="widget-rounded-circle card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-4">
-                                    <img src="{{ asset('assets/images/icons/wallet.png') }}" class="img-fluid" alt="">
-                                </div>
-                                <div class="col-8">
-                                    <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $tunai->saldo }}</span></h4>
-                                        <p class="text-muted mb-1 text-truncate">Pemasukan Tunai</p>
-                                        <a href="{{ route('tenant.finance.pemasukan.tunai') }}" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-xl-3">
+                <div class="col-md-4 col-xl-4">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
@@ -49,7 +29,7 @@
                                     <div class="text-end">
                                         <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qrisPending }}</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Saldo Transaksi</p>
-                                        <a href="{{ route('tenant.finance.pemasukan.qris.pending') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.mitra.dashboard.finance.pemasukan.qris.pending') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -58,7 +38,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-xl-3">
+                <div class="col-md-4 col-xl-4">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
@@ -69,7 +49,7 @@
                                     <div class="text-end">
                                         <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qrisHariIni }}</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Saldo Transaksi Hari Ini</p>
-                                        <a href="{{ route('tenant.finance.pemasukan.qris.today') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.mitra.dashboard.finance.pemasukan.qris.today') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -78,7 +58,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3 col-xl-3">
+                <div class="col-md-4 col-xl-4">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
@@ -89,7 +69,7 @@
                                     <div class="text-end">
                                         <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qris->saldo }}</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Saldo Qris Anda</p>
-                                        <a href="{{ route('tenant.finance.pemasukan.qris.all') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.mitra.dashboard.finance.pemasukan.qris.all') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                         {{-- <a title="Tarik Saldo" href="" class="btn btn-blue btn-sm ms-2">
@@ -170,4 +150,4 @@
             </div>
         </div>
     </div>
-</x-tenant-layout>
+</x-tenant_mitra-layout>

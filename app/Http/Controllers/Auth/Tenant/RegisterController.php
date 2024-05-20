@@ -121,4 +121,57 @@ class RegisterController extends Controller {
 
         // return redirect(route('tenant.login'))->with($notification);
     }
+
+    public function createMitra(): View {
+        return view('tenant.auth.register_mitra');
+    }
+
+    public function storeMitra(Request $request): RedirectResponse {
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
+            'no_ktp' => ['required', 'string', 'numeric', 'digits:16', 'unique:'.DetailAdmin::class, 'unique:'.DetailMarketing::class, 'unique:'.DetailTenant::class, 'unique:'.DetailKasir::class],
+            'phone' => ['required', 'string', 'numeric', 'digits_between:1,20', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
+            'jenis_kelamin' => ['required'],
+            'tempat_lahir' => ['required'],
+            'tanggal_lahir' => ['required'],
+            'alamat' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'confirmed', 'min:8'],
+        ]);
+
+        $tenant = Tenant::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+            'id_inv_code' => 0
+        ]);
+
+        if(!is_null($tenant)) {
+            $tenant->detailTenantStore($tenant);
+            $tenant->createWallet($tenant);
+        }
+
+        event(new Registered($tenant));
+                
+        Auth::guard('tenant')->login($tenant);
+
+        History::create([
+            'id_user' => NULL,
+            'email' => $request->email,
+            'action' => "Register Tenant : Success!",
+            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+            'deteksi_ip' => $ip,
+            'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+            'status' => 1
+        ]);
+
+        return redirect(RouteServiceProvider::TENANT_MITRA_DASHBOARD);
+    }
 }

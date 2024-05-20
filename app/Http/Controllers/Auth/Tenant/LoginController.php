@@ -91,6 +91,10 @@ class LoginController extends Controller {
             'message' => 'Anda berhasil login!',
             'alert-type' => 'info',
         );
+        //dd(Auth::guard('tenant')->user()->id_inv_code);
+        if(Auth::guard('tenant')->user()->id_inv_code == 0){
+            return redirect()->intended(RouteServiceProvider::TENANT_MITRA_DASHBOARD)->with($notification);
+        }
         return redirect()->intended(RouteServiceProvider::TENANT_DASHBOARD)->with($notification);
 
     }

@@ -15,6 +15,8 @@ use App\Models\Discount;
 use App\Models\Tax;
 use App\Models\TenantField;
 use App\Models\Invoice;
+use App\Models\TenantQrisAccount;
+use App\Models\UmiRequest;
 
 class StoreDetail extends Model {
     use HasFactory;
@@ -76,5 +78,13 @@ class StoreDetail extends Model {
 
     public function invoice(){
         return $this->hasMany(Invoice::class, 'store_identifier', 'store_identifier');
+    }
+
+    public function tenantQrisAccount(){
+        return $this->hasOne(TenantQrisAccount::class, 'store_identifier', 'store_identifier');
+    }
+
+    public function reqUmi(){
+        return $this->belongsTo(UmiRequest::class, 'store_identifier', 'store_identifier');
     }
 }

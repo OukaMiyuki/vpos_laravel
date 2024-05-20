@@ -1,4 +1,4 @@
-<x-tenant-layout>
+<x-tenant_mitra-layout>
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
@@ -11,10 +11,10 @@
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.finance') }}">Finance</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.saldo') }}">Saldo</a></li>
-                                <li class="breadcrumb-item active">Transaksi Qris (Kemarin)</li>
+                                <li class="breadcrumb-item active">Transaksi Qris Hari Ini</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Transaksi Qris Kemarin</h4>
+                        <h4 class="page-title">Data Transaksi Qris Hari Ini</h4>
                     </div>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Data Transaksi Qris (Kemarin)</h4>
+                            <h4 class="header-title mb-3">Tabel Data Transaksi Qris Toko Hari Ini</h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
@@ -105,4 +105,4 @@
         </div>
         <!-- container -->
     </div>
-</x-tenant-layout>
+</x-tenant_mitra-layout>

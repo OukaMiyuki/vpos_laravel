@@ -12,13 +12,14 @@ use App\Models\Kasir;
 use App\Models\Tenant;
 use App\Models\InvoiceField;
 use App\Models\StoreDetail;
-use Exception;
 use App\Models\Product;
+use App\Models\StoreList;
 use App\Models\ProductStock;
 use App\Models\TunaiWallet;
 use App\Models\QrisWallet;
 use App\Models\CustomerIdentifier;
 use App\Models\TenantQrisAccount;
+use Exception;
 
 class Invoice extends Model {
     use HasFactory;
@@ -27,6 +28,10 @@ class Invoice extends Model {
 
     public function store(){
         return $this->belongsTo(StoreDetail::class, 'store_identifier', 'store_identifier');
+    }
+
+    public function storeMitra(){
+        return $this->belongsTo(StoreList::class, 'store_identifier', 'store_identifier');
     }
 
     public function tenant(){
@@ -166,31 +171,65 @@ class Invoice extends Model {
             $index_number = Invoice::max('id') + 1;
             $generate_nomor_invoice = $invoice_code.$date.str_pad($index_number, 9, '0', STR_PAD_LEFT);
             $model->nomor_invoice = $generate_nomor_invoice;
+            $tenant = Tenant::select(['id_inv_code'])->find($model->id_tenant);
             if($model->jenis_pembayaran == "Qris"){
-                // $qrisAccount = TenantQrisAccount::where('id_tenant', auth()->user()->id)
-                //                                     ->where('email', auth()->user()->email)
-                //                                     ->first();
-                // if(!empty($qrisAccount) || !is_null($qrisAccount)){
-
-                // }
-                try {
-                    $postResponse = $client->request('POST',  $url, [
-                        'form_params' => [
-                            'amount' => $model->nominal_bayar,
-                            'transactionNo' => $generate_nomor_invoice,
-                            'pos_id' => "VP",
-                            'secret_key' => "Vpos71237577"
-                        ]
-                    ]);
-                    $responseCode = $postResponse->getStatusCode();
-                    $data = json_decode($postResponse->getBody());
-                    //dd($data);
-                    $model->qris_data = $data->data->data->qrisData;
-                } catch (Exception $e) {
-                    return $e;
-                    exit;
+                if($tenant->id_inv_code != 0){
+                    $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $model->store_identifier)->first();
+                    if($storeDetail->status_umi == 1){
+                        if($model->nominal_bayar <= 100000){
+                            $model->mdr = 0;
+                            $model->nominal_mdr = 0;
+                            $model->nominal_terima_bersih = $model->nominal_bayar;
+                        } else {
+                            $nominal_mdr = self::hitungMDR($model->nominal_bayar);
+                            $model->nominal_mdr = $nominal_mdr;
+                            $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                        }   
+                    } else {
+                        $nominal_mdr = self::hitungMDR($model->nominal_bayar);
+                        $model->nominal_mdr = $nominal_mdr;
+                        $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                    }
+                    try {
+                        $postResponse = $client->request('POST',  $url, [
+                            'form_params' => [
+                                'amount' => $model->nominal_bayar,
+                                'transactionNo' => $generate_nomor_invoice,
+                                'pos_id' => "VP",
+                                'secret_key' => "Vpos71237577"
+                            ]
+                        ]);
+                        $responseCode = $postResponse->getStatusCode();
+                        $data = json_decode($postResponse->getBody());
+                        $model->qris_data = $data->data->data->qrisData;
+                    } catch (Exception $e) {
+                        return $e;
+                        exit;
+                    }
+                } else if($tenant->id_inv_code == 0) {
+                    $store = StoreList::select(['status_umi'])->where('store_identifier', $model->store_identifier)->first();
+                    if($store->status_umi == 1) {
+                        if($model->nominal_bayar <= 100000){
+                            $model->mdr = 0;
+                            $model->nominal_mdr = 0;
+                            $model->nominal_terima_bersih = $model->nominal_bayar;
+                        } else {
+                            $nominal_mdr = self::hitungMDR($model->nominal_bayar);
+                            $model->nominal_mdr = $nominal_mdr;
+                            $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                        }
+                    } else {
+                        $nominal_mdr = self::hitungMDR($model->nominal_bayar);
+                        $model->nominal_mdr = $nominal_mdr;
+                        $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                    }
                 }
             }
         });
+    }
+
+    public static function hitungMDR($nominal_bayar){
+        $nominal_mdr = $nominal_bayar*0.007;
+        return $nominal_mdr;
     }
 }

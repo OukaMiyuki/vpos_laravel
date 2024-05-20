@@ -36,9 +36,9 @@ use Mail;
 use Exception;
 
 class ProfileController extends Controller{
-    public function __construct() {
-        $this->middleware('isTenantIsMitra');
-    }
+    // public function __construct() {
+    //     $this->middleware('isTenantIsMitra');
+    // }
 
     public function tenantSettings(){
         return view('tenant.tenant_settings');

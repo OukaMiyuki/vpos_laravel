@@ -94,7 +94,11 @@
                     Mitra Aplikasi
                 @endauth
                 @auth('tenant')
-                    Tenant
+                    @if (auth()->user()->id_inv_code == 0)
+                        Mitra Bisnis
+                    @else
+                        Tenant
+                    @endif
                 @endauth
                 @auth('kasir')
                     Kasir
@@ -114,7 +118,11 @@
                         {{ route('marketing.dashboard') }}
                     @endauth
                     @auth('tenant')
-                        {{ route('tenant.dashboard') }}
+                        @if (auth()->user()->id_inv_code == 0)
+                            {{ route('tenant.mitra.dashboard') }}
+                        @else
+                            {{ route('tenant.dashboard') }}
+                        @endif
                     @endauth
                     @auth('kasir')
                         {{ route('kasir.dashboard') }}
@@ -125,12 +133,14 @@
                     </a>
                 </li>
                 @auth('tenant')
-                    <li>
-                        <a href="{{ route('tenant.pos') }}">
-                            <i class="mdi mdi-point-of-sale"></i>
-                            <span> POS </span>
-                        </a>
-                    </li>
+                    @if (auth()->user()->id_inv_code != 0)
+                        <li>
+                            <a href="{{ route('tenant.pos') }}">
+                                <i class="mdi mdi-point-of-sale"></i>
+                                <span> POS </span>
+                            </a>
+                        </li>
+                    @endif
                 @endauth
                 @auth('kasir')
                     <li>
@@ -300,29 +310,47 @@
                     <li>
                         <a href="#toko" data-bs-toggle="collapse">
                             <i class="mdi mdi-store"></i>
-                            <span> Menu Toko </span>
+                            <span> 
+                                @if (auth()->user()->id_inv_code != 0)
+                                    Menu Toko
+                                @else
+                                    Menu Merchant
+                                @endif
+                            </span>
                             <span class="menu-arrow"></span>
                         </a>
                         <div class="collapse" id="toko">
                             <ul class="nav-second-level">
-                                <li>
-                                    <a href="{{ route('tenant.toko') }}">Dashboard Toko</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.supplier.list') }}">Supplier</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.batch.list') }}">Batch Code</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.category.list') }}">Kategori</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.product.batch.list') }}">Batch Product</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.product.stock.list') }}">Stock Manager</a>
-                                </li>
+                                @if (auth()->user()->id_inv_code != 0)
+                                    <li>
+                                        <a href="{{ route('tenant.toko') }}">Dashboard Toko</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.supplier.list') }}">Supplier</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.batch.list') }}">Batch Code</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.category.list') }}">Kategori</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.product.batch.list') }}">Batch Product</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.product.stock.list') }}">Stock Manager</a>
+                                    </li>
+                                @else
+                                    <li>
+                                        <a href="{{ route('tenant.mitra.dashboard.toko') }}">Dashboard Merchant</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.mitra.dashboard.toko.list') }}">Merchant List</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.mitra.dashboard.toko.request.umi.list') }}">Umi</a>
+                                    </li>
+                                @endif
                             </ul>
                         </div>
                     </li>
@@ -335,84 +363,134 @@
                         <div class="collapse" id="transaksi">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="{{ route('tenant.transaction') }}">Dashboard Transaksi</a>
+                                    <a href="{{ route('tenant.mitra.dashboard.transaction') }}">Dashboard Transaksi</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('tenant.transaction.list') }}">Semua Transaksi</a>
+                                    <a href="{{ route('tenant.mitra.dashboard.transaction.all_transaction') }}">Semua Transaksi</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('tenant.transaction.list.pending') }}">Transaction Pending</a>
+                                    <a href="{{ route('tenant.mitra.dashboard.transaction.pending_transaction') }}">Pyament Pending</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('tenant.transaction.list.pending.payment') }}">Payment Qris Pending</a>
+                                    <a href="{{ route('tenant.mitra.dashboard.transaction.finish_transaction') }}">Payment Finish</a>
                                 </li>
                             </ul>
                         </div>
                     </li>
-                    <li>
-                        <a href="#karyawan" data-bs-toggle="collapse">
-                            <i class="mdi mdi-account-multiple-outline"></i>
-                            <span> Menu Karyawan </span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="collapse" id="karyawan">
-                            <ul class="nav-second-level">
-                                <li>
-                                    <a href="{{ route('tenant.kasir') }}">Dashboard Kasir</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.kasir.list') }}">Manager Kasir</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#harga" data-bs-toggle="collapse">
-                            <i class="mdi mdi-sale"></i>
-                            <span> Store Managament </span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="collapse" id="harga">
-                            <ul class="nav-second-level">
-                                <li>
-                                    <a href="{{ route('tenant.store.management') }}">Store Menu</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.discount.modify') }}">Pengaturan Diskon</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.pajak.modify') }}">Pengaturan Pajak</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.customField.modify') }}">Custom Fields</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                    @if (auth()->user()->id_inv_code == 0)
+                        <li>
+                            <a href="#aplikasi" data-bs-toggle="collapse">
+                                <i class="mdi mdi-apps"></i>
+                                <span> Aplikasi </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="aplikasi">
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('tenant.transaction') }}">Dashboard Aplikasi</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.toko') }}">Akun Qris Toko</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.transaction.list.pending') }}">Pengaturan API Qris</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.transaction.list.pending.payment') }}">Dokumentasi</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    @endif
+                    @if (auth()->user()->id_inv_code != 0)
+                        <li>
+                            <a href="#karyawan" data-bs-toggle="collapse">
+                                <i class="mdi mdi-account-multiple-outline"></i>
+                                <span> Menu Karyawan </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="karyawan">
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('tenant.kasir') }}">Dashboard Kasir</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.kasir.list') }}">Manager Kasir</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="#harga" data-bs-toggle="collapse">
+                                <i class="mdi mdi-sale"></i>
+                                <span> Store Managament </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="harga">
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('tenant.store.management') }}">Store Menu</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.discount.modify') }}">Pengaturan Diskon</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.pajak.modify') }}">Pengaturan Pajak</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.customField.modify') }}">Custom Fields</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    @endif
                     <li class="menu-title mt-2">Finance Manager</li>
-                    <li>
-                        <a href="#finance" data-bs-toggle="collapse">
-                            <i class="mdi mdi-finance"></i>
-                            <span> Finance </span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="collapse" id="finance">
-                            <ul class="nav-second-level">
-                                <li>
-                                    <a href="{{ route('tenant.finance') }}">Dashboard Finansial</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.finance.pemasukan') }}">Pemasukan</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan Anda</a>
-                                </li>
-                            </ul>
-                        </div>
+                    @if (auth()->user()->id_inv_code != 0)
+                        <li>
+                            <a href="#finance" data-bs-toggle="collapse">
+                                <i class="mdi mdi-finance"></i>
+                                <span> Finance </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="finance">
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('tenant.finance') }}">Dashboard Finansial</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.finance.pemasukan') }}">Pemasukan</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan Anda</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    @else
+                        <li>
+                            <a href="#finance" data-bs-toggle="collapse">
+                                <i class="mdi mdi-finance"></i>
+                                <span> Finance </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="finance">
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('tenant.mitra.dashboard.finance') }}">Dashboard Finansial</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.mitra.dashboard.finance.saldo') }}">Total Saldo</a>
+                                    </li>
+                                    <li>
+                                        <a href="">History Penarikan Anda</a>
+                                    </li>
+                                </ul>
+                            </div>
                     </li>
+                    @endif
                     <li class="menu-title mt-2">Other Menu</li>
                     <li>
                         <a href="#role" data-bs-toggle="collapse">

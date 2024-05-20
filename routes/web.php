@@ -122,6 +122,10 @@ Route::middleware(['guest:tenant', 'throttle'])->prefix('tenant')->group( functi
     Route::get('register', [App\Http\Controllers\Auth\Tenant\RegisterController::class, 'create'])->name('tenant.register');
     Route::post('register', [App\Http\Controllers\Auth\Tenant\RegisterController::class, 'store']);
 
+    Route::prefix('mitra')->group(function() {
+        Route::get('register', [App\Http\Controllers\Auth\Tenant\RegisterController::class, 'createMitra'])->name('tenant.mitra.register');
+        Route::post('register', [App\Http\Controllers\Auth\Tenant\RegisterController::class, 'storeMitra'])->name('tenant.mitra.register.insert');
+    });
 });
 
 Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( function () {
@@ -139,19 +143,54 @@ Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( functio
     Route::post('logout', [App\Http\Controllers\Auth\Tenant\LoginController::class, 'destroy'])->name('tenant.logout');
 });
 
+Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive'])->prefix('tenant')->group( function () {
+    Route::get('settings', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tenantSettings'])->name('tenant.settings');
+    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:10,1'])->name('tenant.settings.whatsappotp');
+    Route::post('settings/validate/whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappOTPSubmit'])->name('tenant.settings.whatsappotp.validate');
+
+    Route::get('settings/profile', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profile'])->name('tenant.profile');
+    Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profileInfoUpdate'])->name('tenant.profile.info.update');
+    Route::get('settings/password', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'password'])->name('tenant.password');
+    Route::post('settings/password/update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'passwordUpdate'])->name('tenant.password.update');
+    Route::get('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeingSetting'])->name('tenant.rekening.setting');
+    Route::post('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeningSettingUpdate'])->name('tenant.rekening.setting.update');
+
+    Route::post('settings/profile/tarik-dana', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tarikDanaQris'])->name('tenant.profile.tarik');
+    Route::post('settings/profile/tarik-dana/proses', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'prosesTarikDana'])->name('tenant.profile.tarik.proses');
+
+    Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestForm'])->name('tenant.request.umi');
+    Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');
+});
+
 Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsNotMitra'])->prefix('/tenant/mitra')->group( function () {
-    //Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'index'])->name('tenant.mitra.dashboard');
-    Route::get('/dashboard', function () {
-        return "walla";
-    })->name('tenant.mitra.dashboard');
+    Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'index'])->name('tenant.mitra.dashboard');
+
+    Route::get('/dashboard/store', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeDashboard'])->name('tenant.mitra.dashboard.toko');
+    Route::get('/dashboard/store/list', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeList'])->name('tenant.mitra.dashboard.toko.list');
+    Route::get('/dashboard/store/create', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeCreate'])->name('tenant.mitra.dashboard.toko.create');
+    Route::post('/dashboard/store/create', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeRegister'])->name('tenant.mitra.dashboard.toko.register');
+    Route::get('/dashboard/store/edit/{id}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeEdit'])->name('tenant.mitra.dashboard.toko.edit');
+    Route::post('/dashboard/store/update', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeUpdate'])->name('tenant.mitra.dashboard.toko.update');
+    Route::get('/dashboard/store/detail/{id}/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeDetail'])->name('tenant.mitra.dashboard.toko.detail');
+    Route::post('/dashboard/store/request_umi', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'requestUmi'])->name('tenant.mitra.dashboard.toko.request.umi');
+    Route::get('/dashboard/store/request_umi', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'umiRequestList'])->name('tenant.mitra.dashboard.toko.request.umi.list');
+    Route::get('/dashboard/transaction/', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationDashboard'])->name('tenant.mitra.dashboard.transaction');
+    Route::get('/dashboard/transaction/list', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationAll'])->name('tenant.mitra.dashboard.transaction.all_transaction');
+    Route::get('/dashboard/transaction/today', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationAllToday'])->name('tenant.mitra.dashboard.transaction.all_today_transaction');
+    Route::get('/dashboard/transaction/list/pending_payment', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationPending'])->name('tenant.mitra.dashboard.transaction.pending_transaction');
+    Route::get('/dashboard/transaction/list/finish_payment', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationFinish'])->name('tenant.mitra.dashboard.transaction.finish_transaction');
+    Route::get('/dashboard/transaction/list/finish_payment_today', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationFinishToday'])->name('tenant.mitra.dashboard.transaction.finish_transaction_today');
+    Route::get('/dashboard/transaction/store/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationStore'])->name('tenant.mitra.dashboard.transaction.store');
+
+    Route::get('/dashboard/finance', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'financeDashboard'])->name('tenant.mitra.dashboard.finance');
+    Route::get('/dashboard/finance/saldo', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'saldoData'])->name('tenant.mitra.dashboard.finance.saldo');
+
+    Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-yesterday', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'pemasukanQrisPending'])->name('tenant.mitra.dashboard.finance.pemasukan.qris.pending');
+    Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-today', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'pemasukanQrisToday'])->name('tenant.mitra.dashboard.finance.pemasukan.qris.today');
+    Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-all', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'pemasukanQris'])->name('tenant.mitra.dashboard.finance.pemasukan.qris.all');
 });
 
 Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsMitra'])->prefix('tenant')->group( function () {
-    // Route::get('check-payment', function () { event(new App\Events\PaymentCheck('Someone')); return "Event has been sent!";});
-    // Route::get('test', function () {
-    //     event(new App\Events\PaymentCheck('Someone'));
-    //     return "Event has been sent!";
-    //     });
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'index'])->name('tenant.dashboard');
     Route::get('/dashboard/kasir', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantKasirDashboard'])->name('tenant.kasir');
     Route::get('/dashboard/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');
@@ -159,7 +198,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/kasir/list/non-aktif', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirListNonActive'])->name('tenant.kasir.list.non.active');
     Route::get('/dashboard/kasir/info/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirDetail'])->name('tenant.kasir.detail');
     Route::post('/kasir/register', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirRegister'])->name('tenant.register.kasir');
-    
+
     Route::get('/dashboard/pos', [App\Http\Controllers\Auth\Tenant\PosController::class, 'pos'])->name('tenant.pos');
     Route::post('/dashboard/pos/addcart', [App\Http\Controllers\Auth\Tenant\PosController::class, 'addCart'])->name('tenant.pos.addcart');
     Route::post('/dashboard/pos/update', [App\Http\Controllers\Auth\Tenant\PosController::class, 'updateCart'])->name('tenant.pos.updateCart');
@@ -221,9 +260,9 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/finance/pemasukan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'financePemasukan'])->name('tenant.finance.pemasukan');
     Route::get('/dashboard/finance/saldo', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'saldoData'])->name('tenant.saldo');
     Route::get('/dashboard/finance/saldo/tunai', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanTunai'])->name('tenant.finance.pemasukan.tunai');
-    Route::get('/dashboard/finance/saldo/invoice-pending-qris', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisPending'])->name('tenant.finance.pemasukan.qris.pending');
-    Route::get('/dashboard/finance/saldo/invoice-today-qris', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisToday'])->name('tenant.finance.pemasukan.qris.today');
-    Route::get('/dashboard/finance/saldo/invoice-finish-qris-all', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQris'])->name('tenant.finance.pemasukan.qris.all');
+    Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-yesterday', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisPending'])->name('tenant.finance.pemasukan.qris.pending');
+    Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-today', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisToday'])->name('tenant.finance.pemasukan.qris.today');
+    Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-all', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQris'])->name('tenant.finance.pemasukan.qris.all');
     Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'historyPenarikan'])->name('tenant.finance.history_penarikan');
     Route::get('/dashboard/finance/history-penarikan/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'invoiceTarikDana'])->name('tenant.finance.history_penarikan.invoice');
 
@@ -234,24 +273,9 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::post('/dashboard/management/pajak/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pajakModifyInsert'])->name('tenant.pajak.modify.insert');
     Route::get('/dashboard/management/custom_fields', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'customField'])->name('tenant.customField.modify');
     Route::post('/dashboard/management/custom_fields/insert', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'customFieldInsert'])->name('tenant.customField.modify.insert');
-    
-    Route::get('settings', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tenantSettings'])->name('tenant.settings');
-    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:10,1'])->name('tenant.settings.whatsappotp');
-    Route::post('settings/validate/whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappOTPSubmit'])->name('tenant.settings.whatsappotp.validate');
+
     Route::get('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettings'])->name('tenant.store.profile');
     Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');
-    Route::get('settings/profile', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profile'])->name('tenant.profile');
-    Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profileInfoUpdate'])->name('tenant.profile.info.update');
-    Route::get('settings/password', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'password'])->name('tenant.password');
-    Route::post('settings/password/update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'passwordUpdate'])->name('tenant.password.update');
-    Route::get('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeingSetting'])->name('tenant.rekening.setting');
-    Route::post('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeningSettingUpdate'])->name('tenant.rekening.setting.update');
-
-    Route::post('settings/profile/tarik-dana', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tarikDanaQris'])->name('tenant.profile.tarik');
-    Route::post('settings/profile/tarik-dana/proses', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'prosesTarikDana'])->name('tenant.profile.tarik.proses');
-
-    Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestForm'])->name('tenant.request.umi');
-    Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');
 });
 
 Route::middleware(['guest:kasir', 'throttle'])->prefix('kasir')->group( function () {
