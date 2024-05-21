@@ -642,8 +642,9 @@ class TenantMitraController extends Controller {
                                                 ->whereDate('tanggal_transaksi', Carbon::today())
                                                 ->sum('nominal_terima_bersih');
 
-        $totalPemasukanQrisBulanIni = Invoice::where('store_identifier', $identifier)
-                                                ->where('invoices.jenis_pembayaran', 'Qris')
+        $totalPemasukanQrisBulanIni = Invoice::where('invoices.jenis_pembayaran', 'Qris')
+                                                ->where('id_tenant', auth()->user()->id)
+                                                ->where('email', auth()->user()->email)
                                                 ->where('status_pembayaran', 1)
                                                 ->whereMonth('tanggal_transaksi', Carbon::now()->month)
                                                 ->sum('nominal_terima_bersih');
