@@ -584,7 +584,7 @@ class ProfileController extends Controller{
                     'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                     'deteksi_ip' => $ip,
                     'log' => $e,
-                    'status' => 1
+                    'status' => 0
                 ]);
 
                 $notification = array(
@@ -631,7 +631,21 @@ class ProfileController extends Controller{
                 'json' => $data,
             ]);
         } catch(Exception $ex){
-            return $ex;
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Send OTP : Error!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $ex,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'OTP Gagal dikirim!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
         $responseCode = $postResponse->getStatusCode();
         

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Marketing;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Stevebauman\Location\Facades\Location;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use App\Models\Marketing;
 use App\Models\DetailMarketing;
 use App\Models\Rekening;
+use App\Models\History;
 use Exception;
 
 class ProfileController extends Controller {
@@ -193,6 +195,13 @@ class ProfileController extends Controller {
     }
 
     public function whatsappNotification(Request $request){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
         $client = new GuzzleHttpClient();
@@ -225,7 +234,21 @@ class ProfileController extends Controller {
                 'json' => $data,
             ]);
         } catch(Exception $ex){
-            return $ex;
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Send OTP : Error!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $ex,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'OTP Gagal dikirim!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
         $responseCode = $postResponse->getStatusCode();
         
