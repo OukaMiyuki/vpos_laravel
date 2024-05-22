@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::middleware(['guest'])->prefix('/')->group( function () {
+    Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('welcome');
+});
 
 // Temporarry commit because of error
 
