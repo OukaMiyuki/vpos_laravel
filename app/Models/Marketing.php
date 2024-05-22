@@ -108,7 +108,7 @@ class Marketing extends Authenticatable implements MustVerifyEmail {
         // $qrisPendingWallet->save();
         $qrisWallet->id_user = $model->id;
         $qrisWallet->email = $model->email;
-        $qrisWallet->nominal = 0;
+        $qrisWallet->saldo = 0;
         $qrisWallet->save();
     }
 }
