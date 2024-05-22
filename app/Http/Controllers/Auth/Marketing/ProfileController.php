@@ -209,7 +209,7 @@ class ProfileController extends Controller {
                 $hp    ="62".substr(trim($nohp), 1);
             }
         }
-        $url = 'https://whatzapp.my.id/send-message';
+        $url = 'https://waq.my.id/send-message';
         $headers = [
             'Content-Type' => 'application/json',
         ];
