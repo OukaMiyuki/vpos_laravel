@@ -139,6 +139,17 @@ class MarketingController extends Controller {
         }
  
         $inv_code = Str::upper($request->code);
+        $code_check = InvitationCode::where('inv_code', $inv_code)->first();
+
+        if(!is_null($code_check) || !empty($code_check)){
+            $notification = array(
+                'message' => 'Kode telah didaftarkan, silahkan buat kode lain!',
+                'alert-type' => 'warning',
+            );
+            
+            return redirect()->back()->with($notification);
+        }
+
         InvitationCode::create([
             'id_marketing' => auth()->user()->id,
             'holder' => $request->holder,
