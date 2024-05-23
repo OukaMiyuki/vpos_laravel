@@ -20,7 +20,7 @@ class RouteServiceProvider extends ServiceProvider
     public const HOME = '/dashboard';
     public const WELCOME = '/';
     public const ADMIN_DASHBOARD = '/admin/dashboard';
-    public const MARKETING_DASHBOARD = '/marketing/dashboard';
+    public const MARKETING_DASHBOARD = '/mitra/dashboard';
     public const TENANT_DASHBOARD = '/tenant/dashboard';
     public const TENANT_MITRA_DASHBOARD = '/tenant/mitra/dashboard';
     public const KASIR_DASHBOARD = '/kasir/dashboard';

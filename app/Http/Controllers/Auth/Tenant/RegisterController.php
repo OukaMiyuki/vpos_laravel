@@ -113,13 +113,6 @@ class RegisterController extends Controller {
         ]);
 
         return redirect(RouteServiceProvider::TENANT_DASHBOARD);
-
-        // $notification = array(
-        //     'message' => 'Akun anda sukses dibuat!',
-        //     'alert-type' => 'info',
-        // );
-
-        // return redirect(route('tenant.login'))->with($notification);
     }
 
     public function createMitra(): View {
@@ -165,7 +158,7 @@ class RegisterController extends Controller {
         History::create([
             'id_user' => NULL,
             'email' => $request->email,
-            'action' => "Register Tenant : Success!",
+            'action' => "Register Tenant Mitra Bisnis : Success!",
             'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
             'deteksi_ip' => $ip,
             'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),

@@ -314,6 +314,10 @@ class TenantMitraController extends Controller {
         }
     }
 
+    public function requestUmiResend(Request $request){
+        return "Walla";
+    }
+
     public function umiRequestList(){
         $umiRequest = UmiRequest::with(['storeList'])
                                     ->where('id_tenant', auth()->user()->id)

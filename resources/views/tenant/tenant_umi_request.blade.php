@@ -10,7 +10,7 @@
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="#">Settings</a></li>
-                                <li class="breadcrumb-item active">Profile</li>
+                                <li class="breadcrumb-item active">Pengajuan UMI</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Request Umi</h4>
@@ -106,6 +106,12 @@
                                         </div>
                                     </form>
                                 @else
+                                    @php
+                                        $tenantQris = App\Models\TenantQrisAccount::where('store_identifier', auth()->user()->storeDetail->store_identifier)
+                                                                                    ->where('id_tenant', auth()->user()->id)
+                                                                                    ->where('email', auth()->user()->email)
+                                                                                    ->first();
+                                    @endphp
                                     <div class="table-responsive">
                                         <table class="table table-bordered mb-0">
                                             <thead>
@@ -133,21 +139,75 @@
                                                         @endif
                                                     </td>
                                                     <td>{{ $umiRequest->note }}</td>
-                                                    <td><button title="Lihat data kasir" type="button" class="btn btn-info rounded-pill waves-effect waves-light">Ajukan Ulang</button></td>
+                                                    <td>
+                                                        @if ($umiRequest->is_active == 2)
+                                                            <form method="post" action="{{ route('tenant.request.umi.resend') }}" enctype="multipart/form-data">
+                                                                @csrf
+                                                                <input type="hidden" readonly class="d-none" name="id" id="id" value="{{ auth()->user()->storeDetail->id }}">
+                                                                <input type="hidden" readonly class="d-none" name="store_identifier" id="store_identifier" value="{{ auth()->user()->storeDetail->store_identifier }}">
+                                                                <div class="row">
+                                                                    <div class="text-center">
+                                                                        <button title="Ajukan Umi Ulang" type="submit" class="btn btn-info rounded-pill waves-effect waves-light">Ajukan Ulang</button>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
-                                    </div> <!-- end .table-responsive-->
+                                    </div>
+                                    @if($umiRequest->is_active == 1)
+                                        @if (!empty($tenantQris) || !is_null($tenantQris))
+                                            <h5 class="mb-4 text-uppercase mt-3"><i class="mdi mdi-account-circle me-1"></i> Detail Informasi Akun Qris</h5>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="name" class="form-label">Qris Login User</label>
+                                                        <input type="text" class="form-control" readonly name="login-user" id="login-user" required value="{{ $tenantQris->qris_login_user }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="no_telp" class="form-label">Qris Password</label>
+                                                        <input type="text" class="form-control" readonly name="qpassword" id="qpassword" required value="{{ $tenantQris->qris_password }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="jenis" class="form-label">Qris Merchant ID</label>
+                                                        <input type="text" class="form-control" readonly name="mcrid" id="mcrid" required value="{{ $tenantQris->qris_merchant_id }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="jenis" class="form-label">Qris Store ID</label>
+                                                        <input type="text" class="form-control" readonly name="storeid" id="storeid" required value="{{ $tenantQris->qris_store_id }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="kabupaten" class="form-label">MDR (%)</label>
+                                                        <input readonly type="text" class="form-control" name="mdr" id="mdr" readonlyrequired value="{{ $tenantQris->mdr }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endif
                                 @endif
                             </div>
                         </div>
                     </div>
-                    <!-- end card-->
                 </div>
-                <!-- end col -->
             </div>
-            <!-- end row-->
         </div>
-        <!-- container -->
     </div>
 </x-tenant-layout>

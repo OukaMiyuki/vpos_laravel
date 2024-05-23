@@ -53,7 +53,7 @@ class QrisWalletPendingUpdate extends Command {
             $qris->update([
                 'saldo' => $qrisSaldo+$saldoTransfer
             ]);
-            $qrisAdminWallet = QrisWallet::where('id_user', 8)->find(6);
+            $qrisAdminWallet = QrisWallet::where('id_user', 1)->where('email', 'adminsu@vipos.id')->find(1);
             $saldoAdmin = $qrisAdminWallet->saldo;
             $nominal_mdr = $invoice->nominal_mdr;
             $insentif_cashback = $nominal_mdr*0.25;

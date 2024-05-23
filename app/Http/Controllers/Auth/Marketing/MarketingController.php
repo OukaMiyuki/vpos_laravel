@@ -6,14 +6,41 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Stevebauman\Location\Facades\Location;
 use Twilio\Rest\Client;
 use Illuminate\Support\Str;
 use App\Models\InvitationCode;
 use App\Models\Marketing;
 use App\Models\Tenant;
 use App\Models\QrisWallet;
+use App\Models\Withdrawal;
+use App\Models\Rekening;
+use App\Models\History;
+use Exception;
 
 class MarketingController extends Controller {
+
+    function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
     public function index(){
         $code = InvitationCode::where('id_marketing', auth()->user()->id)->count();
         $tenant = Marketing::select(['id'])
@@ -55,17 +82,6 @@ class MarketingController extends Controller {
                                     ->latest()
                                     ->limit(5)
                                     ->get();
-        foreach ($pemasukanTerbaru as $tenantList){
-            foreach ($tenantList->invitationCodeTenant as $tenantInfo){
-                foreach($tenantInfo->withdrawal as $detail){
-                    //dd($detail);
-                }
-            }
-        }
-        // dd($pemasukanTerbaru);
-        // $daftarTenantBaru = $tenantTerbaru->toArray();
-        // dd($daftarTenantBaru);
-        //dd($tenantTerbaru);
         $tenantNumber = "";
         foreach($tenant as $t){
             $tenantNumber = $t->invitation_code_tenant_count;
@@ -97,15 +113,6 @@ class MarketingController extends Controller {
                                             ->where('invitation_codes.id_marketing', auth()->user()->id)
                                             ->orderBy('id', 'DESC')
                                             ->get();
-                // $tenantTerbaru = Marketing::select(['marketings.id'])
-                //                             ->with(['invitationCodeTenant' => function($query){
-                //                                 $query->select('tenants.id', 'tenants.phone', 'tenants.is_active', 'tenants.id_inv_code', 'tenants.created_at')
-                //                                         ->with(['invitationCode' => function($query) {
-                //                                             $query->select('invitation_codes.id', 'invitation_codes.inv_code', 'invitation_codes.holder')->get();
-                //                                         }])->get();
-                //                             }])
-                //                             ->where('id', auth()->user()->id)
-                //                             ->get();
             $tenantCount = Marketing::select(['id'])
                                 ->withCount('invitationCodeTenant')
                                 ->where('id', auth()->user()->id)
@@ -130,6 +137,12 @@ class MarketingController extends Controller {
     }
 
     public function invitationCodeInsert(Request $request){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
         if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
             $notification = array(
                 'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
@@ -154,6 +167,16 @@ class MarketingController extends Controller {
             'id_marketing' => auth()->user()->id,
             'holder' => $request->holder,
             'inv_code' => $inv_code
+        ]);
+
+        History::create([
+            'id_user' => auth()->user()->id,
+            'email' => auth()->user()->email,
+            'action' => "Create Invitation Code : Success!",
+            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+            'deteksi_ip' => $ip,
+            'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+            'status' => 1
         ]);
 
         $notification = array(
@@ -222,8 +245,6 @@ class MarketingController extends Controller {
                                     $query->with(['invitationCode'])->select(['tenants.id as id_tenant', 'name', 'phone', 'id_inv_code', 'tenants.created_at as tanggal_bergabung']);
                                 }
                             ])->get();
-            // $tenant = Marketing::select(['id'])->with(['tenantList'])->where('id', auth()->user()->id)->get();
-            // dd($tenant);
             return view('marketing.marketing_tenant_list', compact('tenant'));
         } else {
             if(auth()->check()){
@@ -269,6 +290,47 @@ class MarketingController extends Controller {
                 return redirect('/marketing/login')->with($notification);
             }
         }
+    }
+
+    public function financeDashboard(){
+        return view('marketing.marketing_finance');
+    }
+
+    public function historyPenarikan(){
+        $withdrawData = Withdrawal::where('id_user', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->latest();
+        $allData = $withdrawData->get();
+        $penarikanTerbaru = $withdrawData->latest()->first();
+        $allDataSum = $withdrawData->sum('nominal');
+
+        return view('marketing.marketing_finance_penarikan', compact(['allData', 'penarikanTerbaru', 'allDataSum']));
+    }
+
+    public function invoiceTarikDana($id){
+        $withdrawData = Withdrawal::select([ 'withdrawals.id',
+                                             'withdrawals.email',
+                                             'withdrawals.tanggal_penarikan',
+                                             'withdrawals.nominal',
+                                             'withdrawals.biaya_admin',
+                                             'withdrawals.tanggal_masuk',
+                                             'withdrawals.status' 
+                                            ])
+                                ->where('email', auth()->user()->email)
+                                ->find($id);
+        if(is_null($withdrawData) || empty($withdrawData)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'info',
+            );
+    
+            return redirect()->route('marketing.finance.history_penarikan')->with($notification);
+        }
+        $rekening = Rekening::select(['swift_code', 'no_rekening'])
+                            ->where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        return view('marketing.marketing_penarikan_invoice', compact(['withdrawData', 'withdrawData', 'rekening']));
     }
 
     public function whatsappNotification(){

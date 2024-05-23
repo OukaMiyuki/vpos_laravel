@@ -28,10 +28,10 @@
                                     @csrf
                                     <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Add Stock</h5>
                                     @php
-                                    $store = App\Models\StoreDetail::select(['store_identifier'])
-                                                        ->where('id_tenant', auth()->user()->id)
-                                                        ->where('email', auth()->user()->email)
-                                                        ->first();
+                                        $store = App\Models\StoreDetail::select(['store_identifier'])
+                                                            ->where('id_tenant', auth()->user()->id)
+                                                            ->where('email', auth()->user()->email)
+                                                            ->first();
                                     @endphp
                                     <div class="row">
                                         <div class="col-md-12">

@@ -162,7 +162,7 @@
                         <!-- end card -->
                         <div class="row mt-3">
                             <div class="col-12 text-center">
-                                <p class="text-white-50">Sudah punya akun?  <a href="{{ route('tenant.login') }}" class="text-white ms-1"><b>Sign In</b></a></p>
+                                <p class="text-white-50">Sudah punya akun?  <a href="{{ route('access.login') }}" class="text-white ms-1"><b>Sign In</b></a></p>
                             </div>
                             <!-- end col -->
                         </div>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth\Kasir;
+namespace App\Http\Controllers\Auth;
 
 use Illuminate\View\View;
 use Illuminate\Http\Request;
@@ -18,9 +18,6 @@ use App\Models\History;
 use Exception;
 
 class LoginController extends Controller {
-    public function create(): View {
-        return view('kasir.auth.login');
-    }
 
     function get_client_ip() {
         $ipaddress = '';
@@ -43,34 +40,43 @@ class LoginController extends Controller {
         return $ipaddress;
     }
 
-    public function store(Request $request): RedirectResponse {
+    public function index(): View {
+        return view('auth.login');
+    }
+
+    public function store(Request $request) : RedirectResponse {
         $ip = "125.164.244.223";
         $PublicIP = $this->get_client_ip();
         $getLoc = Location::get($ip);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         DB::connection()->enableQueryLog();
-
-        $this->ensureIsNotRateLimited();
+        $this->ensureIsNotRateLimited($request);
         $request->validate([
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
             'password' => ['required', 'string'],
         ]);
 
-        if(! Auth::guard('kasir')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
-            History::create([
-                'id_user' => NULL,
-                'email' => $request->email,
-                'action' => "Login : Login Gagal (Username atau Password salah!)",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 0
-            ]);
-            RateLimiter::hit($this->throttleKey());
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
+        if(! Auth::guard('admin')->attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            if(! Auth::guard('marketing')->attempt($request->only('email', 'password'), $request->boolean('remember'))){
+                if(! Auth::guard('tenant')->attempt($request->only('email', 'password'), $request->boolean('remember'))){
+                    if(! Auth::guard('kasir')->attempt($request->only('email', 'password'), $request->boolean('remember'))){
+                        History::create([
+                            'id_user' => NULL,
+                            'email' => $request->email,
+                            'action' => "Login : Login Gagal (Username atau Password salah!)",
+                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                            'deteksi_ip' => $ip,
+                            'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                            'status' => 0
+                        ]);
+                        RateLimiter::hit($this->throttleKey());
+                        throw ValidationException::withMessages([
+                            'email' => trans('auth.failed'),
+                        ]);
+                    }
+                }
+            }
         }
         $notification = array(
             'message' => 'Anda berhasil login!',
@@ -87,15 +93,26 @@ class LoginController extends Controller {
             'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
             'status' => 1
         ]);
-        return redirect()->intended(RouteServiceProvider::KASIR_DASHBOARD)->with($notification);
+        if(Auth::guard('admin')->check()){
+            return redirect()->intended(RouteServiceProvider::ADMIN_DASHBOARD)->with($notification);
+        } else if(Auth::guard('marketing')->check()){
+            return redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD)->with($notification);
+        } else if(Auth::guard('tenant')->check()){
+            if(Auth::guard('tenant')->user()->id_inv_code == 0){
+                return redirect()->intended(RouteServiceProvider::TENANT_MITRA_DASHBOARD)->with($notification);
+            }
+            return redirect()->intended(RouteServiceProvider::TENANT_DASHBOARD)->with($notification);
+        } else if(Auth::guard('kasir')->check()){
+            return redirect()->intended(RouteServiceProvider::KASIR_DASHBOARD)->with($notification);
+        }
     }
 
-    public function ensureIsNotRateLimited(): void {
+    public function ensureIsNotRateLimited($request): void {
         if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
-        event(new Lockout($this));
+        event(new Lockout($request));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
@@ -112,14 +129,13 @@ class LoginController extends Controller {
     }
 
     public function destroy(Request $request): RedirectResponse {
-        Auth::guard('kasir')->logout();
-
-        $request->session()->flush();
-
+        if(Auth::guard('admin')->check() || Auth::guard('marketing')->check() || Auth::guard('tenant')->check() || Auth::guard('kasir')->check()){
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect('/login');
+        }
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
-
-        return redirect('/kasir/login');
+        return redirect('/login');
     }
 }

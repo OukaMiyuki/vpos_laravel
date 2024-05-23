@@ -59,6 +59,25 @@
                 <div class="col-xl-3 col-md-3">
                     <div class="card">
                         <div class="card-body">
+                            <h4 class="header-title mb-0">Pengajuan UMI</h4>
+                            <div id="cardCollpase1" class="collapse show">
+                                <div class="text-center pt-3">
+                                    <div class="row text-center">
+                                        <div class="col-12">
+                                            <img src="{{ asset('assets/images/icons/job-application.png') }}" class="img-fluid" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <a href="{{ route('tenant.request.umi') }}"><button title="Pengaturan rekening bank" type="button" class="btn btn-info waves-effect waves-light">Setting</button></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-3">
+                    <div class="card">
+                        <div class="card-body">
                             <h4 class="header-title mb-0">Rekening Bank</h4>
                             <div id="cardCollpase1" class="collapse show">
                                 <div class="text-center pt-3">

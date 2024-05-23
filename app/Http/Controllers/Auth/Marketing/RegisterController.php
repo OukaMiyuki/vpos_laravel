@@ -10,9 +10,12 @@ use App\Models\DetailAdmin;
 use App\Models\DetailMarketing;
 use App\Models\DetailTenant;
 use App\Models\DetailKasir;
+use App\Models\History;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Support\Facades\DB;
+use Stevebauman\Location\Facades\Location;
 use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -20,11 +23,38 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 
 class RegisterController extends Controller {
+    function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
     public function create(): View {
         return view('marketing.auth.register');
     }
 
     public function store(Request $request): RedirectResponse {
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
@@ -44,9 +74,6 @@ class RegisterController extends Controller {
             'password' => Hash::make($request->password),
         ]);
 
-        // Auth::guard('marketing')->login($marketing);
-
-        // return redirect(RouteServiceProvider::MARKETING_DASHBOARD);
         if(!is_null($marketing)) {
             $marketing->detailMarketingStore($marketing);
             $marketing->createWallet($marketing);
@@ -56,13 +83,16 @@ class RegisterController extends Controller {
 
         Auth::guard('marketing')->login($marketing);
 
+        History::create([
+            'id_user' => NULL,
+            'email' => $request->email,
+            'action' => "Register Mitra Aplikasi : Success!",
+            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+            'deteksi_ip' => $ip,
+            'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+            'status' => 1
+        ]);
+
         return redirect(RouteServiceProvider::MARKETING_DASHBOARD);
-
-        // $notification = array(
-        //     'message' => 'Akun anda sukses dibuat!',
-        //     'alert-type' => 'info',
-        // );
-
-        // return redirect(route('marketing.login'))->with($notification);
     }
 }

@@ -297,10 +297,16 @@
                         <div class="collapse" id="finance">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="crm-dashboard.html">Penarikan Anda</a>
+                                    <a href="{{ route('marketing.finance') }}">Dashboard Finansial</a>
+                                </li>
+                                <li>
+                                    <a href="crm-customers.html">Pemasukan</a>
                                 </li>
                                 <li>
                                     <a href="crm-customers.html">Total Saldo</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('marketing.finance.history_penarikan') }}">History Penarikan Anda</a>
                                 </li>
                             </ul>
                         </div>

@@ -12,14 +12,7 @@
                 <li><a href="blog.html">Blog</a></li>
                 <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
                 @guest
-                    <li class="dropdown">
-                        <a class="getstarted scrollto" href="#about">Login <i class="bi bi-chevron-down"></i></a>
-                        <ul>
-                            <li><a href="{{ route('marketing.login') }}">Mitra Aplikasi</a></li>
-                            <li><a href="{{ route('tenant.login') }}">Mitra Bisnis</a></li>
-                            <li><a href="{{ route('tenant.login') }}">Mitra Tenant</a></li>
-                        </ul>
-                    </li>
+                    <li><a class="getstarted scrollto" href="{{ route('access.login') }}">Login</a></li>
                 @endguest
             </ul>
             <i class="bi bi-list mobile-nav-toggle"></i>

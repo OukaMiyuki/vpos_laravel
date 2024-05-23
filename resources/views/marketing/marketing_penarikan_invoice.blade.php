@@ -1,4 +1,4 @@
-<x-tenant-layout>
+<x-marketing-layout>
     <div class="content">
         <div class="container-fluid">
             <div class="row">
@@ -166,4 +166,4 @@
 
         </div>
     </div>
-</x-tenant-layout>
+</x-marketing-layout>

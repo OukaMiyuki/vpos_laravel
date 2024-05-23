@@ -169,7 +169,20 @@
                                                             @endif
                                                         </td>
                                                         <td>{{ $umiRequest->note }}</td>
-                                                        <td><button title="Lihat data kasir" type="button" class="btn btn-info rounded-pill waves-effect waves-light">Ajukan Ulang</button></td>
+                                                        <td>
+                                                            @if ($umiRequest->is_active == 2)
+                                                                <form method="post" action="{{ route('tenant.mitra.dashboard.toko.request.umi.resend') }}" enctype="multipart/form-data">
+                                                                    @csrf
+                                                                    <input type="hidden" readonly class="d-none" name="id" id="id" value="{{ auth()->user()->storeDetail->id }}">
+                                                                    <input type="hidden" readonly class="d-none" name="store_identifier" id="store_identifier" value="{{ auth()->user()->storeDetail->store_identifier }}">
+                                                                    <div class="row">
+                                                                        <div class="text-center">
+                                                                            <button title="Ajukan Umi Ulang" type="submit" class="btn btn-info rounded-pill waves-effect waves-light">Ajukan Ulang</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </form>
+                                                            @endif
+                                                        </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -213,7 +226,7 @@
                                                     <div class="col-md-12">
                                                         <div class="mb-3">
                                                             <label for="kabupaten" class="form-label">MDR (%)</label>
-                                                            <input type="text" class="form-control" name="mdr" id="mdr" readonlyrequired value="{{ $tenantQris->mdr }}">
+                                                            <input readonly type="text" class="form-control" name="mdr" id="mdr" readonlyrequired value="{{ $tenantQris->mdr }}">
                                                         </div>
                                                     </div>
                                                 </div>

@@ -8,8 +8,8 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="#">Settings</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('marketing.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('marketing.settings') }}">Settings</a></li>
                                 <li class="breadcrumb-item active">Profile</li>
                             </ol>
                         </div>
@@ -22,21 +22,21 @@
                 <div class="col-lg-4 col-xl-4">
                     <div class="card text-center">
                         <div class="card-body">
-                            <img src="{{ !empty(auth()->user()->detail->photo) ? Storage::url('images/profile/'.auth()->user()->detail->photo) : asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                            <img src="{{ !empty($profilMarketing->detail->photo) ? Storage::url('images/profile/'.$profilMarketing->detail->photo) : asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
                             <h4 class="mb-0">
-                                {{ auth()->user()->name }}
+                                {{ $profilMarketing->name }}
                             </h4>
                             <p class="text-muted">
                                 Mitra Aplikasi
                             </p>
-                            @if(auth()->user()->is_active == 1)
+                            @if($profilMarketing->is_active == 1)
                                 <button type="button" class="btn btn-success btn-xs waves-effect mb-2 waves-light">Aktif</button>
                             @else
                                 <button type="button" class="btn btn-warning btn-xs waves-effect mb-2 waves-light">Belum Diaktifkan</button>
                             @endif
                             <div class="text-start mt-3">
-                                <p class="text-muted mb-2 font-13"><strong>Mobile :</strong><span class="ms-2">{{ auth()->user()->phone }}</span></p>
-                                <p class="text-muted mb-2 font-13"><strong>Email :</strong> <span class="ms-2">{{ auth()->user()->email }}</span></p>
+                                <p class="text-muted mb-2 font-13"><strong>Mobile :</strong><span class="ms-2">{{ $profilMarketing->phone }}</span></p>
+                                <p class="text-muted mb-2 font-13"><strong>Email :</strong> <span class="ms-2">{{ $profilMarketing->email }}</span></p>
                             </div>
                         </div>
                     </div>
@@ -71,14 +71,14 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="name" class="form-label">Nama Lengkap</label>
-                                                    <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ auth()->user()->id }}">
-                                                    <input readonly type="text" class="form-control" name="name" id="name" required value="{{ auth()->user()->name }}" placeholder="Masukkan nama lengkap">
+                                                    <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ $profilMarketing->id }}">
+                                                    <input readonly type="text" class="form-control" name="name" id="name" required value="{{ $profilMarketing->name }}" placeholder="Masukkan nama lengkap">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="email" class="form-label">Email</label>
-                                                    <input readonly type="email" class="form-control" name="email" id="email" required value="{{ auth()->user()->email }}" placeholder="Masukkan email akun">
+                                                    <input readonly type="email" class="form-control" name="email" id="email" required value="{{ $profilMarketing->email }}" placeholder="Masukkan email akun">
                                                 </div>
                                             </div>
                                             <!-- end col -->
@@ -87,14 +87,14 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="phone" class="form-label">Phone Number</label>
-                                                    <input readonly type="text" class="form-control" name="phone" id="phone" required value="{{ auth()->user()->phone }}" placeholder="Enter email">
+                                                    <input readonly type="text" class="form-control" name="phone" id="phone" required value="{{ $profilMarketing->phone }}" placeholder="Enter email">
                                                 </div>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                                 <div class="tab-pane" id="aboutme">
-                                    @if (is_null(auth()->user()->phone_number_verified_at) || empty(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == "")
+                                    @if (is_null($profilMarketing->phone_number_verified_at) || empty($profilMarketing->phone_number_verified_at) || $profilMarketing->phone_number_verified_at == "")
                                         <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Verifikasi Nomor Whatsapp</h5>
                                         <p class="sub-header text-danger"><strong>*Note : Anda tidak bisa melakukan proses apapun sebelum melakukan verifikasi nomor Whatsapp, silahkan Verifikasikan nomor WA sebelum melakukan proses selanjutnya!</strong></p>
                                         <div class="row">
@@ -103,7 +103,7 @@
                                                     <label for="no_wa" class="form-label">Nomor Whatsapp</label>
                                                     <div class="row">
                                                         <div class="col-8">
-                                                            <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ auth()->user()->phone }}" placeholder="Masukkan nomor Whatsapp"> 
+                                                            <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ $profilMarketing->phone }}" placeholder="Masukkan nomor Whatsapp"> 
                                                         </div>
                                                         <div class="col-4">
                                                             <form method="post" action="{{ route('marketing.settings.whatsappotp') }}">
@@ -137,7 +137,7 @@
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
                                                         <label for="name" class="form-label">Nama Lengkap</label>
-                                                        <input type="text" class="form-control" name="name" id="name" required value="{{ auth()->user()->name }}" placeholder="Masukkan nama lengkap">
+                                                        <input type="text" class="form-control" name="name" id="name" required value="{{ $profilMarketing->name }}" placeholder="Masukkan nama lengkap">
                                                     </div>
                                                 </div>
                                             </div>
@@ -145,8 +145,8 @@
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
                                                         <label for="no_ktp" class="form-label">Nomor KTP</label>
-                                                        <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ auth()->user()->detail->id }}">
-                                                        <input type="text" class="form-control" name="no_ktp" id="no_ktp" required value="{{auth()->user()->detail->no_ktp}}" placeholder="Masukkan nomor KTP">
+                                                        <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ $profilMarketing->detail->id }}">
+                                                        <input type="text" class="form-control" name="no_ktp" id="no_ktp" required value="{{$profilMarketing->detail->no_ktp}}" placeholder="Masukkan nomor KTP">
                                                     </div>
                                                 </div>
                                             </div>
@@ -154,13 +154,13 @@
                                                 <div class="col-md-6">
                                                     <div class="mb-3">
                                                         <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
-                                                        <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="{{ auth()->user()->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
+                                                        <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="{{ $profilMarketing->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="mb-3">
                                                         <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                                                        <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ auth()->user()->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" required>
+                                                        <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ $profilMarketing->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -170,8 +170,8 @@
                                                         <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
                                                         <select class="form-select @error('jenis_kelamin') is-invalid @enderror" id="jenis_kelamin" name="jenis_kelamin" required>
                                                             <option value="">- Pilih jenis kelamin -</option>
-                                                            <option @if(auth()->user()->detail->jenis_kelamin == "Laki-laki") selected @endif value="Laki-laki">Laki-laki</option>
-                                                            <option @if(auth()->user()->detail->jenis_kelamin == "Perempuan") selected @endif value="Perempuan">Perempuan</option>
+                                                            <option @if($profilMarketing->detail->jenis_kelamin == "Laki-laki") selected @endif value="Laki-laki">Laki-laki</option>
+                                                            <option @if($profilMarketing->detail->jenis_kelamin == "Perempuan") selected @endif value="Perempuan">Perempuan</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -180,7 +180,7 @@
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
                                                         <label for="alamat" class="form-label">Alamat</label>
-                                                        <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! auth()->user()->detail->alamat !!}</textarea>
+                                                        <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $profilMarketing->detail->alamat !!}</textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -207,42 +207,75 @@
                                 </div>
                                 <div class="tab-pane" id="saldo">
                                     <h5 class="mb-4 text-uppercase"><i class="mdi mdi-cash-multiple me-1"></i> Proses Penarikan Saldo</h5>
-                                    @if (auth()->user()->is_active == 0)
+                                    @if ($profilMarketing->is_active == 0)
                                         <div class="message">
                                             <h1 class="acces-denied">Access to this page is restricted</h1>
                                             <p class="sub-header">Saat ini akun anda belum diaktifkan dan diverifikasi oleh Admin.<br> silahkan hubungi admin kami untuk melanjutkan ke proses selanjutnya, Terima Kasih!.</p>
                                         </div>
                                     @else
-                                        @if (empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == "")
+                                        @if (empty($profilMarketing->phone_number_verified_at) || is_null($profilMarketing->phone_number_verified_at) || $profilMarketing->phone_number_verified_at == NULL || $profilMarketing->phone_number_verified_at == "")
                                             <div class="message">
                                                 <h1 class="acces-denied">Access to this page is restricted</h1>
                                                 <p class="sub-header text-danger"><strong>Lakukan verifikasi nomor Whatsapp sebelum melakukan penarikan saldo.</strong></p>
                                             </div>
                                         @else
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label for="saldo" class="form-label">Saldo Anda (Rp.)</label>
-                                                    <input readonly type="text" class="form-control" name="saldo" id="saldo" required value="1000000" placeholder="Masukkan jumlah saldo">
+                                            @if (empty($rekening->swift_code) && empty($rekening->no_rekening) || is_null($rekening->swift_code) && is_null($rekening->no_rekening) )
+                                                <div class="message">
+                                                    <h1 class="acces-denied">Access to this page is restricted</h1>
+                                                    <p class="sub-header">Anda belum memasukkan informasi rekening! Silahkan terlebih dahulu memperbarui rekening anda.</p>
                                                 </div>
-                                            </div>
-                                            <form method="post" action="">
-                                                @csrf
-                                                <div class="row">
-                                                    <input type="hidden" class="form-control" name="id" id="id" required value="{{auth()->user()->detail->id}}">
+                                            @else
+                                                <p class="sub-header text-danger"><strong>*Note : Per-tarik dana akan dikenakan biaya admin sebesar Rp. 1500</strong></p>
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="saldo" class="form-label">Saldo Anda (Rp.)</label>
+                                                        <input readonly type="text" class="form-control" name="saldo" id="saldo" required value="{{ $qrisWallet->saldo }}" placeholder="Masukkan jumlah saldo">
+                                                    </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <div class="mb-3">
-                                                            <label for="tempat_lahir" class="form-label">Nominal Tarik</label>
-                                                            <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="" placeholder="Masukkan nominal tarik dana">
+                                                            <label for="no_wa" class="form-label">Nomor Whatsapp</label>
+                                                            <div class="row">
+                                                                <div class="col-8">
+                                                                    <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ $profilMarketing->phone }}" placeholder="Masukkan nomor Whatsapp">
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    <form method="post" action="{{ route('marketing.settings.whatsappotp') }}">
+                                                                        @csrf
+                                                                        <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-email-outline"></i> Kirim Kode OTP</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="text-end">
-                                                    <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Tarik</button>
-                                                </div>
-                                            </form>
-                                        @endif
+                                                <form method="post" action="{{ route('marketing.profile.tarik') }}">
+                                                    @csrf
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label for="nominal" class="form-label">Nominal Tarik (Rp.)</label>
+                                                                <input type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" name="nominal_tarik" id="nominal_tarik" required value="" placeholder="Masukkan nominal tarik dana">
+                                                                <small id="emailHelp" class="form-text text-muted"><strong>Minimal tarik dana Rp. 50.000, Pastikan saldo anda cukup, sebelum melakukan penarikan!</strong></small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label for="nominal" class="form-label">Whatsapp OTP</label>
+                                                                <input type="text" class="form-control" name="wa_otp" id="wa_otp" required value="" placeholder="Masukkan kode OTP Whatsapp">
+                                                                <small id="emailHelp" class="form-text text-muted"><strong>Wajib melampirkan OTP Whatsapp!</strong></small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Tarik</button>
+                                                    </div>
+                                                </form>
+                                            @endif
+                                         @endif
                                     @endif
                                 </div>
                             </div>
