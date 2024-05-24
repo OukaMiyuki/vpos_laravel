@@ -55,7 +55,13 @@
                                                 </td>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->kasir->name }}</td>
+                                                <td>
+                                                    @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
+                                                        Transaksi Oleh Tenant
+                                                    @else
+                                                        {{ $invoice->kasir->name }}
+                                                    @endif
+                                                </td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
                                                 <td>{{ $invoice->jenis_pembayaran }}</td>
                                                 <td>

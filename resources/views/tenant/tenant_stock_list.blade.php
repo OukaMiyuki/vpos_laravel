@@ -39,10 +39,10 @@
                                         <th>Photo</th>
                                         <th>Barcode</th>
                                         <th>Product Name</th>
+                                        <th>Stok Barang</th>
                                         <th>Tanggal Beli</th>
                                         <th>Tanggal Expired</th>
                                         <th>Harga Beli (Rp.)</th>
-                                        <th>Stok</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -68,10 +68,10 @@
                                             </td>
                                             <td>{{ $stok->barcode }}</td>
                                             <td>{{ $stok->product->product_name }}</td>
+                                            <td>{{ $stok->stok }}</td>
                                             <td>{{ $stok->tanggal_beli }}</td>
                                             <td>{{ $stok->tanggal_expired }}</td>
                                             <td>{{ $stok->harga_beli }}</td>
-                                            <td>{{ $stok->stok }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

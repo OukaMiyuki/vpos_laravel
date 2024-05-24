@@ -9076,4 +9076,8 @@ span.flatpickr-weekday {
     font-family: "Material Design Icons";
     position: absolute;
 }
+
+td {
+    vertical-align: middle !important;
+}
 /*# sourceMappingURL=app.min.css.map */

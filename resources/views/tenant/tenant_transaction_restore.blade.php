@@ -77,6 +77,7 @@
                             <div class="bg-primary pt-3 pb-2">  
                                 @php
                                     $nominaldiskon = 0;
+                                    $nominalpajak = 0;
                                     $store = App\Models\StoreDetail::select(['store_identifier'])
                                                         ->where('id_tenant', auth()->user()->id)
                                                         ->where('email', auth()->user()->email)
@@ -107,6 +108,10 @@
                                                 $sub_total_belanja=$sbttl;
                                             @endphp
                                         @endif
+                                    @else
+                                        @php
+                                            $sub_total_belanja=$sbttl;
+                                        @endphp
                                     @endif
                                 ) : Rp. {{ $nominaldiskon }}</p>
                                 <p class="pos-price-text">Sub Total : Rp. {{ $sub_total_belanja }}</p>
@@ -114,10 +119,16 @@
                                     @if(!empty($pajak->pajak))
                                         {{ $pajak->pajak }}%
                                     @endif
-                                    @php
-                                        $nominalpajak = (int) ($pajak->pajak*($sbttl-$nominaldiskon))/100;
-                                        $totalBelanja = (int) $sub_total_belanja+$nominalpajak;
-                                    @endphp
+                                    @if(!empty($pajak->pajak))
+                                        @php
+                                            $nominalpajak = (int) ($pajak->pajak*($sbttl-$nominaldiskon))/100;
+                                            $totalBelanja = (int) $sub_total_belanja+$nominalpajak;
+                                        @endphp
+                                    @else
+                                        @php
+                                            $totalBelanja=$sub_total_belanja;
+                                        @endphp
+                                    @endif
                                 ) : Rp. {{ $nominalpajak }}</p>
                                 <p><h2 class="text-white">Total Belanja</h2><h1 class="text-white">Rp. {{ $totalBelanja }}</h1></p>
                             </div>

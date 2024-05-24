@@ -40,7 +40,6 @@
                                             <th>Product Batch Code</th>
                                             <th>Product Name</th>
                                             <th>Kategori</th>
-                                            {{-- <th>Total Stok</th> --}}
                                             <th>Harga Jual Per-Piece (Rp.)</th>
                                         </tr>
                                     </thead>
@@ -61,7 +60,7 @@
                                                     </a>
                                                 </td>
                                                 <td>
-                                                    <img src="{{ !empty($product->photo) ? Storage::url('images/product/'.$product->photo) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" alt="Product Photo">
+                                                    <img src="{{ !empty($product->photo) ? Storage::url('images/product/'.$product->photo) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" alt="Product Photo" width="80">
                                                 </td>
                                                 <td>{{ $product->product_code }}</td>
                                                 <td>{{ $product->product_name }}</td>

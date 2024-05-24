@@ -56,14 +56,16 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
-                                                <label for="t_beli" class="form-label">Tanggal Beli</label>
-                                                <input type="date" class="form-control" name="t_beli" id="t_beli" required value="{{ $stock->tanggal_beli }}" placeholder="Masukkan tanggal beli">
+                                                <label for="t_beli" class="form-label">Tanggal Beli (Opsional)</label>
+                                                <input type="date" class="form-control" name="t_beli" id="t_beli" value="{{ $stock->tanggal_beli }}" placeholder="Masukkan tanggal beli">
+                                                <small id="emailHelp" class="form-text text-muted"><strong>Isikan dengan tanggal beli produk, field ini tidak wajib diisi atau boleh dikosongi!</strong></small>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="mb-3">
-                                                <label for="t_expired" class="form-label">Tanggal Expired (kosongi jika bukan peroduk makanan)</label>
+                                                <label for="t_expired" class="form-label">Tanggal Expired (Kosongi jika bukan peroduk makanan)</label>
                                                 <input type="date" class="form-control" name="t_expired" id="t_expired" value="{{ $stock->tanggal_expired }}" placeholder="Masukkan tanggal expired">
+                                                <small id="emailHelp" class="form-text text-muted"><strong>Isikan dengan tanggal expired produk, field ini tidak wajib diisi atau boleh dikosongi!</strong></small>
                                             </div>
                                         </div>
                                     </div>
@@ -71,7 +73,8 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="h_beli" class="form-label">Harga beli per piece <strong>(Rp.)</strong></label>
-                                                <input type="number" class="form-control" name="h_beli" id="h_beli" required value="{{ $stock->harga_beli }}" placeholder="Masukkan nominal harga beli">
+                                                <input type="number" class="form-control" name="h_beli" id="h_beli" value="{{ $stock->harga_beli }}" placeholder="Masukkan nominal harga beli">
+                                                <small id="emailHelp" class="form-text text-muted"><strong>Isikan dengan harga beli per-item dari supplier, field ini tidak wajib diisi atau boleh dikosongi!</strong></small>
                                             </div>
                                         </div>
                                     </div>

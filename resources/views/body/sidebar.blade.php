@@ -367,20 +367,37 @@
                             <span class="menu-arrow"></span>
                         </a>
                         <div class="collapse" id="transaksi">
-                            <ul class="nav-second-level">
-                                <li>
-                                    <a href="{{ route('tenant.mitra.dashboard.transaction') }}">Dashboard Transaksi</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.mitra.dashboard.transaction.all_transaction') }}">Semua Transaksi</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.mitra.dashboard.transaction.pending_transaction') }}">Pyament Pending</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('tenant.mitra.dashboard.transaction.finish_transaction') }}">Payment Finish</a>
-                                </li>
-                            </ul>
+                            @if (auth()->user()->id_inv_code == 0)
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('tenant.mitra.dashboard.transaction') }}">Dashboard Transaksi</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.mitra.dashboard.transaction.all_transaction') }}">Semua Transaksi</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.mitra.dashboard.transaction.pending_transaction') }}">Pyament Pending</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.mitra.dashboard.transaction.finish_transaction') }}">Payment Finish</a>
+                                    </li>
+                                </ul>
+                            @else
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('tenant.transaction') }}">Dashboard Transaksi</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.transaction.list') }}">Semua Transaksi</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.transaction.list.pending') }}">Transaction Pending</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.transaction.list.pending.payment') }}">Payment Qris Pending</a>
+                                    </li>
+                                </ul>
+                            @endif
                         </div>
                     </li>
                     @if (auth()->user()->id_inv_code == 0)
