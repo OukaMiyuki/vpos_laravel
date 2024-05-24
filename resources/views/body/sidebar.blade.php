@@ -391,6 +391,9 @@
                                         <a href="{{ route('tenant.transaction.list') }}">Semua Transaksi</a>
                                     </li>
                                     <li>
+                                        <a href="{{ route('tenant.transaction.finish') }}">Transaction Finish</a>
+                                    </li>
+                                    <li>
                                         <a href="{{ route('tenant.transaction.list.pending') }}">Transaction Pending</a>
                                     </li>
                                     <li>

@@ -35,9 +35,7 @@
                                     </thead>
                                     <tbody>
                                         @php
-                                            $allCart = Cart::content();
                                             $no=0;
-                                            //$total=0;
                                             $totalqty=0;
                                             $sbttl=0;
                                         @endphp
@@ -76,12 +74,12 @@
                                     </tbody>
                                 </table>
                             </div> <!-- end .table-responsive-->
-                            <div class="bg-primary pt-3 pb-2">
+                            <div class="bg-primary pt-3 pb-2">  
                                 @php
-                                    $nominaldiskon=0;
-                                    $sub_total_belanja=0;
+                                    $nominaldiskon = 0;
+                                    $nominalpajak = 0;
                                     $diskon = App\Models\Discount::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();
-                                    $pajak =  App\Models\Tax::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();
+                                    $pajak =  App\Models\Tax::where('store_identifier', auth()->user()->id_store)->where('is_active', 1)->first();	
                                 @endphp
                                 <p class="pos-price-text">Total Item Quantity : {{ $totalqty }} </p>
                                 <p class="pos-price-text">Diskon (
@@ -101,6 +99,10 @@
                                                 $sub_total_belanja=$sbttl;
                                             @endphp
                                         @endif
+                                    @else
+                                        @php
+                                            $sub_total_belanja=$sbttl;
+                                        @endphp
                                     @endif
                                 ) : Rp. {{ $nominaldiskon }}</p>
                                 <p class="pos-price-text">Sub Total : Rp. {{ $sub_total_belanja }}</p>
@@ -108,10 +110,16 @@
                                     @if(!empty($pajak->pajak))
                                         {{ $pajak->pajak }}%
                                     @endif
-                                    @php
-                                        $nominalpajak = (int) ($pajak->pajak*($sbttl-$nominaldiskon))/100;
-                                        $totalBelanja = (int) $sub_total_belanja+$nominalpajak;
-                                    @endphp
+                                    @if(!empty($pajak->pajak))
+                                        @php
+                                            $nominalpajak = (int) ($pajak->pajak*($sbttl-$nominaldiskon))/100;
+                                            $totalBelanja = (int) $sub_total_belanja+$nominalpajak;
+                                        @endphp
+                                    @else
+                                        @php
+                                            $totalBelanja=$sub_total_belanja;
+                                        @endphp
+                                    @endif
                                 ) : Rp. {{ $nominalpajak }}</p>
                                 <p><h2 class="text-white">Total Belanja</h2><h1 class="text-white">Rp. {{ $totalBelanja }}</h1></p>
                             </div>
@@ -174,7 +182,6 @@
                                     <div class="col-md-12">
                                         <div class="mb-3">
                                             <button @if($totalBelanja==0) disabled @endif type="button" disabled id="formCheckout" class="btn btn-blue waves-effect waves-light m-1">Create Invoice</button>&nbsp;&nbsp;
-                                            {{-- <button @if($totalBelanja==0) disabled @endif type="submit" formaction="{{ route('kasir.pos.transaction.save') }}" formmethod="post" class="btn m-1 btn-blue waves-effect waves-light">Save Transaction</button> --}}
                                         </div>
                                     </div>
                                 </div>

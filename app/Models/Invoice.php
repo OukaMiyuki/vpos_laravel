@@ -169,6 +169,8 @@ class Invoice extends Model {
             $time=time();
             $date = date('dmYHis');
             $index_number = Invoice::max('id') + 1;
+            // $index_number = $model->id + 1;
+            // $index_number = (int) $model->id;
             $generate_nomor_invoice = $invoice_code.$date.str_pad($index_number, 9, '0', STR_PAD_LEFT);
             $model->nomor_invoice = $generate_nomor_invoice;
             $tenant = Tenant::select(['id_inv_code'])->find($model->id_tenant);

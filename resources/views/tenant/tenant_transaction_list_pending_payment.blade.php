@@ -73,6 +73,9 @@
                                                     <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
                                                         <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
+                                                    <a href="{{ route('tenant.transaction.pending.delete', ['id' => $invoice->id ]) }}">
+                                                        <button title="Hapus transaksi pending" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                    </a>
                                                 </td>
                                             </tr>
                                         @endforeach

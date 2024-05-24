@@ -98,12 +98,18 @@
                                             <th>No.</th>
                                             <th>Invoice</th>
                                             <th>Kasir</th>
-                                            <th>Nilai Transaksi (Rp.)</th>
                                             <th>Tanggal Transaksi</th>
+                                            <th>Tanggal Pelunasan</th>
                                             <th>Pembayaran</th>
                                             <th>Transaksi Oleh</th>
                                             <th>Status Transaksi</th>
                                             <th>Status Pembayaran</th>
+                                            <th>Sub Total (Rp.)</th>
+                                            <th>Pajak (Rp.)</th>
+                                            <th>Diskon (Rp.)</th>
+                                            <th>MDR (%)</th>
+                                            <th>Nominal MDR (Rp.)</th>
+                                            <th>Nominal Terima Bersih Qris (Rp.)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -124,8 +130,8 @@
                                                         {{ $invoice->kasir->name }}
                                                     @endif
                                                 </td>
-                                                <td>{{ $invoice->sub_total+$invoice->pajak }}</td>
                                                 <td>{{ $invoice->tanggal_transaksi }}</td>
+                                                <td>{{ $invoice->tanggal_pelunasan }}</td>
                                                 <td>{{ $invoice->jenis_pembayaran }}</td>
                                                 <td>
                                                     @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
@@ -152,6 +158,12 @@
                                                         <span class="badge bg-soft-success text-success">Dibayar</span>
                                                     @endif
                                                 </td>
+                                                <td>{{ $invoice->sub_total }}</td>
+                                                <td>{{ $invoice->pajak }}</td>
+                                                <td>{{ $invoice->diskon }}</td>
+                                                <td>{{ $invoice->mdr }}</td>
+                                                <td>{{ $invoice->nominal_mdr }}</td>
+                                                <td>{{ $invoice->nominal_terima_bersih }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

@@ -34,28 +34,60 @@
                                 <table id="datatable-buttons" class="table table-striped dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
+                                            <th>Action</th>
                                             <th>No.</th>
                                             <th>Invoice</th>
                                             <th>Tanggal Transaksi</th>
+                                            <th>Tanggal Pelunasan</th>
                                             <th>Pembayaran</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th>Status Transaksi</th>
+                                            <th>Status Pembayaran</th>
+                                            <th>Sub Total (Rp.)</th>
+                                            <th>Pajak (Rp.)</th>
+                                            <th>Diskon (Rp.)</th>
+                                            <th>MDR (%)</th>
+                                            <th>Nominal MDR (Rp.)</th>
+                                            <th>Nominal Terima Bersih Qris (Rp.)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($invoice as $invoice)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
-                                                <td><span class="badge bg-soft-success text-success">Selesai</span></td>
                                                 <td>
                                                     <a href="{{ route('kasir.pos.transaction.invoice', ['id' => $invoice->id ]) }}">
                                                         <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                 </td>
+                                                <td>{{ $no+=1 }}</td>
+                                                <td>{{ $invoice->nomor_invoice }}</td>
+                                                <td>{{ $invoice->tanggal_transaksi }}</td>
+                                                <td>{{ $invoice->tanggal_pelunasan }}</td>
+                                                <td>{{ $invoice->jenis_pembayaran }}</td>
+                                                <td>
+                                                    @if (!empty($invoice->jenis_pembayaran) || !is_null($invoice->jenis_pembayaran) || $invoice->jenis_pembayaran != "")
+                                                        @if($invoice->status_pembayaran == 0)
+                                                            <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
+                                                        @elseif($invoice->status_pembayaran == 1)
+                                                            <span class="badge bg-soft-success text-success">Selesai</span>
+                                                        @endif
+                                                    @else
+                                                        <span class="badge bg-soft-danger text-danger">Belum Diproses</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if($invoice->status_pembayaran == 0)
+                                                        <span class="badge bg-soft-warning text-warning">Belum Bayar</span>
+                                                    @elseif($invoice->status_pembayaran == 1)
+                                                        <span class="badge bg-soft-success text-success">Dibayar</span>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $invoice->sub_total }}</td>
+                                                <td>{{ $invoice->pajak }}</td>
+                                                <td>{{ $invoice->diskon }}</td>
+                                                <td>{{ $invoice->mdr }}</td>
+                                                <td>{{ $invoice->nominal_mdr }}</td>
+                                                <td>{{ $invoice->nominal_terima_bersih }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

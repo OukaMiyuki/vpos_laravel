@@ -38,13 +38,13 @@ class QrisWalletPendingUpdate extends Command {
                                     'id_tenant',
                                     'email',
                                     "store_identifier",
-                                    'nominal_mdr',
-                                    DB::raw("(sum(nominal_bayar)) as total_penghasilan"),
+                                    DB::raw("(sum(nominal_mdr)) as total_nominal_mdr"),
+                                    DB::raw("(sum(nominal_terima_bersih)) as total_penghasilan"),
                             ])
                             ->whereDate('tanggal_transaksi', $yesterday)
                             ->where('jenis_pembayaran', 'Qris')
                             ->where('status_pembayaran', 1)
-                            ->groupBy(['id','store_identifier', 'email', 'id_tenant', 'nominal_mdr'])
+                            ->groupBy(['id','store_identifier', 'email', 'id_tenant'])
                             ->get();
         foreach($invoiceYesterday as $invoice){
             $qris = QrisWallet::where('id_user', $invoice->id_tenant)->first();
@@ -55,7 +55,7 @@ class QrisWalletPendingUpdate extends Command {
             ]);
             $qrisAdminWallet = QrisWallet::where('id_user', 1)->where('email', 'adminsu@vipos.id')->find(1);
             $saldoAdmin = $qrisAdminWallet->saldo;
-            $nominal_mdr = $invoice->nominal_mdr;
+            $nominal_mdr = $invoice->total_nominal_mdr;
             $insentif_cashback = $nominal_mdr*0.25;
 
             $qrisAdminWallet->update([

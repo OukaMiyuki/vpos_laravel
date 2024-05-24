@@ -46,20 +46,6 @@ class KasirController extends Controller {
     }
 
     public function index(){
-        // $invoiceYesterday = Invoice::select([
-        //                             'id',
-        //                             'id_tenant',
-        //                             'email',
-        //                             "store_identifier",
-        //                             'nominal_mdr',
-        //                             DB::raw("(sum(nominal_bayar)) as total_penghasilan"),
-        //                     ])
-        //                     ->whereDate('tanggal_transaksi', Carbon::yesterday())
-        //                     ->where('jenis_pembayaran', 'Qris')
-        //                     ->where('status_pembayaran', 1)
-        //                     ->groupBy(['id','store_identifier', 'email', 'id_tenant', 'nominal_mdr'])
-        //                     ->get();
-                        // dd($invoiceYesterday );
         $totalInvoiceHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
                                         ->where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
@@ -111,7 +97,22 @@ class KasirController extends Controller {
                                         ->latest()
                                         ->take(10)
                                         ->get();
-        return view('kasir.dashboard', compact(['totalInvoiceHariIni', 'totalInvoice', 'pemasukanHariIni', 'totalPemasukan']));
+        $transaksiTerbaru = Invoice::where('store_identifier', auth()->user()->id_store)
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->whereDate('tanggal_transaksi', Carbon::now())
+                                    ->latest()
+                                    ->take(10)
+                                    ->get();
+        $transaksiQrisPending = Invoice::where('store_identifier', auth()->user()->id_store)
+                                    ->where('id_kasir', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->where('jenis_pembayaran', 'Qris')
+                                    ->where('status_pembayaran', 0)
+                                    ->latest()
+                                    ->take(10)
+                                    ->get();
+        return view('kasir.dashboard', compact(['totalInvoiceHariIni', 'totalInvoice', 'pemasukanHariIni', 'totalPemasukan', 'transaksiTerbaru', 'transaksiQrisPending']));
     }
 
     public function kasirPos(){
@@ -604,7 +605,7 @@ class KasirController extends Controller {
                                 ->where('id_kasir', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
                                 ->where('id_tenant', auth()->user()->store->id_tenant)
-                                ->where('jenis_pembayaran', NULL)
+                                ->where('status_pembayaran', 0)
                                 ->find($id);
             $invoiceTemp = $invoice->nomor_invoice;
             if(is_null($invoice) || empty($invoice)){
@@ -693,27 +694,6 @@ class KasirController extends Controller {
                 $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
                 // Ga perlu id_tenant dan ngecek apa invitation codenya 0
                 $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
-                if($storeDetail->status_umi == 1){
-                    if($invoice->nominal_bayar <= 100000){
-                        $invoice->update([
-                            'mdr' => 0,
-                            'nominal_mdr' => 0,
-                            'nominal_terima_bersih' => $invoice->nominal_bayar
-                        ]);
-                    } else {
-                        $nominal_mdr = $total*0.007;
-                        $invoice->update([
-                            'nominal_mdr' => $nominal_mdr,
-                            'nominal_terima_bersih' => $total-$nominal_mdr
-                        ]);
-                    }   
-                } else {
-                    $nominal_mdr = $total*0.007;
-                    $invoice->update([
-                        'nominal_mdr' => $nominal_mdr,
-                        'nominal_terima_bersih' => $total-$nominal_mdr
-                    ]);
-                }
                 // this first
                 $client = new Client();
                 $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
@@ -741,6 +721,28 @@ class KasirController extends Controller {
 
                 if(!is_null($invoice)) {
                     $invoice->fieldSave($invoice);
+                }
+
+                if($storeDetail->status_umi == 1){
+                    if($invoice->nominal_bayar <= 100000){
+                        $invoice->update([
+                            'mdr' => 0,
+                            'nominal_mdr' => 0,
+                            'nominal_terima_bersih' => $invoice->nominal_bayar
+                        ]);
+                    } else {
+                        $nominal_mdr = $total*0.007;
+                        $invoice->update([
+                            'nominal_mdr' => $nominal_mdr,
+                            'nominal_terima_bersih' => $total-$nominal_mdr
+                        ]);
+                    }   
+                } else {
+                    $nominal_mdr = $total*0.007;
+                    $invoice->update([
+                        'nominal_mdr' => $nominal_mdr,
+                        'nominal_terima_bersih' => $total-$nominal_mdr
+                    ]);
                 }
                 // this end
             }

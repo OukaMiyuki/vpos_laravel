@@ -64,7 +64,7 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                <img src="{{ !empty($stok->product->photo) ? Storage::url('images/product/'.$stok->product->photo) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" alt="Product Photo">
+                                                <img src="{{ !empty($stok->product->photo) ? Storage::url('images/product/'.$stok->product->photo) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" alt="Product Photo" width="80">
                                             </td>
                                             <td>{{ $stok->barcode }}</td>
                                             <td>{{ $stok->product->product_name }}</td>

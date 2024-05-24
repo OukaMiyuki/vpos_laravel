@@ -468,7 +468,7 @@ class PosController extends Controller {
         try{
             $identifier = $this->getStoreIdentifier();
             $invoice = Invoice::where('store_identifier', $identifier)
-                                ->where('jenis_pembayaran', NULL)
+                                ->where('status_pembayaran', 0)
                                 ->find($id);
             $invoiceTemp = $invoice->nomor_invoice;
             session()->forget('cart');
@@ -692,27 +692,6 @@ class PosController extends Controller {
                 $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
                 if(auth()->user()->id_inv_code != 0){
                     $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
-                    if($storeDetail->status_umi == 1){
-                        if($invoice->nominal_bayar <= 100000){
-                            $invoice->update([
-                                'mdr' => 0,
-                                'nominal_mdr' => 0,
-                                'nominal_terima_bersih' => $invoice->nominal_bayar
-                            ]);
-                        } else {
-                            $nominal_mdr = $total*0.007;
-                            $invoice->update([
-                                'nominal_mdr' => $nominal_mdr,
-                                'nominal_terima_bersih' => $total-$nominal_mdr
-                            ]);
-                        }   
-                    } else {
-                        $nominal_mdr = $total*0.007;
-                        $invoice->update([
-                            'nominal_mdr' => $nominal_mdr,
-                            'nominal_terima_bersih' => $total-$nominal_mdr
-                        ]);
-                    }
                     // this first
                     $client = new Client();
                     $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
@@ -740,6 +719,28 @@ class PosController extends Controller {
     
                     if(!is_null($invoice)) {
                         $invoice->fieldSave($invoice);
+                    }
+
+                    if($storeDetail->status_umi == 1){
+                        if($invoice->nominal_bayar <= 100000){
+                            $invoice->update([
+                                'mdr' => 0,
+                                'nominal_mdr' => 0,
+                                'nominal_terima_bersih' => $invoice->nominal_bayar
+                            ]);
+                        } else {
+                            $nominal_mdr = $total*0.007;
+                            $invoice->update([
+                                'nominal_mdr' => $nominal_mdr,
+                                'nominal_terima_bersih' => $total-$nominal_mdr
+                            ]);
+                        }   
+                    } else {
+                        $nominal_mdr = $total*0.007;
+                        $invoice->update([
+                            'nominal_mdr' => $nominal_mdr,
+                            'nominal_terima_bersih' => $total-$nominal_mdr
+                        ]);
                     }
                     // this end
                 }
