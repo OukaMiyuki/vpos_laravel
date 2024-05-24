@@ -50,7 +50,12 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="jenis" class="form-label">Jenis Usaha</label>
-                                                <input type="text" class="form-control" name="jenis" id="jenis" required value="{{ $store->jenis_usaha }}" placeholder="Masukkan jenis usaha">
+                                                <select required class="form-control" name="jenis" id="jenis" data-toggle="select2" data-width="100%">
+                                                    <option value="">- Pilih Jenis Usaha -</option>
+                                                    @foreach (App\Models\JenisUsaha::get() as $jenis_usaha)
+                                                        <option value="{{ $jenis_usaha->jenis_usaha }}"@if ($store->jenis_usaha == $jenis_usaha->jenis_usaha) selected="selected" @endif>{{ $jenis_usaha->jenis_usaha  }}</option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                     </div>

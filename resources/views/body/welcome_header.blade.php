@@ -12,7 +12,7 @@
                 <li><a href="blog.html">Blog</a></li>
                 <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
                 @guest
-                    <li><a class="getstarted scrollto" href="{{ route('access.login') }}">Login</a></li>
+                    <li><a class="getstarted scrollto" href="{{ route('access.login') }}">Hubungi Kami</a></li>
                 @endguest
             </ul>
             <i class="bi bi-list mobile-nav-toggle"></i>
