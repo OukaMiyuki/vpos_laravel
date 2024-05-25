@@ -131,7 +131,7 @@
                                             @foreach ($tenantTerbaru as $tenants)
                                                 @foreach ($tenants->invitationCodeTenant as $tenantInfo)
                                                     <tr>
-                                                        <td><a href="#" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a></td>
+                                                        <td><a href="{{ route('marketing.dashboard.tenant.detail', ['inv_code' => $tenantInfo->invitationCode->id, 'id' => $tenantInfo->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a></td>
                                                         <td>{{ $tenantInfo->name }}</td>
                                                         <td>{{ \Carbon\Carbon::parse($tenantInfo->created_at)->format('d-m-Y') }}</td>
                                                         <td>{{ $tenantInfo->phone }}</td>

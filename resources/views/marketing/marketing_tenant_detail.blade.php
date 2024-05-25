@@ -8,7 +8,7 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('marketing.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="#">Settings</a></li>
                                 <li class="breadcrumb-item active">Profile</li>
                             </ol>
@@ -22,10 +22,10 @@
                 <div class="col-lg-4 col-xl-4">
                     <div class="card text-center">
                         <div class="card-body">
-                            <img src="{{ !empty($tenant->storeDetail->photo) ? Storage::url('images/profile/'.$tenant->storeDetail->photo) : asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                            <img src="{{ !empty($tenant->storeDetail->store_photo) ? Storage::url('images/profile/'.$tenant->storeDetail->store_photo) : asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
                             <h4 class="mb-0">
-                                @if(!empty($tenant->storeDetail->name))
-                                    {{ $tenant->storeDetail->name }}
+                                @if(!empty($tenant->storeDetail->store_name))
+                                    {{ $tenant->storeDetail->store_name }}
                                 @endif
                             </h4>
                             <p class="text-muted">
@@ -49,7 +49,7 @@
                                 <div class="tab-pane show active" id="settings">
                                     <form method="post">
                                         @csrf
-                                        <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Update Informasi Toko</h5>
+                                        <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Data Informasi Toko Tenant</h5>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
@@ -69,16 +69,8 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="umi" class="form-label">Status UMI</label>
-                                                    <input readonly type="text" class="form-control" name="umi" id="umi" required @if(!empty($tenant->storeDetail->status_umi)) @if($tenant->storeDetail->status_umi == 1) value="Terdaftar" @else value="Tidak terdaftar" @endif @endif placeholder="Masukkan jenis usaha">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
                                                     <label for="alamat" class="form-label">Alamat</label>
-                                                    <textarea readonly placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>@if(!empty($tenant->storeDetail->alamat)) {!! $tenant->storeDetail->alamat !!} @endif</textarea>
+                                                    <textarea readonly placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>@if(!empty($tenant->storeDetail->store_alamat)) {!! $tenant->storeDetail->store_alamat !!} @endif</textarea>
                                                 </div>
                                             </div>
                                         </div>

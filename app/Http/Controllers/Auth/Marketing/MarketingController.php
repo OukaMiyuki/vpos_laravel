@@ -268,8 +268,33 @@ class MarketingController extends Controller {
             );
             return view('marketing.auth.not_active')->with($notification);
         }else if(auth()->user()->is_active == 1) {
-            $tenant = Tenant::select(['id', 'name', 'email', 'phone', 'is_active'])
-                            ->with(['detail', 'storeDetail'])
+            $tenant = Tenant::select(['tenants.id', 
+                                        'tenants.name', 
+                                        'tenants.email', 
+                                        'tenants.phone', 
+                                        'tenants.is_active'
+                                    ])
+                            ->with(['detail' => function($query){
+                                $query->select([
+                                    'detail_tenants.id',
+                                    'detail_tenants.id_tenant',
+                                    'detail_tenants.tempat_lahir',
+                                    'detail_tenants.tanggal_lahir',
+                                    'detail_tenants.jenis_kelamin',
+                                    'detail_tenants.alamat',
+                                ]);
+                            }
+                            ,'storeDetail' => function($query){
+                                $query->select([
+                                    'store_details.id',
+                                    'store_details.id_tenant',
+                                    'store_details.name as store_name',
+                                    'store_details.alamat as store_alamat',
+                                    'store_details.jenis_usaha',
+                                    'store_details.photo as store_photo',
+                                ]);
+                            }
+                            ])
                             ->where('id_inv_code', $inv_code)
                             ->where(DB::table('invitation_codes')
                                 ->where('inv_code', $inv_code)

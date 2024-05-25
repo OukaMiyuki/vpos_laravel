@@ -21,13 +21,14 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void {
-        Model::handleLazyLoadingViolationUsing(function($model, $relation){
-            $class = $model->$relation()->getRelated();
+        Model::preventLazyLoading();
+        // Model::handleLazyLoadingViolationUsing(function($model, $relation){
+        //     $class = $model->$relation()->getRelated();
 
-            if(Str::startsWith(get_class($class), 'App')){
-                throw new LazyLoadingViolationException($model, $relation);
-            }
-        });
+        //     if(Str::startsWith(get_class($class), 'App')){
+        //         throw new LazyLoadingViolationException($model, $relation);
+        //     }
+        // });
         // if(config('app.env') === 'production') {
         //     URL::forceScheme('https');
         // }

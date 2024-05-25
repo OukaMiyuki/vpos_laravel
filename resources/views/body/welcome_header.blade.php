@@ -1,6 +1,6 @@
 <header id="header" class="header fixed-top">
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
-        <a href="index.html" class="logo d-flex align-items-center">
+        <a href="{{ route('welcome') }}" class="logo d-flex align-items-center">
         <img src="{{ asset('assets/images/logo/Logo2.png') }}" alt="">
         <span>Visioner POS</span>
         </a>
