@@ -9,7 +9,8 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('marketing.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="#">Settings</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('marketing.dashboard.invitationcode') }}">Code</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('marketing.dashboard.tenant.list') }}">Data Tenant</a></li>
                                 <li class="breadcrumb-item active">Profile</li>
                             </ol>
                         </div>
@@ -44,6 +45,11 @@
                                         Informasi Toko
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="#about_tenant" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+                                        Detail Infomasi Tenant
+                                    </a>
+                                </li>
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane show active" id="settings">
@@ -69,23 +75,108 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="alamat" class="form-label">Alamat</label>
+                                                    <label for="alamat" class="form-label">Alamat Toko</label>
                                                     <textarea readonly placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>@if(!empty($tenant->storeDetail->store_alamat)) {!! $tenant->storeDetail->store_alamat !!} @endif</textarea>
                                                 </div>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
+                                <div class="tab-pane" id="about_tenant">
+                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Data Informasi Pemilik Usaha</h5>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="name" class="form-label">Nama Lengkap</label>
+                                                <input type="text" class="form-control" name="name" id="name" readonly value="{{ $tenant->name }}" placeholder="Masukkan nama lengkap">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
+                                                <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" readonly value="{{ $tenant->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
+                                                <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ $tenant->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
+                                                <input type="text" class="form-control" name="jenis_kelamin" id="jenis_kelamin" readonly value="{{ $tenant->detail->jenis_kelamin }}" placeholder="Masukkan jenis kelamin">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="alamat" class="form-label">Alamat Pemilik Usaha</label>
+                                                <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $tenant->detail->alamat !!}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <!-- end tab-content -->
                         </div>
                     </div>
-                    <!-- end card-->
                 </div>
-                <!-- end col -->
             </div>
-            <!-- end row-->
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="dropdown float-end">
+                                <a href="#" class="dropdown-toggle arrow-none card-drop" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="mdi mdi-dots-vertical"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="" class="dropdown-item">Cetak Data</a>
+                                </div>
+                            </div>
+                            <h4 class="header-title mb-3">Tabel Data Penarikan Dana Tenant</h4>
+                        
+                            <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Nama</th>
+                                        <th>Tanggal Penarikan</th>
+                                        <th>Nominal</th>
+                                        <th>Insentif Mitra</th>
+                                        <th>Status Penarikan</th>
+                                    </tr>
+                                </thead>
+                                @php
+                                    $no=0;
+                                @endphp
+                                <tbody>
+                                    @foreach ($tenant->withdrawal as $wd)
+                                        <tr>
+                                            <td>{{ $no+=1 }}</td>
+                                            <td>{{ $tenant->name }}</td>
+                                            <td>{{ $wd->tanggal_penarikan }}</td>
+                                            <td>{{ $wd->nominal }}</td>
+                                            <td>{{ $wd->detailWithdraw->biaya_mitra }}</td>
+                                            <td>
+                                                @if ($wd->status == 1)
+                                                    <span class="badge bg-soft-success text-success">Sukses</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- container -->
     </div>
 </x-marketing-layout>

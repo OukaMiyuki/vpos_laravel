@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Stevebauman\Location\Facades\Location;
 use Twilio\Rest\Client;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\InvitationCode;
 use App\Models\Marketing;
@@ -244,7 +245,9 @@ class MarketingController extends Controller {
                                 ->with(['invitationCodeTenant' => function ($query) {
                                     $query->with(['invitationCode'])->select(['tenants.id as id_tenant', 'name', 'phone', 'id_inv_code', 'tenants.created_at as tanggal_bergabung']);
                                 }
-                            ])->get();
+                            ])
+                            ->latest()
+                            ->get();
             return view('marketing.marketing_tenant_list', compact('tenant'));
         } else {
             if(auth()->check()){
@@ -294,6 +297,24 @@ class MarketingController extends Controller {
                                     'store_details.photo as store_photo',
                                 ]);
                             }
+                            , 'withdrawal' => function($query){
+                                $query->select([
+                                    'withdrawals.id',
+                                    'withdrawals.id_user',
+                                    'withdrawals.tanggal_penarikan', 
+                                    'withdrawals.nominal', 
+                                    'withdrawals.status'
+                                ])
+                                ->with(['detailWithdraw' => function($query){
+                                    $query->select(['detail_penarikans.id', 
+                                                    'detail_penarikans.id_penarikan',
+                                                    'detail_penarikans.biaya_mitra',
+                                                ])->get();
+                                }])
+                                ->where('withdrawals.status', 1)
+                                ->latest()
+                                ->get();
+                            }
                             ])
                             ->where('id_inv_code', $inv_code)
                             ->where(DB::table('invitation_codes')
@@ -315,6 +336,163 @@ class MarketingController extends Controller {
                 return redirect('/marketing/login')->with($notification);
             }
         }
+    }
+
+    public function marketingPemasukanList(){
+        $pemasukanTerbaru = Marketing::select(['marketings.id'])
+                                        ->with(['invitationCodeTenant' => function($query){
+                                            $query->select('tenants.id', 'tenants.name', 'tenants.id_inv_code')
+                                                    ->with(['withdrawal' => function($query){
+                                                        $query->select(['withdrawals.id', 'withdrawals.id_user', 'withdrawals.tanggal_penarikan', 'withdrawals.status'])
+                                                                ->with(['detailWithdraw' => function($query){
+                                                                    $query->select(['detail_penarikans.id', 
+                                                                                    'detail_penarikans.id_penarikan',
+                                                                                    'detail_penarikans.biaya_mitra',
+                                                                                ])->get();
+                                                                }])
+                                                                ->where('withdrawals.status', 1)
+                                                                // ->whereDate('tanggal_penarikan', Carbon::now())
+                                                                ->get();
+                                                    },
+                                                    'invitationCode' => function($query) {
+                                                        $query->select('invitation_codes.id', 'invitation_codes.inv_code', 'invitation_codes.holder')
+                                                                    ->groupBy(['invitation_codes.id',  'invitation_codes.inv_code', 'invitation_codes.holder'])
+                                                                    ->get();
+                                                    },
+                                                    'storeDetail' => function($query) {
+                                                        $query->select([
+                                                            'store_details.id',
+                                                            'store_details.store_identifier',
+                                                            'store_details.id_tenant',
+                                                            'store_details.name as store_name'
+                                                        ])
+                                                        ->groupBy(['store_details.id',  'store_details.store_identifier', 'store_details.id_tenant', 'store_details.name'])
+                                                        ->get();
+                                                    }
+                                                    ])->get();
+                                        }])
+                                        ->find(auth()->user()->id);
+        // dd($pemasukanTerbaru);
+        $todayWithdraw = "";
+        $monthWithdraw = "";
+        $totalWithdrawMitra = "";
+        foreach($pemasukanTerbaru->invitationCodeTenant as $inv){
+            // dd($inv->invitationCode->inv_code);
+            // dd($inv->withdrawal);
+            foreach($inv->withdrawal as $withdrawal){
+                $totalWithdrawMitra = $withdrawal->detailWithdraw->sum('biaya_mitra');
+                //dd($withdrawal);
+                //dd($inv->invitationCode->inv_code);
+                //dd($inv->storeDetail->store_name);
+            }
+        }
+        foreach($pemasukanTerbaru->invitationCodeTenant as $inv){
+            foreach($inv->withdrawal as $withdrawal){
+                $todayWithdraw = $withdrawal->select(['withdrawals.id', 'withdrawals.id_user'])
+                                            ->whereDate('tanggal_penarikan', Carbon::now())
+                                            ->where('withdrawals.status', 1)
+                                            ->with(['detailWithdraw' => function($query){
+                                                $query->select(['detail_penarikans.id', 
+                                                                'detail_penarikans.id_penarikan',
+                                                                'detail_penarikans.biaya_mitra',
+                                                            ])->get();
+                                            }])
+                                            ->get();
+                $monthWithdraw = $withdrawal->select(['withdrawals.id', 'withdrawals.id_user'])
+                                            ->whereMonth('tanggal_penarikan', Carbon::now()->month)
+                                            ->where('withdrawals.status', 1)
+                                            ->with(['detailWithdraw' => function($query){
+                                                $query->select(['detail_penarikans.id', 
+                                                                'detail_penarikans.id_penarikan',
+                                                                'detail_penarikans.biaya_mitra',
+                                                            ])->get();
+                                            }])
+                                            ->get();
+            }
+        }
+        $pemasukanMitraHariIni = "";
+        $pemasukanMitraBulaniIni = "";
+        foreach($todayWithdraw as $wd){
+            $pemasukanMitraHariIni = $wd->detailWithdraw->sum('biaya_mitra');
+        }
+        foreach($monthWithdraw as $wd){
+            $pemasukanMitraBulaniIni = $wd->detailWithdraw->sum('biaya_mitra');
+        }
+        return view('marketing.marketing_data_pemasukan', compact(['pemasukanTerbaru', 'pemasukanMitraHariIni', 'totalWithdrawMitra', 'pemasukanMitraBulaniIni']));
+    }
+
+    public function marketingPemasukanListToday(){
+        $pemasukanTerbaru = Marketing::select(['marketings.id'])
+                                        ->with(['invitationCodeTenant' => function($query){
+                                            $query->select('tenants.id', 'tenants.name', 'tenants.id_inv_code')
+                                                    ->with(['withdrawal' => function($query){
+                                                        $query->select(['withdrawals.id', 'withdrawals.id_user', 'withdrawals.tanggal_penarikan', 'withdrawals.status'])
+                                                                ->with(['detailWithdraw' => function($query){
+                                                                    $query->select(['detail_penarikans.id', 
+                                                                                    'detail_penarikans.id_penarikan',
+                                                                                    'detail_penarikans.biaya_mitra',
+                                                                                ])->get();
+                                                                }])
+                                                                ->where('withdrawals.status', 1)
+                                                                ->whereDate('tanggal_penarikan', Carbon::now())
+                                                                ->get();
+                                                    },
+                                                    'invitationCode' => function($query) {
+                                                        $query->select('invitation_codes.id', 'invitation_codes.inv_code', 'invitation_codes.holder')
+                                                                    ->groupBy(['invitation_codes.id',  'invitation_codes.inv_code', 'invitation_codes.holder'])
+                                                                    ->get();
+                                                    },
+                                                    'storeDetail' => function($query) {
+                                                        $query->select([
+                                                            'store_details.id',
+                                                            'store_details.store_identifier',
+                                                            'store_details.id_tenant',
+                                                            'store_details.name as store_name'
+                                                        ])
+                                                        ->groupBy(['store_details.id',  'store_details.store_identifier', 'store_details.id_tenant', 'store_details.name'])
+                                                        ->get();
+                                                    }
+                                                    ])->get();
+                                        }])
+                                        ->find(auth()->user()->id);
+        return view('marketing.marketing_data_pemasukan_today', compact(['pemasukanTerbaru']));
+    }
+
+    public function marketingPemasukanListMonth(){
+        $pemasukanTerbaru = Marketing::select(['marketings.id'])
+                                        ->with(['invitationCodeTenant' => function($query){
+                                            $query->select('tenants.id', 'tenants.name', 'tenants.id_inv_code')
+                                                    ->with(['withdrawal' => function($query){
+                                                        $query->select(['withdrawals.id', 'withdrawals.id_user', 'withdrawals.tanggal_penarikan', 'withdrawals.status'])
+                                                                ->with(['detailWithdraw' => function($query){
+                                                                    $query->select(['detail_penarikans.id', 
+                                                                                    'detail_penarikans.id_penarikan',
+                                                                                    'detail_penarikans.biaya_mitra',
+                                                                                ])->get();
+                                                                }])
+                                                                ->where('withdrawals.status', 1)
+                                                                ->whereMonth('tanggal_penarikan', Carbon::now()->month)
+                                                                ->get();
+                                                    },
+                                                    'invitationCode' => function($query) {
+                                                        $query->select('invitation_codes.id', 'invitation_codes.inv_code', 'invitation_codes.holder')
+                                                                    ->groupBy(['invitation_codes.id',  'invitation_codes.inv_code', 'invitation_codes.holder'])
+                                                                    ->get();
+                                                    },
+                                                    'storeDetail' => function($query) {
+                                                        $query->select([
+                                                            'store_details.id',
+                                                            'store_details.store_identifier',
+                                                            'store_details.id_tenant',
+                                                            'store_details.name as store_name'
+                                                        ])
+                                                        ->groupBy(['store_details.id',  'store_details.store_identifier', 'store_details.id_tenant', 'store_details.name'])
+                                                        ->get();
+                                                    }
+                                                    ])->get();
+                                        }])
+                                        ->find(auth()->user()->id);
+        return view('marketing.marketing_data_pemasukan_month', compact(['pemasukanTerbaru']));
     }
 
     public function financeDashboard(){

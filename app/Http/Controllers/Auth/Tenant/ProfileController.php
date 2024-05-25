@@ -915,9 +915,7 @@ class ProfileController extends Controller{
                                 ->where('email', auth()->user()->email)
                                 ->first();
         $agregateWallet = AgregateWallet::find(1);
-        $qrisAdmin = QrisWallet::where('id_user', 1)
-                                ->where('email', 'adminsu@vipos.id')
-                                ->find(6);
+        $qrisAdmin = QrisWallet::where('email', 'adminsu@visipos.id')->find(1);
         $marketing = InvitationCode::select(['invitation_codes.id',
                                             'invitation_codes.id_marketing',
                                         ])
@@ -980,7 +978,7 @@ class ProfileController extends Controller{
                             'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                             'status' => 1
                         ]);
-
+                        // return $withDraw;
                         if(!is_null($withDraw) || !empty($withDraw)){
                             $qrisWallet->update([
                                 'saldo' => $saldo-$total_penarikan
@@ -1076,7 +1074,7 @@ class ProfileController extends Controller{
                             'message' => 'Penarikan dana gagal, harap hubungi admin!',
                             'alert-type' => 'error',
                         );
-                        return redirect()->back()->with($notification);
+                        return redirect()->route('tenant.profile')->with($notification);
                     }
                 } catch (Exception $e) {
                     History::create([
@@ -1092,7 +1090,7 @@ class ProfileController extends Controller{
                         'message' => 'Penarikan dana gagal, harap hubungi admin!',
                         'alert-type' => 'error',
                     );
-                    return redirect()->back()->with($notification);
+                    return redirect()->route('tenant.profile')->with($notification);
                 }
             }
         } catch (Exception $e){
@@ -1110,7 +1108,7 @@ class ProfileController extends Controller{
                 'message' => 'Penarikan dana gagal, harap hubungi admin!',
                 'alert-type' => 'error',
             );
-            return redirect()->back()->with($notification);
+            return redirect()->route('tenant.profile')->with($notification);
         }
     }
 

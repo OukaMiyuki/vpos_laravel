@@ -263,10 +263,7 @@
                                     <a href="{{ route('marketing.dashboard.tenant.list') }}">Data Tenant</a>
                                 </li>
                                 <li>
-                                    <a href="#">Pemasukan Hari Ini</a>
-                                </li>
-                                <li>
-                                    <a href="#">Data Pemasukan</a>
+                                    <a href="{{ route('marketing.dashboard.pemasukan') }}">Pemasukan Anda</a>
                                 </li>
                             </ul>
                         </div>

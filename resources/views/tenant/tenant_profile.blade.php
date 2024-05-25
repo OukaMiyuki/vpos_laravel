@@ -217,7 +217,7 @@
                                                 <p class="sub-header">Anda belum memasukkan informasi rekening! Silahkan terlebih dahulu memperbarui rekening anda.</p>
                                             </div>
                                         @else
-                                            <p class="sub-header text-danger"><strong>*Note : Per-tarik dana akan dikenakan biaya admin sebesar Rp. 1500</strong></p>
+                                            <p class="sub-header text-danger"><strong>*Note : Per-tarik dana akan dikenakan biaya transfer BI-Fast sebesar Rp. 1500</strong></p>
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="saldo" class="form-label">Saldo Anda (Rp.)</label>
@@ -249,7 +249,7 @@
                                                         <div class="mb-3">
                                                             <label for="nominal" class="form-label">Nominal Tarik (Rp.)</label>
                                                             <input type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" name="nominal_tarik" id="nominal_tarik" required value="" placeholder="Masukkan nominal tarik dana">
-                                                            <small id="emailHelp" class="form-text text-muted"><strong>Minimal tarik dana Rp. 50.000, Pastikan saldo anda cukup, sebelum melakukan penarikan!</strong></small>
+                                                            <small id="emailHelp" class="form-text text-muted"><strong>Minimal tarik dana Rp. 10.000, Pastikan saldo anda cukup, sebelum melakukan penarikan!</strong></small>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -75,8 +75,12 @@ Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'isMa
     Route::get('/dashboard/code/cashout/info', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutList'])->name('marketing.dashboard.invitationcode.cashout.list');
     Route::get('/dashboard/code/cashout/invoice', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutInvoice'])->name('marketing.dashboard.invitationcode.cashout.invoice');
 
-    Route::get('/dashboard/tenant/list', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantList'])->name('marketing.dashboard.tenant.list');
-    Route::get('/dashboard/tenant/detail/{inv_code}/{id}', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantDetail'])->name('marketing.dashboard.tenant.detail');
+    Route::get('/dashboard/code/tenant/', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantList'])->name('marketing.dashboard.tenant.list');
+    Route::get('/dashboard/code/tenant/detail/{inv_code}/{id}', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantDetail'])->name('marketing.dashboard.tenant.detail');
+
+    Route::get('/dashboard/code/pemasukan', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingPemasukanList'])->name('marketing.dashboard.pemasukan');
+    Route::get('/dashboard/code/pemasukan/today', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingPemasukanListToday'])->name('marketing.dashboard.pemasukan.today');
+    Route::get('/dashboard/code/pemasukan/this-month', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingPemasukanListMonth'])->name('marketing.dashboard.pemasukan.month');
 
     Route::get('/dashboard/finance', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'financeDashboard'])->name('marketing.finance');
     Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'historyPenarikan'])->name('marketing.finance.history_penarikan');

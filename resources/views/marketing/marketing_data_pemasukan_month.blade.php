@@ -1,4 +1,5 @@
 <x-marketing-layout>
+
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
@@ -10,10 +11,11 @@
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('marketing.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('marketing.dashboard.invitationcode') }}">Code</a></li>
-                                <li class="breadcrumb-item active">Data Tenant</li>
+                                <li class="breadcrumb-item"><a href="{{ route('marketing.dashboard.pemasukan') }}">Pemasukan Anda</a></li>
+                                <li class="breadcrumb-item active">This Month</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Tenant List</h4>
+                        <h4 class="page-title">Data Pemasukan Bulan Ini</h4>
                     </div>
                 </div>
             </div>
@@ -29,36 +31,44 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Tenant List</h4>
+                            <h4 class="header-title mb-3">Tabel Daftar Pemasukan Bulan Ini</h4>
                             <div class="table-responsive">
                                 <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>Invitation Code</th>
+                                            <th>Holder</th>
                                             <th>Nama Tenant</th>
-                                            <th>Tanggal Bergabung</th>
-                                            <th>Phone</th>
-                                            <th>Action</th>
+                                            <th>Nama Toko</th>
+                                            <th>Insentif Mitra (Rp.)</th>
+                                            <th>Tanggal Penarikan</th>
+                                            <th>Bulan</th>
+                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
-                                        @foreach($tenant as $key => $t)
-                                            @foreach ($t->invitationCodeTenant as $userTenant)
+                                        @php
+                                            $no=0;
+                                        @endphp
+                                        @foreach($pemasukanTerbaru->invitationCodeTenant as $inv)
+                                            @foreach($inv->withdrawal as $withdrawal)
                                                 <tr>
                                                     <td>{{ $no+=1 }}</td>
-                                                    <td>{{ $userTenant->invitationCode->inv_code }}</td>
-                                                    <td>{{ $userTenant->name }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($userTenant->tanggal_bergabung)->format('d-m-Y') }}</td>
-                                                    <td>{{ $userTenant->phone }}</td>
+                                                    <td>{{ $inv->invitationCode->inv_code }}</td>
+                                                    <td>{{ $inv->invitationCode->holder }}</td>
+                                                    <td>{{ $inv->name }}</td>
+                                                    <td>{{ $inv->storeDetail->store_name }}</td>
+                                                    <td>{{ $withdrawal->detailWithdraw->biaya_mitra }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('d-m-Y') }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('F') }}</td>
                                                     <td>
-                                                        <a href="{{ route('marketing.dashboard.tenant.detail', ['inv_code' => $userTenant->invitationCode->id, 'id' => $userTenant->id_tenant]) }}">
-                                                            <button title="Lihat detail tenant" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
-                                                        </a>
+                                                        @if ($withdrawal->status == 1)
+                                                            <span class="badge bg-soft-success text-success">Sukses</span>
+                                                        @endif
                                                     </td>
                                                 </tr>
-                                                @endforeach
+                                            @endforeach
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -67,8 +77,6 @@
                     </div>
                 </div>
             </div>
-            <!-- end row -->
         </div>
-        <!-- container -->
     </div>
 </x-marketing-layout>

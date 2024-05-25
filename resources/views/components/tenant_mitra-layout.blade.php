@@ -73,7 +73,7 @@
         <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
         <script src="{{ asset('assets/libs/selectize/js/standalone/selectize.min.js') }}"></script>
         <!-- Dashboar 1 init js-->
-        {{-- <script src="{{ asset('assets/js/pages/dashboard-1.init.js') }}"></script> --}}
+        <script src="{{ asset('assets/js/pages/dashboard-1.init.js') }}"></script>
         <!-- App js-->
         <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
         <script src="{{ asset('assets/libs/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
