@@ -257,7 +257,7 @@
                                                             <div class="mb-3">
                                                                 <label for="nominal" class="form-label">Nominal Tarik (Rp.)</label>
                                                                 <input type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" name="nominal_tarik" id="nominal_tarik" required value="" placeholder="Masukkan nominal tarik dana">
-                                                                <small id="emailHelp" class="form-text text-muted"><strong>Minimal tarik dana Rp. 50.000, Pastikan saldo anda cukup, sebelum melakukan penarikan!</strong></small>
+                                                                <small id="emailHelp" class="form-text text-muted"><strong>Minimal tarik dana Rp. 10.000, Pastikan saldo anda cukup, sebelum melakukan penarikan!</strong></small>
                                                             </div>
                                                         </div>
                                                     </div>

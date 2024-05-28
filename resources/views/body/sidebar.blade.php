@@ -221,7 +221,7 @@
                         <div class="collapse" id="sidebarCrm">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Merchant List</a>
+                                    <a href="">Merchant List</a>
                                 </li>
                             </ul>
                         </div>
@@ -260,10 +260,10 @@
                                     <a href="{{ route('marketing.dashboard.invitationcode') }}">Dashboard Code</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('marketing.dashboard.tenant.list') }}">Data Tenant</a>
+                                    <a href="{{ route('marketing.dashboard.pemasukan') }}">Pemasukan</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('marketing.dashboard.pemasukan') }}">Pemasukan Anda</a>
+                                    <a href="{{ route('marketing.dashboard.tenant.list') }}">Data Tenant</a>
                                 </li>
                             </ul>
                         </div>
@@ -277,10 +277,7 @@
                         <div class="collapse" id="sidebarCrm">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Tenant List</a>
-                                </li>
-                                <li>
-                                    <a href="#">Data Penarikan</a>
+                                    <a href="{{ route('marketing.dashboard.merchant') }}">Merchant List</a>
                                 </li>
                             </ul>
                         </div>
@@ -297,10 +294,7 @@
                                     <a href="{{ route('marketing.finance') }}">Dashboard Finansial</a>
                                 </li>
                                 <li>
-                                    <a href="crm-customers.html">Pemasukan</a>
-                                </li>
-                                <li>
-                                    <a href="crm-customers.html">Total Saldo</a>
+                                    <a href="{{ route('marketing.finance.saldo') }}">Total Saldo</a>
                                 </li>
                                 <li>
                                     <a href="{{ route('marketing.finance.history_penarikan') }}">History Penarikan Anda</a>
@@ -410,16 +404,16 @@
                             <div class="collapse" id="aplikasi">
                                 <ul class="nav-second-level">
                                     <li>
-                                        <a href="{{ route('tenant.transaction') }}">Dashboard Aplikasi</a>
+                                        <a href="{{ route('tenant.mitra.dashboard.app') }}">Dashboard Aplikasi</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('tenant.toko') }}">Akun Qris Toko</a>
+                                        <a href="{{ route('tenant.mitra.dashboard.app.qrisacc') }}">Akun Qris Merchant</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('tenant.transaction.list.pending') }}">Pengaturan API Qris</a>
+                                        <a href="#">Pengaturan API Qris</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('tenant.transaction.list.pending.payment') }}">Dokumentasi</a>
+                                        <a href="#">Dokumentasi</a>
                                     </li>
                                 </ul>
                             </div>
@@ -508,7 +502,7 @@
                                         <a href="{{ route('tenant.mitra.dashboard.finance.saldo') }}">Total Saldo</a>
                                     </li>
                                     <li>
-                                        <a href="">History Penarikan Anda</a>
+                                        <a href="#">History Penarikan Anda</a>
                                     </li>
                                 </ul>
                             </div>

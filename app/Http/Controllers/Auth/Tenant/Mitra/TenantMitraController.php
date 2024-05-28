@@ -19,6 +19,9 @@ use App\Models\Tenant;
 use App\Models\StoreList;
 use App\Models\UmiRequest;
 use App\Models\QrisWallet;
+use App\Models\TenantQrisAccount;
+use App\Models\ApiKey;
+use App\Models\CallbackApiData;
 use File;
 use Mail;
 use Exception;
@@ -507,6 +510,30 @@ class TenantMitraController extends Controller {
                             ->latest()
                             ->get();
             return view('tenant.tenant_mitra.tenant_transaction_list_finish_today', compact('invoice'));
+    }
+
+    public function appDashboard(){
+        return view('tenant.tenant_mitra.tenant_application_dashboard');
+    }
+
+    public function qrisAccountList(){
+        $qrisAcc = TenantQrisAccount::where('id_tenant', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->latest()
+                                    ->get();
+
+        return view('tenant.tenant_mitra.tenant_application_qris', compact(['qrisAcc']));
+    }
+
+    public function qrisApiSetting(){
+        $apiKey = ApiKey::where('id_tenant', auth()->user()->id)
+                        ->where('email', auth()->user()->email)
+                        ->first();
+        $callback = CallbackApiData::where('id_tenant', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
+        return view('tenant.tenant_mitra.tenant_application_settings', compact(['apiKey', 'callback']));
+        
     }
 
     public function financeDashboard(){

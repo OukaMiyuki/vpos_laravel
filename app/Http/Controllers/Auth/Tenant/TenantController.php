@@ -859,7 +859,8 @@ class TenantController extends Controller {
 
     public function batchProductList(){
         $identifier = $this->getStoreIdentifier();
-        $product = Product::where('store_identifier', $identifier)
+        $product = Product::with(['category'])
+                            ->where('store_identifier', $identifier)
                             ->latest()
                             ->get();
         return view('tenant.tenant_product_list', compact('product'));

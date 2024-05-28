@@ -25,6 +25,7 @@ use App\Models\QrisWallet;
 use App\Models\QrisWalletPending;
 use App\Models\UmiRequest;
 use App\Models\Withdrawal;
+use App\Models\DetailPenarikan;
 use App\Models\Kasir;
 use App\Models\StoreList;
 
@@ -101,6 +102,18 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
 
     public function withdrawal(){
         return $this->hasMany(Withdrawal::class, 'id_user', 'id');
+    }
+
+    
+    public function withdrawalDetail(){
+        return $this->hasManyThrough(
+            DetailPenarikan::class, 
+            Withdrawal::class, 
+            'id_user', 
+            'id_penarikan',
+            'id',
+            'id'
+        );
     }
 
     public function saldoTunai(){

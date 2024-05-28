@@ -35,10 +35,10 @@
                             <h4 class="header-title mb-3">Revenue History</h4>
                             <div class="row">
                                 <div class="col-6">
-                                    <h3 class="mb-3"><span>Invitation Code : </span>AMAR5</h3>
+                                    <h3 class="mb-3"><span>Invitation Code : </span>{{ $withdrawList->inv_code }} - {{ $withdrawList->holder }}</h3>
                                 </div>
                                 <div class="col-6">
-                                    <h3 class="mb-3 text-end"><span>Total Saldo : </span>Rp. 2000.000,00</h3>
+                                    <h3 class="mb-3 text-end"><span>Total Saldo : </span>Rp. {{ $totalInsentif }}</h3>
                                 </div>
                             </div>
                             <div class="responsive-table-plugin">
@@ -48,24 +48,29 @@
                                             <thead>
                                                 <tr>
                                                     <th>No.</th>
-                                                    <th>Merchant ID</th>
-                                                    <th>Merchant Name</th>
-                                                    <th>Cash Out Date</th>
-                                                    <th>Cash Out Nominal</th>
-                                                    <th>Marketing Share</th>
-                                                    <th>Action</th>
+                                                    <th>Nama Tenant</th>
+                                                    <th>Nama Toko</th>
+                                                    <th>Tanggal Penarikan</th>
+                                                    <th>Nominal (Rp.)</th>
+                                                    <th>Insentif Mitra (Rp.)</th>
                                                 </tr>
                                             </thead>
+                                            @php
+                                                $no=0;
+                                            @endphp
                                             <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>MR0001</td>
-                                                    <td>Toko Bangunan Surabaya</td>
-                                                    <td>01-02-2024</td>
-                                                    <td>Rp. 2.000.000,00</td>
-                                                    <td>Rp. 500,00</td>
-                                                    <td><a href="{{ route('marketing.dashboard.invitationcode.cashout.invoice') }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>&nbsp;&nbsp;</td>
-                                                </tr>
+                                                @foreach ($withdrawList->tenant as $tenantWD)
+                                                    @foreach ($tenantWD->withdrawal as $wd)
+                                                        <tr>
+                                                            <td>{{ $no+=1 }}</td>
+                                                            <td>{{ $tenantWD->name }}</td>
+                                                            <td>{{ $tenantWD->storeDetail->store_name }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }}</td>
+                                                            <td>{{ $wd->nominal }}</td>
+                                                            <td>{{ $wd->detailWithdraw->biaya_mitra }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endforeach
                                             </tbody>
                                         </table>
                                     </div>

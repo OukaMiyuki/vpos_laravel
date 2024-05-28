@@ -72,7 +72,7 @@ Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'isMa
 
     Route::get('/dashboard/code', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeDashboard'])->name('marketing.dashboard.invitationcode');
     Route::post('/dashboard/code/insert', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeInsert'])->name('marketing.dashboard.invitationcode.insert');
-    Route::get('/dashboard/code/cashout/info', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutList'])->name('marketing.dashboard.invitationcode.cashout.list');
+    Route::get('/dashboard/code/cashout/info/{code}', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutList'])->name('marketing.dashboard.invitationcode.cashout.list');
     Route::get('/dashboard/code/cashout/invoice', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutInvoice'])->name('marketing.dashboard.invitationcode.cashout.invoice');
 
     Route::get('/dashboard/code/tenant/', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantList'])->name('marketing.dashboard.tenant.list');
@@ -82,7 +82,10 @@ Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'isMa
     Route::get('/dashboard/code/pemasukan/today', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingPemasukanListToday'])->name('marketing.dashboard.pemasukan.today');
     Route::get('/dashboard/code/pemasukan/this-month', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingPemasukanListMonth'])->name('marketing.dashboard.pemasukan.month');
 
+    Route::get('/dashboard/merchant', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingMerchant'])->name('marketing.dashboard.merchant');
+
     Route::get('/dashboard/finance', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'financeDashboard'])->name('marketing.finance');
+    Route::get('/dashboard/finance/saldo', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'financeSaldo'])->name('marketing.finance.saldo');
     Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'historyPenarikan'])->name('marketing.finance.history_penarikan');
     Route::get('/dashboard/finance/history-penarikan/{id}', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invoiceTarikDana'])->name('marketing.finance.history_penarikan.invoice');
 
@@ -149,6 +152,10 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/transaction/list/finish_payment', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationFinish'])->name('tenant.mitra.dashboard.transaction.finish_transaction');
     Route::get('/dashboard/transaction/list/finish_payment_today', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationFinishToday'])->name('tenant.mitra.dashboard.transaction.finish_transaction_today');
     Route::get('/dashboard/transaction/store/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationStore'])->name('tenant.mitra.dashboard.transaction.store');
+
+    Route::get('/dashboard/application', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'appDashboard'])->name('tenant.mitra.dashboard.app');
+    Route::get('/dashboard/application/qris', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'qrisAccountList'])->name('tenant.mitra.dashboard.app.qrisacc');
+    Route::get('/dashboard/application/setting', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'qrisApiSetting'])->name('tenant.mitra.dashboard.app.seting');
 
     Route::get('/dashboard/finance', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'financeDashboard'])->name('tenant.mitra.dashboard.finance');
     Route::get('/dashboard/finance/saldo', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'saldoData'])->name('tenant.mitra.dashboard.finance.saldo');

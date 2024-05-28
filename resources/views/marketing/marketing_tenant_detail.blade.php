@@ -141,7 +141,14 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Data Penarikan Dana Tenant</h4>
-                        
+                            <div class="row">
+                                <div class="col-6">
+                                    <h4 class="mb-3"><span>Invitation Code : </span>{{ $tenant->invitationCode->inv_code }} - {{ $tenant->invitationCode->holder }}</h4>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="mb-3 text-end"><span>Total Insentif : </span>Rp. {{ $totalPenghasilan }}</h4>
+                                </div>
+                            </div>
                             <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
                                 <thead>
                                     <tr>

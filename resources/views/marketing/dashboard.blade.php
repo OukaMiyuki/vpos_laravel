@@ -78,7 +78,7 @@
                                         <div class="text-end">
                                             <h4 class="text-dark mt-1">RP.&nbsp;<span data-plugin="counterup">{{ $qrisWallet->saldo }}</span></h4>
                                             <p class="text-muted mb-1 text-truncate">Saldo Anda</p>
-                                            <a href="" class="btn btn-blue btn-sm ms-2">
+                                            <a href="{{ route('marketing.finance.saldo') }}" class="btn btn-blue btn-sm ms-2">
                                                 <i class="mdi mdi-eye"></i>
                                             </a>
                                         </div>
@@ -177,7 +177,7 @@
                                                 @foreach ($tenantList->invitationCodeTenant as $tenantInfo)
                                                     @foreach ($tenantInfo->withdrawal as $detail)
                                                         <tr>
-                                                            <td><a href="#" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a></td>
+                                                            <td><a href="{{ route('marketing.dashboard.tenant.detail', ['inv_code' => $tenantInfo->invitationCode->id, 'id' => $tenantInfo->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a></td>
                                                             <td>{{ $tenantInfo->name }}</td>
                                                             <td>{{ \Carbon\Carbon::parse($detail->tanggal_penarikan)->format('d-m-Y') }}</td>
                                                             <td>

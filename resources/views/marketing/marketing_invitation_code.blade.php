@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-3 col-xl-3">
+                <div class="col-md-4 col-xl-4">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
@@ -40,7 +40,7 @@
                     </div>
                     <!-- end widget-rounded-circle-->
                 </div>
-                <div class="col-md-3 col-xl-3">
+                <div class="col-md-4 col-xl-4">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
@@ -52,50 +52,6 @@
                                         <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $tenantNumber }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Tenant</p>
                                         <a href="{{ route('tenant.transaction.today') }}" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row-->
-                        </div>
-                    </div>
-                    <!-- end widget-rounded-circle-->
-                </div>
-                <div class="col-md-3 col-xl-3">
-                    <div class="widget-rounded-circle card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-4">
-                                    <img src="{{ asset('assets/images/icons/cash-withdrawal.png') }}" class="img-fluid" alt="">
-                                </div>
-                                <div class="col-8">
-                                    <div class="text-end">
-                                        <h4 class="text-dark mt-1">RP.<span data-plugin="counterup">40000</span></h4>
-                                        <p class="text-muted mb-1 text-truncate">Pemasukan Hari Ini</p>
-                                        <a href="{{ route('tenant.transaction.list.pending') }}" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row-->
-                        </div>
-                    </div>
-                    <!-- end widget-rounded-circle-->
-                </div>
-                <div class="col-md-3 col-xl-3">
-                    <div class="widget-rounded-circle card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-4">
-                                    <img src="{{ asset('assets/images/icons/money.png') }}" class="img-fluid" alt="">
-                                </div>
-                                <div class="col-8">
-                                    <div class="text-end">
-                                        <h4 class="text-dark mt-1">RP.<span data-plugin="counterup">1000000</span></h4>
-                                        <p class="text-muted mb-1 text-truncate">Total Pemasukan</p>
-                                        <a href="{{ route('tenant.transaction.list.pending.payment') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -150,7 +106,7 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <a href="{{ route('marketing.dashboard.invitationcode.cashout.list') }}">
+                                                    <a href="{{ route('marketing.dashboard.invitationcode.cashout.list', ['code' => $code->inv_code]) }}">
                                                         <button title="Lihat data penarikan" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                 </td>
