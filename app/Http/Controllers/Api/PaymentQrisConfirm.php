@@ -66,6 +66,10 @@ class PaymentQrisConfirm extends Controller {
                 $data = [
                     $parameter => $invoice->nomor_invoice,
                     $secret_key_parameter => $secret_key,
+                    'amount' => $invoice->nominal_bayar,
+                    'mdr' => $invoice->mdr,
+                    'nominal_mdr' => $invoice->nominal_mdr,
+                    'nominal_terima_bersih' => $invoice->nominal_terima_bersih,
                     'status' => 'success',
                 ];
     
@@ -78,7 +82,7 @@ class PaymentQrisConfirm extends Controller {
                     $contents = $response->getBody()->getContents();
 
                     History::create([
-                        'action' => 'User Callback : Success',
+                        'action' => 'User Payment Callback : Success',
                         'id_user' => $invoice->id_tenant,
                         'email' => $invoice->email,
                         'lokasi_anda' => 'System Report',
@@ -88,7 +92,7 @@ class PaymentQrisConfirm extends Controller {
                     ]);
                 } catch(Exception $ex){
                     History::create([
-                        'action' => 'User Callback : Fail',
+                        'action' => 'User Payment Callback : Fail',
                         'id_user' => $invoice->id_tenant,
                         'email' => $invoice->email,
                         'lokasi_anda' => 'System Report',
@@ -99,7 +103,7 @@ class PaymentQrisConfirm extends Controller {
                 }
             } else {
                 History::create([
-                    'action' => 'User Callback : No Callback provided',
+                    'action' => 'User Payment Callback : No Callback provided from the user',
                     'id_user' => $invoice->id_tenant,
                     'email' => $invoice->email,
                     'lokasi_anda' => 'System Report',

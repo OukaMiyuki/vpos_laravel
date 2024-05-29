@@ -63,6 +63,14 @@
                                                         @endif
                                                     </td>
                                                     <td>
+                                                        <a href="{{ route('tenant.kasir.activation', ['id' => $k->id]) }}">
+                                                            <button title="Nonaktifkan Kasir" type="button" class="btn
+                                                            @if ($k->is_active == 1)
+                                                                btn-danger
+                                                            @else
+                                                                btn-success
+                                                            @endif  rounded-pill waves-effect waves-light"><span class="mdi mdi-power"></span></button>&nbsp;
+                                                        </a>
                                                         <a href="{{ route('tenant.kasir.detail', ['id' => $k->id]) }}">
                                                             <button title="Lihat data kasir" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                         </a>

@@ -24,7 +24,7 @@ class IsMarketingActive {
                 'message' => 'Login gagal! Akun anda telah dinonaktifkan! Silahkan hubungi Admin.',
                 'alert-type' => 'error',
             );
-            return redirect()->route('marketing.login')->with($notification);
+            return redirect()->route('access.login')->with($notification);
         }
         return $next($request);
     }

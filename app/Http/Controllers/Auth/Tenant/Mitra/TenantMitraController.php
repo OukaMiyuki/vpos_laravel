@@ -61,7 +61,8 @@ class TenantMitraController extends Controller {
         $all = $invoice->count();
         $allToday = $invoice->whereDate('tanggal_transaksi', Carbon::now())->count();
         $allFinish = $invoice->whereDate('tanggal_transaksi', Carbon::now())->where('status_pembayaran', 1)->count();
-        $invoiceNew = Invoice::where('id_tenant', auth()->user()->id)
+        $invoiceNew = Invoice::with(['storeMitra'])
+                            ->where('id_tenant', auth()->user()->id)
                             ->where('email', auth()->user()->email)
                             ->latest()
                             ->take(10)
@@ -493,30 +494,47 @@ class TenantMitraController extends Controller {
     }
 
     public function transationDashboard(){
-        $invoice = Invoice::where('id_tenant', auth()->user()->id)
-                            ->where('email', auth()->user()->email);
-        $all = $invoice->count();
-        $allToday = $invoice->whereDate('tanggal_transaksi', Carbon::now())->count();
-        $allPending = $invoice->where('status_pembayaran', 0)->count();
-        $allFinish = $invoice->where('status_pembayaran', 1)->count();
+        $all = Invoice::where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->count();
+        $allToday = Invoice::where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->whereDate('tanggal_transaksi', Carbon::now())
+                            ->count();
+        $allPending = Invoice::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->where('status_pembayaran', 0)
+                                ->count();
+        $allFinish = Invoice::where('id_tenant', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->where('status_pembayaran', 1)
+                                ->count();
 
-        $storeList = Invoice::select([
-                                        'id',
-                                        "store_identifier",
-                                        DB::raw("(count(store_identifier)) as banyak_transaksi")
-                                    ])
-                                    ->with(['storeMitra' => function($query){
-                                        $query->select([
-                                            'store_lists.id',
-                                            'store_lists.store_identifier',
-                                            'store_lists.name'
-                                        ]);
-                                    }])
-                                    ->where('jenis_pembayaran', 'Qris')
-                                    ->where('id_tenant', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
-                                    ->groupBy(['id','store_identifier'])
-                                    ->get();
+        // $storeList = Invoice::select([
+        //                                 'id',
+        //                                 "store_identifier",
+        //                                 DB::raw("(count(store_identifier)) as banyak_transaksi")
+        //                             ])
+        //                             ->with(['storeMitra' => function($query){
+        //                                 $query->select([
+        //                                     'store_lists.id',
+        //                                     'store_lists.store_identifier',
+        //                                     'store_lists.name'
+        //                                 ])
+        //                                 ->groupBy(['id','store_identifier', 'name'])
+        //                                 ->get();
+        //                             }])
+        //                             ->where('jenis_pembayaran', 'Qris')
+        //                             ->where('id_tenant', auth()->user()->id)
+        //                             ->where('email', auth()->user()->email)
+        //                             ->groupBy(['id','store_identifier'])
+        //                             ->get();
+
+        $storeList = StoreList::where('id_user', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->select(['store_lists.id', 'store_lists.id_user', 'store_lists.store_identifier', 'store_lists.name'])
+                                ->withCount(['invoice'])
+                                ->get();
 
         return view('tenant.tenant_mitra.tenant_transaction_dashboard', compact(['all', 'allToday', 'allPending', 'allFinish', 'storeList']));
     }

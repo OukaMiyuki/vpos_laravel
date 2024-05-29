@@ -916,19 +916,23 @@ class ProfileController extends Controller{
                                 ->first();
         $agregateWallet = AgregateWallet::find(1);
         $qrisAdmin = QrisWallet::where('email', 'adminsu@visipos.id')->find(1);
-        $marketing = InvitationCode::select(['invitation_codes.id',
-                                            'invitation_codes.id_marketing',
-                                        ])
-                                ->with(['marketing' => function ($query){
-                                    $query->select(['marketings.id',
-                                                    'marketings.email'
-                                    ])->get();
-                                }])
-                                ->find(auth()->user()->id_inv_code);
-        
-        $saldoMitra = QrisWallet::where('id_user', $marketing->marketing->id)
-                                ->where('email', $marketing->marketing->email)
-                                ->first();
+        $marketing = "";
+        $saldoMitra = "";
+        if(auth()->user()->id_inv_code != 0){
+            $marketing = InvitationCode::select(['invitation_codes.id',
+                                                    'invitation_codes.id_marketing',
+                                                ])
+                                        ->with(['marketing' => function ($query){
+                                            $query->select(['marketings.id',
+                                                            'marketings.email'
+                                            ])->get();
+                                        }])
+                                        ->find(auth()->user()->id_inv_code);
+
+            $saldoMitra = QrisWallet::where('id_user', $marketing->marketing->id)
+                                    ->where('email', $marketing->marketing->email)
+                                    ->first();
+        }
         $agregateSaldo = $agregateWallet->saldo;
 
         try{
@@ -984,13 +988,22 @@ class ProfileController extends Controller{
                                 'saldo' => $saldo-$total_penarikan
                             ]);
                             $adminSaldo = $qrisAdmin->saldo;
-                            $qrisAdmin->update([
-                                'saldo' => $adminSaldo+$aplikator
-                            ]);
-                            $mitraSaldo = $saldoMitra->saldo;
-                            $saldoMitra->update([
-                                'saldo' => $mitraSaldo+$mitra
-                            ]);
+
+                            if(auth()->user()->id_inv_code != 0){
+                                $qrisAdmin->update([
+                                    'saldo' => $adminSaldo+$aplikator
+                                ]);
+
+                                $mitraSaldo = $saldoMitra->saldo;
+                                $saldoMitra->update([
+                                    'saldo' => $mitraSaldo+$mitra
+                                ]);
+                            } else if(auth()->user()->id_inv_code == 0){
+                                $qrisAdmin->update([
+                                    'saldo' => $adminSaldo+$aplikator+$mitra
+                                ]);
+                            }
+
                             $agregateWallet->update([
                                 'saldo' =>$agregateSaldo+$agregate
                             ]);

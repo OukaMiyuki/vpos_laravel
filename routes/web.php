@@ -130,6 +130,9 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
 
     Route::post('settings/profile/tarik-dana', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tarikDanaQris'])->name('tenant.profile.tarik');
     Route::post('settings/profile/tarik-dana/proses', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'prosesTarikDana'])->name('tenant.profile.tarik.proses');
+
+    Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'historyPenarikan'])->name('tenant.finance.history_penarikan');
+    Route::get('/dashboard/finance/history-penarikan/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'invoiceTarikDana'])->name('tenant.finance.history_penarikan.invoice');
 });
 
 Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsNotMitra'])->prefix('/tenant/mitra')->group( function () {
@@ -178,6 +181,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/kasir/list/active', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirListActive'])->name('tenant.kasir.list.active');
     Route::get('/dashboard/kasir/list/non-aktif', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirListNonActive'])->name('tenant.kasir.list.non.active');
     Route::get('/dashboard/kasir/info/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirDetail'])->name('tenant.kasir.detail');
+    Route::get('/dashboard/kasir/activation/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirActivate'])->name('tenant.kasir.activation');
     Route::post('/kasir/register', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirRegister'])->name('tenant.register.kasir');
 
     Route::get('/dashboard/pos', [App\Http\Controllers\Auth\Tenant\PosController::class, 'pos'])->name('tenant.pos');
@@ -244,8 +248,6 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-yesterday', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisPending'])->name('tenant.finance.pemasukan.qris.pending');
     Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-today', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisToday'])->name('tenant.finance.pemasukan.qris.today');
     Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-all', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQris'])->name('tenant.finance.pemasukan.qris.all');
-    Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'historyPenarikan'])->name('tenant.finance.history_penarikan');
-    Route::get('/dashboard/finance/history-penarikan/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'invoiceTarikDana'])->name('tenant.finance.history_penarikan.invoice');
 
     Route::get('/dashboard/management', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'storeManagement'])->name('tenant.store.management');
     Route::get('/dashboard/management/discount', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModify'])->name('tenant.discount.modify');

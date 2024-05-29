@@ -508,7 +508,7 @@
                                         <a href="{{ route('tenant.mitra.dashboard.finance.saldo') }}">Total Saldo</a>
                                     </li>
                                     <li>
-                                        <a href="#">History Penarikan Anda</a>
+                                        <a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan Anda</a>
                                     </li>
                                 </ul>
                             </div>

@@ -47,7 +47,7 @@ class QrisWalletPendingUpdate extends Command {
                             ->groupBy(['id','store_identifier', 'email', 'id_tenant'])
                             ->get();
         foreach($invoiceYesterday as $invoice){
-            $qris = QrisWallet::where('id_user', $invoice->id_tenant)->first();
+            $qris = QrisWallet::where('id_user', $invoice->id_tenant)->where('email', $invoice->email)->first();
             $qrisSaldo = $qris->saldo;
             $saldoTransfer = $invoice->total_penghasilan;
             $qris->update([

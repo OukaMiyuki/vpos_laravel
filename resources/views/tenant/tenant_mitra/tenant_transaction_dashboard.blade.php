@@ -137,8 +137,8 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $inv->store_identifier }}</td>
-                                                <td>{{ $inv->storeMitra->name }}</td>
-                                                <td>{{ $inv->banyak_transaksi }}</td>
+                                                <td>{{ $inv->name }}</td>
+                                                <td>{{ $inv->invoice_count }}</td>
                                                 <td>
                                                     <a href="{{ route('tenant.mitra.dashboard.transaction.store', ['store_identifier' => $inv->store_identifier]) }}">
                                                         <button title="Lihat daftar transaksi" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;

@@ -32,7 +32,9 @@ use Exception;
 class TenantController extends Controller {
 
     public function __construct() {
-        $this->middleware('isTenantIsMitra');
+        $this->middleware('isTenantIsMitra', ['except' => [
+                                'historyPenarikan', 'invoiceTarikDana'
+                            ]]);
     }
 
     public function getStoreIdentifier(){
@@ -284,6 +286,55 @@ class TenantController extends Controller {
             return redirect()->route('tenant.kasir.list')->with($notification);
         }
         return view('tenant.tenant_kasir_detail', compact('kasir'));
+    }
+
+    public function kasirActivate($id){
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $kasir = Kasir::where('id_store', $store->store_identifier)->find($id);
+
+        if(is_null($kasir) || empty($kasir)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'info',
+            );
+    
+            return redirect()->route('tenant.kasir.list')->with($notification);
+        }
+
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        if($kasir->is_active == 0){
+            $kasir->update([
+                'is_active' => 1
+            ]);
+        } else {
+            $kasir->update([
+                'is_active' => 0
+            ]);
+        }
+
+        History::create([
+            'id_user' => auth()->user()->id,
+            'email' => auth()->user()->email,
+            'action' => "Kasir activation : Success!",
+            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+            'deteksi_ip' => $ip,
+            'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+            'status' => 1
+        ]);
+
+        $notification = array(
+            'message' => 'Kasir berhasil dinonaktifkan!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
     }
 
     public function tenantMenuToko(){

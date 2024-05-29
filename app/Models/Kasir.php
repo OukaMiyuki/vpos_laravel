@@ -22,6 +22,7 @@ class Kasir extends Authenticatable implements MustVerifyEmail {
         'email',
         'phone',
         'password',
+        'is_active'
     ];
 
     protected $hidden = [

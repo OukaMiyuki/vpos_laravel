@@ -21,10 +21,10 @@ class IsKasirActive {
             $request->session()->invalidate();
             $request->session()->regenerateToken();
             $notification = array(
-                'message' => 'Login gagal! Akun anda telah dinonaktifkan!',
+                'message' => 'Login gagal! Akun anda telah dinonaktifkan oleh Tenant!',
                 'alert-type' => 'error',
             );
-            return redirect()->route('kasir.login')->with($notification);
+            return redirect()->route('access.login')->with($notification);
         }
         return $next($request);
     }

@@ -49,49 +49,41 @@ class KasirController extends Controller {
         $totalInvoiceHariIni = Invoice::whereDate('tanggal_transaksi', Carbon::today())
                                         ->where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
-                                        ->where('email', auth()->user()->email)
                                         ->count();
         $totalInvoice = Invoice::where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
                                     ->count();
         $pemasukanHariIniTunai = Invoice::whereDate('tanggal_transaksi', Carbon::today())
                                     ->where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
                                     ->where('jenis_pembayaran', 'Tunai')
                                     ->where('status_pembayaran', 1)
                                     ->sum(DB::raw('sub_total + pajak'));
         $pemasukanHariIniQris = Invoice::whereDate('tanggal_transaksi', Carbon::today())
                                     ->where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
                                     ->where('jenis_pembayaran', 'Qris')
                                     ->where('status_pembayaran', 1)
                                     ->sum('nominal_terima_bersih');
         $pemasukanHariIni = $pemasukanHariIniTunai+$pemasukanHariIniQris;
         $totalPemasukanTunai = Invoice::where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
                                     ->where('jenis_pembayaran', 'Tunai')
                                     ->where('status_pembayaran', 1)
                                     ->sum(DB::raw('sub_total + pajak'));
         $totalPemasukanQris = Invoice::where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
                                     ->where('jenis_pembayaran', 'Qris')
                                     ->where('status_pembayaran', 1)
                                     ->sum('nominal_terima_bersih');
         $totalPemasukan = $totalPemasukanTunai+$totalPemasukanQris;
         $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
                             ->latest()
                             ->take(10)
                             ->get();
         $invoicePaymentPending = Invoice::where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
-                                        ->where('email', auth()->user()->email)
                                         ->where('jenis_pembayaran', 'Qris')
                                         ->where('status_pembayaran', 0)
                                         ->latest()
@@ -99,14 +91,12 @@ class KasirController extends Controller {
                                         ->get();
         $transaksiTerbaru = Invoice::where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
                                     ->whereDate('tanggal_transaksi', Carbon::now())
                                     ->latest()
                                     ->take(10)
                                     ->get();
         $transaksiQrisPending = Invoice::where('store_identifier', auth()->user()->id_store)
                                     ->where('id_kasir', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
                                     ->where('jenis_pembayaran', 'Qris')
                                     ->where('status_pembayaran', 0)
                                     ->latest()
@@ -217,10 +207,9 @@ class KasirController extends Controller {
         $invoice = "";
 
         try{
-
             $invoice = Invoice::create([
                 'store_identifier' => auth()->user()->id_store,
-                'email' => auth()->user()->email,
+                'email' => auth()->user()->store->email,
                 'id_tenant' => auth()->user()->store->id_tenant,
                 'id_kasir' => auth()->user()->id,
                 'tanggal_transaksi' => Carbon::now()
@@ -296,7 +285,7 @@ class KasirController extends Controller {
             if($request->jenisPembayaran == "Tunai"){
                 $invoice = Invoice::create([
                     'store_identifier' => auth()->user()->id_store,
-                    'email' => auth()->user()->email,
+                    'email' => auth()->user()->store->email,
                     'id_tenant' => auth()->user()->store->id_tenant,
                     'id_kasir' => auth()->user()->id,
                     'jenis_pembayaran' => $request->jenisPembayaran,
@@ -379,26 +368,22 @@ class KasirController extends Controller {
         $transaction = Invoice::where('store_identifier', auth()->user()->id_store)
                                 ->where('id_kasir', auth()->user()->id)
                                 ->where('id_tenant', auth()->user()->store->id_tenant)
-                                ->where('email', auth()->user()->email)
                                 ->count();
         $transactionPending = Invoice::where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
                                         ->where('id_tenant', auth()->user()->store->id_tenant)
-                                        ->where('email', auth()->user()->email)
                                         ->where('jenis_pembayaran', NULL)
                                         ->where('status_pembayaran', 0)
                                         ->count();
         $transactionPendingPayment = Invoice::where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
                                         ->where('id_tenant', auth()->user()->store->id_tenant)
-                                        ->where('email', auth()->user()->email)
                                         ->where('jenis_pembayaran', "Qris")
                                         ->where('status_pembayaran', 0)
                                         ->count();
         $transactionFinish = Invoice::where('store_identifier', auth()->user()->id_store)
                                         ->where('id_kasir', auth()->user()->id)
                                         ->where('id_tenant', auth()->user()->store->id_tenant)
-                                        ->where('email', auth()->user()->email)
                                         ->where('status_pembayaran', 1)
                                         ->count();
         //dd($transactionFinish);
@@ -411,7 +396,6 @@ class KasirController extends Controller {
                             ->where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('id_tenant', auth()->user()->store->id_tenant)
-                            ->where('email', auth()->user()->email)
                             ->latest()
                             ->get();
         return view('kasir.kasir_transaction_list', compact('invoice'));
@@ -422,7 +406,6 @@ class KasirController extends Controller {
                             ->where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('id_tenant', auth()->user()->store->id_tenant)
-                            ->where('email', auth()->user()->email)
                             ->where('jenis_pembayaran', NULL)
                             ->where('status_pembayaran', 0)
                             ->latest()
@@ -434,7 +417,6 @@ class KasirController extends Controller {
         $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                         ->where('id_kasir', auth()->user()->id)
                         ->where('id_tenant', auth()->user()->store->id_tenant)
-                        ->where('email', auth()->user()->email)
                         ->where('jenis_pembayaran', "Qris")
                         ->where('status_pembayaran', 0)
                         ->latest()
@@ -447,7 +429,6 @@ class KasirController extends Controller {
                             ->where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('id_tenant', auth()->user()->store->id_tenant)
-                            ->where('email', auth()->user()->email)
                             ->whereNull('jenis_pembayaran')
                             ->where('status_pembayaran', 0)
                             ->find($id);
@@ -603,7 +584,6 @@ class KasirController extends Controller {
         try{
             $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                                 ->where('id_kasir', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
                                 ->where('id_tenant', auth()->user()->store->id_tenant)
                                 ->where('status_pembayaran', 0)
                                 ->find($id);
@@ -668,7 +648,6 @@ class KasirController extends Controller {
             $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                                 ->where('id_kasir', auth()->user()->id)
                                 ->where('id_tenant', auth()->user()->store->id_tenant)
-                                ->where('email', auth()->user()->email)
                                 ->find($request->id_invoice);
             $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalianText);
             if($request->jenisPembayaran == "Tunai"){
@@ -793,7 +772,6 @@ class KasirController extends Controller {
         $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('id_tenant', auth()->user()->store->id_tenant)
-                            ->where('email', auth()->user()->email)
                             ->find($request->id);
         try{
             $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalian);
@@ -849,7 +827,6 @@ class KasirController extends Controller {
                             ->where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('id_tenant', auth()->user()->store->id_tenant)
-                            ->where('email', auth()->user()->email)
                             ->whereNotNull('jenis_pembayaran')
                             ->find($id);
 
@@ -870,7 +847,6 @@ class KasirController extends Controller {
                             ->where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('id_tenant', auth()->user()->store->id_tenant)
-                            ->where('email', auth()->user()->email)
                             ->whereNotNull('jenis_pembayaran')
                             ->find($id);
         return view('kasir.printer', compact('invoice'));
@@ -880,7 +856,6 @@ class KasirController extends Controller {
         $invoice = Invoice::where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('id_tenant', auth()->user()->store->id_tenant)
-                            ->where('email', auth()->user()->email)
                             ->where('status_pembayaran', 1)
                             ->latest()
                             ->get();
