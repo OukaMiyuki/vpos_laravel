@@ -4,10 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use GuzzleHttp\Client as GuzzleHttpClient;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use App\Models\Invoice;
 use App\Models\StoreList;
+use App\Models\ApiKey;
+use App\Models\CallbackApiData;
+use App\Models\History;
 // use App\Models\HistoryCashbackAdmin;
 // use App\Models\QrisWallet;
 use Exception;
@@ -15,62 +20,102 @@ use Exception;
 class PaymentQrisConfirm extends Controller {
     public function qrisConfirmPayment(Request $request) : JsonResponse{
         $apiPassword = $request->password;
-        // $amount = $request->amount;
-        // $mdr = 0;
+        $invoice_number = $request->nomor_invoice;
+
         if($apiPassword == "VposQrisPaymentConfirm"){
-            $invoice = Invoice::where('nomor_invoice', $request->nomor_invoice)
+            $invoice = Invoice::where('nomor_invoice', $invoice_number)
                                 ->where('jenis_pembayaran', 'Qris')
                                 ->first();
-            // $qrisAdminWallet = QrisWallet::where('id_user', 8)->find(6);
-            // $saldoAdmin = $qrisAdminWallet->saldo;
+
+            if(is_null($invoice) || empty($invoice)){
+
+                History::create([
+                    'action' => 'Payment Callback : Invoice cannot be found!',
+                    'id_user' => NULL,
+                    'email' => NULL,
+                    'lokasi_anda' => 'System Report',
+                    'deteksi_ip' => 'System Report',
+                    'log' => $invoice_number,
+                    'status' => 1
+                ]);
+
+                return response()->json([
+                    'message' => 'Invoice cannot be found!',
+                    'response-content' => $invoice_number,
+                    'status' => 404
+                ]);
+            }
 
             $invoice->update([
                 'tanggal_pelunasan' => Carbon::now(),
                 'status_pembayaran' => 1,
             ]);
+            $contents = "";
+            $callback = CallbackApiData::where('email', $invoice->email)->where('id_tenant', $invoice->id_tenant)->first();
 
-            // $nominal_mdr = $invoice->nominal_mdr;
-            // $insentif_cashback = $nominal_mdr*0.25;
+            if(!is_null($callback) || !empty( $callback )){
+                $client = new GuzzleHttpClient();
+                $url = $callback->callback;
+                $parameter = $callback->parameter;
+                $secret_key_parameter = $callback->secret_key_parameter;
+                $secret_key = $callback->secret_key;
 
-            // $qrisAdminWallet->update([
-            //     'saldo' => $saldoAdmin+$insentif_cashback
-            // ]);
+                $headers = [
+                    'Content-Type' => 'application/json',
+                ];
+                $data = [
+                    $parameter => $invoice->nomor_invoice,
+                    $secret_key_parameter => $secret_key,
+                    'status' => 'success',
+                ];
+    
+                try {
+                    $response = $client->post($url, [
+                        'headers' => $headers,
+                        'json' => $data,
+                    ]);
 
-            // HistoryCashbackAdmin::create([
-            //     'id_invoice' => $invoice->id,
-            //     'nominal_terima_mdr' => $insentif_cashback
-            // ]);
+                    $contents = $response->getBody()->getContents();
 
-            // $store = StoreDetail::where('store_identifier', $invoice->store_identifier)
-            //                 ->where('id_tenant', $invoice->id_tenant)
-            //                 ->first();
-
-            // $qrisWallet = QrisWallet::where('id_user', $store->id_tenant)
-            //                     ->where('email', $store->email)
-            //                     ->first();
-
-            // $presentaseKurang = $invoice->nominal_bayar*0.007;
-            // $hasilKurang = $invoice->nominal_bayar-$presentaseKurang;
-
-            // $qrisWalletSaldoNow = $qrisWallet->saldo;
-            // $saldo = $qrisWalletSaldoNow+$hasilKurang;
-
-            // $qrisWallet->update([
-            //     'saldo' => $saldo 
-            // ]);
-
-            // $invoice->update([
-            //     'tanggal_pelunasan' => Carbon::now(),
-            //     'status_pembayaran' => 1
-            // ]);
+                    History::create([
+                        'action' => 'User Callback : Success',
+                        'id_user' => $invoice->id_tenant,
+                        'email' => $invoice->email,
+                        'lokasi_anda' => 'System Report',
+                        'deteksi_ip' => 'System Report',
+                        'log' => $contents,
+                        'status' => 1
+                    ]);
+                } catch(Exception $ex){
+                    History::create([
+                        'action' => 'User Callback : Fail',
+                        'id_user' => $invoice->id_tenant,
+                        'email' => $invoice->email,
+                        'lokasi_anda' => 'System Report',
+                        'deteksi_ip' => 'System Report',
+                        'log' => $ex,
+                        'status' => 1
+                    ]);
+                }
+            } else {
+                History::create([
+                    'action' => 'User Callback : No Callback provided',
+                    'id_user' => $invoice->id_tenant,
+                    'email' => $invoice->email,
+                    'lokasi_anda' => 'System Report',
+                    'deteksi_ip' => 'System Report',
+                    'log' => 'No callback provided from user',
+                    'status' => 1
+                ]);
+            }
 
             return response()->json([
                 'message' => 'Payment Success!',
                 'invoice' => $invoice,
+                'response-content' => $contents,
                 'status' => 200
             ]);
         } else {
-            
             return response()->json([
                 'message' => 'Unauthorized!',
                 'status' => 500
@@ -118,5 +163,77 @@ class PaymentQrisConfirm extends Controller {
                 'status' => 500
             ]);
         }
+    }
+
+    public function requestQris(Request $request) : JsonResponse{
+        $store_identifier = $request->store_identifier;
+        $password = $request->secret_key;
+        $nominal = $request->amount;
+        $tanggal_transaksi = Carbon::now();
+        $jenis_pembayaran = "Qris";
+
+        $store = StoreList::select(['id', 'id_user', 'email', 'store_identifier', 'status_umi'])
+                            ->where('store_identifier', $store_identifier)
+                            ->first();
+        if(is_null($store) || empty($store)){
+            return response()->json([
+                'message' => 'Merchant cannot be found!',
+                'status' => 404
+            ]);
+        } else {
+            $api_key = ApiKey::where('email', $store->email)->where('id_tenant', $store->id_user)->first();
+            if(!Hash::check($password, $api_key->key)){
+                return response()->json([
+                    'message' => 'Unauthorized, API Key not did not match!',
+                    'status' => '500',
+                ]);
+            }
+                $invoice = Invoice::create([
+                    'store_identifier' => $store_identifier,
+                    'email' => $store->email,
+                    'id_tenant' => $store->id_user,
+                    'tanggal_transaksi' => $tanggal_transaksi,
+                    'jenis_pembayaran' => $jenis_pembayaran,
+                    'nominal_bayar' => $nominal
+                ]);
+
+                return response()->json([
+                    'message' => 'Success!',
+                    'invoice' => $invoice,
+                    'status' => 200
+                ]);
+        }
+        // if($password == $secret_key) {
+        //     try{
+        //         $store = StoreList::select(['id', 'id_user', 'email', 'store_identifier'])
+        //                             ->where('store_identifier', $store_identifier)
+        //                             ->first();
+        //         $invoice = Invoice::create([
+        //             'store_identifier' => $store_identifier,
+        //             'email' => $store->email,
+        //             'id_tenant' => $store->id_user,
+        //             'tanggal_transaksi' => $tanggal_transaksi,
+        //             'jenis_pembayaran' => $jenis_pembayaran,
+        //             'nominal_bayar' => $nominal
+        //         ]);
+
+        //         return response()->json([
+        //             'message' => 'Success!',
+        //             'invoice' => $invoice,
+        //             'status' => 200
+        //         ]);
+        //     } catch(Exception $e){
+        //         return response()->json([
+        //             'message' => 'Error!',
+        //             'error' => $e,
+        //             'status' => 500
+        //         ]);
+        //     }
+        // } else {
+        //     return response()->json([
+        //         'message' => 'Unauthorized!',
+        //         'status' => 500
+        //     ]);
+        // }
     }
 }

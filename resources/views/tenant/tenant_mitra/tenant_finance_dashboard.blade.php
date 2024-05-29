@@ -1,4 +1,4 @@
-<x-tenant_mitra-layout>
+<x-tenant-layout>
 
     <div class="content">
         <!-- Start Content-->
@@ -60,4 +60,4 @@
         </div>
     </div>
 
-</x-tenant_mitra-layout>
+</x-tenant-layout>

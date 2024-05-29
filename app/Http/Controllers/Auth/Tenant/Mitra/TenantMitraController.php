@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Imports\CsvImport;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Stevebauman\Location\Facades\Location;
+use Illuminate\Support\Facades\Hash;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +24,7 @@ use App\Models\QrisWallet;
 use App\Models\TenantQrisAccount;
 use App\Models\ApiKey;
 use App\Models\CallbackApiData;
+use App\Models\History;
 use File;
 use Mail;
 use Exception;
@@ -29,6 +32,27 @@ use Exception;
 class TenantMitraController extends Controller {
     public function __construct() {
         $this->middleware('isTenantIsNotMitra');
+    }
+
+    function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
     }
 
     public function index(){
@@ -52,6 +76,7 @@ class TenantMitraController extends Controller {
     public function storeList(){
         $storeList = StoreList::where('id_user', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
+                                ->withCount('invoice')
                                 ->latest()
                                 ->get();
         return view('tenant.tenant_mitra.tenant_mitra_dashboard_store_list', compact(['storeList']));
@@ -62,51 +87,102 @@ class TenantMitraController extends Controller {
     }
 
     public function storeRegister(Request $request){
-        $randomString = Str::random(30);
-        if($request->hasFile('photo')){
-            $file = $request->file('photo');
-            $namaFile = $request->name;
-            $storagePath = Storage::path('public/images/profile/store_list');
-            $ext = $file->getClientOriginalExtension();
-            $filename = $namaFile.'-'.time().'.'.$ext;
-
-            try {
-                $file->move($storagePath, $filename);
-            } catch (\Exception $e) {
-                return $e->getMessage();
-            }
-
-            StoreList::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'store_identifier' => $randomString,
-                'name' => $request->name,
-                'alamat' => $request->alamat,
-                'kabupaten' => $request->kabupaten,
-                'kode_pos' => $request->kode_pos,
-                'no_telp_toko' => $request->no_telp,
-                'jenis_usaha' => $request->jenis,
-                'photo' => $filename
-            ]);
-        } else {
-            StoreList::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'store_identifier' => $randomString,
-                'name' => $request->name,
-                'alamat' => $request->alamat,
-                'kabupaten' => $request->kabupaten,
-                'kode_pos' => $request->kode_pos,
-                'no_telp_toko' => $request->no_telp,
-                'jenis_usaha' => $request->jenis,
-            ]);
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
         }
 
-        $notification = array(
-            'message' => 'Toko berhasil ditambahkan!',
-            'alert-type' => 'success',
-        );
-        return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        try{
+            $randomString = Str::random(30);
+            if($request->hasFile('photo')){
+                $file = $request->file('photo');
+                $namaFile = $request->name;
+                $storagePath = Storage::path('public/images/profile/store_list');
+                $ext = $file->getClientOriginalExtension();
+                $filename = $namaFile.'-'.time().'.'.$ext;
+
+                try {
+                    $file->move($storagePath, $filename);
+                } catch (\Exception $e) {
+                    History::create([
+                        'id_user' => auth()->user()->id,
+                        'email' => auth()->user()->email,
+                        'action' => "Upload Photo : Error",
+                        'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                        'deteksi_ip' => $ip,
+                        'log' => $e,
+                        'status' => 0
+                    ]);
+                }
+
+                StoreList::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'store_identifier' => $randomString,
+                    'name' => $request->name,
+                    'alamat' => $request->alamat,
+                    'kabupaten' => $request->kabupaten,
+                    'kode_pos' => $request->kode_pos,
+                    'no_telp_toko' => $request->no_telp,
+                    'jenis_usaha' => $request->jenis,
+                    'photo' => $filename
+                ]);
+            } else {
+                StoreList::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'store_identifier' => $randomString,
+                    'name' => $request->name,
+                    'alamat' => $request->alamat,
+                    'kabupaten' => $request->kabupaten,
+                    'kode_pos' => $request->kode_pos,
+                    'no_telp_toko' => $request->no_telp,
+                    'jenis_usaha' => $request->jenis,
+                ]);
+            }
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Create Merchant : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+
+            $notification = array(
+                'message' => 'Toko berhasil ditambahkan!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Create Merchant : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Gagal membuat data baru, harap hubungi Admin!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
 
     }
 
@@ -127,6 +203,13 @@ class TenantMitraController extends Controller {
     }
 
     public function storeUpdate(Request $request){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
         try{
             $tenantStore = StoreList::where('id_user', auth()->user()->id)
                                         ->where('email', auth()->user()->email)
@@ -152,11 +235,31 @@ class TenantMitraController extends Controller {
                     try {
                         $file->move($storagePath, $filename);
                     } catch (\Exception $e) {
-                        return $e->getMessage();
+                        History::create([
+                            'id_user' => auth()->user()->id,
+                            'email' => auth()->user()->email,
+                            'action' => "Upload Photo : Error",
+                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                            'deteksi_ip' => $ip,
+                            'log' => $e,
+                            'status' => 0
+                        ]);
                     }
                 } else {
-                    Storage::delete('public/images/profile/store_list/'.$tenantStore->photo);
-                    $file->move($storagePath, $filename);
+                    try{
+                        Storage::delete('public/images/profile/store_list/'.$tenantStore->photo);
+                        $file->move($storagePath, $filename);
+                    } catch(Exception $e){
+                        History::create([
+                            'id_user' => auth()->user()->id,
+                            'email' => auth()->user()->email,
+                            'action' => "Upload Photo : Error",
+                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                            'deteksi_ip' => $ip,
+                            'log' => $e,
+                            'status' => 0
+                        ]);
+                    }
                 }
 
                 $tenantStore->update([
@@ -179,14 +282,34 @@ class TenantMitraController extends Controller {
                 ]);
             }
 
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Merchant : Success!",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+
             $notification = array(
                 'message' => 'Data Toko berhasil diperbarui!',
                 'alert-type' => 'success',
             );
             return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
         } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Update Merchant : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
             $notification = array(
-                'message' => 'Error data gagal diupdate!',
+                'message' => 'Data gagal diupdate, harap hubungi Admin!',
                 'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
@@ -219,8 +342,23 @@ class TenantMitraController extends Controller {
     }
 
     public function requestUmi(Request $request){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
         $store_id = $request->id;
         $store_identifier = $request->store_identifier;
+
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            $notification = array(
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'alert-type' => 'error',
+            );
+            return redirect()->route('tenant.mitra.dashboard.toko.detail')->with($notification);
+        }
 
         $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
@@ -303,14 +441,37 @@ class TenantMitraController extends Controller {
                    
                 // dd("Email is sent successfully.");
 
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Request UMI : Success",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                    'status' => 1
+                ]);
+
                 $notification = array(
                     'message' => 'Permintaan UMI berhasil diajukan!',
                     'alert-type' => 'success',
                 );
                 return redirect()->back()->with($notification);
             } catch (Exception $e) {
-                return $e;
-                exit;
+                History::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'action' => "Request UMI : Error",
+                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                    'deteksi_ip' => $ip,
+                    'log' => $e,
+                    'status' => 0
+                ]);
+
+                $notification = array(
+                    'message' => 'Pengajuan Umi gagal, harap hubungi admin!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
             }
         } else {
             return redirect()->back();
@@ -534,6 +695,133 @@ class TenantMitraController extends Controller {
                                     ->first();
         return view('tenant.tenant_mitra.tenant_application_settings', compact(['apiKey', 'callback']));
         
+    }
+
+    public function qrisApiSettingGenerateKey(){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        $apiKey = ApiKey::where('id_tenant', auth()->user()->id)
+                        ->where('email', auth()->user()->email)
+                        ->first();
+        
+        try{
+            $randomString = Str::random(150);
+            if(is_null($apiKey) || empty($apiKey)){
+                ApiKey::create([
+                    'id_tenant' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'true_key' => $randomString,
+                    'key' => Hash::make($randomString)
+                ]);
+            } else {
+                $apiKey->update([
+                    'true_key' => $randomString,
+                    'key' => Hash::make($randomString)
+                ]);
+            }
+            
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "API Key Generation : Success",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+
+            $notification = array(
+                'message' => 'Key generated successfully!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "API Key Generation : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Gagal membuat API Key, Harap hubungi Admin!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
+    public function qrisApiSettingUpdateCallback(Request $request){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        DB::connection()->enableQueryLog();
+
+        $callback = CallbackApiData::where('id_tenant', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
+
+        try{
+            if(is_null($callback) || empty($callback)){
+                CallbackApiData::create([
+                    'id_tenant' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'callback' => $request->callback,
+                    'parameter' => $request->parameter,
+                    'secret_key_parameter' => $request->secret_key_parameter,
+                    'secret_key' => $request->secret_key
+                ]);
+            } else {
+                $callback->update([
+                    'callback' => $request->callback,
+                    'parameter' => $request->parameter,
+                    'secret_key_parameter' => $request->secret_key_parameter,
+                    'secret_key' => $request->secret_key
+                ]);
+            }
+
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Callback Update : Success",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
+                'status' => 1
+            ]);
+    
+            $notification = array(
+                'message' => 'Callback successfully updated!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            History::create([
+                'id_user' => auth()->user()->id,
+                'email' => auth()->user()->email,
+                'action' => "Callback Update : Error",
+                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                'deteksi_ip' => $ip,
+                'log' => $e,
+                'status' => 0
+            ]);
+
+            $notification = array(
+                'message' => 'Update Callback Error, harap hubungi Admin!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
     }
 
     public function financeDashboard(){

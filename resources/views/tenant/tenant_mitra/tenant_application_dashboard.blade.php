@@ -1,4 +1,4 @@
-<x-tenant_mitra-layout>
+<x-tenant-layout>
 
     <div class="content">
         <!-- Start Content-->
@@ -49,7 +49,7 @@
                                         </div>
                                     </div>
                                     <div class="row mt-3">
-                                        <a href=""><button title="Pengaturan rekening bank" type="button" class="btn btn-info waves-effect waves-light">Lihat Data</button></a>
+                                        <a href="{{ route('tenant.mitra.dashboard.app.setting') }}"><button title="Pengaturan rekening bank" type="button" class="btn btn-info waves-effect waves-light">Lihat Data</button></a>
                                     </div>
                                 </div>
                             </div>
@@ -79,4 +79,4 @@
         </div>
     </div>
 
-</x-tenant_mitra-layout>
+</x-tenant-layout>

@@ -665,8 +665,8 @@ class ProfileController extends Controller {
                                 ->first();
         $agregateWallet = AgregateWallet::find(1);
         $qrisAdmin = QrisWallet::where('id_user', 1)
-                                ->where('email', 'adminsu@vipos.id')
-                                ->find(6);      
+                                ->where('email', 'adminsu@visipos.id')
+                                ->find(1);      
         $agregateSaldo = $agregateWallet->saldo;
 
         try{
@@ -687,7 +687,7 @@ class ProfileController extends Controller {
                     'message' => 'Saldo anda tidak mencukupi!',
                     'alert-type' => 'warning',
                 );
-                return redirect()->back()->with($notification);
+                return redirect()->route('marketing.profile')->with($notification);
             } else {
                 try {
                     $postResponse = $client->request('POST',  $url, [
@@ -771,6 +771,12 @@ class ProfileController extends Controller {
                                 'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
                                 'status' => 0
                             ]);
+
+                            $notification = array(
+                                'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                                'alert-type' => 'error',
+                            );
+                            return redirect()->route('marketing.profile')->with($notification);
                         }
                     } else {
                         $withDraw = Withdrawal::create([
@@ -808,7 +814,7 @@ class ProfileController extends Controller {
                             'message' => 'Penarikan dana gagal, harap hubungi admin!',
                             'alert-type' => 'error',
                         );
-                        return redirect()->back()->with($notification);
+                        return redirect()->route('marketing.profile')->with($notification);
                     }
                 } catch (Exception $e) {
                     History::create([
@@ -824,7 +830,7 @@ class ProfileController extends Controller {
                         'message' => 'Penarikan dana gagal, harap hubungi admin!',
                         'alert-type' => 'error',
                     );
-                    return redirect()->back()->with($notification);
+                    return redirect()->route('marketing.profile')->with($notification);
                 }
             }
         } catch (Exception $e){
@@ -842,7 +848,7 @@ class ProfileController extends Controller {
                 'message' => 'Penarikan dana gagal, harap hubungi admin!',
                 'alert-type' => 'error',
             );
-            return redirect()->back()->with($notification);
+            return redirect()->route('marketing.profile')->with($notification);
         }
     }
 

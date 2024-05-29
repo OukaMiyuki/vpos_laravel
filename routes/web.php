@@ -155,7 +155,9 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
 
     Route::get('/dashboard/application', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'appDashboard'])->name('tenant.mitra.dashboard.app');
     Route::get('/dashboard/application/qris', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'qrisAccountList'])->name('tenant.mitra.dashboard.app.qrisacc');
-    Route::get('/dashboard/application/setting', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'qrisApiSetting'])->name('tenant.mitra.dashboard.app.seting');
+    Route::get('/dashboard/application/setting', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'qrisApiSetting'])->name('tenant.mitra.dashboard.app.setting');
+    Route::post('/dashboard/application/setting/generate-key', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'qrisApiSettingGenerateKey'])->name('tenant.mitra.dashboard.app.setting.generateKey');
+    Route::post('/dashboard/application/setting/update-callback', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'qrisApiSettingUpdateCallback'])->name('tenant.mitra.dashboard.app.setting.updateCallback');
 
     Route::get('/dashboard/finance', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'financeDashboard'])->name('tenant.mitra.dashboard.finance');
     Route::get('/dashboard/finance/saldo', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'saldoData'])->name('tenant.mitra.dashboard.finance.saldo');

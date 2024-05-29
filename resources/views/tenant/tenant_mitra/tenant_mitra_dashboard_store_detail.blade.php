@@ -1,4 +1,4 @@
-<x-tenant_mitra-layout>
+<x-tenant-layout>
     <div class="content">
         @php
             $umi = "";
@@ -246,4 +246,4 @@
         </div>
         <!-- container -->
     </div>
-</x-tenant_mitra-layout>
+</x-tenant-layout>

@@ -401,7 +401,7 @@ class MarketingController extends Controller {
     }
 
     public function marketingPemasukanList(){
-        $pemasukanTerbaru = Marketing::select(['marketings.id'])
+        $pemasukanTotal = Marketing::select(['marketings.id'])
                                         ->with(['invitationCodeTenant' => function($query){
                                             $query->select('tenants.id', 'tenants.name', 'tenants.id_inv_code')
                                                     ->with(['withdrawal' => function($query){
@@ -412,6 +412,7 @@ class MarketingController extends Controller {
                                                                                     'detail_penarikans.biaya_mitra',
                                                                                 ])->get();
                                                                 }])
+                                                                ->withSum('detailWithdraw', 'biaya_mitra')
                                                                 ->where('withdrawals.status', 1)
                                                                 ->latest()
                                                                 // ->whereDate('tanggal_penarikan', Carbon::now())
@@ -435,53 +436,21 @@ class MarketingController extends Controller {
                                                     ])->get();
                                         }])
                                         ->find(auth()->user()->id);
-        // dd($pemasukanTerbaru);
         $todayWithdraw = "";
         $monthWithdraw = "";
-        $totalWithdrawMitra = "";
-        foreach($pemasukanTerbaru->invitationCodeTenant as $inv){
+        $totalWithdrawMitra = 0;
+        foreach($pemasukanTotal->invitationCodeTenant as $inv){
             // dd($inv->invitationCode->inv_code);
             // dd($inv->withdrawal);
             foreach($inv->withdrawal as $withdrawal){
-                $totalWithdrawMitra = $withdrawal->detailWithdraw->sum('biaya_mitra');
-                //dd($withdrawal);
+                //$totalWithdrawMitra = $withdrawal->detailWithdraw->sum('biaya_mitra');
+                //dd($withdrawal->toArray());
+                $totalWithdrawMitra+=$withdrawal->detail_withdraw_sum_biaya_mitra;
                 //dd($inv->invitationCode->inv_code);
                 //dd($inv->storeDetail->store_name);
             }
         }
-        foreach($pemasukanTerbaru->invitationCodeTenant as $inv){
-            foreach($inv->withdrawal as $withdrawal){
-                $todayWithdraw = $withdrawal->select(['withdrawals.id', 'withdrawals.id_user'])
-                                            ->whereDate('tanggal_penarikan', Carbon::now())
-                                            ->where('withdrawals.status', 1)
-                                            ->with(['detailWithdraw' => function($query){
-                                                $query->select(['detail_penarikans.id', 
-                                                                'detail_penarikans.id_penarikan',
-                                                                'detail_penarikans.biaya_mitra',
-                                                            ])->get();
-                                            }])
-                                            ->get();
-                $monthWithdraw = $withdrawal->select(['withdrawals.id', 'withdrawals.id_user'])
-                                            ->whereMonth('tanggal_penarikan', Carbon::now()->month)
-                                            ->where('withdrawals.status', 1)
-                                            ->with(['detailWithdraw' => function($query){
-                                                $query->select(['detail_penarikans.id', 
-                                                                'detail_penarikans.id_penarikan',
-                                                                'detail_penarikans.biaya_mitra',
-                                                            ])->get();
-                                            }])
-                                            ->get();
-            }
-        }
-        $pemasukanMitraHariIni = "";
-        $pemasukanMitraBulaniIni = "";
-        foreach($todayWithdraw as $wd){
-            $pemasukanMitraHariIni = $wd->detailWithdraw->sum('biaya_mitra');
-        }
-        foreach($monthWithdraw as $wd){
-            $pemasukanMitraBulaniIni = $wd->detailWithdraw->sum('biaya_mitra');
-        }
-        return view('marketing.marketing_data_pemasukan', compact(['pemasukanTerbaru', 'pemasukanMitraHariIni', 'totalWithdrawMitra', 'pemasukanMitraBulaniIni']));
+        return view('marketing.marketing_data_pemasukan', compact(['pemasukanTotal', 'totalWithdrawMitra']));
     }
 
     public function marketingPemasukanListToday(){

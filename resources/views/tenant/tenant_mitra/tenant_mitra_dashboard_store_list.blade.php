@@ -1,4 +1,4 @@
-<x-tenant_mitra-layout>
+<x-tenant-layout>
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
@@ -67,7 +67,7 @@
                                                         @endif
                                                     @endif
                                                 </td>
-                                                <td class="text-center">30</td>
+                                                <td class="text-center">{{ $store->invoice_count }}</td>
                                                 <td>
                                                     <a href="">
                                                         <button title="Lihat daftar invoice" type="button" class="btn btn-primary rounded-pill waves-effect waves-light">Lihat Invoice</button>&nbsp;
@@ -94,4 +94,4 @@
         </div>
         <!-- container -->
     </div>
-</x-tenant_mitra-layout>
+</x-tenant-layout>

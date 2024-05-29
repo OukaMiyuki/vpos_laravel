@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-4 col-xl-4">
+                {{-- <div class="col-md-4 col-xl-4">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
@@ -38,8 +38,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4 col-xl-4">
+                </div> --}}
+                {{-- <div class="col-md-4 col-xl-4">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
@@ -58,8 +58,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4 col-xl-4">
+                </div> --}}
+                <div class="col-md-5 col-xl-5">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
@@ -68,11 +68,8 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp.<span data-plugin="counterup">{{ $totalWithdrawMitra }}</span></h4>
+                                        <h2 class="text-dark mt-1">Rp.<span data-plugin="counterup">{{ $totalWithdrawMitra }}</span></h2>
                                         <p class="text-muted mb-1 text-truncate">Total Pemasukan</p>
-                                        {{-- <a href="{{ route('tenant.transaction.list.pending.payment') }}" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a> --}}
                                     </div>
                                 </div>
                             </div>
@@ -111,7 +108,7 @@
                                         @php
                                             $no=0;
                                         @endphp
-                                        @foreach($pemasukanTerbaru->invitationCodeTenant as $inv)
+                                        @foreach($pemasukanTotal->invitationCodeTenant as $inv)
                                             @foreach($inv->withdrawal as $withdrawal)
                                                 <tr>
                                                     <td>{{ $no+=1 }}</td>

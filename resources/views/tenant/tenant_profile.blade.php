@@ -27,7 +27,11 @@
                                 {{ $profilTenant->name }}
                             </h4>
                             <p class="text-muted">
-                                Tenant
+                                @if (auth()->user()->id_inv_code == 0)
+                                    Mitra Bisnis
+                                @else
+                                    Tenant
+                                @endif
                             </p>
                             @if($profilTenant->is_active == 1)
                                 <button type="button" class="btn btn-success btn-xs waves-effect mb-2 waves-light">Aktif</button>

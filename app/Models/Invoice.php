@@ -186,27 +186,11 @@ class Invoice extends Model {
                             $nominal_mdr = self::hitungMDR($model->nominal_bayar);
                             $model->nominal_mdr = $nominal_mdr;
                             $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
-                        }   
+                        }
                     } else {
                         $nominal_mdr = self::hitungMDR($model->nominal_bayar);
                         $model->nominal_mdr = $nominal_mdr;
                         $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
-                    }
-                    try {
-                        $postResponse = $client->request('POST',  $url, [
-                            'form_params' => [
-                                'amount' => $model->nominal_bayar,
-                                'transactionNo' => $generate_nomor_invoice,
-                                'pos_id' => "VP",
-                                'secret_key' => "Vpos71237577"
-                            ]
-                        ]);
-                        $responseCode = $postResponse->getStatusCode();
-                        $data = json_decode($postResponse->getBody());
-                        $model->qris_data = $data->data->data->qrisData;
-                    } catch (Exception $e) {
-                        return $e;
-                        exit;
                     }
                 } else if($tenant->id_inv_code == 0) {
                     $store = StoreList::select(['status_umi'])->where('store_identifier', $model->store_identifier)->first();
@@ -224,6 +208,52 @@ class Invoice extends Model {
                         $nominal_mdr = self::hitungMDR($model->nominal_bayar);
                         $model->nominal_mdr = $nominal_mdr;
                         $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                    }
+                }
+
+                $qrisAccount = TenantQrisAccount::where('store_identifier', $model->store_identifier)->where('id_tenant', $model->id_tenant)->first();
+
+                if(is_null($qrisAccount) || empty($qrisAccount)){
+                    try {
+                        $postResponse = $client->request('POST',  $url, [
+                            'form_params' => [
+                                'amount' => $model->nominal_bayar,
+                                'transactionNo' => $generate_nomor_invoice,
+                                'pos_id' => "VP",
+                                'secret_key' => "Vpos71237577"
+                            ]
+                        ]);
+                        $responseCode = $postResponse->getStatusCode();
+                        $data = json_decode($postResponse->getBody());
+                        $model->qris_data = $data->data->data->qrisData;
+                    } catch (Exception $e) {
+                        return $e;
+                        exit;
+                    }
+                } else {
+                    $qrisLogin = $qrisAccount->qris_login_user;
+                    $qrisPassword = $qrisAccount->qris_password;
+                    $qrisMerchantID = $qrisAccount->qris_merchant_id;
+                    $qrisStoreID = $qrisAccount->qris_store_id;
+                    try {
+                        $postResponse = $client->request('POST',  $url, [
+                            'form_params' => [
+                                'login' => $qrisLogin,
+                                'password' => $qrisPassword,
+                                'merchantID' => $qrisMerchantID,
+                                'storeID' => $qrisStoreID,
+                                'amount' => $model->nominal_bayar,
+                                'transactionNo' => $generate_nomor_invoice,
+                                'pos_id' => "VP",
+                                'secret_key' => "Vpos71237577"
+                            ]
+                        ]);
+                        $responseCode = $postResponse->getStatusCode();
+                        $data = json_decode($postResponse->getBody());
+                        $model->qris_data = $data->data->data->qrisData;
+                    } catch (Exception $e) {
+                        return $e;
+                        exit;
                     }
                 }
             }

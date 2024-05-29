@@ -263,6 +263,12 @@
                                     <a href="{{ route('marketing.dashboard.pemasukan') }}">Pemasukan</a>
                                 </li>
                                 <li>
+                                    <a href="{{ route('marketing.dashboard.pemasukan.today') }}">Pemasukan Hari Ini</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('marketing.dashboard.pemasukan.month') }}">Pemasukan Bulan Ini</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('marketing.dashboard.tenant.list') }}">Data Tenant</a>
                                 </li>
                             </ul>
@@ -410,7 +416,7 @@
                                         <a href="{{ route('tenant.mitra.dashboard.app.qrisacc') }}">Akun Qris Merchant</a>
                                     </li>
                                     <li>
-                                        <a href="#">Pengaturan API Qris</a>
+                                        <a href="{{ route('tenant.mitra.dashboard.app.setting') }}">Pengaturan API Qris</a>
                                     </li>
                                     <li>
                                         <a href="#">Dokumentasi</a>

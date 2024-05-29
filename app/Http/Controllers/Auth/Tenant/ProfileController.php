@@ -1037,6 +1037,12 @@ class ProfileController extends Controller{
                                 'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
                                 'status' => 0
                             ]);
+
+                            $notification = array(
+                                'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                                'alert-type' => 'error',
+                            );
+                            return redirect()->route('tenant.profile')->with($notification);
                         }
                     } else {
                         $withDraw = Withdrawal::create([
