@@ -17,6 +17,7 @@ use App\Models\Discount;
 use App\Models\Tax;
 use App\Models\TenantField;
 use App\Models\ProductCategory;
+use App\Models\TenantQrisAccount;
 use Rawilk\Printing\Receipts\ReceiptPrinter;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
@@ -163,7 +164,7 @@ class KasirController extends Controller {
                                         $q->where('product_name', 'LIKE', '%'.$keyword.'%');
                                     })->where(function ($query){
                                             $query->where('stok', '!=', 0);
-                                    })->where('id_tenant', auth()->user()->id_tenant)
+                                    })->where('store_identifier', auth()->user()->id_store)
                                     ->latest()
                                     ->get();
             } catch (Exception $e) {
@@ -305,6 +306,12 @@ class KasirController extends Controller {
                         ]);
                     } else {
                         $tempqty = $cart->qty;
+                        if($stoktemp == 0 || $stoktemp<($request->qty+$tempqty)){
+                            return response()->json([
+                                'message' => 'Stok barang tidak cukup!',
+                                'status' => 200,
+                            ]);
+                        }
                         $cart->update([
                             'qty' => $tempqty+$request->qty,
                             'sub_total' => ($tempqty+$request->qty)*$cart->harga
@@ -333,7 +340,13 @@ class KasirController extends Controller {
     public function deleteCart(Request $request) : JsonResponse {
         $id_cart = $request->id_cart;
         try {
-            $cart = ShoppingCart::where('id_kasir', auth()->user()->id)->findOrFail($id_cart);
+            $cart = ShoppingCart::where('id_kasir', auth()->user()->id)->find($id_cart);
+            if(is_null($cart) || empty($cart)){
+                return response()->json([
+                    'message' => 'Data not found!',
+                    'status' => 404
+                ]);
+            }
             $qty = $cart->qty;
             $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->findOrFail($cart->id_product);
             $stoktemp = $stock->stok;
@@ -352,6 +365,7 @@ class KasirController extends Controller {
 
         return response()->json([
             'message' => 'Success Deleted',
+            'status' => 200
         ]);
     }
 
@@ -409,6 +423,7 @@ class KasirController extends Controller {
 
     public function listCartInvoice(Request $request) : JsonResponse {
         $cartContent = "";
+        $invoice = $request->id_invoice;
         try {
             $cartContent = ShoppingCart::select(['shopping_carts.id', 
                                                     'shopping_carts.id_invoice', 
@@ -431,7 +446,7 @@ class KasirController extends Controller {
                                         }])->get();
                                     }])
                                     ->where('id_kasir', auth()->user()->id)
-                                    ->where('id_invoice', $request->id_invoice)
+                                    ->where('id_invoice', $invoice)
                                     ->latest()
                                     ->get();
         } catch (Exception $e) {
@@ -556,7 +571,7 @@ class KasirController extends Controller {
 
         $invoice = Invoice::create([
             'store_identifier' => auth()->user()->id_store,
-            'email' => auth()->user()->email,
+            'email' => auth()->user()->store->email,
             'id_tenant' => auth()->user()->store->id_tenant,
             'id_kasir' => auth()->user()->id,
             'jenis_pembayaran' => "Qris",
@@ -817,18 +832,45 @@ class KasirController extends Controller {
         $nominalpajak = ($pajak/100)*$temptotal;
         $total = $temptotal+$nominalpajak;
 
+        $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
+        $qrisAccount = TenantQrisAccount::where('store_identifier', $invoice->store_identifier)->first();
+
+        $data = "";
         $client = new Client();
         $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
-        $postResponse = $client->request('POST',  $url, [
-            'form_params' => [
-                'amount' => $total,
-                'transactionNo' => $invoice->nomor_invoice,
-                'pos_id' => "IN01",
-                'secret_key' => "Vpos71237577"
-            ]
-        ]);
-        $responseCode = $postResponse->getStatusCode();
-        $data = json_decode($postResponse->getBody());
+        if(is_null($qrisAccount) || empty($qrisAccount)){
+            $postResponse = $client->request('POST',  $url, [
+                'form_params' => [
+                    'amount' => $total,
+                    'transactionNo' => $invoice->nomor_invoice,
+                    'pos_id' => "IN01",
+                    'secret_key' => "Vpos71237577"
+                ]
+            ]);
+            $responseCode = $postResponse->getStatusCode();
+            $data = json_decode($postResponse->getBody());
+        } else {
+            $qrisLogin = $qrisAccount->qris_login_user;
+            $qrisPassword = $qrisAccount->qris_password;
+            $qrisMerchantID = $qrisAccount->qris_merchant_id;
+            $qrisStoreID = $qrisAccount->qris_store_id;
+
+            $postResponse = $client->request('POST',  $url, [
+                'form_params' => [
+                    'login' => $qrisLogin,
+                    'password' => $qrisPassword,
+                    'merchantID' => $qrisMerchantID,
+                    'storeID' => $qrisStoreID,
+                    'amount' => $total,
+                    'transactionNo' => $invoice->nomor_invoice,
+                    'pos_id' => "IN01",
+                    'secret_key' => "Vpos71237577"
+                ]
+            ]);
+
+            $responseCode = $postResponse->getStatusCode();
+            $data = json_decode($postResponse->getBody());
+        }
 
         $invoice->update([
             'qris_data' => $data->data->data->qrisData,
@@ -838,8 +880,30 @@ class KasirController extends Controller {
             'nominal_bayar' => $total
         ]);
 
+        if($storeDetail->status_umi == 1){
+            if($invoice->nominal_bayar <= 100000){
+                $invoice->update([
+                    'mdr' => 0,
+                    'nominal_mdr' => 0,
+                    'nominal_terima_bersih' => $invoice->nominal_bayar
+                ]);
+            } else {
+                $nominal_mdr = $total*0.007;
+                $invoice->update([
+                    'nominal_mdr' => $nominal_mdr,
+                    'nominal_terima_bersih' => $total-$nominal_mdr
+                ]);
+            }   
+        } else {
+            $nominal_mdr = $total*0.007;
+            $invoice->update([
+                'nominal_mdr' => $nominal_mdr,
+                'nominal_terima_bersih' => $total-$nominal_mdr
+            ]);
+        }
+
         return response()->json([
-            'message' => 'Fetch Success',
+            'message' => 'Transaction Updated',
             'invoice' => $invoice,
             'cartData' => $invoice->shoppingCart,
         ]);

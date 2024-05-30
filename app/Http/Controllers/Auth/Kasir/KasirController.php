@@ -310,7 +310,7 @@ class KasirController extends Controller {
             } else if($request->jenisPembayaran == "Qris"){
                 $invoice = Invoice::create([
                     'store_identifier' => auth()->user()->id_store,
-                    'email' => auth()->user()->email,
+                    'email' => auth()->user()->store->email,
                     'id_tenant' => auth()->user()->store->id_tenant,
                     'id_kasir' => auth()->user()->id,
                     'jenis_pembayaran' => $request->jenisPembayaran,
@@ -673,19 +673,44 @@ class KasirController extends Controller {
                 $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
                 // Ga perlu id_tenant dan ngecek apa invitation codenya 0
                 $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
+                $qrisAccount = TenantQrisAccount::where('store_identifier', $invoice->store_identifier)->first();
                 // this first
                 $client = new Client();
+                $data = "";
                 $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
-                $postResponse = $client->request('POST',  $url, [
-                    'form_params' => [
-                        'amount' => $total,
-                        'transactionNo' => $invoice->nomor_invoice,
-                        'pos_id' => "VP",
-                        'secret_key' => "Vpos71237577"
-                    ]
-                ]);
-                $responseCode = $postResponse->getStatusCode();
-                $data = json_decode($postResponse->getBody());
+                if(is_null($qrisAccount) || empty($qrisAccount)){
+                    $postResponse = $client->request('POST',  $url, [
+                        'form_params' => [
+                            'amount' => $total,
+                            'transactionNo' => $invoice->nomor_invoice,
+                            'pos_id' => "VP",
+                            'secret_key' => "Vpos71237577"
+                        ]
+                    ]);
+                    $responseCode = $postResponse->getStatusCode();
+                    $data = json_decode($postResponse->getBody());
+                } else {
+                    $qrisLogin = $qrisAccount->qris_login_user;
+                    $qrisPassword = $qrisAccount->qris_password;
+                    $qrisMerchantID = $qrisAccount->qris_merchant_id;
+                    $qrisStoreID = $qrisAccount->qris_store_id;
+
+                    $postResponse = $client->request('POST',  $url, [
+                        'form_params' => [
+                            'login' => $qrisLogin,
+                            'password' => $qrisPassword,
+                            'merchantID' => $qrisMerchantID,
+                            'storeID' => $qrisStoreID,
+                            'amount' => $total,
+                            'transactionNo' => $invoice->nomor_invoice,
+                            'pos_id' => "VP",
+                            'secret_key' => "Vpos71237577"
+                        ]
+                    ]);
+                    // dd($postResponse);
+                    $responseCode = $postResponse->getStatusCode();
+                    $data = json_decode($postResponse->getBody());
+                }
 
                 $invoice->update([
                     'jenis_pembayaran' => $request->jenisPembayaran,

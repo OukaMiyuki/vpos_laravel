@@ -55,10 +55,6 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:100,1', 'custom
 
     Route::post('/rek-list', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'rekList']);
 
-    // untuk call back qris, harusnya ga disini jadi di comment dulu
-    // Route::post('/invoice-upd', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'invoiceUpdate']);
-     // untuk call back qris, harusnya ga disini jadi di comment dulu
-
     Route::post('/transaction', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionList']);
     Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionListAlias']);
     Route::get('/transaction/detail/{id}', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionDetail']);
@@ -76,8 +72,8 @@ Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:100,1', 'custom.
     Route::post('/add-cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'addCart']);
     Route::post('/delete-cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'deleteCart']);
     Route::get('/cart', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'listCart']);
-    Route::post('/cart-invoice', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'listCartInvoice']);
     Route::post('/cart-process', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'processCart']);
+    Route::post('/cart-invoice', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'listCartInvoice']);
     Route::get('/get-alias', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'getAlias']);
     Route::post('/transaction', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionList']);
     Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionListAlias']);
