@@ -541,6 +541,28 @@ class ProfileController extends Controller{
             $alamat = $request->alamat;
             $kab_kota = $request->kab_kota;
             $kode_pos = $request->kode_pos;
+            if(empty($nama_usaha) 
+                || is_null($nama_usaha) 
+                || $nama_usaha == "" 
+                || empty($jenis_usaha) 
+                || is_null($jenis_usaha) 
+                || $jenis_usaha == ""
+                || empty($alamat) 
+                || is_null($alamat) 
+                || $alamat == ""
+                || empty($kab_kota) 
+                || is_null($kab_kota) 
+                || $kab_kota == ""
+                || empty($kode_pos) 
+                || is_null($kode_pos) 
+                || $kode_pos == ""
+            ) {
+                $notification = array(
+                    'message' => 'Data detail toko belum lengkap, silahkan lengkapi data terlebih dahulu!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
             $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_NOBU_QRIS_(NMID).xlsx');
             $userDocsPath = Storage::path('public/docs/umi/user_doc');
             $filename = 'Formulir Pendaftaran NOBU QRIS (NMID) PT BRAHMA ESATAMA_'.$nama_usaha.'_'.date('dmYHis').'.xlsx';

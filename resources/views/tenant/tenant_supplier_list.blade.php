@@ -121,16 +121,18 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="alamat" class="form-label">Alamat</label>
-                                    <textarea placeholder="Masukkan alamat supplier" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! old('alamat') !!}</textarea>
+                                    <label for="alamat" class="form-label">Alamat (Opsional)</label>
+                                    <textarea placeholder="Masukkan alamat supplier" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false">{!! old('alamat') !!}</textarea>
+                                    <small id="emailHelp" class="form-text text-muted">Tidak wajib diisi atau boleh dikosongi</small>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="keterangan" class="form-label">Keterangan</label>
-                                    <textarea placeholder="Masukkan keterangan" class="form-control" id="keterangan" name="keterangan" rows="5" spellcheck="false" required>{!! old('keterangan') !!}</textarea>
+                                    <label for="keterangan" class="form-label">Keterangan (Opsional)</label>
+                                    <textarea placeholder="Masukkan keterangan" class="form-control" id="keterangan" name="keterangan" rows="5" spellcheck="false">{!! old('keterangan') !!}</textarea>
+                                    <small id="emailHelp" class="form-text text-muted">Tidak wajib diisi atau boleh dikosongi</small>
                                 </div>
                             </div>
                         </div>

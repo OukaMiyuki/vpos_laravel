@@ -51,7 +51,7 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $tenantNumber }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Tenant</p>
-                                        <a href="{{ route('tenant.transaction.today') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('marketing.dashboard.tenant.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>

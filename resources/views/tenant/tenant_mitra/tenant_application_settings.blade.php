@@ -27,7 +27,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="mb-3">
-                                        <label for="api_key" class="form-label">API Key</label>
+                                        <label for="api_key" class="form-label">API Key (Request Qris)</label>
                                         <div class="row">
                                             <div class="col-8">
                                                 <input type="text" readonly class="form-control" name="api_key" id="api_key" required @if(!is_null($apiKey) || !empty($apiKey)) value={{ $apiKey->true_key }} @endif placeholder="Masukkan api key">
@@ -42,7 +42,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <br>
                             <br>
                             <div class="row">
                                 <div class="col-md-12">
