@@ -14,50 +14,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
-// Route::middleware(['guest:admin', 'throttle:10,1', 'custom.restrict'])->prefix('admin')->group( function () {
-//     Route::post('register', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'register']);
-//     Route::post('login', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'login']);
-// });
-
-// Route::middleware(['auth:sanctum', 'abilities:admin', 'throttle:10,1', 'custom.restrict'])->prefix('admin')->group(function () {
-//     Route::post('/logout', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'logout']);
-//     Route::get('/user', [\App\Http\Controllers\Auth\Admin\Api\AuthController::class, 'user']);
-// });
-
-// Route::middleware(['guest:marketing', 'throttle:10,1','custom.restrict'])->prefix('marketing')->group( function () {
-//     Route::post('register', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'register']);
-//     Route::post('login', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'login']);
-// });
-
-// Route::middleware(['auth:sanctum', 'abilities:marketing', 'throttle:10,1','custom.restrict'])->prefix('marketing')->group(function () {
-//     Route::post('/logout', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'logout']);
-//     Route::get('/user', [\App\Http\Controllers\Auth\Marketing\Api\AuthController::class, 'user']);
-// });
-
 Route::post('payment-qris-success', [\App\Http\Controllers\Api\PaymentQrisConfirm::class, 'qrisConfirmPayment']);
 Route::post('request-invoice-number', [\App\Http\Controllers\Api\PaymentQrisConfirm::class, 'requestInvoiceNumber']);
 Route::post('request-qris', [\App\Http\Controllers\Api\PaymentQrisConfirm::class, 'requestQris']);
 
-Route::middleware(['guest:tenant', 'guest:kasir', 'throttle:90,1', 'custom.restrict'])->group( function () {
+Route::middleware(['guest:tenant', 'guest:kasir', 'throttle:100,1', 'custom.restrict'])->group( function () {
     Route::post('register', [\App\Http\Controllers\Auth\Api\RegisterController::class, 'registerTenant']);
     Route::post('login', [\App\Http\Controllers\Auth\Api\LoginController::class, 'login']);
 });
 
-Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throttle:90,1', 'custom.restrict'])->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throttle:100,1', 'custom.restrict'])->group(function () {
     Route::post('/logout', [\App\Http\Controllers\Auth\Api\LoginController::class, 'logout']);
     Route::get('/user', [\App\Http\Controllers\Auth\Api\LoginController::class, 'user']);
 });
 
-// Route::middleware(['guest:tenant', 'throttle:10,1', 'custom.restrict'])->prefix('tenant')->group( function () {
-//     Route::post('register', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'register']);
-//     Route::post('login', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'login']);
-// });
 
-Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:90,1', 'custom.restrict'])->prefix('tenant')->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:100,1', 'custom.restrict'])->prefix('tenant')->group(function () {
     Route::post('/send-mail-otp', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'sendMailOTP']);
     Route::post('/verify-email-otp', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'verifyMailOTP']);
 
@@ -73,8 +45,6 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:90,1', 'custom.
     Route::post('/kasir/detail', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'kasirDetail']);
     Route::post('/kasir/register', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'kasirRegister']);
 
-    // Route::post('/setting/store', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'storeInfo']);
-    // Route::post('/setting/store/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'storeUpdate']);
     Route::post('/setting/alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'aliasList']);
     Route::post('/setting/alias/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'aliasUpdate']);
 
@@ -82,7 +52,6 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:90,1', 'custom.
     Route::get('/category', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productCategory']);
     Route::post('/filter-category', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'filterCategory']);
     Route::post('/search-product', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'searchProduct']);
-    //Route::post('/setting/rekening', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'rekeningSetting']);
 
     Route::post('/rek-list', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'rekList']);
 
@@ -95,13 +64,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:90,1', 'custom.
     Route::get('/transaction/detail/{id}', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionDetail']);
 });
 
-// Route::middleware(['guest:kasir', 'throttle:10,1', 'custom.restrict'])->prefix('kasir')->group( function () {
-//     Route::post('login', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'login']);
-// });
-
-Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:90,1', 'custom.restrict'])->prefix('kasir')->group(function () {
-    // Route::post('/logout', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'logout']);
-    //Route::get('/user', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'user']);
+Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:100,1', 'custom.restrict'])->prefix('kasir')->group(function () {
     Route::post('/user/detail', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'userDetail']);
     Route::post('/user/update', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'userUpdate']);
     Route::get('/product', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productList']);

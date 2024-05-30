@@ -16,7 +16,7 @@ class RestrictMiddleware
     public function handle(Request $request, Closure $next): Response {
         $restrictedIps = ['102.129.158.0'];
         if(in_array($request->ip(), $restrictedIps)){
-        App::abort(403, 'Request forbidden');
+            App::abort(403, 'Request forbidden');
         }
         return $next($request);
     }
