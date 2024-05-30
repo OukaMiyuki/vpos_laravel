@@ -49,9 +49,17 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:100,1', 'custom
     Route::post('/setting/alias/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'aliasUpdate']);
 
     Route::get('/product', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productList']);
+    Route::post('/product/detail', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productDetail']);
     Route::get('/category', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productCategory']);
     Route::post('/filter-category', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'filterCategory']);
     Route::post('/search-product', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'searchProduct']);
+    Route::post('/search-barcode', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'searchBarcode']);
+    Route::post('/add-cart', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'addCart']);
+    Route::post('/delete-cart', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'deleteCart']);
+    Route::get('/cart', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'listCart']);
+    Route::post('/cart-process', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'processCart']);
+    Route::post('/cart-invoice', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'listCartInvoice']);
+    Route::get('/get-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'getAlias']);
 
     Route::post('/rek-list', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'rekList']);
 

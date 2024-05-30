@@ -17,6 +17,9 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Invoice;
 use App\Models\InvoiceField;
+use App\Models\ShoppingCart;
+use App\Models\Tax;
+use App\Models\Discount;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -317,9 +320,16 @@ class TenantController extends Controller {
                                 ->first();
         $product = "";
         try {
-            $product = Product::where('store_identifier', $store->store_identifier)
-                                ->latest()
-                                ->get();
+            $product = ProductStock::with(['product' => function ($query) {
+                                            $query->where('harga_jual', '!=',0);
+                                    }])
+                                    ->where(function ($query) {
+                                            $query->where('stok', '!=', 0)
+                                                ->where('harga_beli', '!=', 0);
+                                    })
+                                    ->where('store_identifier', $store->store_identifier)
+                                    ->latest()
+                                    ->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -339,10 +349,40 @@ class TenantController extends Controller {
         } else {
             return response()->json([
                 'message' => 'Fetch Success!',
-                'data-product' => $product,
+                'data-product-stock' => $product,
                 'status' => 200
             ]);
         }
+    }
+
+    public function productDetail(Request $request) : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $stock = "";
+        $id = $request->id;
+        try {
+            $stock = ProductStock::with(['product' => function ($query) {
+                        $query->with('category')->get();
+                    }])
+                    ->where(function ($query){
+                            $query->where('stok', '!=', 0);
+                    })->where('store_identifier', $store->store_identifier)
+                    ->findOrFail($id);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        return response()->json([
+            'message' => 'Fetch Success',
+            'data-detail-stock' => $stock,
+            'status' => 200
+        ]);
     }
 
     public function productCategory() : JsonResponse {
@@ -383,10 +423,14 @@ class TenantController extends Controller {
         $category = $request->id_category;
         $product = "";
         try {
-            $product = Product::where('id_category', $category)
-                                ->where('store_identifier', $store->store_identifier)
-                                ->latest()
-                                ->get();
+            $product = ProductStock::with('product')
+                                    ->whereHas('product', function($q) use ($category) {
+                                            $q->where('id_category', $category);
+                                    })->where(function ($query){
+                                            $query->where('stok', '!=', 0);
+                                    })->where('store_identifier', $store->store_identifier)
+                                    ->latest()
+                                    ->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -406,7 +450,7 @@ class TenantController extends Controller {
         } else {
             return response()->json([
                 'message' => "Fetch Success walaaa!",
-                'data-product' => $product,
+                'data-product-stock' => $product,
                 'status' => 200
             ]);
         }
@@ -420,8 +464,12 @@ class TenantController extends Controller {
         $product = "";
         if($keyword){
             try {
-                $product = Product::where('store_identifier', $store->store_identifier)
-                                    ->where('product_name', 'LIKE', '%'.$keyword.'%')
+                $product = ProductStock::with('product')
+                                    ->whereHas('product', function($q) use($keyword) {
+                                        $q->where('product_name', 'LIKE', '%'.$keyword.'%');
+                                    })->where(function ($query){
+                                            $query->where('stok', '!=', 0);
+                                    })->where('store_identifier', $store->store_identifier)
                                     ->latest()
                                     ->get();
 
@@ -438,16 +486,431 @@ class TenantController extends Controller {
                 return response()->json([
                     'message' => 'Fetch Success',
                     'data-status' => 'No product found!',
-                    'dataStokProduk' => $product,
+                    'data-product-stock' => $product,
                     'status' => 200
                 ]);
             } else {
                 return response()->json([
                     'message' => "Fetch Success!",
-                    'dataStokProduk' => $product,
+                    'data-product-stock' => $product,
                     'status' => 200
                 ]);
             }
+        }
+    }
+
+    public function searchBarcode(Request $request) : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $barcode = $request->barcode;
+        $stock = "";
+        if($barcode){
+            try {
+                $stock = ProductStock::with('product')
+                                    ->where(function ($query){
+                                            $query->where('stok', '!=', 0);
+                                    })
+                                    ->where('barcode', $barcode)
+                                    ->where('store_identifier', $store->store_identifier)
+                                    ->first();
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to fetch data!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
+            }
+
+            if(is_null($stock) || empty($stock)){
+                return response()->json([
+                    'message' => "Product Not Found!",
+                    'data-product-stock' => $stock,
+                    'status' => 200
+                ]);
+            }
+
+            return response()->json([
+                'message' => "Fetch Success!",
+                'data-product-stock' => $stock,
+                'status' => 200
+            ]);
+        }
+    }
+
+    public function addCart(Request $request) : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $cartCheckup = "";
+        $stock = "";
+        $stoktemp = "";
+        $cart = "";
+        try {
+            $cartCheckup = ShoppingCart::where('id_tenant', auth()->user()->id)
+                                    ->whereNull('id_invoice')
+                                    ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Data chekup fail, please check the server or query!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        try {
+            $stock = ProductStock::where('store_identifier', $store->store_identifier)->where('stok', '!=', 0)->findOrFail($request->id_stok);
+            $stoktemp = $stock->stok;
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to find data stock. make sure the id is correct!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if($stoktemp == 0 || $stoktemp<$request->qty){
+            return response()->json([
+                'message' => 'Stok barang tidak cukup!',
+                'status' => 200,
+            ]);
+        } else {
+            if($cartCheckup->count() == 0 || $cartCheckup == "" || is_null($cartCheckup) || empty($cartCheckup)){
+                try {
+                    $cart = ShoppingCart::create([
+                        'id_tenant' => auth()->user()->id,
+                        'id_product' => $request->id_stok,
+                        'product_name' => $request->product_name,
+                        'qty' => $request->qty,
+                        'harga' => $request->harga,
+                        'sub_total' => $request->qty*$request->harga
+                    ]);
+                    $stock->update([
+                        'stok' => (int) $stoktemp-$cart->qty
+                    ]);
+                    return response()->json([
+                        'message' => 'Added Success',
+                        'cart' => $cart,
+                        'data' => 'Add new cart'
+                    ]);
+                } catch (Exception $e) {
+                    return response()->json([
+                        'message' => 'Failed to insert data!',
+                        'error-message' => $e->getMessage(),
+                        'status' => 500,
+                    ]);
+                    exit;
+                }
+            } else {
+                try {
+                    $cart = $cartCheckup->where('id_product' ,$request->id_stok)->first();
+                    if(empty($cart)){
+                        $cart = ShoppingCart::create([
+                            'id_tenant' => auth()->user()->id,
+                            'id_product' => $request->id_stok,
+                            'product_name' => $request->product_name,
+                            'qty' => $request->qty,
+                            'harga' => $request->harga,
+                            'sub_total' => $request->qty*$request->harga
+                        ]);
+                    } else {
+                        $tempqty = $cart->qty;
+                        if($stoktemp == 0 || $stoktemp<($request->qty+$tempqty)){
+                            return response()->json([
+                                'message' => 'Stok barang tidak cukup!',
+                                'status' => 200,
+                            ]);
+                        }
+                        $cart->update([
+                            'qty' => $tempqty+$request->qty,
+                            'sub_total' => ($tempqty+$request->qty)*$cart->harga
+                        ]);
+                    }
+                } catch (Exception $e) {
+                    return response()->json([
+                        'message' => 'Failed to find data stock. make sure the id is correct!',
+                        'error-message' => $e->getMessage(),
+                        'status' => 500,
+                    ]);
+                    exit;
+                }
+                $stock->update([
+                    'stok' => (int) $stoktemp-$request->qty
+                ]);
+                return response()->json([
+                    'message' => 'Added Success',
+                    'cart' => $cart,
+                    'data' => 'Uodate cart'
+                ]);
+            }
+        }
+    }
+
+    public function deleteCart(Request $request) : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $id_cart = $request->id_cart;
+        try {
+            $cart = ShoppingCart::where('id_tenant', auth()->user()->id)->find($id_cart);
+            if(is_null($cart) || empty($cart)){
+                return response()->json([
+                    'message' => 'Data not found!',
+                    'status' => 404
+                ]);
+            }
+            $qty = $cart->qty;
+            $stock = ProductStock::where('store_identifier', $store->store_identifier)->findOrFail($cart->id_product);
+            $stoktemp = $stock->stok;
+            $stock->update([
+                'stok' => (int) $stoktemp+$qty
+            ]);
+            $cart->delete();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete cart',
+                'error-message' => $e->getMessage(),
+                'status' => $e->getCode(),
+            ]);
+            exit;
+        }
+
+        return response()->json([
+            'message' => 'Success Deleted',
+            'status' => 200
+        ]);
+    }
+
+    public function listCart() : JsonResponse {
+        $cartContent = "";
+        try {
+            $cartContent = ShoppingCart::select(['shopping_carts.id', 
+                                                    'shopping_carts.id_invoice', 
+                                                    'shopping_carts.id_product',
+                                                    'shopping_carts.product_name',
+                                                    'shopping_carts.qty',
+                                                    'shopping_carts.harga',
+                                                    'shopping_carts.sub_total',
+                                                    'shopping_carts.id_tenant',
+                                                    ])
+                                    ->with(['stock' => function ($query){
+                                        $query->select(['product_stocks.id',
+                                                        'product_stocks.id_batch_product'
+                                        ])
+                                        ->with(['product' => function ($query){
+                                            $query->select(['products.id',
+                                                            'products.photo'
+                                            ])->get();
+                                        }])->get();
+                                    }])
+                                    ->where('id_tenant', auth()->user()->id)
+                                    ->whereNull('id_invoice')
+                                    ->latest()
+                                    ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if(empty($cartContent) || $cartContent->count() == 0 || $cartContent == ""){
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'data-status' => 'Cart is empty!',
+                'dataStokProduk' => $cartContent,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success',
+                'cartData' => $cartContent,
+                'status' => 200
+            ]);
+        }
+    }
+
+    public function processCart(Request $request) : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $subtotal = 0;
+        $nominalpajak = 0;
+        $nominaldiskon = 0;
+        $nominaldiskon = 0;
+        $temptotal = 0;
+        $nominalpajak = 0;
+        $total = 0;
+        $diskon = Discount::where('store_identifier', $store->store_identifier)
+                            ->where('is_active', 1)->first();
+        $disc = 0;
+        $tax = Tax::where('store_identifier', $store->store_identifier)
+                            ->where('is_active', 1)->first();
+        $pajak = 0;
+
+        if(!empty($tax)){
+            $pajak = $tax->pajak;
+        } else {
+            $pajak = 0;
+        }
+
+        if(!empty($diskon)){
+            $disc = $diskon->diskon;
+        } else {
+            $disc = 0;
+        }
+
+        $cartContent = ShoppingCart::select(['shopping_carts.id', 
+                                                'shopping_carts.id_invoice', 
+                                                'shopping_carts.id_product',
+                                                'shopping_carts.product_name',
+                                                'shopping_carts.qty',
+                                                'shopping_carts.harga',
+                                                'shopping_carts.sub_total',
+                                                'shopping_carts.id_tenant',
+                                                ])
+                                ->with(['stock' => function ($query){
+                                    $query->select(['product_stocks.id',
+                                                    'product_stocks.id_batch_product'
+                                    ])
+                                    ->with(['product' => function ($query){
+                                        $query->select(['products.id',
+                                                        'products.photo'
+                                        ])->get();
+                                    }])->get();
+                                }])
+                                ->where('id_tenant', auth()->user()->id)
+                                ->whereNull('id_invoice')
+                                ->latest()
+                                ->get();
+        $subtotal = $cartContent->sum('sub_total');
+        
+        if($subtotal>=$disc){
+            $nominaldiskon = ($disc/100)*$subtotal;
+        }
+
+        $temptotal = $subtotal-$nominaldiskon;
+        $nominalpajak = ($pajak/100)*$temptotal;
+        $total = $temptotal+$nominalpajak;
+
+        $invoice = Invoice::create([
+            'store_identifier' => $store->store_identifier,
+            'email' => auth()->user()->email,
+            'id_tenant' => auth()->user()->id,
+            'id_kasir' => NULL,
+            'jenis_pembayaran' => "Qris",
+            'status_pembayaran' => 0,
+            'sub_total' => $temptotal,
+            'pajak' => $nominalpajak,
+            'diskon' => $nominaldiskon,
+            'nominal_bayar' => $total,
+            'tanggal_transaksi' => Carbon::now(),
+        ]);
+
+        foreach($cartContent as $cart){
+            $cart->update([
+                'id_invoice' => $invoice->id
+            ]);
+        }
+
+        if(!is_null($invoice)) {
+            $invoice->fieldSave($invoice);
+        }
+
+        return response()->json([
+            'message' => 'Transaction has been processed successfully',
+            'invoice' => $invoice,
+            'cartData' => $cartContent,
+        ]);
+
+    }
+
+    public function listCartInvoice(Request $request) : JsonResponse {
+        $cartContent = "";
+        $invoice = $request->id_invoice;
+        try {
+            $cartContent = ShoppingCart::select(['shopping_carts.id', 
+                                                    'shopping_carts.id_invoice', 
+                                                    'shopping_carts.id_product',
+                                                    'shopping_carts.product_name',
+                                                    'shopping_carts.qty',
+                                                    'shopping_carts.harga',
+                                                    'shopping_carts.sub_total',
+                                                    'shopping_carts.id_tenant',
+                                                    ])
+                                    ->with(['stock' => function ($query){
+                                        $query->select(['product_stocks.id',
+                                                        'product_stocks.id_batch_product'
+                                        ])
+                                        ->with(['product' => function ($query){
+                                            $query->select(['products.id',
+                                                            'products.photo'
+                                            ])->get();
+                                        }])->get();
+                                    }])
+                                    ->where('id_tenant', auth()->user()->id)
+                                    ->where('id_invoice', $invoice)
+                                    ->latest()
+                                    ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if(empty($cartContent) || $cartContent->count() == 0 || $cartContent == ""){
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'data-status' => 'Cart is empty!',
+                'dataStokProduk' => $cartContent,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success',
+                'cartData' => $cartContent,
+                'status' => 200
+            ]);
+        }
+    }
+
+    public function getAlias() : JsonResponse {
+        $store = StoreDetail::where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $alias = "";
+        try {
+            $alias = TenantField::where('store_identifier', $store->store_identifier)->first();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if(empty($alias) || $alias == "" || is_null($alias) || $alias->count() == 0 ){
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'data-status' => 'No data found in this collection!',
+                'alias-data' => $alias,
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success!',
+                'alias-data' => $alias,
+                'status' => 200
+            ]);
         }
     }
 
