@@ -65,6 +65,16 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:100,1', 'custom
 
     Route::post('/transaction', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionList']);
     Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionListAlias']);
+    Route::get('/transaction/pending', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionPending']);
+
+
+    Route::post('/transaction/pending/cart/add', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionCartAdd']);
+    Route::post('/transaction/pending/cart/delete', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionCartDelete']);
+    Route::post('/transaction/pending/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionPendingUpdate']);
+    Route::post('/transaction/pending/delete', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionPendingDelete']);
+    Route::post('/transaction/change-payment', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionChangePayment']);
+
+
     Route::get('/transaction/detail/{id}', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionDetail']);
 });
 

@@ -15,6 +15,8 @@ use App\Models\ProductStock;
 use App\Models\TenantField;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\TenantQrisAccount;
+use App\Models\TunaiWallet;
 use App\Models\Invoice;
 use App\Models\InvoiceField;
 use App\Models\ShoppingCart;
@@ -104,13 +106,11 @@ class TenantController extends Controller {
     }
 
     public function aliasList() : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
+        $identifier = $this->getStoreIdentifier();
         $alias = "";
 
         try {
-            $alias = TenantField::where('store_identifier', $store->store_identifier)->first();
+            $alias = TenantField::where('store_identifier', $identifier)->first();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -137,13 +137,11 @@ class TenantController extends Controller {
     }
 
     public function aliasUpdate(Request $request) : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
+        $identifier = $this->getStoreIdentifier();
 
         $alias = "";
         try {
-            $alias = TenantField::where('store_identifier', $store->store_identifier)->first();
+            $alias = TenantField::where('store_identifier', $identifier)->first();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Checkup Failed!',
@@ -219,12 +217,10 @@ class TenantController extends Controller {
 
     public function kasirList() : JsonResponse {
         $kasir = "";
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
+        $identifier = $this->getStoreIdentifier();
         try {
             $kasir = Kasir::select(['id','name', 'email', 'is_active'])
-                            ->where('id_store', $store->store_identifier)
+                            ->where('id_store', $identifier)
                             ->latest()
                             ->get();
         } catch (Exception $e) {
@@ -254,13 +250,11 @@ class TenantController extends Controller {
 
     public function kasirDetail(Request $request) : JsonResponse {
         $id = $request->id_kasir;
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
+        $identifier = $this->getStoreIdentifier();
         $kasir = "";
         try {
             $kasir = Kasir::with('detail')
-                            ->where('id_store', $store->store_identifier)
+                            ->where('id_store', $identifier)
                             ->findOrFail($id);
         } catch (Exception $e) {
             return response()->json([
@@ -279,9 +273,7 @@ class TenantController extends Controller {
     }
 
     public function kasirRegister(Request $request) : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
+        $identifier = $this->getStoreIdentifier();
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
@@ -290,7 +282,7 @@ class TenantController extends Controller {
         ]);
         try {
             $kasir = Kasir::create([
-                'id_store' => $store->store_identifier,
+                'id_store' => $identifier,
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
@@ -315,9 +307,7 @@ class TenantController extends Controller {
     }
 
     public function productList() : JsonResponse{
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
+        $identifier = $this->getStoreIdentifier();
         $product = "";
         try {
             $product = ProductStock::with(['product' => function ($query) {
@@ -327,7 +317,7 @@ class TenantController extends Controller {
                                             $query->where('stok', '!=', 0)
                                                 ->where('harga_beli', '!=', 0);
                                     })
-                                    ->where('store_identifier', $store->store_identifier)
+                                    ->where('store_identifier', $identifier)
                                     ->latest()
                                     ->get();
         } catch (Exception $e) {
@@ -356,9 +346,7 @@ class TenantController extends Controller {
     }
 
     public function productDetail(Request $request) : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
+        $identifier = $this->getStoreIdentifier();
         $stock = "";
         $id = $request->id;
         try {
@@ -367,7 +355,7 @@ class TenantController extends Controller {
                     }])
                     ->where(function ($query){
                             $query->where('stok', '!=', 0);
-                    })->where('store_identifier', $store->store_identifier)
+                    })->where('store_identifier', $identifier)
                     ->findOrFail($id);
         } catch (Exception $e) {
             return response()->json([
@@ -386,12 +374,10 @@ class TenantController extends Controller {
     }
 
     public function productCategory() : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
+        $identifier = $this->getStoreIdentifier();
         $productCategory = "";
         try {
-            $productCategory = ProductCategory::select(['id','name'])->where('store_identifier', $store->store_identifier)->latest()->get();
+            $productCategory = ProductCategory::select(['id','name'])->where('store_identifier', $identifier)->latest()->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -417,9 +403,7 @@ class TenantController extends Controller {
     }
 
     public function filterCategory(Request $request) : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
+        $identifier = $this->getStoreIdentifier();
         $category = $request->id_category;
         $product = "";
         try {
@@ -428,7 +412,7 @@ class TenantController extends Controller {
                                             $q->where('id_category', $category);
                                     })->where(function ($query){
                                             $query->where('stok', '!=', 0);
-                                    })->where('store_identifier', $store->store_identifier)
+                                    })->where('store_identifier', $identifier)
                                     ->latest()
                                     ->get();
         } catch (Exception $e) {
@@ -457,9 +441,7 @@ class TenantController extends Controller {
     }
 
     public function searchProduct(Request $request) : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
+        $identifier = $this->getStoreIdentifier();
         $keyword = $request->product_name;
         $product = "";
         if($keyword){
@@ -469,7 +451,7 @@ class TenantController extends Controller {
                                         $q->where('product_name', 'LIKE', '%'.$keyword.'%');
                                     })->where(function ($query){
                                             $query->where('stok', '!=', 0);
-                                    })->where('store_identifier', $store->store_identifier)
+                                    })->where('store_identifier', $identifier)
                                     ->latest()
                                     ->get();
 
@@ -500,9 +482,7 @@ class TenantController extends Controller {
     }
 
     public function searchBarcode(Request $request) : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
+        $identifier = $this->getStoreIdentifier();
         $barcode = $request->barcode;
         $stock = "";
         if($barcode){
@@ -512,7 +492,7 @@ class TenantController extends Controller {
                                             $query->where('stok', '!=', 0);
                                     })
                                     ->where('barcode', $barcode)
-                                    ->where('store_identifier', $store->store_identifier)
+                                    ->where('store_identifier', $identifier)
                                     ->first();
             } catch (Exception $e) {
                 return response()->json([
@@ -540,9 +520,7 @@ class TenantController extends Controller {
     }
 
     public function addCart(Request $request) : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
+        $identifier = $this->getStoreIdentifier();
         $cartCheckup = "";
         $stock = "";
         $stoktemp = "";
@@ -561,7 +539,7 @@ class TenantController extends Controller {
         }
 
         try {
-            $stock = ProductStock::where('store_identifier', $store->store_identifier)->where('stok', '!=', 0)->findOrFail($request->id_stok);
+            $stock = ProductStock::where('store_identifier', $identifier)->where('stok', '!=', 0)->findOrFail($request->id_stok);
             $stoktemp = $stock->stok;
         } catch (Exception $e) {
             return response()->json([
@@ -650,9 +628,7 @@ class TenantController extends Controller {
     }
 
     public function deleteCart(Request $request) : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
+        $identifier = $this->getStoreIdentifier();
         $id_cart = $request->id_cart;
         try {
             $cart = ShoppingCart::where('id_tenant', auth()->user()->id)->find($id_cart);
@@ -663,7 +639,7 @@ class TenantController extends Controller {
                 ]);
             }
             $qty = $cart->qty;
-            $stock = ProductStock::where('store_identifier', $store->store_identifier)->findOrFail($cart->id_product);
+            $stock = ProductStock::where('store_identifier', $identifier)->findOrFail($cart->id_product);
             $stoktemp = $stock->stok;
             $stock->update([
                 'stok' => (int) $stoktemp+$qty
@@ -736,9 +712,7 @@ class TenantController extends Controller {
     }
 
     public function processCart(Request $request) : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
+        $identifier = $this->getStoreIdentifier();
         $subtotal = 0;
         $nominalpajak = 0;
         $nominaldiskon = 0;
@@ -746,10 +720,10 @@ class TenantController extends Controller {
         $temptotal = 0;
         $nominalpajak = 0;
         $total = 0;
-        $diskon = Discount::where('store_identifier', $store->store_identifier)
+        $diskon = Discount::where('store_identifier', $identifier)
                             ->where('is_active', 1)->first();
         $disc = 0;
-        $tax = Tax::where('store_identifier', $store->store_identifier)
+        $tax = Tax::where('store_identifier', $identifier)
                             ->where('is_active', 1)->first();
         $pajak = 0;
 
@@ -799,7 +773,7 @@ class TenantController extends Controller {
         $total = $temptotal+$nominalpajak;
 
         $invoice = Invoice::create([
-            'store_identifier' => $store->store_identifier,
+            'store_identifier' => $identifier,
             'email' => auth()->user()->email,
             'id_tenant' => auth()->user()->id,
             'id_kasir' => NULL,
@@ -883,12 +857,10 @@ class TenantController extends Controller {
     }
 
     public function getAlias() : JsonResponse {
-        $store = StoreDetail::where('id_tenant', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
+        $identifier = $this->getStoreIdentifier();
         $alias = "";
         try {
-            $alias = TenantField::where('store_identifier', $store->store_identifier)->first();
+            $alias = TenantField::where('store_identifier', $identifier)->first();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -1057,6 +1029,292 @@ class TenantController extends Controller {
                 'transaction-data' => $invoiceAliasSearch,
             ]);
         }
+    }
+
+    public function transactionPending() : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $invoice = "";
+        try {
+            $invoice = Invoice::where('status_pembayaran', 0)
+                                ->where('store_identifier', $identifier)
+                                ->where('id_tenant', auth()->user()->id)
+                                ->latest()
+                                ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        return response()->json([
+            'message' => 'Fetch Success',
+            'transaction-data' => $invoice,
+        ]);
+    }
+
+    public function transactionCartAdd(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $cart = "";
+        $tempqty = "";
+        try {
+            $invoice = Invoice::with('shoppingCart')
+                                ->where('store_identifier', $identifier)
+                                ->where('id_tenant', auth()->user()->id)
+                                ->find($request->id_invoice);
+            $cart = $invoice->shoppingCart->where('id_product' ,$request->id_stok)->first();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if(empty($cart) || $cart->count() == 0 || $cart == "" || is_null($cart)){
+            $cart = ShoppingCart::create([
+                'id_tenant' => auth()->user()->id,
+                'id_invoice' =>  $request->id_invoice,
+                'id_product' => $request->id_stok,
+                'product_name' => $request->product_name,
+                'qty' => $request->qty,
+                'harga' => $request->harga,
+                'sub_total' => $request->qty*$request->harga
+            ]);
+        } else {
+            $tempqty = $cart->qty;
+            $cart->update([
+                'qty' => $tempqty+$request->qty,
+                'sub_total' => ($tempqty+$request->qty)*$cart->harga
+            ]);
+        }
+
+        $stock = ProductStock::where('store_identifier', $identifier)->find($request->id_stok);
+        $stoktemp = $stock->stok;
+        $stock->update([
+            'stok' => (int) $stoktemp-$request->qty
+        ]);
+
+        return response()->json([
+            'message' => 'Added Success',
+            'cart' => $cart
+        ]);
+    }
+
+
+    public function transactionCartDelete(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        try {
+            $invoice = Invoice::with('shoppingCart')
+                                ->where('store_identifier', $identifier)
+                                ->where('id_tenant', auth()->user()->id)
+                                ->find($request->id_invoice);
+            $cart = $invoice->shoppingCart->find($request->id_cart);
+            $qty = $cart->qty;
+            $stock = ProductStock::where('store_identifier', $identifier)->find($cart->id_product);
+            $stoktemp = $stock->stok;
+            $stock->update([
+                'stok' => (int) $stoktemp+$qty
+            ]);
+            $cart->delete();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        return response()->json([
+            'message' => 'Success Deleted',
+        ]);
+    }
+
+    public function transactionPendingUpdate(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::with('shoppingCart')
+                            ->where('store_identifier', $identifier)
+                            ->where('id_tenant', auth()->user()->id)
+                            ->find($request->id_invoice);
+
+        $diskon = Discount::where('store_identifier', $identifier)
+                            ->where('is_active', 1)->first();
+        $disc = 0;
+        $tax = Tax::where('store_identifier', $identifier)
+                    ->where('is_active', 1)->first();
+        $pajak = 0;
+
+        if(!empty($tax)){
+            $pajak = $tax->pajak;
+        } else {
+            $pajak = 0;
+        }
+
+        if(!empty($diskon)){
+            $disc = $diskon->diskon;
+        } else {
+            $disc = 0;
+        }
+
+        $subtotal = 0;
+        $nominalpajak = 0;
+        $nominaldiskon = 0;
+        foreach($invoice->shoppingCart as $cart){
+            $subtotal+= $cart->sub_total;
+        }
+        $nominaldiskon = 0;
+        if($subtotal>=$disc){
+            $nominaldiskon = ($disc/100)*$subtotal;
+        }
+        $temptotal = $subtotal-$nominaldiskon;
+        $nominalpajak = ($pajak/100)*$temptotal;
+        $total = $temptotal+$nominalpajak;
+
+        $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
+        $qrisAccount = TenantQrisAccount::where('store_identifier', $invoice->store_identifier)->first();
+
+        $data = "";
+        $client = new Client();
+        $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+        if(is_null($qrisAccount) || empty($qrisAccount)){
+            $postResponse = $client->request('POST',  $url, [
+                'form_params' => [
+                    'amount' => $total,
+                    'transactionNo' => $invoice->nomor_invoice,
+                    'pos_id' => "IN01",
+                    'secret_key' => "Vpos71237577"
+                ]
+            ]);
+            $responseCode = $postResponse->getStatusCode();
+            $data = json_decode($postResponse->getBody());
+        } else {
+            $qrisLogin = $qrisAccount->qris_login_user;
+            $qrisPassword = $qrisAccount->qris_password;
+            $qrisMerchantID = $qrisAccount->qris_merchant_id;
+            $qrisStoreID = $qrisAccount->qris_store_id;
+
+            $postResponse = $client->request('POST',  $url, [
+                'form_params' => [
+                    'login' => $qrisLogin,
+                    'password' => $qrisPassword,
+                    'merchantID' => $qrisMerchantID,
+                    'storeID' => $qrisStoreID,
+                    'amount' => $total,
+                    'transactionNo' => $invoice->nomor_invoice,
+                    'pos_id' => "IN01",
+                    'secret_key' => "Vpos71237577"
+                ]
+            ]);
+
+            $responseCode = $postResponse->getStatusCode();
+            $data = json_decode($postResponse->getBody());
+        }
+
+        $invoice->update([
+            'qris_data' => $data->data->data->qrisData,
+            'sub_total' => $temptotal,
+            'pajak' => $nominalpajak,
+            'diskon' => $nominaldiskon,
+            'nominal_bayar' => $total
+        ]);
+
+        if($storeDetail->status_umi == 1){
+            if($invoice->nominal_bayar <= 100000){
+                $invoice->update([
+                    'mdr' => 0,
+                    'nominal_mdr' => 0,
+                    'nominal_terima_bersih' => $invoice->nominal_bayar
+                ]);
+            } else {
+                $nominal_mdr = $total*0.007;
+                $invoice->update([
+                    'nominal_mdr' => $nominal_mdr,
+                    'nominal_terima_bersih' => $total-$nominal_mdr
+                ]);
+            }   
+        } else {
+            $nominal_mdr = $total*0.007;
+            $invoice->update([
+                'nominal_mdr' => $nominal_mdr,
+                'nominal_terima_bersih' => $total-$nominal_mdr
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Transaction Updated',
+            'invoice' => $invoice,
+            'cartData' => $invoice->shoppingCart,
+        ]);
+    }
+
+    public function transactionPendingDelete(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        try {
+            $invoice = Invoice::where('status_pembayaran', 0)
+                                ->where('id_tenant', auth()->user()->id)
+                                ->where('store_identifier', $identifier)
+                                ->find($request->id_invoice);
+            $cartContent = ShoppingCart::with('stock')->where('id_invoice', $request->id_invoice)->get();
+            foreach($cartContent as $cart){
+                $productStock = ProductStock::find($cart->id_product);
+                $stok = $cart->qty + $productStock->stok;
+                $productStock->update([
+                    'stok' => $stok
+                ]);
+                $cart->delete();
+            }
+            $invoice->delete();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+        return response()->json([
+            'message' => 'Transaction deleted',
+        ]);
+    }
+
+    public function transactionChangePayment(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $invoice = "";
+        try {
+            $invoice = Invoice::where('status_pembayaran', 0)
+                                ->where('id_tenant', auth()->user()->id)
+                                ->where('store_identifier', $identifier)
+                                ->find($request->id_invoice);
+            $invoice->update([
+                'tanggal_pelunasan' => Carbon::now(),
+                'jenis_pembayaran' => "Tunai",
+                'qris_data' => NULL,
+                'status_pembayaran' => 1
+            ]);
+            $tunaiWallet = TunaiWallet::where('id_tenant', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
+                                        ->first();
+            $totalSaldo = $tunaiWallet->saldo+$invoice->nominal_bayar;
+            
+            $tunaiWallet->update([
+                'saldo' => $totalSaldo
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+        return response()->json([
+            'message' => 'Payment Success',
+            'transaction-data' => $invoice,
+        ]);
     }
 
     public function transactionDetail($id) : JsonResponse {
