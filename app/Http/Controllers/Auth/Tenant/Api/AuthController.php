@@ -35,6 +35,7 @@ use GuzzleHttp\Client as GuzzleHttpClient;
 use Exception;
 
 class AuthController extends Controller {
+    // tetsing github
     
     public function register(Request $request) {
         //EDIT DISINI
