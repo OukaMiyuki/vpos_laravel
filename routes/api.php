@@ -61,7 +61,13 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:100,1', 'custom
     Route::post('/cart-invoice', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'listCartInvoice']);
     Route::get('/get-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'getAlias']);
 
-    Route::post('/rek-list', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'rekList']);
+    Route::post('/rek-list', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'rekList']);
+    Route::post('/bank-list', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'banList']);
+    Route::post('/update-rekening', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'rekeningupdate']);
+
+    Route::post('/cek-saldo-qris', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'cekSaldoQris']);
+
+    Route::post('/tarik-dana-qris', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'tarikDana']);
 
     Route::post('/transaction', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionList']);
     Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionListAlias']);

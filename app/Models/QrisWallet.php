@@ -7,5 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class QrisWallet extends Model {
     use HasFactory;
-    protected $guarded = [];
+    protected $fillable = [
+        'id_user',
+        'email',
+        'saldo'
+    ];
 }

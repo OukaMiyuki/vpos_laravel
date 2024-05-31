@@ -72,6 +72,10 @@ class ProfileController extends Controller{
         return view('tenant.tenant_profile', compact('profilTenant', 'rekening', 'qrisWallet'));
     }
 
+    public function tarikDana(Request $request){
+
+    }
+
     // public function profileAccountUpdate(Request $request){
     //     $profileInfo = Tenant::find(auth()->user()->id);
 
