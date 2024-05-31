@@ -13,6 +13,7 @@ use App\Models\DetailMarketing;
 use App\Models\Tenant;
 
 class AdminController extends Controller {
+    // Teting github error
     public function index(){
         $marketingCount = Marketing::count();
         $mitraBisnis = Tenant::where('id_inv_code', '==', 0)->count();
