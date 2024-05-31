@@ -500,17 +500,27 @@ class AuthController extends Controller {
                 'status' => 200
             ]);
         } else {
-            return response()->json([
-                'message' => 'Fetch Success!',
-                'rekening-status' => 'Akun Terdeteksi',
-                'data-bank' => $dataRekening,
-                'data-rekening' => $rek,
-                'status' => 200
-            ]);
+            if($dataRekening->responseCode == "2001600" || $dataRekening->responseCode == 2001600){
+                return response()->json([
+                    'message' => 'Fetch Success!',
+                    'rekening-status' => 'Akun Terdeteksi',
+                    'data-bank' => $dataRekening,
+                    'data-rekening' => $rek,
+                    'status' => 200
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Fetch Success!',
+                    'rekening-status' => 'Akun Bank Tidak Terdeteksi, Harap cek kembali nomor rekening dan nama bank yang anda inputkan',
+                    'data-bank' => $dataRekening,
+                    'data-rekening' => $rek,
+                    'status' => 200
+                ]);
+            }
         }
     }
 
-    public function banList(){
+    public function bankList(){
         $client = new GuzzleHttpClient();
         $ip = "36.84.106.3";
         $PublicIP = $this->get_client_ip();

@@ -62,7 +62,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:100,1', 'custom
     Route::get('/get-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'getAlias']);
 
     Route::post('/rek-list', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'rekList']);
-    Route::post('/bank-list', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'banList']);
+    Route::post('/bank-list', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'bankList']);
     Route::post('/update-rekening', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'rekeningupdate']);
 
     Route::post('/cek-saldo-qris', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'cekSaldoQris']);

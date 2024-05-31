@@ -10,10 +10,14 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Marketing;
 use App\Models\DetailMarketing;
+use App\Models\Tenant;
 
 class AdminController extends Controller {
     public function index(){
-        return view('admin.dashboard');
+        $marketingCount = Marketing::count();
+        $mitraBisnis = Tenant::where('id_inv_code', '==', 0)->count();
+        $mitraTenant = Tenant::where('id_inv_code', '!=', 0)->count();
+        return view('admin.dashboard', compact(['marketingCount', 'mitraBisnis', 'mitraTenant']));
     }
 
     public function adminDashboardMarketing(){
@@ -56,7 +60,7 @@ class AdminController extends Controller {
             'phone' => $request->phone,
             'is_active' => $request->status,
         ]);
-        
+
         $notification = array(
             'message' => 'Data akun berhasil diupdate!',
             'alert-type' => 'success',
