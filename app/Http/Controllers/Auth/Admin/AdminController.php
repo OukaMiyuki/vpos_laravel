@@ -11,6 +11,8 @@ use Carbon\Carbon;
 use App\Models\Marketing;
 use App\Models\DetailMarketing;
 use App\Models\Tenant;
+use App\Models\Withdrawal;
+use App\Models\DetailPenarikan;
 
 class AdminController extends Controller {
     // Teting github error
@@ -18,7 +20,51 @@ class AdminController extends Controller {
         $marketingCount = Marketing::count();
         $mitraBisnis = Tenant::where('id_inv_code', '==', 0)->count();
         $mitraTenant = Tenant::where('id_inv_code', '!=', 0)->count();
-        return view('admin.dashboard', compact(['marketingCount', 'mitraBisnis', 'mitraTenant']));
+        $withdrawals = Withdrawal::where('email', '!=' , auth()->user()->email);
+        $withDrawToday = Withdrawal::where('email', '!=' , auth()->user()->email)
+                                     ->whereDate('tanggal_penarikan', Carbon::now())
+                                     ->where('status', 1)
+                                     ->withSum('detailWithdraw', 'biaya_admin_su')
+                                     ->get();
+        $marketing = Marketing::select([
+                                        'marketings.id',
+                                        'marketings.name',
+                                        'marketings.email',
+                                        'marketings.is_active',
+                                        'marketings.created_at'
+                                    ])
+                                    ->with(['detail' => function($query){
+                                        $query->select(['detail_marketings.id', 'detail_marketings.id_marketing', 'detail_marketings.jenis_kelamin']);
+                                    }])
+                                    ->latest()
+                                    ->take(10)
+                                    ->get();
+        $totalWithdrawToday = 0;
+        foreach($withDrawToday as $wd){
+            $totalWithdrawToday+=$wd->detail_withdraw_sum_biaya_admin_su;
+        }
+
+        $withdrawCount = $withdrawals->count();
+        $withdrawNew = $withdrawals->select([
+                                'withdrawals.id',
+                                'withdrawals.email',
+                                'withdrawals.tanggal_penarikan',
+                                'withdrawals.nominal',
+                                'withdrawals.status',
+                            ])
+                            ->with(['detailWithdraw' => function($query){
+                                $query->select([
+                                    'detail_penarikans.id',
+                                    'detail_penarikans.id_penarikan',
+                                    'detail_penarikans.nominal_penarikan',
+                                    'detail_penarikans.biaya_admin_su'
+                                ]);
+                            }])
+                            ->take(10)
+                            ->latest()
+                            ->get();
+        dd($withdrawNew);
+        return view('admin.dashboard', compact(['marketingCount', 'mitraBisnis', 'mitraTenant', 'withdrawCount', 'totalWithdrawToday', 'marketing', 'withdrawNew']));
     }
 
     public function adminDashboardMarketing(){
