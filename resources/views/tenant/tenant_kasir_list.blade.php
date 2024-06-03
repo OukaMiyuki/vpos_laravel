@@ -64,12 +64,14 @@
                                                     </td>
                                                     <td>
                                                         <a href="{{ route('tenant.kasir.activation', ['id' => $k->id]) }}">
-                                                            <button title="Nonaktifkan Kasir" type="button" class="btn
+                                                            <button type="button"
                                                             @if ($k->is_active == 1)
-                                                                btn-danger
+                                                                title="Nonaktifkan Kasir"
+                                                                class="btn btn-danger rounded-pill waves-effect waves-light"
                                                             @else
-                                                                btn-success
-                                                            @endif  rounded-pill waves-effect waves-light"><span class="mdi mdi-power"></span></button>&nbsp;
+                                                                title="Aktifkan Kasir"
+                                                                class="btn btn-success rounded-pill waves-effect waves-light"
+                                                            @endif><span class="mdi mdi-power"></span></button>&nbsp;
                                                         </a>
                                                         <a href="{{ route('tenant.kasir.detail', ['id' => $k->id]) }}">
                                                             <button title="Lihat data kasir" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;

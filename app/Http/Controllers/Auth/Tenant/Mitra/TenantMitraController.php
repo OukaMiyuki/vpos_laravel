@@ -91,7 +91,15 @@ class TenantMitraController extends Controller {
         if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
             $notification = array(
                 'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
-                'alert-type' => 'error',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
+        }
+
+        if(auth()->user()->is_active == 0){
+            $notification = array(
+                'message' => 'Akun anda belum diverifikasi dan diaktifkan oleh Admin!',
+                'alert-type' => 'warning',
             );
             return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
         }
@@ -320,15 +328,36 @@ class TenantMitraController extends Controller {
     public function storeDetail($id, $store_identifier){
         $store = StoreList::where('id_user', auth()->user()->id)
                             ->where('email', auth()->user()->email)
+                            ->where('store_identifier', $store_identifier)
                             ->find($id);
         $umiRequest = "";
         $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
                                 ->where('store_identifier', $store_identifier)
                                 ->first();
+
+        if(is_null($store) || empty($store)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
+        }
+            
         if(empty($umiRequest)){
             $umiRequest = "Empty";
         }
+
+        return view('tenant.tenant_mitra.tenant_mitra_dashboard_store_detail', compact('store', 'umiRequest'));
+
+    }
+
+    public function storeInvoiceList($store_identifier){
+        $store = StoreList::where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->where('store_identifier', $store_identifier)
+                            ->select(['store_lists.store_identifier', 'store_lists.name'])
+                            ->first();
 
         if(is_null($store) || empty($store)){
             $notification = array(
@@ -338,11 +367,39 @@ class TenantMitraController extends Controller {
             return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
         }
 
-        return view('tenant.tenant_mitra.tenant_mitra_dashboard_store_detail', compact('store', 'umiRequest'));
-
+        $invoice = Invoice::select(['invoices.id', 
+                                    'invoices.store_identifier', 
+                                    'invoices.id_tenant', 
+                                    'invoices.nomor_invoice', 
+                                    'invoices.tanggal_transaksi', 
+                                    'invoices.tanggal_pelunasan', 
+                                    'invoices.jenis_pembayaran', 
+                                    'invoices.status_pembayaran', 
+                                    'invoices.nominal_bayar', 
+                                    'invoices.mdr', 
+                                    'invoices.nominal_mdr', 
+                                    'invoices.nominal_terima_bersih'
+                                ])
+                            ->with(['storeMitra' => function($query){
+                                $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();
+                            }])
+                            ->where('id_tenant', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->where('store_identifier', $store_identifier)
+                            ->latest()
+                            ->get();
+        return view('tenant.tenant_mitra.tenant_mitra_dashboard_store_transaction_list', compact('invoice', 'store'));
     }
 
     public function requestUmi(Request $request){
+        if(auth()->user()->is_active == 0){
+            $notification = array(
+                'message' => 'Akun anda belum diverifikasi dan diaktifkan oleh Admin!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+
         $ip = "125.164.244.223";
         $PublicIP = $this->get_client_ip();
         $getLoc = Location::get($ip);
@@ -716,6 +773,13 @@ class TenantMitraController extends Controller {
     }
 
     public function qrisApiSettingGenerateKey(){
+        if(auth()->user()->is_active == 0){
+            $notification = array(
+                'message' => 'Akun anda belum diverifikasi dan diaktifkan oleh Admin!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
         $ip = "125.164.244.223";
         $PublicIP = $this->get_client_ip();
         $getLoc = Location::get($ip);
@@ -778,6 +842,13 @@ class TenantMitraController extends Controller {
     }
 
     public function qrisApiSettingUpdateCallback(Request $request){
+        if(auth()->user()->is_active == 0){
+            $notification = array(
+                'message' => 'Akun anda belum diverifikasi dan diaktifkan oleh Admin!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
         $ip = "125.164.244.223";
         $PublicIP = $this->get_client_ip();
         $getLoc = Location::get($ip);

@@ -20,16 +20,27 @@ Route::middleware(['guest', 'throttle'])->prefix('/')->group( function () {
     Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'store'])->name('process.login');
 });
 
-
 Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function () {
-    Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('admin.logout');
-    Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
-
     Route::get('settings/profile', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profile'])->name('admin.profile');
     Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileAccountUpdate'])->name('admin.profile.account.update');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileInfoUpdate'])->name('admin.profile.info.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'password'])->name('admin.password');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'passwordUpdate'])->name('admin.password.update');
+});
+
+Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function () {
+    Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('admin.logout');
+    Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
+
+    Route::get('/dashboard/admin', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuDashboard'])->name('admin.dashboard.menu');
+    Route::get('/dashboard/user/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTransaction'])->name('admin.dashboard.menu.userTransaction');
+    Route::get('/dashboard/user/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserWithdrawals'])->name('admin.dashboard.menu.userWithdrawals');
+
+    Route::get('/dashboard/administrator', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminList'])->name('admin.dashboard.administrator.list');
+    Route::get('/dashboard/administrator/register', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminCreate'])->name('admin.dashboard.administrator.create');
+    Route::post('/dashboard/administrator/register', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminRegister'])->name('admin.dashboard.administrator.register');
+    Route::get('/dashboard/administrator/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminActivation'])->name('admin.dashboard.administrator.activation');
+    Route::get('/dashboard/administrator/detail/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDetail'])->name('admin.dashboard.administrator.detail');
 
     Route::get('dashboard/data/marketing', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketing'])->name('admin.dashboard.marketing');
     Route::get('dashboard/data/marketing/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountActivation'])->name('admin.dashboard.marketing.account.activation');
@@ -145,6 +156,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/store/edit/{id}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeEdit'])->name('tenant.mitra.dashboard.toko.edit');
     Route::post('/dashboard/store/update', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeUpdate'])->name('tenant.mitra.dashboard.toko.update');
     Route::get('/dashboard/store/detail/{id}/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeDetail'])->name('tenant.mitra.dashboard.toko.detail');
+    Route::get('/dashboard/store/invoice/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeInvoiceList'])->name('tenant.mitra.dashboard.toko.invoice');
     Route::post('/dashboard/store/request_umi', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'requestUmi'])->name('tenant.mitra.dashboard.toko.request.umi');
     Route::post('/dashboard/store/request_umi/resend', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'requestUmiResend'])->name('tenant.mitra.dashboard.toko.request.umi.resend');
     Route::get('/dashboard/store/request_umi', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'umiRequestList'])->name('tenant.mitra.dashboard.toko.request.umi.list');

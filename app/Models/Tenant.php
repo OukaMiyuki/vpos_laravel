@@ -134,6 +134,11 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         $DetailTenant->jenis_kelamin = request()->jenis_kelamin;
         $DetailTenant->alamat = request()->alamat;
         $DetailTenant->save();
+        if($model->id_inv_code != 0){
+            $model->is_active = 1;
+            $model->save();
+        }
+            
     }
 
     public function storeInsert($model, $randomString){

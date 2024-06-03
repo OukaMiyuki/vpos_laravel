@@ -8,10 +8,16 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use App\Models\Marketing;
-use App\Models\DetailMarketing;
-use App\Models\Tenant;
 use App\Models\Withdrawal;
+use App\Models\Admin;
+use App\Models\Marketing;
+use App\Models\Tenant;
+use App\Models\Kasir;
+use App\Models\DetailAdmin;
+use App\Models\DetailMarketing;
+use App\Models\DetailTenant;
+use App\Models\DetailKasir;
+use App\Models\Invoice;
 use App\Models\DetailPenarikan;
 
 class AdminController extends Controller {
@@ -37,7 +43,7 @@ class AdminController extends Controller {
                                         $query->select(['detail_marketings.id', 'detail_marketings.id_marketing', 'detail_marketings.jenis_kelamin']);
                                     }])
                                     ->latest()
-                                    ->take(10)
+                                    ->take(5)
                                     ->get();
         $totalWithdrawToday = 0;
         foreach($withDrawToday as $wd){
@@ -47,7 +53,7 @@ class AdminController extends Controller {
         $withdrawCount = $withdrawals->count();
         $withdrawNew = $withdrawals->select([
                                 'withdrawals.id',
-                                'withdrawals.email',
+                                'withdrawals.invoice_pemarikan',
                                 'withdrawals.tanggal_penarikan',
                                 'withdrawals.nominal',
                                 'withdrawals.status',
@@ -60,11 +66,166 @@ class AdminController extends Controller {
                                     'detail_penarikans.biaya_admin_su'
                                 ]);
                             }])
-                            ->take(10)
+                            ->take(5)
                             ->latest()
                             ->get();
-        dd($withdrawNew);
+        //dd($withdrawNew);
         return view('admin.dashboard', compact(['marketingCount', 'mitraBisnis', 'mitraTenant', 'withdrawCount', 'totalWithdrawToday', 'marketing', 'withdrawNew']));
+    }
+
+    public function adminMenuDashboard(){
+        return view('admin.admin_menu_dashboard');
+    }
+
+    public function adminMenuUserTransaction(){
+        $invoice = Invoice::latest()->get();
+        return view('admin.admin_menu_dashboard_user_transaction', compact('invoice'));
+    }
+
+    public function adminMenuUserWithdrawals(){
+        $withdrawals = Withdrawal::select([
+                                    'withdrawals.id',
+                                    'withdrawals.invoice_pemarikan',
+                                    'withdrawals.email',
+                                    'withdrawals.tanggal_penarikan',
+                                    'withdrawals.nominal',
+                                    'withdrawals.biaya_admin',
+                                    'withdrawals.status',
+                                ])
+                                ->with(['detailWithdraw' => function($query){
+                                    $query->select([
+                                        'detail_penarikans.id',
+                                        'detail_penarikans.id_penarikan',
+                                        'detail_penarikans.nominal_bersih_penarikan',
+                                        'detail_penarikans.biaya_nobu',
+                                        'detail_penarikans.biaya_mitra',
+                                        'detail_penarikans.biaya_tenant',
+                                        'detail_penarikans.biaya_admin_su',
+                                        'detail_penarikans.biaya_agregate',
+                                    ]);
+                                }])
+                                ->latest()
+                                ->get();
+
+        return view('admin.admin_menu_dashboard_user_withdrawals', compact(['withdrawals']));
+    }
+
+    public function adminList(){
+        $adminList = Admin::select([
+                                'admins.id',
+                                'admins.name',
+                                'admins.email',
+                                'admins.phone',
+                                'admins.is_active',
+                            ])
+                            ->with(['detail' => function($query){
+                                $query->select([
+                                    'detail_admins.id',
+                                    'detail_admins.id_admin',
+                                    'detail_admins.jenis_kelamin',
+                                    'detail_admins.no_ktp',
+                                ]);
+                            }])
+                            ->where('access_level', 1)
+                            ->latest()
+                            ->get();
+            return view('admin.admin_administrator_list', compact('adminList'));
+    }
+
+    public function adminCreate(){
+        return view('admin.admin_administrator_create');
+    }
+
+    public function adminRegister(Request $request){
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
+            'no_ktp' => ['required', 'string', 'numeric', 'digits:16', 'unique:'.DetailAdmin::class, 'unique:'.DetailMarketing::class, 'unique:'.DetailTenant::class, 'unique:'.DetailKasir::class],
+            'phone' => ['required', 'string', 'numeric', 'digits_between:1,20', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
+            'jenis_kelamin' => ['required'],
+            'tempat_lahir' => ['required'],
+            'tanggal_lahir' => ['required'],
+            'alamat' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'confirmed', 'min:8'],
+        ]);
+
+        $admin = Admin::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+        ]);
+
+        if(!is_null($admin)) {
+            $admin->detailAdminStore($admin);
+        }
+
+        $notification = array(
+            'message' => 'Admin berhasil diregister!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('admin.dashboard.administrator.list')->with($notification);
+    }
+
+    public function adminActivation($id){
+        $admin = Admin::find($id);
+
+        if(is_null($admin) || empty($admin)){
+            $notification = array(
+                'message' => 'Data Admin tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.administrator.list')->with($notification);
+        }
+
+        if($admin->is_active == 0){
+            $admin->update([
+                'is_active' => 1
+            ]);
+        } else {
+            $admin->update([
+                'is_active' => 0
+            ]);
+        }
+
+        $notification = array(
+            'message' => 'Admin berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('admin.dashboard.administrator.list')->with($notification);
+    }
+
+    public function adminDetail($id){
+        $admin = Admin::select([
+                        'admins.id',
+                        'admins.name',
+                        'admins.email',
+                        'admins.phone',
+                        'admins.is_active'
+                    ])
+                    ->with(['detail' => function($query){
+                        $query->select([
+                            'detail_admins.id',
+                            'detail_admins.id_admin',
+                            'detail_admins.no_ktp',
+                            'detail_admins.tempat_lahir',
+                            'detail_admins.tanggal_lahir',
+                            'detail_admins.jenis_kelamin',
+                            'detail_admins.alamat',
+                            'detail_admins.photo'
+                        ]);
+                    }])
+                    ->find($id);
+
+        if(is_null($admin) || empty($admin)){
+            $notification = array(
+                'message' => 'Data Admin tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.administrator.list')->with($notification);
+        }
+
+        return view('admin.admin_administrator_detail', compact(['admin']));
     }
 
     public function adminDashboardMarketing(){

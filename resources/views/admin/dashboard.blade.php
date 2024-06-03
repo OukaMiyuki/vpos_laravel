@@ -11,14 +11,11 @@
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control border-0" id="dash-daterange">
                                     <span class="input-group-text bg-blue border-blue text-white">
-                                    <i class="mdi mdi-calendar-range"></i>
+                                        <i class="mdi mdi-calendar-range"></i>
                                     </span>
                                 </div>
-                                <a href="#" class="btn btn-blue btn-sm ms-2">
-                                <i class="mdi mdi-autorenew"></i>
-                                </a>
-                                <a href="#" class="btn btn-blue btn-sm ms-1">
-                                <i class="mdi mdi-filter-variant"></i>
+                                <a href="javascript: void(0);" class="btn btn-blue btn-sm ms-2">
+                                    <i class="mdi mdi-autorenew"></i>
                                 </a>
                             </form>
                         </div>
@@ -226,116 +223,44 @@
                                 <table class="table table-borderless table-nowrap table-hover table-centered m-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>Marketplaces</th>
-                                            <th>Date</th>
-                                            <th>Payouts</th>
+                                            <th>No.</th>
+                                            <th>Invoice</th>
+                                            <th>Tanggal Penarikan</th>
+                                            <th>Nominal (Rp.)</th>
+                                            <th>Insentif Admin (Rp.)</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
+                                    @php
+                                        $no=0;
+                                    @endphp
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <h5 class="m-0 fw-normal">Themes Market</h5>
-                                            </td>
-                                            <td>
-                                                Oct 15, 2018
-                                            </td>
-                                            <td>
-                                                $5848.68
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-soft-warning text-warning">Upcoming</span>
-                                            </td>
-                                            <td>
-                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h5 class="m-0 fw-normal">Freelance</h5>
-                                            </td>
-                                            <td>
-                                                Oct 12, 2018
-                                            </td>
-                                            <td>
-                                                $1247.25
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-soft-success text-success">Paid</span>
-                                            </td>
-                                            <td>
-                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h5 class="m-0 fw-normal">Share Holding</h5>
-                                            </td>
-                                            <td>
-                                                Oct 10, 2018
-                                            </td>
-                                            <td>
-                                                $815.89
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-soft-success text-success">Paid</span>
-                                            </td>
-                                            <td>
-                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h5 class="m-0 fw-normal">Envato's Affiliates</h5>
-                                            </td>
-                                            <td>
-                                                Oct 03, 2018
-                                            </td>
-                                            <td>
-                                                $248.75
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-soft-danger text-danger">Overdue</span>
-                                            </td>
-                                            <td>
-                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h5 class="m-0 fw-normal">Marketing Revenue</h5>
-                                            </td>
-                                            <td>
-                                                Sep 21, 2018
-                                            </td>
-                                            <td>
-                                                $978.21
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-soft-warning text-warning">Upcoming</span>
-                                            </td>
-                                            <td>
-                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h5 class="m-0 fw-normal">Advertise Revenue</h5>
-                                            </td>
-                                            <td>
-                                                Sep 15, 2018
-                                            </td>
-                                            <td>
-                                                $358.10
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-soft-success text-success">Paid</span>
-                                            </td>
-                                            <td>
-                                                <a href="#" class="btn btn-xs btn-light"><i class="mdi mdi-pencil"></i></a>
-                                            </td>
-                                        </tr>
+                                        @foreach ($withdrawNew as $wd)
+                                            <tr>
+                                                <td>{{ $no+=1 }}</td>
+                                                <td>{{ $wd->invoice_pemarikan }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }}</td>
+                                                <td>{{ $wd->nominal }}</td>
+                                                <td>
+                                                    @if ($wd->status == 0)
+                                                        0
+                                                    @else
+                                                        {{ $wd->detailWithdraw->biaya_admin_su }}
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if ($wd->status == 0)
+                                                        <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
+                                                    @else
+                                                        <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>

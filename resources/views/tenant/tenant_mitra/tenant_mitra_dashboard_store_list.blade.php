@@ -69,7 +69,7 @@
                                                 </td>
                                                 <td class="text-center">{{ $store->invoice_count }}</td>
                                                 <td>
-                                                    <a href="">
+                                                    <a href="{{ route('tenant.mitra.dashboard.toko.invoice', ['store_identifier' => $store->store_identifier]) }}">
                                                         <button title="Lihat daftar invoice" type="button" class="btn btn-primary rounded-pill waves-effect waves-light">Lihat Invoice</button>&nbsp;
                                                     </a>
                                                 </td>

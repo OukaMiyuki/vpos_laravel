@@ -132,6 +132,51 @@
                         <span> Dashboards </span>
                     </a>
                 </li>
+                @auth('admin')
+                    <li>
+                        <a href="#transaction-list-admin" data-bs-toggle="collapse">
+                            <i class="mdi mdi-view-list-outline"></i>
+                            <span> Admin Menu </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="transaction-list-admin">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('admin.dashboard.menu') }}">Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.dashboard.menu.userTransaction') }}">User Transaction List</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.dashboard.menu.userWithdrawals') }}">User Withdrawals</a>
+                                </li>
+                                <li>
+                                    <a href="#">User Bank Account</a>
+                                </li>
+                                <li>
+                                    <a href="#">Request UMI</a>
+                                </li>
+                                <li>
+                                    <a href="#">Tenant Qris Account</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#sidebarCrm" data-bs-toggle="collapse">
+                            <i class="mdi mdi-account-box-multiple"></i>
+                            <span> Administrator </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="sidebarCrm">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('admin.dashboard.administrator.list') }}">Account</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                @endauth
                 @auth('tenant')
                     @if (auth()->user()->id_inv_code != 0)
                         <li>
@@ -198,7 +243,7 @@
                     <li>
                         <a href="#marketing" data-bs-toggle="collapse">
                             <i class="mdi mdi-account-tie-voice"></i>
-                            <span> Marketing </span>
+                            <span> Mitra Aplikasi </span>
                             <span class="menu-arrow"></span>
                         </a>
                         <div class="collapse" id="marketing">
@@ -207,21 +252,65 @@
                                     <a href="{{ route('admin.dashboard.marketing') }}">Dashboard</a>
                                 </li>
                                 <li>
-                                    <a href="#">Marketing Accounts</a>
+                                    <a href="#">Mitra List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Invitation Codes</a>
+                                </li>
+                                <li>
+                                    <a href="#">Withdrawals</a>
                                 </li>
                             </ul>
                         </div>
                     </li>
                     <li>
-                        <a href="#sidebarCrm" data-bs-toggle="collapse">
-                            <i class="mdi mdi-store"></i>
-                            <span> Merchant </span>
+                        <a href="#mitra-bisnis-admin" data-bs-toggle="collapse">
+                            <i class="mdi mdi-account-tie"></i>
+                            <span> Mitra Bisnis </span>
                             <span class="menu-arrow"></span>
                         </a>
-                        <div class="collapse" id="sidebarCrm">
+                        <div class="collapse" id="mitra-bisnis-admin">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="">Merchant List</a>
+                                    <a href="{{ route('admin.dashboard.marketing') }}">Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="#">Mitra List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Merchant List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Transaction List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Withdrawals</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#mitra-tenant-admin" data-bs-toggle="collapse">
+                            <i class="mdi mdi-store"></i>
+                            <span> Mitra Tenant </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="mitra-tenant-admin">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">Mitra List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Store List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Kasir List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Transaction List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Withdrawals</a>
                                 </li>
                             </ul>
                         </div>
