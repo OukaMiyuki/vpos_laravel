@@ -13,15 +13,15 @@ class UmiRequest extends Model {
 
     protected $guarded = [];
 
-    public function tenant(){
-        return $this->belongsTo(Tenant::class, 'id_tenant', 'id');
-    }
+    // public function tenant(){
+    //     return $this->belongsTo(Tenant::class, 'id_tenant', 'id');
+    // }
 
     public function storeList(){
-        return $this->hasOne(StoreList::class, 'store_identifier', 'store_identifier');
+        return $this->belongsTo(StoreList::class, 'store_identifier', 'store_identifier');
     }
 
     public function storeDetail(){
-        return $this->hasOne(StoreDetail::class, 'store_identifier', 'store_identifier');
+        return $this->belongsTo(StoreDetail::class, 'store_identifier', 'store_identifier');
     }
 }

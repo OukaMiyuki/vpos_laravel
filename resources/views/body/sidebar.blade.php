@@ -151,13 +151,10 @@
                                     <a href="{{ route('admin.dashboard.menu.userWithdrawals') }}">User Withdrawals</a>
                                 </li>
                                 <li>
-                                    <a href="#">User Bank Account</a>
+                                    <a href="{{ route('admin.dashboard.menu.userUmiRequest') }}">Request UMI</a>
                                 </li>
                                 <li>
-                                    <a href="#">Request UMI</a>
-                                </li>
-                                <li>
-                                    <a href="#">Tenant Qris Account</a>
+                                    <a href="{{ route('admin.dashboard.menu.userTenantQris') }}">Tenant Qris Account</a>
                                 </li>
                             </ul>
                         </div>

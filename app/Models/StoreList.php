@@ -27,6 +27,6 @@ class StoreList extends Model {
     }
 
     public function reqUmi(){
-        return $this->belongsTo(UmiRequest::class, 'store_identifier', 'store_identifier');
+        return $this->hasOne(UmiRequest::class, 'store_identifier', 'store_identifier');
     }
 }

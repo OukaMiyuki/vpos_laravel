@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -18,6 +19,8 @@ use App\Models\DetailMarketing;
 use App\Models\DetailTenant;
 use App\Models\DetailKasir;
 use App\Models\Invoice;
+use App\Models\UmiRequest;
+use App\Models\TenantQrisAccount;
 use App\Models\DetailPenarikan;
 
 class AdminController extends Controller {
@@ -108,6 +111,44 @@ class AdminController extends Controller {
                                 ->get();
 
         return view('admin.admin_menu_dashboard_user_withdrawals', compact(['withdrawals']));
+    }
+
+    public function adminMenuUserUmiRequest(){
+        $umiRequest = UmiRequest::select([
+                                    'umi_requests.id',
+                                    'umi_requests.id_tenant',
+                                    'umi_requests.email',
+                                    'umi_requests.store_identifier',
+                                    'umi_requests.tanggal_pengajuan',
+                                    'umi_requests.tanggal_approval',
+                                    'umi_requests.is_active',
+                                    'umi_requests.file_path',
+                                    'umi_requests.note'
+                                ])
+                                ->latest()
+                                ->get();
+        return view('admin.admin_menu_dashboard_user_umi_request', compact(['umiRequest']));
+    }
+
+    public function adminMenuUserUmiRequestDownload($id){
+        $umiXLS = UmiRequest::find($id);
+        $userDocsPath = Storage::path('public/docs/umi/user_doc');
+        $file_path = $userDocsPath. "/" . $umiXLS->file_path;
+        $headers = array(
+            'Content-Type: xlsx',
+            'Content-Disposition: attachment; filename='.$umiXLS->file_path,
+        );
+
+        if ( file_exists( $file_path ) ) {
+            return Response::download( $file_path, $umiXLS->file_path, $headers );
+        } else {
+            exit( 'Requested file does not exist on our server!' );
+        }
+    }
+
+    public function adminMenuUserTenantQris(){
+        $tenantQris = TenantQrisAccount::latest()->get();
+        return view('admin.admin_menu_dashboard_user_tenant_qris', compact(['tenantQris']));
     }
 
     public function adminList(){

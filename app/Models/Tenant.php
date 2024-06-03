@@ -70,9 +70,9 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         return $this->hasMany(StoreList::class, 'id_user', 'id');
     }
 
-    public function umi(){
-        return $this->hasOne(UmiRequest::class, 'id_tenant', 'id');
-    }
+    // public function umi(){
+    //     return $this->hasMany(UmiRequest::class, 'id_tenant', 'id');
+    // }
 
     public function invoiceStoreList(){
         return $this->hasManyThrough(

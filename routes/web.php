@@ -35,6 +35,9 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('/dashboard/admin', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuDashboard'])->name('admin.dashboard.menu');
     Route::get('/dashboard/user/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTransaction'])->name('admin.dashboard.menu.userTransaction');
     Route::get('/dashboard/user/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserWithdrawals'])->name('admin.dashboard.menu.userWithdrawals');
+    Route::get('/dashboard/user/request-umi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequest'])->name('admin.dashboard.menu.userUmiRequest');
+    Route::get('/dashboard/user/request-umi/download/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestDownload'])->name('admin.dashboard.menu.userUmiRequest.download');
+    Route::get('/dashboard/user/tenant-qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTenantQris'])->name('admin.dashboard.menu.userTenantQris');
 
     Route::get('/dashboard/administrator', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminList'])->name('admin.dashboard.administrator.list');
     Route::get('/dashboard/administrator/register', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminCreate'])->name('admin.dashboard.administrator.create');
