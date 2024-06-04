@@ -14,7 +14,7 @@
                                 <li class="breadcrumb-item active">Profile</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Marketing User's Profile</h4>
+                        <h4 class="page-title">Mitra Aplikasi User's Profile</h4>
                     </div>
                 </div>
             </div>
@@ -28,7 +28,7 @@
                                 {{ $marketing->name }}
                             </h4>
                             <p class="text-muted">
-                                Marketing
+                                Mitra Aplikasi
                             </p>
                             @if($marketing->is_active == 1)
                                 <button type="button" class="btn btn-success btn-xs waves-effect mb-2 waves-light">Aktif</button>
@@ -36,8 +36,9 @@
                                 <button type="button" class="btn btn-danger btn-xs waves-effect mb-2 waves-light">Tidak Aktif</button>
                             @endif
                             <div class="text-start mt-3">
-                                <p class="text-muted mb-2 font-13"><strong>Mobile :</strong><span class="ms-2">{{ $marketing->phone }}</span></p>
-                                <p class="text-muted mb-2 font-13"><strong>Email :</strong> <span class="ms-2">{{ $marketing->email }}</span></p>
+                                <p class="text-muted mb-2 font-13"><strong>Mobile :</strong><span class="ms-2">{{ $marketing->phone }}&nbsp;@if(!is_null($marketing->phone_number_verified_at) || !empty($marketing->phone_number_verified_at) || $marketing->phone_number_verified_at != "" || $marketing->phone_number_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</p>
+                                <p class="text-muted mb-2 font-13"><strong>Email :</strong> <span class="ms-2">{{ $marketing->email }}&nbsp;@if(!is_null($marketing->email_verified_at) || !empty($marketing->email_verified_at) || $marketing->email_verified_at != "" || $marketing->email_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</p>
+                                <p class="text-muted mb-2 font-13"><strong>Bergabung Pada :</strong> <span class="ms-2">{{ \Carbon\Carbon::parse($marketing->created_at)->format('d-m-Y') }}</p>
                             </div>
                         </div>
                     </div>
@@ -65,7 +66,7 @@
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane show active" id="settings">
-                                    <form method="post" action="{{ route('admin.dashboard.marketing.account.update') }}">
+                                    <form method="post">
                                         @csrf
                                         <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Modify Account</h5>
                                         <div class="row">
@@ -73,13 +74,13 @@
                                                 <div class="mb-3">
                                                     <label for="name" class="form-label">Nama Lengkap</label>
                                                     <input readonly type="hidden" class="form-control" name="id" id="id" required value="{{ $marketing->id }}">
-                                                    <input type="text" class="form-control" name="name" id="name" required value="{{ $marketing->name }}" placeholder="Masukkan nama lengkap">
+                                                    <input readonly type="text" class="form-control" name="name" id="name" required value="{{ $marketing->name }}" placeholder="Masukkan nama lengkap">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="email" class="form-label">Email</label>
-                                                    <input type="email" class="form-control" name="email" id="email" required value="{{ $marketing->email }}" placeholder="Masukkan email akun">
+                                                    <input readonly type="email" class="form-control" name="email" id="email" required value="{{ $marketing->email }}" placeholder="Masukkan email akun">
                                                 </div>
                                             </div>
                                             <!-- end col -->
@@ -89,13 +90,13 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="phone" class="form-label">Phone Number</label>
-                                                    <input type="text" class="form-control" name="phone" id="phone" required value="{{ $marketing->phone }}" placeholder="Enter email">
+                                                    <input readonly type="text" class="form-control" name="phone" id="phone" required value="{{ $marketing->phone }}" placeholder="Enter email">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="example-select" class="form-label">Status Akun</label>
-                                                    <select class="form-select" id="example-select" name="status" required>
+                                                    <select disabled class="form-select" id="example-select" name="status" required>
                                                         <option value="">- Pilih status akun -</option>
                                                         <option @if($marketing->is_active == 0) selected  @endif value="0">Belum Aktif</option>
                                                         <option @if($marketing->is_active == 1) selected  @endif value="1">Aktif</option>
@@ -105,13 +106,10 @@
                                             </div>
                                             <!-- end col -->
                                         </div>
-                                        <div class="text-end">
-                                            <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>
-                                        </div>
                                     </form>
                                 </div>
                                 <div class="tab-pane" id="aboutme">
-                                    <form method="post" action="{{ route('admin.dashboard.marketing.info.update') }}" enctype="multipart/form-data">
+                                    <form method="post" enctype="multipart/form-data">
                                         @csrf
                                         <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Update Informasi User</h5>
                                         <div class="row">
@@ -127,13 +125,13 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
-                                                    <input type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="{{ $marketing->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
+                                                    <input readonly type="text" class="form-control" name="tempat_lahir" id="tempat_lahir" required value="{{ $marketing->detail->tempat_lahir }}" placeholder="Masukkan tempat lahir">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                                                    <input type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ $marketing->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" required>
+                                                    <input readonly type="date" class="form-control" name="tanggal_lahir" id="tanggal_lahir" value="{{ $marketing->detail->tanggal_lahir }}" placeholder="Masukkan tanggal lahir" required>
                                                 </div>
                                             </div>
                                         </div>
@@ -141,7 +139,7 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
-                                                    <select class="form-select @error('jenis_kelamin') is-invalid @enderror" id="jenis_kelamin" name="jenis_kelamin" required>
+                                                    <select disabled class="form-select @error('jenis_kelamin') is-invalid @enderror" id="jenis_kelamin" name="jenis_kelamin" required>
                                                         <option value="">- Pilih jenis kelamin -</option>
                                                         <option @if($marketing->detail->jenis_kelamin == "Laki-laki") selected @endif value="Laki-laki">Laki-laki</option>
                                                         <option @if($marketing->detail->jenis_kelamin == "Perempuan") selected @endif value="Perempuan">Perempuan</option>
@@ -153,26 +151,9 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="alamat" class="form-label">Alamat</label>
-                                                    <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $marketing->detail->alamat !!}</textarea>
+                                                    <textarea readonly placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $marketing->detail->alamat !!}</textarea>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label for="photo" class="form-label">Upload Foto Profil</label>
-                                                    <input type="file" id="image" class="form-control" name="photo" accept="image/*">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label for="example-fileinput" class="form-label"></label>
-                                                    <img id="showImage" src="{{ asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="text-end">
-                                            <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>
                                         </div>
                                     </form>
                                 </div>
@@ -188,22 +169,29 @@
                                                             <th>Invitation Code</th>
                                                             <th>Holder</th>
                                                             <th>Created</th>
-                                                            <th>Attempt</th>
-                                                            <th>Action</th>
+                                                            <th class="text-center">Attempt</th>
+                                                            <th class="text-center">Action</th>
                                                         </tr>
                                                     </thead> 
+                                                    @php
+                                                        $no=0;
+                                                    @endphp
                                                     <tbody>
-                                                        <tr>
-                                                            <td>1</td>
-                                                            <td>AMAR5</td>
-                                                            <td>Amar Wibianto</td>
-                                                            <td>12-01-2024</td>
-                                                            <td>61</td>
-                                                            <td>
-                                                                <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>&nbsp;&nbsp;
-                                                                <a href="" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
-                                                            </td>
-                                                        </tr>
+                                                        @foreach ($marketing->invitationCode as $invitation)
+                                                            <tr>
+                                                                <td>{{ $no+=1 }}</td>
+                                                                <td>{{ $invitation->inv_code }}</td>
+                                                                <td>{{ $invitation->holder }}</td>
+                                                                <td>{{ \Carbon\Carbon::parse($invitation->created_at)->format('d-m-Y') }}</td>
+                                                                <td class="text-center">{{ $invitation->tenant->count() }}</td>
+                                                                <td class="text-center">
+                                                                    @if ($invitation->is_active == 1)
+                                                                        <a href="" class="btn btn-xs btn-danger"><i class="mdi mdi-power"></i></a>
+                                                                    @endif
+                                                                    <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
                                                     </tbody>
                                                 </table>   
                                             </div>

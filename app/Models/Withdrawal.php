@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\NobuWithdrawFeeHistory;
 use App\Models\DetailPenarikan;
+use App\Models\Tenant;
 
 class Withdrawal extends Model {
     use HasFactory;
@@ -18,6 +19,10 @@ class Withdrawal extends Model {
 
     public function detailWithdraw(){
         return $this->hasOne(DetailPenarikan::class, 'id_penarikan', 'id');
+    }
+
+    public function withdraw(){
+        return $this->belongsTo(Tenant::class, 'email', 'email');
     }
 
     public static function boot(){

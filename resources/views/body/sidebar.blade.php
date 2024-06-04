@@ -238,6 +238,32 @@
                 @endauth
                 @auth('admin')
                     <li>
+                        <a href="#saldo-admin" data-bs-toggle="collapse">
+                            <i class="mdi mdi-wallet"></i>
+                            <span> Saldo </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="saldo-admin">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="#">Saldo Qris</a>
+                                </li>
+                                <li>
+                                    <a href="#">Saldo Agregate</a>
+                                </li>
+                                <li>
+                                    <a href="#">History Cashback Transaksi</a>
+                                </li>
+                                <li>
+                                    <a href="#">History Nobu Transfer</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
                         <a href="#marketing" data-bs-toggle="collapse">
                             <i class="mdi mdi-account-tie-voice"></i>
                             <span> Mitra Aplikasi </span>
@@ -249,13 +275,13 @@
                                     <a href="{{ route('admin.dashboard.marketing') }}">Dashboard</a>
                                 </li>
                                 <li>
-                                    <a href="#">Mitra List</a>
+                                    <a href="{{ route('admin.dashboard.marketing.list') }}">Mitra List</a>
                                 </li>
                                 <li>
-                                    <a href="#">Invitation Codes</a>
+                                    <a href="{{ route('admin.dashboard.marketing.invitationcode') }}">Invitation Codes</a>
                                 </li>
                                 <li>
-                                    <a href="#">Withdrawals</a>
+                                    <a href="{{ route('admin.dashboard.marketing.withdraw') }}">Withdrawals</a>
                                 </li>
                             </ul>
                         </div>
@@ -269,7 +295,7 @@
                         <div class="collapse" id="mitra-bisnis-admin">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="{{ route('admin.dashboard.marketing') }}">Dashboard</a>
+                                    <a href="#">Dashboard</a>
                                 </li>
                                 <li>
                                     <a href="#">Mitra List</a>

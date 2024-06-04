@@ -36,8 +36,13 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('/dashboard/user/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTransaction'])->name('admin.dashboard.menu.userTransaction');
     Route::get('/dashboard/user/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserWithdrawals'])->name('admin.dashboard.menu.userWithdrawals');
     Route::get('/dashboard/user/request-umi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequest'])->name('admin.dashboard.menu.userUmiRequest');
+    Route::post('/dashboard/user/request-umi/approve', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestApprove'])->name('admin.dashboard.menu.userUmiRequest.approve');
+    Route::post('/dashboard/user/request-umi/reject', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestReject'])->name('admin.dashboard.menu.userUmiRequest.reject');
     Route::get('/dashboard/user/request-umi/download/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestDownload'])->name('admin.dashboard.menu.userUmiRequest.download');
     Route::get('/dashboard/user/tenant-qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTenantQris'])->name('admin.dashboard.menu.userTenantQris');
+    Route::post('/dashboard/user/tenant-qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTenantQrisRegister'])->name('admin.dashboard.menu.userTenantQris.register');
+    Route::post('/dashboard/user/tenant-qris/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTenantQrisUpdate'])->name('admin.dashboard.menu.userTenantQris.update');
+    Route::get('/dashboard/user/tenant-qris/delete/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTenantQrisDelete'])->name('admin.dashboard.menu.userTenantQris.delete');
 
     Route::get('/dashboard/administrator', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminList'])->name('admin.dashboard.administrator.list');
     Route::get('/dashboard/administrator/register', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminCreate'])->name('admin.dashboard.administrator.create');
@@ -46,10 +51,12 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('/dashboard/administrator/detail/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDetail'])->name('admin.dashboard.administrator.detail');
 
     Route::get('dashboard/data/marketing', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketing'])->name('admin.dashboard.marketing');
-    Route::get('dashboard/data/marketing/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountActivation'])->name('admin.dashboard.marketing.account.activation');
     Route::get('dashboard/data/marketing/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingProfile'])->name('admin.dashboard.marketing.profile');
-    Route::post('dashboard/data/marketing/account_update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountUpdate'])->name('admin.dashboard.marketing.account.update');
-    Route::post('dashboard/data/marketing/account_info_update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountInfoUpdate'])->name('admin.dashboard.marketing.info.update');
+
+    Route::get('dashboard/data/marketing/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingList'])->name('admin.dashboard.marketing.list');
+    Route::get('dashboard/data/marketing/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountActivation'])->name('admin.dashboard.marketing.account.activation');
+    Route::get('dashboard/data/marketing/invitation-code', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingInvitationCodeList'])->name('admin.dashboard.marketing.invitationcode');
+    Route::get('dashboard/data/marketing/withdraw', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingWithdrawalList'])->name('admin.dashboard.marketing.withdraw');
 });
 
 

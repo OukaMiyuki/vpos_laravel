@@ -12,7 +12,7 @@
                                 <li class="breadcrumb-item active">Administrator</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Administrator</h4>
+                        <h4 class="page-title">Data Mitra Aplikasi</h4>
                     </div>
                 </div>
             </div>
@@ -28,53 +28,50 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar Administrator&nbsp;&nbsp;&nbsp;<a href="{{ route('admin.dashboard.administrator.create') }}"><button data-bs-toggle="modal" data-bs-target="#staticBackdrop" title="Tambah kode baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan admin baru</button></a></h4>
+                            <h4 class="header-title mb-3">Tabel Daftar Mitra Aplikasi</h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>Nama</th>
+                                            <th>No. KTP</th>
                                             <th>Email</th>
                                             <th>Phone</th>
-                                            <th>Level</th>
                                             <th>Jenis Kelamin</th>
-                                            <th>No. KTP</th>
                                             <th class="text-center">Status</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
-                                        @foreach ($adminList as $admin)
+                                        @foreach ($marketing as $marketing)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
-                                                <td>{{ $admin->name }}</td>
-                                                <td>{{ $admin->email }}</td>
-                                                <td>{{ $admin->phone }}</td>
-                                                <td>Administrator</td>
-                                                <td>{{ $admin->detail->jenis_kelamin }}</td>
-                                                <td>{{ $admin->detail->no_ktp }}</td>
+                                                <td>{{ $marketing->name }}</td>
+                                                <td>{{ $marketing->detail->no_ktp }}</td>
+                                                <td>{{ $marketing->email }}</td>
+                                                <td>{{ $marketing->phone }}</td>
+                                                <td>{{ $marketing->detail->jenis_kelamin }}</td>
                                                 <td class="text-center">
-                                                    @if ($admin->is_active == 0)
+                                                    @if ($marketing->is_active == 0)
+                                                        <span class="badge bg-soft-warning text-warning">Belum Aktif</span>
+                                                    @elseif($marketing->is_active == 1)
+                                                        <span class="badge bg-soft-success text-success">Aktif</span>
+                                                    @elseif($marketing->is_active == 2)
                                                         <span class="badge bg-soft-danger text-danger">Non Aktif</span>
-                                                    @else
-                                                        <span class="badge bg-soft-success text-success">Aktif</span>                                                        
                                                     @endif
                                                 </td>
                                                 <td class="text-center">
-                                                    <a href="{{ route('admin.dashboard.administrator.activation', ['id' => $admin->id]) }}">
-                                                        <button title="Nonaktifkan Admin" type="button"
-                                                        @if ($admin->is_active == 1)
-                                                            title="Nonaktifkan Admin"
-                                                            class="btn btn-danger rounded-pill waves-effect waves-light"
-                                                        @else
-                                                            title="Aktifkan Admin"
-                                                            class="btn btn-success rounded-pill waves-effect waves-light"
-                                                        @endif><span class="mdi mdi-power"></span></button>&nbsp;
-                                                    </a>
-                                                    <a href="{{ route('admin.dashboard.administrator.detail', ['id' => $admin->id]) }}">
-                                                        <button title="Lihat data admin" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                    @if($marketing->is_active == 0)
+                                                        <a href="{{ route('admin.dashboard.marketing.account.activation', ['id' => $marketing->id]) }}" class="btn btn-warning rounded-pill waves-effect waves-light"><i class="mdi mdi-check-all"></i></a>
+                                                    @elseif($marketing->is_active == 1)
+                                                        <a href="{{ route('admin.dashboard.marketing.account.activation', ['id' => $marketing->id]) }}" class="btn btn-danger rounded-pill waves-effect waves-light"><i class="mdi mdi-power"></i></a>
+                                                    @elseif($marketing->is_active == 2)
+                                                        <a href="{{ route('admin.dashboard.marketing.account.activation', ['id' => $marketing->id]) }}" class="btn btn-success rounded-pill waves-effect waves-light"><i class="mdi mdi-power"></i></a>
+                                                    @endif
+                                                    <a href="{{ route('admin.dashboard.marketing.profile', ['id' => $marketing->id]) }}">
+                                                        <button title="Lihat data admin" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
                                                     </a>
                                                 </td>
                                             </tr>

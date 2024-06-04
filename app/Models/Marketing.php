@@ -14,6 +14,7 @@ use App\Models\Tenant;
 use App\Models\StoreDetail;
 use App\Models\Rekening;
 use App\Models\QrisWallet;
+use App\Models\Withdrawal;
 use App\Models\QrisWalletPending;
 
 class Marketing extends Authenticatable implements MustVerifyEmail {
@@ -78,6 +79,10 @@ class Marketing extends Authenticatable implements MustVerifyEmail {
             'id',
             'id'
         );
+    }
+
+    public function withdraw(){
+        return $this->hasMany(Withdrawal::class, 'email', 'email');
     }
 
     public function sendEmailVerificationNotification() {

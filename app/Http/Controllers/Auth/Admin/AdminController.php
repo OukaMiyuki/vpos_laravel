@@ -22,6 +22,9 @@ use App\Models\Invoice;
 use App\Models\UmiRequest;
 use App\Models\TenantQrisAccount;
 use App\Models\DetailPenarikan;
+use App\Models\StoreDetail;
+use App\Models\StoreList;
+use App\Models\InvitationCode;
 
 class AdminController extends Controller {
     // Teting github error
@@ -146,9 +149,169 @@ class AdminController extends Controller {
         }
     }
 
+    public function adminMenuUserUmiRequestApprove(Request $request){
+        $umiRequest = UmiRequest::where('store_identifier', $request->store_identifier)->find($request->id);
+
+        if(is_null($umiRequest) || empty($umiRequest)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+
+        $umiRequest->update([
+            'tanggal_approval' => Carbon::now(),
+            'is_active' => 1,
+            'note' => $request->note
+        ]);
+        $store = "";
+        $store = StoreDetail::where('store_identifier', $request->store_identifier)->first();
+
+        if(is_null($store) || empty($store) || $store == ""){
+            $store = StoreList::where('store_identifier', $request->store_identifier)->first();
+        }
+
+        $store->update([
+            'status_umi' => 1
+        ]);
+
+        $notification = array(
+            'message' => 'Umi berhasil disetujui!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
+    public function adminMenuUserUmiRequestReject(Request $request){
+        $umiRequest = UmiRequest::where('store_identifier', $request->store_identifier)->find($request->id);
+
+        if(is_null($umiRequest) || empty($umiRequest)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+
+        $umiRequest->update([
+            'tanggal_approval' => NULL,
+            'is_active' => 2,
+            'note' => $request->note
+        ]);
+        $store = "";
+        $store = StoreDetail::where('store_identifier', $request->store_identifier)->first();
+
+        if(is_null($store) || empty($store) || $store == ""){
+            $store = StoreList::where('store_identifier', $request->store_identifier)->first();
+        }
+
+        $store->update([
+            'status_umi' => 2
+        ]);
+
+        $notification = array(
+            'message' => 'Umi berhasil ditolak!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
     public function adminMenuUserTenantQris(){
         $tenantQris = TenantQrisAccount::latest()->get();
         return view('admin.admin_menu_dashboard_user_tenant_qris', compact(['tenantQris']));
+    }
+
+    public function adminMenuUserTenantQrisRegister(Request $request){
+        $store_identifier = $request->store_identifier;
+        $qris_login = $request->qris_login;
+        $qris_password = $request->qris_password;
+        $qris_merchant_id = $request->qris_merchant_id;
+        $qris_store_id = $request->qris_store_id;
+        $mdr = $request->mdr;
+        $store = "";
+        $store = StoreDetail::where('store_identifier', $store_identifier)->first();
+
+        if(is_null($store) || empty($store) || $store == ""){
+            $store = StoreList::where('store_identifier', $store_identifier)->first();
+
+            TenantQrisAccount::create([
+                'store_identifier' => $store_identifier,
+                'id_tenant' => $store->id_user,
+                'email' => $store->email,
+                'qris_login_user' => $qris_login,
+                'qris_password' => $qris_password,
+                'qris_merchant_id' => $qris_merchant_id,
+                'qris_store_id' => $qris_store_id,
+                'mdr' => $mdr
+            ]);
+    
+            $notification = array(
+                'message' => 'Akun Tenant Qris berhasil dibuat!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        }
+
+        TenantQrisAccount::create([
+            'store_identifier' => $store_identifier,
+            'id_tenant' => $store->id_tenant,
+            'email' => $store->email,
+            'qris_login_user' => $qris_login,
+            'qris_password' => $qris_password,
+            'qris_merchant_id' => $qris_merchant_id,
+            'qris_store_id' => $qris_store_id,
+            'mdr' => $mdr
+        ]);
+
+        $notification = array(
+            'message' => 'Akun Tenant Qris berhasil dibuat!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
+    public function adminMenuUserTenantQrisUpdate(Request $request){
+        $id = $request->id;
+        $store_identifier = $request->store_identifier;
+        $qris_login = $request->qris_login;
+        $qris_password = $request->qris_password;
+        $qris_merchant_id = $request->qris_merchant_id;
+        $qris_store_id = $request->qris_store_id;
+        $mdr = $request->mdr;
+        $qris = TenantQrisAccount::where('store_identifier', $store_identifier)->find($id);
+
+        $qris->update([
+            'qris_login_user' => $qris_login,
+            'qris_password' => $qris_password,
+            'qris_merchant_id' => $qris_merchant_id,
+            'qris_store_id' => $qris_store_id,
+            'mdr' => $mdr
+        ]);
+
+        $notification = array(
+            'message' => 'Akun Tenant Qris berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
+    public function adminMenuUserTenantQrisDelete($id){
+        $qris = TenantQrisAccount::find($id);
+
+        if(is_null($qris) || empty($qris)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+        $qris->delete();
+        $notification = array(
+            'message' => 'Data akun qris berhasil dihapus!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
     }
 
     public function adminList(){
@@ -271,7 +434,6 @@ class AdminController extends Controller {
 
     public function adminDashboardMarketing(){
         $marketingList = Marketing::count();
-        // $invitationCode = InvitationCode::count();
         $marketingData = Marketing::with('detail')->where('is_active', 1)->latest()->take(5)->get();
         $marketingAktivasi = Marketing::where('is_active', 0)->latest()->take(10)->get();
         return view('admin.admin_marketing_dashboard', compact('marketingList', 'marketingData', 'marketingAktivasi'));
@@ -296,79 +458,134 @@ class AdminController extends Controller {
     }
 
     public function adminMarketingProfile($id){
-        $marketing = Marketing::find($id);
+        $marketing = Marketing::select([
+                                    'marketings.id',
+                                    'marketings.name',
+                                    'marketings.email',
+                                    'marketings.email_verified_at',
+                                    'marketings.phone',
+                                    'marketings.phone_number_verified_at',
+                                    'marketings.is_active',
+                                    'marketings.created_at',
+                                ])
+                                ->with(['detail' => function($query){
+                                    $query->select([
+                                        'detail_marketings.id',
+                                        'detail_marketings.id_marketing',
+                                        'detail_marketings.no_ktp',
+                                        'detail_marketings.tempat_lahir',
+                                        'detail_marketings.tanggal_lahir',
+                                        'detail_marketings.jenis_kelamin',
+                                        'detail_marketings.alamat',
+                                        'detail_marketings.photo',
+                                    ]);
+                                },
+                                'invitationCode' => function($query){
+                                    $query->select([
+                                        'invitation_codes.id',
+                                        'invitation_codes.id_marketing',
+                                        'invitation_codes.inv_code',
+                                        'invitation_codes.holder',
+                                        'invitation_codes.is_active',
+                                        'invitation_codes.created_at',
+                                    ])
+                                    ->with(['tenant' => function($query){
+                                        $query->select([
+                                                    'tenants.id',
+                                                    'tenants.id_inv_code'
+                                        ]);
+                                    }]);
+                                }
+                                ])
+                                ->find($id);
+
         return view('admin.admin_marketing_profile', compact('marketing'));
     }
 
-    public function adminMarketingAccountUpdate(Request $request){
-        $marketing = Marketing::find($request->id);
-
-        $marketing->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'is_active' => $request->status,
-        ]);
-
-        $notification = array(
-            'message' => 'Data akun berhasil diupdate!',
-            'alert-type' => 'success',
-        );
-        return redirect()->back()->with($notification);
+    public function adminDashboardMarketingList(){
+        $marketing = Marketing::select([
+                                'marketings.id',
+                                'marketings.name',
+                                'marketings.email',
+                                'marketings.email_verified_at',
+                                'marketings.phone',
+                                'marketings.phone_number_verified_at',
+                                'marketings.is_active',
+                                'marketings.created_at',
+                            ])
+                            ->with(['detail' => function($query){
+                                $query->select([
+                                    'detail_marketings.id',
+                                    'detail_marketings.id_marketing',
+                                    'detail_marketings.jenis_kelamin',
+                                    'detail_marketings.no_ktp',
+                                ]);
+                            }])
+                            ->latest()
+                            ->get();
+        return view('admin.admin_marketing_list', compact('marketing'));
     }
 
-    public function adminMarketingAccountInfoUpdate(Request $request){
-        $detailMarketing = DetailMarketing::find($request->id);
+    public function adminDashboardMarketingInvitationCodeList(){
+        $invitationCode = InvitationCode::select([
+                                            'invitation_codes.id',
+                                            'invitation_codes.id_marketing',
+                                            'invitation_codes.inv_code',
+                                            'invitation_codes.holder',
+                                            'invitation_codes.is_active',
+                                        ])
+                                        ->with(['marketing' => function($query){
+                                                    $query->select([
+                                                        'marketings.id',
+                                                        'marketings.name',
+                                                        'marketings.email'
+                                                    ]);
+                                                },
+                                                'tenant' => function($query){
+                                                    $query->select([
+                                                                'tenants.id',
+                                                                'tenants.id_inv_code'
+                                                    ]);
+                                                }
+                                        ])
+                                        ->latest()
+                                        ->get();
+        return view('admin.admin_marketing_invitation_code', compact('invitationCode'));
+    }
 
-        if($request->hasFile('photo')){
-            $file = $request->file('photo');
-            $namaFile = $detailMarketing->name;
-            $storagePath = Storage::path('public/images/profile');
-            $ext = $file->getClientOriginalExtension();
-            $filename = $namaFile.'-'.time().'.'.$ext;
-
-            if(empty($detailMarketing->detail->photo)){
-                try {
-                    $file->move($storagePath, $filename);
-                } catch (\Exception $e) {
-                    return $e->getMessage();
-                }
-            } else {
-                Storage::delete('public/images/profile/'.$detailMarketing->detail->photo);
-                $file->move($storagePath, $filename);
-            }
-
-            $detailMarketing->update([
-                'no_ktp' => $request->no_ktp,
-                'tempat_lahir' => $request->tempat_lahir,
-                'tanggal_lahir' => $request->tanggal_lahir,
-                'jenis_kelamin' => $request->jenis_kelamin,
-                'alamat' => $request->alamat,
-                'photo' => $filename,
-                'updated_at' => Carbon::now()
-            ]);
-
-            $notification = array(
-                'message' => 'Data akun berhasil diupdate!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
-
-        } else {
-            $detailMarketing->update([
-                'no_ktp' => $request->no_ktp,
-                'tempat_lahir' => $request->tempat_lahir,
-                'tanggal_lahir' => $request->tanggal_lahir,
-                'jenis_kelamin' => $request->jenis_kelamin,
-                'alamat' => $request->alamat,
-                'updated_at' => Carbon::now()
-            ]);
-
-            $notification = array(
-                'message' => 'Data akun berhasil diupdate!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
-        }
+    public function adminDashboardMarketingWithdrawalList(){
+        $marketingWD = Marketing::select([
+                                'marketings.id',
+                                'marketings.name',
+                                'marketings.email',
+                            ])
+                            ->with(['withdraw' => function($query){
+                                $query->select([
+                                    'withdrawals.id',
+                                    'withdrawals.invoice_pemarikan',
+                                    'withdrawals.id_user',
+                                    'withdrawals.email',
+                                    'withdrawals.tanggal_penarikan',
+                                    'withdrawals.nominal',
+                                    'withdrawals.biaya_admin',
+                                    'withdrawals.status',
+                                ])
+                                ->with(['detailWithdraw' => function($query){
+                                    $query->select([
+                                        'detail_penarikans.id',
+                                        'detail_penarikans.id_penarikan',
+                                        'detail_penarikans.nominal_penarikan',
+                                        'detail_penarikans.nominal_bersih_penarikan',
+                                        'detail_penarikans.biaya_nobu',
+                                        'detail_penarikans.biaya_mitra',
+                                        'detail_penarikans.biaya_tenant',
+                                        'detail_penarikans.biaya_admin_su',
+                                        'detail_penarikans.biaya_agregate',
+                                    ]);
+                                }]);
+                            }])
+                            ->latest()
+                            ->get();
+        return view('admin.admin_marketing_withdraw', compact('marketingWD'));
     }
 }
