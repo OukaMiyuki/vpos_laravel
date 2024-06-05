@@ -295,19 +295,19 @@
                         <div class="collapse" id="mitra-bisnis-admin">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Dashboard</a>
+                                    <a href="{{ route('admin.dashboard.mitraBisnis') }}">Dashboard</a>
                                 </li>
                                 <li>
-                                    <a href="#">Mitra List</a>
+                                    <a href="{{ route('admin.dashboard.mitraBisnis.list') }}">Mitra List</a>
                                 </li>
                                 <li>
-                                    <a href="#">Merchant List</a>
+                                    <a href="{{ route('admin.dashboard.mitraBisnis.merchantList') }}">Merchant List</a>
                                 </li>
                                 <li>
-                                    <a href="#">Transaction List</a>
+                                    <a href="{{ route('admin.dashboard.mitraBisnis.transactionList') }}">Transaction List</a>
                                 </li>
                                 <li>
-                                    <a href="#">Withdrawals</a>
+                                    <a href="{{ route('admin.dashboard.mitraBisnis.withdrawList') }}">Withdrawals</a>
                                 </li>
                             </ul>
                         </div>
@@ -320,6 +320,9 @@
                         </a>
                         <div class="collapse" id="mitra-tenant-admin">
                             <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">Dashboard</a>
+                                </li>
                                 <li>
                                     <a href="#">Mitra List</a>
                                 </li>

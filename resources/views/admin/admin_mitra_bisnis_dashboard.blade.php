@@ -23,24 +23,24 @@
                                 </a>
                             </form>
                         </div>
-                        <h4 class="page-title">Dashboard Mitra Aplikasi</h4>
+                        <h4 class="page-title">Dashboard Mitra Bisnis</h4>
                     </div>
                 </div>
             </div>
             <!-- end page title --> 
             <div class="row">
-                <div class="col-md-6 col-xl-4">
+                <div class="col-md-3 col-xl-3">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-4">
-                                    <img src="{{ asset('assets/images/icons/teamwork.png') }}" class="img-fluid" alt="">
+                                    <img src="{{ asset('assets/images/icons/partner.png') }}" class="img-fluid" alt="">
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $marketingList }}</span></h3>
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $tenantCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Mitra</p>
-                                        <a href="{{ route('admin.dashboard.marketing.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('admin.dashboard.mitraBisnis.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -52,18 +52,18 @@
                     <!-- end widget-rounded-circle-->
                 </div>
                 <!-- end col-->
-                <div class="col-md-6 col-xl-4">
+                <div class="col-md-3 col-xl-3">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-4">
-                                    <img src="{{ asset('assets/images/icons/letter.png') }}" class="img-fluid" alt="">
+                                    <img src="{{ asset('assets/images/icons/store.png') }}" class="img-fluid" alt="">
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $invitationCodeCount }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Invitation Codes</p>
-                                        <a href="{{ route('admin.dashboard.marketing.invitationcode') }}" class="btn btn-blue btn-sm ms-2">
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $merchantCount }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Merchant</p>
+                                        <a href="{{ route('admin.dashboard.mitraBisnis.merchantList') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -75,18 +75,40 @@
                     <!-- end widget-rounded-circle-->
                 </div>
                 <!-- end col-->
-                <div class="col-md-6 col-xl-4">
+                <div class="col-md-3 col-xl-3">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-4">
-                                    <img src="{{ asset('assets/images/icons/box.png') }}" class="img-fluid" alt="">
+                                    <img src="{{ asset('assets/images/icons/transaction-data.png') }}" class="img-fluid" alt="">
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $invTenantCount }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Redeemed</p>
-                                        <a href="{{ route('admin.dashboard.marketing.withdraw') }}" class="btn btn-blue btn-sm ms-2">
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $merchantTransactionCount }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Transaction</p>
+                                        <a href="{{ route('admin.dashboard.mitraBisnis.transactionList') }}" class="btn btn-blue btn-sm ms-2">
+                                            <i class="mdi mdi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
+                </div>
+                <div class="col-md-3 col-xl-3">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/cash-withdrawal.png') }}" class="img-fluid" alt="">
+                                </div>
+                                <div class="col-8">
+                                    <div class="text-end">
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $withdrawalCount }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Withdraw</p>
+                                        <a href="{{ route('admin.dashboard.mitraBisnis.withdrawList') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -115,37 +137,35 @@
                                 <table class="table table-borderless table-hover table-nowrap table-centered m-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>Profile</th>
+                                            <th>No.</th>
                                             <th>Nama</th>
-                                            <th>Jenis Kelamin</th>
-                                            <th>Jabatan</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Tanggal Gabung</th>
+                                            <th class="text-center">Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($marketingData as $marData)
+                                        @php $no=0; @endphp
+                                        @foreach($tenantBaru as $tenant)
                                             <tr>
-                                                <td>
-                                                    <img src="{{ !empty($marData->detail->photo) ? Storage::url('images/profile/'.$marData->detail->photo) : asset('assets/images/blank_profile.png') }}"" alt="contact-img" title="contact-img" class="rounded-circle avatar-sm" />
-                                                </td>
-                                                <td>
-                                                    <h5 class="m-0 fw-normal">
-                                                        @if(!empty($marData->name))
-                                                            {{ $marData->name }}
-                                                         @endif
-                                                    </h5>
-                                                    <p class="mb-0 text-muted"><small>Bergabung pada {{ $marData->created_at }}</small></p>
-                                                </td>
-                                                <td>
-                                                    @if(!empty($marData->detail->jenis_kelamin))
-                                                        {{ $marData->detail->jenis_kelamin }}
+                                                <td>{{ $no+=1 }}</td>
+                                                <td>{{ $tenant->name }}</td>
+                                                <td>{{ $tenant->email }}&nbsp;@if(!is_null($tenant->phone_number_verified_at) || !empty($tenant->phone_number_verified_at) || $tenant->phone_number_verified_at != "" || $tenant->phone_number_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
+                                                <td>{{ $tenant->phone }}&nbsp;@if(!is_null($tenant->email_verified_at) || !empty($tenant->email_verified_at) || $tenant->email_verified_at != "" || $tenant->email_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
+                                                <td>{{ \Carbon\Carbon::parse($tenant->created_at)->format('d-m-Y') }}</td>
+                                                <td class="text-center">
+                                                    @if ($tenant->is_active == 0)
+                                                        <span class="badge bg-soft-warning text-warning">Belum Aktif</span>
+                                                    @elseif($tenant->is_active == 1)
+                                                        <span class="badge bg-soft-success text-success">Aktif</span>
+                                                    @elseif($tenant->is_active == 2)
+                                                        <span class="badge bg-soft-danger text-danger">Non Aktif</span>
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    Marketing
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('admin.dashboard.marketing.profile', ['id' => $marData]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                    <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -172,28 +192,36 @@
                                 <table id="scroll-vertical-datatable" class="table dt-responsive nowrap w-100">
                                     <thead class="table-light">
                                         <tr>
+                                            <th>No.</th>
                                             <th>Nama</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
                                             <th>Tanggal Gabung</th>
-                                            <th>Status</th>
+                                            <th class="text-center">Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($marketingAktivasi as $marketingAktivasi)
+                                        @foreach($tenantActivation as $tenant)
                                             <tr>
-                                                <td>
-                                                    <h5 class="m-0 fw-normal">{{ $marketingAktivasi->name }}</h5>
+                                                <td>{{ $no+=1 }}</td>
+                                                <td>{{ $tenant->name }}</td>
+                                                <td>{{ $tenant->email }}&nbsp;@if(!is_null($tenant->phone_number_verified_at) || !empty($tenant->phone_number_verified_at) || $tenant->phone_number_verified_at != "" || $tenant->phone_number_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
+                                                <td>{{ $tenant->phone }}&nbsp;@if(!is_null($tenant->email_verified_at) || !empty($tenant->email_verified_at) || $tenant->email_verified_at != "" || $tenant->email_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
+                                                <td>{{ \Carbon\Carbon::parse($tenant->created_at)->format('d-m-Y') }}</td>
+                                                <td class="text-center">
+                                                    @if ($tenant->is_active == 0)
+                                                        <span class="badge bg-soft-warning text-warning">Belum Aktif</span>
+                                                    @elseif($tenant->is_active == 1)
+                                                        <span class="badge bg-soft-success text-success">Aktif</span>
+                                                    @elseif($tenant->is_active == 2)
+                                                        <span class="badge bg-soft-danger text-danger">Non Aktif</span>
+                                                    @endif
                                                 </td>
                                                 <td>
-                                                    {{ $marketingAktivasi->created_at }}
+                                                    <a href="" class="btn btn-xs btn-warning"><i class="mdi mdi-check-all"></i></a>
                                                 </td>
-                                                <td>
-                                                    <span class="badge bg-soft-warning text-warning">Non Aktif</span>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('admin.dashboard.marketing.account.activation', ['id'=>$marketingAktivasi->id]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
-                                                </td>
-                                            </tr> 
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>

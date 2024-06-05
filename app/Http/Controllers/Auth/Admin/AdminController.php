@@ -436,7 +436,25 @@ class AdminController extends Controller {
         $marketingList = Marketing::count();
         $marketingData = Marketing::with('detail')->where('is_active', 1)->latest()->take(5)->get();
         $marketingAktivasi = Marketing::where('is_active', 0)->latest()->take(10)->get();
-        return view('admin.admin_marketing_dashboard', compact('marketingList', 'marketingData', 'marketingAktivasi'));
+        $invitationcodeCount = InvitationCode::select([
+                                                'invitation_codes.id',
+                                                'invitation_codes.inv_code'
+                                            ])
+                                            ->with(['tenant' => function($query){
+                                                    $query->select([
+                                                        'tenants.id',
+                                                        'tenants.id_inv_code'
+                                                    ]);
+                                            }])
+                                            ->latest()
+                                            ->get();
+        $invitationCodeCount = $invitationcodeCount->count();
+        $invTenantCount = 0;
+        foreach($invitationcodeCount as $inv){
+            $invTenantCount+=$inv->tenant->count();
+        }
+
+        return view('admin.admin_marketing_dashboard', compact('marketingList', 'marketingData', 'marketingAktivasi', 'invitationCodeCount', 'invTenantCount'));
     }
 
     public function adminMarketingAccountActivation($id){
@@ -587,5 +605,165 @@ class AdminController extends Controller {
                             ->latest()
                             ->get();
         return view('admin.admin_marketing_withdraw', compact('marketingWD'));
+    }
+
+    public function adminDashboardMitraBisnis(){
+        $tenant = Tenant::select(['tenants.id', 
+                                  'tenants.name', 
+                                  'tenants.email', 
+                                  'tenants.phone', 
+                                  'tenants.email_verified_at', 
+                                  'tenants.phone_number_verified_at', 
+                                  'tenants.is_active',
+                                  'tenants.created_at'])
+                            ->where('id_inv_code', 0)
+                            ->withCount(['storeList'])
+                            ->withCount(['withdrawal'])
+                            ->with(['storeList' => function($query){
+                                    $query->select([
+                                        'store_lists.id',
+                                        'store_lists.id_user',
+                                        'store_lists.store_identifier'
+                                    ])
+                                    ->withCount(['invoice']);
+                            }])
+                            ->latest()
+                            ->get();
+        $merchantCount=0;
+        $withdrawalCount=0;
+        $merchantTransactionCount=0;
+        $tenantCount = $tenant->count();
+        foreach($tenant as $tenantlist){
+            $merchantCount+=$tenantlist->store_list_count;
+            $withdrawalCount+=$tenantlist->withdrawal_count;
+            foreach($tenantlist->storeList as $transactionStore){
+                $merchantTransactionCount+=$transactionStore->invoice_count;
+            }
+        }
+
+        $tenantBaru = $tenant->take(10);
+        $tenantActivation = $tenant->where('is_active', 0)->take(10);
+
+        return view('admin.admin_mitra_bisnis_dashboard', compact(['tenantCount', 'merchantCount', 'merchantTransactionCount', 'withdrawalCount', 'tenantBaru', 'tenantActivation']));
+    }
+
+    public function adminDashboardMitraBisnisList(){
+        $tenantList = Tenant::select(['tenants.id', 
+                                'tenants.name', 
+                                'tenants.email', 
+                                'tenants.phone', 
+                                'tenants.email_verified_at', 
+                                'tenants.phone_number_verified_at', 
+                                'tenants.is_active',
+                                'tenants.created_at'])
+                        ->where('id_inv_code', 0)
+                        ->withCount(['storeList'])
+                        ->withCount(['withdrawal'])
+                        ->latest()
+                        ->get();
+        return view('admin.admin_mitra_bisnis_list', compact('tenantList'));
+    }
+
+    public function adminDashboardMitraBisnisMerchantList(){
+        $storeList = StoreList::select([
+                                'store_lists.id',
+                                'store_lists.id_user',
+                                'store_lists.email',
+                                'store_lists.store_identifier',
+                                'store_lists.name',
+                                'store_lists.jenis_usaha',
+                                'store_lists.status_umi',
+                            ])
+                            ->with(['tenant' => function($query){
+                                $query->select([
+                                    'tenants.id',
+                                    'tenants.name',
+                                    'tenants.email',
+                                ]);
+                            }])
+                            ->withCount(['invoice'])
+                            ->latest()
+                            ->get();
+
+        return view('admin.admin_mitra_bisnis_merchant_list', compact('storeList'));
+    }
+
+    public function adminDashboardMitraBisnisTransactionList(){
+        $tenantInvoice = Tenant::select(['tenants.id', 'tenants.name'])
+                                ->where('id_inv_code', 0)
+                                ->with([
+                                    'storeList' => function($query){
+                                        $query->select([
+                                            'store_lists.id',
+                                            'store_lists.id_user',
+                                            'store_lists.email',
+                                            'store_lists.store_identifier',
+                                            'store_lists.name',
+                                        ])
+                                        ->with([
+                                            'invoice' => function($query){
+                                                $query->select([
+                                                    'invoices.id',
+                                                    'invoices.store_identifier',
+                                                    'invoices.nomor_invoice',
+                                                    'invoices.tanggal_transaksi',
+                                                    'invoices.tanggal_pelunasan',
+                                                    'invoices.jenis_pembayaran',
+                                                    'invoices.status_pembayaran',
+                                                    'invoices.sub_total',
+                                                    'invoices.pajak',
+                                                    'invoices.diskon',
+                                                    'invoices.nominal_bayar',
+                                                    'invoices.kembalian',
+                                                    'invoices.mdr',
+                                                    'invoices.nominal_mdr',
+                                                    'invoices.nominal_terima_bersih',
+                                                ]);
+                                            }
+                                        ]);
+                                    }
+                                ])
+                                ->latest()
+                                ->get();
+        return view('admin.admin_mitra_bisnis_transaction_list', compact('tenantInvoice'));
+    }
+
+    public function adminDashboardMitraBisnisWithdrawalList(){
+        $tenantWithdraw = Tenant::select(['tenants.id', 'tenants.name', 'tenants.email'])
+                        ->with([
+                            'withdrawal' => function($query){
+                                $query->select([
+                                    'withdrawals.id',
+                                    'withdrawals.invoice_pemarikan',
+                                    'withdrawals.id_user',
+                                    'withdrawals.email',
+                                    'withdrawals.tanggal_penarikan',
+                                    'withdrawals.nominal',
+                                    'withdrawals.biaya_admin',
+                                    'withdrawals.status',
+
+                                ])
+                                ->with([
+                                    'detailWithdraw' => function($query){
+                                        $query->select([
+                                            'detail_penarikans.id',
+                                            'detail_penarikans.id_penarikan',
+                                            'detail_penarikans.nominal_penarikan',
+                                            'detail_penarikans.nominal_bersih_penarikan',
+                                            'detail_penarikans.total_biaya_admin',
+                                            'detail_penarikans.biaya_nobu',
+                                            'detail_penarikans.biaya_mitra',
+                                            'detail_penarikans.biaya_tenant',
+                                            'detail_penarikans.biaya_admin_su',
+                                            'detail_penarikans.biaya_agregate',
+                                        ]);
+                                    }
+                                ]);    
+                            }
+                        ])
+                        ->where('id_inv_code', 0)
+                        ->latest()
+                        ->get();
+        return view('admin.admin_mitra_bisnis_withdrawal_list', compact('tenantWithdraw'));
     }
 }

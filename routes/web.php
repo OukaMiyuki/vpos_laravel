@@ -50,13 +50,19 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('/dashboard/administrator/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminActivation'])->name('admin.dashboard.administrator.activation');
     Route::get('/dashboard/administrator/detail/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDetail'])->name('admin.dashboard.administrator.detail');
 
-    Route::get('dashboard/data/marketing', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketing'])->name('admin.dashboard.marketing');
-    Route::get('dashboard/data/marketing/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingProfile'])->name('admin.dashboard.marketing.profile');
+    Route::get('dashboard/marketing', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketing'])->name('admin.dashboard.marketing');
+    Route::get('dashboard/marketing/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingProfile'])->name('admin.dashboard.marketing.profile');
 
-    Route::get('dashboard/data/marketing/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingList'])->name('admin.dashboard.marketing.list');
-    Route::get('dashboard/data/marketing/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountActivation'])->name('admin.dashboard.marketing.account.activation');
-    Route::get('dashboard/data/marketing/invitation-code', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingInvitationCodeList'])->name('admin.dashboard.marketing.invitationcode');
-    Route::get('dashboard/data/marketing/withdraw', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingWithdrawalList'])->name('admin.dashboard.marketing.withdraw');
+    Route::get('dashboard/marketing/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingList'])->name('admin.dashboard.marketing.list');
+    Route::get('dashboard/marketing/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountActivation'])->name('admin.dashboard.marketing.account.activation');
+    Route::get('dashboard/marketing/invitation-code', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingInvitationCodeList'])->name('admin.dashboard.marketing.invitationcode');
+    Route::get('dashboard/marketing/withdraw', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingWithdrawalList'])->name('admin.dashboard.marketing.withdraw');
+
+    Route::get('dashboard/mitra-bisnis', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnis'])->name('admin.dashboard.mitraBisnis');
+    Route::get('dashboard/mitra-bisnis/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisList'])->name('admin.dashboard.mitraBisnis.list');
+    Route::get('dashboard/mitra-bisnis/merchant', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisMerchantList'])->name('admin.dashboard.mitraBisnis.merchantList');
+    Route::get('dashboard/mitra-bisnis/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisTransactionList'])->name('admin.dashboard.mitraBisnis.transactionList');
+    Route::get('dashboard/mitra-bisnis/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisWithdrawalList'])->name('admin.dashboard.mitraBisnis.withdrawList');
 });
 
 

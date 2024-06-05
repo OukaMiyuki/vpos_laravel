@@ -78,10 +78,10 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         return $this->hasManyThrough(
             Invoice::class, 
             StoreList::class, 
-            'store_identifier', 
-            'store_identifier',
-            'id',
-            'id'
+            'store_lists.id_user', 
+            'invoices.store_identifier',
+            'tenants.id',
+            'store_lists.id'
         );
     }
 
@@ -89,7 +89,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         return $this->hasManyThrough(
             Invoice::class, 
             StoreDetail::class, 
-            'store_identifier', 
+            'id_tenant', 
             'store_identifier',
             'id',
             'id'
@@ -101,7 +101,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
     }
 
     public function withdrawal(){
-        return $this->hasMany(Withdrawal::class, 'id_user', 'id');
+        return $this->hasMany(Withdrawal::class, 'email', 'email');
     }
 
     
