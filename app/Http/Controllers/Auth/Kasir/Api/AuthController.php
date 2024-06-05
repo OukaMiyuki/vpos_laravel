@@ -28,7 +28,8 @@ class AuthController extends Controller {
         return response()->json([
             'message' => 'Login success',
             'access_token' => $token,
-            'token_type' => 'Bearer'
+            'token_type' => 'Bearer',
+            'status' => 200
         ]);
     }
 
@@ -95,13 +96,15 @@ class AuthController extends Controller {
         }
         return response()->json([
             'message' => 'Update Success',
+            'status' => 200
         ]);
     }
 
     public function logout() {
         Auth::user()->tokens()->delete();
         return response()->json([
-            'message' => 'logout success'
+            'message' => 'logout success',
+            'status' => 200
         ]);
     }
 }

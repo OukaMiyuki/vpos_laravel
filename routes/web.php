@@ -63,6 +63,11 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('dashboard/mitra-bisnis/merchant', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisMerchantList'])->name('admin.dashboard.mitraBisnis.merchantList');
     Route::get('dashboard/mitra-bisnis/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisTransactionList'])->name('admin.dashboard.mitraBisnis.transactionList');
     Route::get('dashboard/mitra-bisnis/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisWithdrawalList'])->name('admin.dashboard.mitraBisnis.withdrawList');
+
+    Route::get('dashboard/mitra-tenant', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenant'])->name('admin.dashboard.mitraTenant');
+    Route::get('dashboard/mitra-tenant/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantList'])->name('admin.dashboard.mitraTenant.list');
+    Route::get('dashboard/mitra-tenant/store', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantStoreList'])->name('admin.dashboard.mitraTenant.store.list');
+    Route::get('dashboard/mitra-tenant/kasir', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantKasirList'])->name('admin.dashboard.mitraTenant.kasir.list');
 });
 
 

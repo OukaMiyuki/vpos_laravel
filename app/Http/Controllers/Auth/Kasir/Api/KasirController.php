@@ -282,7 +282,8 @@ class KasirController extends Controller {
                     return response()->json([
                         'message' => 'Added Success',
                         'cart' => $cart,
-                        'data' => 'Add new cart'
+                        'data' => 'Add new cart',
+                        'status' => 200
                     ]);
                 } catch (Exception $e) {
                     return response()->json([
@@ -331,7 +332,8 @@ class KasirController extends Controller {
                 return response()->json([
                     'message' => 'Added Success',
                     'cart' => $cart,
-                    'data' => 'Uodate cart'
+                    'data' => 'Uodate cart',
+                    'status' => 200
                 ]);
             }
         }
@@ -597,6 +599,7 @@ class KasirController extends Controller {
             'message' => 'Transaction has been processed successfully',
             'invoice' => $invoice,
             'cartData' => $cartContent,
+            'status' => 200
         ]);
 
     }
@@ -664,6 +667,7 @@ class KasirController extends Controller {
                     'date-type' => 'Data transaksi tidak ditemukan',
                     'transaction-number' => $invoice->count(),
                     'transaction-data' => $invoice,
+                    'status' => 200
                 ]);
             } else {
                 return response()->json([
@@ -671,6 +675,7 @@ class KasirController extends Controller {
                     'date-type' => $showdate,
                     'transaction-number' => $invoice->count(),
                     'transaction-data' => $invoice,
+                    'status' => 200
                 ]);
             }
         }
@@ -710,6 +715,7 @@ class KasirController extends Controller {
                 'date-type' => 'Data transaksi tidak ditemukan',
                 'transaction-number' => $invoiceAliasSearch->count(),
                 'transaction-data' => $invoiceAliasSearch,
+                'status' => 200
             ]);
         } else {
             return response()->json([
@@ -717,6 +723,7 @@ class KasirController extends Controller {
                 // 'date-type' => $showdate,
                 'transaction-number' => $invoiceAliasSearch->count(),
                 'transaction-data' => $invoiceAliasSearch,
+                'status' => 200
             ]);
         }
     }
@@ -741,6 +748,7 @@ class KasirController extends Controller {
         return response()->json([
             'message' => 'Fetch Success',
             'transaction-data' => $invoice,
+            'status' => 200
         ]);
     }
 
@@ -788,7 +796,8 @@ class KasirController extends Controller {
 
         return response()->json([
             'message' => 'Added Success',
-            'cart' => $cart
+            'cart' => $cart,
+            'status' => 200
         ]);
     }
 
@@ -906,6 +915,7 @@ class KasirController extends Controller {
             'message' => 'Transaction Updated',
             'invoice' => $invoice,
             'cartData' => $invoice->shoppingCart,
+            'status' => 200
         ]);
     }
     //Try Catch Not Yet Applied
@@ -935,6 +945,7 @@ class KasirController extends Controller {
 
         return response()->json([
             'message' => 'Success Deleted',
+            'status' => 200
         ]);
     }
 
@@ -961,6 +972,7 @@ class KasirController extends Controller {
         }
         return response()->json([
             'message' => 'Transaction deleted',
+            'status' => 200
         ]);
     }
 
@@ -992,6 +1004,7 @@ class KasirController extends Controller {
         return response()->json([
             'message' => 'Payment Success',
             'transaction-data' => $invoice,
+            'status' => 200
         ]);
     }
 
@@ -1022,7 +1035,8 @@ class KasirController extends Controller {
             'message' => 'Fetch Success',
             'transaction-data' => $invoice,
             'data-alias' => $alias,
-            'store-detail' => $storeDetail
+            'store-detail' => $storeDetail,
+            'status' => 200
         ]);
     }
 }

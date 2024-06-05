@@ -321,16 +321,16 @@
                         <div class="collapse" id="mitra-tenant-admin">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Dashboard</a>
+                                    <a href="{{ route('admin.dashboard.mitraTenant') }}">Dashboard</a>
                                 </li>
                                 <li>
-                                    <a href="#">Mitra List</a>
+                                    <a href="{{ route('admin.dashboard.mitraTenant.list') }}">Mitra List</a>
                                 </li>
                                 <li>
-                                    <a href="#">Store List</a>
+                                    <a href="{{ route('admin.dashboard.mitraTenant.store.list') }}">Store List</a>
                                 </li>
                                 <li>
-                                    <a href="#">Kasir List</a>
+                                    <a href="{{ route('admin.dashboard.mitraTenant.kasir.list') }}">Kasir List</a>
                                 </li>
                                 <li>
                                     <a href="#">Transaction List</a>

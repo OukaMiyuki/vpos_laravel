@@ -104,6 +104,7 @@ class AuthController extends Controller {
                 'sup_phone_verification' => $tenant->phone_number_verified_at,
                 'sup_user_token'        => $token,
             ),
+            'status' => 200
         ]);
         //EDIT DISINI
     }
@@ -136,6 +137,7 @@ class AuthController extends Controller {
                 'sup_user_type'         => 'owner',
                 'sup_user_token'        => $token
             ),
+            'status' => 200
         ]);
 
         //EDIT DISINI
@@ -387,7 +389,7 @@ class AuthController extends Controller {
             ]);
             exit;
         }
-        return response()->json(['message' => 'Update Success',]);
+        return response()->json(['message' => 'Update Success', 'status' => 200]);
     }
 
     public function userUpdateStore(Request $request) : JsonResponse {
@@ -413,7 +415,7 @@ class AuthController extends Controller {
             ]);
             exit;
         }
-        return response()->json(['message' => 'Update Success',]);
+        return response()->json(['message' => 'Update Success', 'status' => 200]);
     }
 
     public function csInfo() : JsonResponse {

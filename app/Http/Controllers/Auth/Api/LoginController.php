@@ -35,6 +35,7 @@ class LoginController extends Controller {
                     'sup_user_type'         => 'kasir',
                     'sup_user_token'        => $token
                 ),
+                'status' => 200
             ]);
         }
 
@@ -57,6 +58,7 @@ class LoginController extends Controller {
                 'sup_user_type'         => 'owner',
                 'sup_user_token'        => $token
             ),
+            'status' => 200
         ]);
     }
 
@@ -68,7 +70,8 @@ class LoginController extends Controller {
     public function logout() {
         Auth::user()->tokens()->delete();
         return response()->json([
-            'message' => 'logout success'
+            'message' => 'logout success',
+            'status' => 200
         ]);
     }
 }

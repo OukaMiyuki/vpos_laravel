@@ -37,7 +37,7 @@ class StoreDetail extends Model {
     ];
 
     public function tenant(){
-        return $this->belongsTo(Tenant::class, 'id_tenant', 'id')->where('email', auth()->user()->email);
+        return $this->belongsTo(Tenant::class, 'id_tenant', 'id');
     }
 
     public function batch(){
