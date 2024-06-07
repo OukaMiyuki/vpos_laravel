@@ -277,7 +277,7 @@ class Invoice extends Model {
                             'log' => $e,
                             'status' => 0
                         ]);
-                        // testing github
+                        // testing
                     }
                 }
             }
