@@ -12,6 +12,6 @@ class HistoryCashbackAdmin extends Model {
     protected $guarded = [];
 
     public function invoice(){
-        return $this->hasOne(Invoice::class, 'id_invoice', 'id');
+        return $this->belongsTo(Invoice::class, 'id_invoice', 'id');
     }
 }

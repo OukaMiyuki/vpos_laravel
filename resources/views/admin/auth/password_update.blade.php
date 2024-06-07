@@ -23,7 +23,7 @@
                 <div class="col-lg-8 col-xl-8">
                     <div class="card">
                         <div class="card-body">
-                            <form method="post" action="{{ route('admin.password.update') }}">
+                            <form method="post" action="{{ route('admin.password.update') }}" id="update-password">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12">
@@ -70,10 +70,22 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="text-end">
-                                    <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label for="otp" class="form-label">Kode OTP Whatsapp</label>
+                                            <div class="input-group input-group-merge">
+                                                <input required type="text" name="otp" id="otp" class="form-control" placeholder="Masukkan kode OTP Whatsapp">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </form>
+                            <form action="{{ route('admin.settings.whatsappotp') }}" method="POST" id="sendOtp">@csrf</form>
+                            <div class="text-end">
+                                <button type="submit" form="sendOtp" onclick="!this.form && document.getElementById('sendOtp').submit()" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-email-outline"></i> Kirim OTP Whatsapp</button>&nbsp;
+                                <button form="update-password" onclick="!this.form && document.getElementById('update-password').submit()" type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>
+                            </div>
                         </div>
                     </div>
                     <!-- end card-->

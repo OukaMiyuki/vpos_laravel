@@ -246,19 +246,19 @@
                         <div class="collapse" id="saldo-admin">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">Dashboard</a>
+                                    <a href="{{ route('admin.dashboard.saldo') }}">Dashboard</a>
                                 </li>
                                 <li>
-                                    <a href="#">Saldo Qris</a>
+                                    <a href="{{ route('admin.dashboard.saldo.qris') }}">Saldo Qris</a>
                                 </li>
                                 <li>
-                                    <a href="#">Saldo Agregate</a>
+                                    <a href="{{ route('admin.dashboard.saldo.agregate') }}">Saldo Agregate</a>
                                 </li>
                                 <li>
-                                    <a href="#">History Cashback Transaksi</a>
+                                    <a href="{{ route('admin.dashboard.saldo.cashback') }}">History Cashback Transaksi</a>
                                 </li>
                                 <li>
-                                    <a href="#">History Nobu Transfer</a>
+                                    <a href="{{ route('admin.dashboard.saldo.nobu.fee.transfer') }}">History Nobu Fee Transfer</a>
                                 </li>
                             </ul>
                         </div>
@@ -333,10 +333,10 @@
                                     <a href="{{ route('admin.dashboard.mitraTenant.kasir.list') }}">Kasir List</a>
                                 </li>
                                 <li>
-                                    <a href="#">Transaction List</a>
+                                    <a href="{{ route('admin.dashboard.mitraTenant.transaction.list') }}">Transaction List</a>
                                 </li>
                                 <li>
-                                    <a href="#">Withdrawals</a>
+                                    <a href="{{ route('admin.dashboard.mitraTenant.withdraw.list') }}">Withdrawals</a>
                                 </li>
                             </ul>
                         </div>
@@ -350,13 +350,7 @@
                         <div class="collapse" id="finance">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="crm-dashboard.html">Penghasilan</a>
-                                </li>
-                                <li>
-                                    <a href="crm-contacts.html">Penarikan</a>
-                                </li>
-                                <li>
-                                    <a href="crm-customers.html">Saldo</a>
+                                    <a href="{{ route('admin.dashboard.finance') }}">History Saldo</a>
                                 </li>
                             </ul>
                         </div>
@@ -643,6 +637,35 @@
                                 </li>
                                 <li>
                                     <a href="#">Backup Database</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                @endauth
+                @auth('admin')
+                    <li class="menu-title mt-2">Other Menu</li>
+                    <li>
+                        <a href="#role" data-bs-toggle="collapse">
+                            <span class="mdi mdi-message-text-clock-outline"></span>
+                            <span> History </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="role">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="#">User Login</a>
+                                </li>
+                                <li>
+                                    <a href="#">User Regsister</a>
+                                </li>
+                                <li>
+                                    <a href="#">User Activity</a>
+                                </li>
+                                <li>
+                                    <a href="#">User Withdrawal</a>
+                                </li>
+                                <li>
+                                    <a href="#">Errors</a>
                                 </li>
                             </ul>
                         </div>

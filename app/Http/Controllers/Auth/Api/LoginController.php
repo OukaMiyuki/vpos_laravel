@@ -41,25 +41,33 @@ class LoginController extends Controller {
 
         $tenant = Tenant::where('email', $request->email)->firstOrFail();
 
-        $token = $tenant->createToken('auth_token')->plainTextToken;
+        if($tenant->id_inv_code != 0) {
 
-        return response()->json([
-            'message' => 'Login success',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'data' => array(
-                'sup_user_id'           => $tenant->id,
-                'sup_user_name'         => $tenant->name,
-                'sup_user_referal_code' => $tenant->id_inv_code,
-                'sup_user_company'      => null,
-                'sup_user_email'        => $tenant->email,
-                'sup_email_verification' => $tenant->email_verified_at,
-                'sup_phone_verification' => $tenant->phone_number_verified_at,
-                'sup_user_type'         => 'owner',
-                'sup_user_token'        => $token
-            ),
-            'status' => 200
-        ]);
+            $token = $tenant->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Login success',
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'data' => array(
+                    'sup_user_id'           => $tenant->id,
+                    'sup_user_name'         => $tenant->name,
+                    'sup_user_referal_code' => $tenant->id_inv_code,
+                    'sup_user_company'      => null,
+                    'sup_user_email'        => $tenant->email,
+                    'sup_email_verification' => $tenant->email_verified_at,
+                    'sup_phone_verification' => $tenant->phone_number_verified_at,
+                    'sup_user_type'         => 'owner',
+                    'sup_user_token'        => $token
+                ),
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Unauthorized',
+                'status' => 401
+            ]);
+        }
     }
 
     public function user(){

@@ -22,7 +22,7 @@ class Withdrawal extends Model {
     public function detailWithdraw(){
         return $this->hasOne(DetailPenarikan::class, 'id_penarikan', 'id');
     }
-
+    
     public function tenant(){
         return $this->belongsTo(Tenant::class, 'email', 'email');
     }

@@ -187,6 +187,14 @@
                         <i class="fe-user"></i>
                         <span>My Account</span>
                     </a>
+                    @auth('admin')
+                        @if (auth()->user()->access_level == 0)
+                            <a href="{{ route('admin.withdraw') }}" class="dropdown-item notify-item">
+                                <span class="mdi mdi-cash-multiple"></span>&nbsp;
+                                <span>Withdraw</span>
+                            </a>
+                        @endif
+                    @endauth
                     @auth('tenant')
                         @if (auth()->user()->id_inv_code != 0)
                             <a href="{{ route('tenant.store.profile') }}" class="dropdown-item notify-item">
@@ -208,6 +216,14 @@
                             <i class="mdi mdi-credit-card-outline"></i>
                             <span>Rekening</span>
                         </a>
+                    @endauth
+                    @auth('admin')
+                        @if (auth()->user()->access_level == 0)
+                            <a href="{{ route('admin.rekening.setting') }}" class="dropdown-item notify-item">
+                                <i class="mdi mdi-credit-card-outline"></i>
+                                <span>Rekening</span>
+                            </a>
+                        @endif
                     @endauth
                     <a href="
                         @auth('admin')

@@ -19,6 +19,8 @@ use App\Models\TunaiWallet;
 use App\Models\QrisWallet;
 use App\Models\CustomerIdentifier;
 use App\Models\TenantQrisAccount;
+use App\Models\HistoryCashbackAdmin;
+use App\Models\History;
 use Exception;
 
 class Invoice extends Model {
@@ -53,6 +55,11 @@ class Invoice extends Model {
     public function customer() {
         return $this->hasOne(CustomerIdentifier::class, 'id_invoice', 'id');
     }
+
+    public function historyCashbackAdmin(){
+        return $this->hasOne(HistoryCashbackAdmin::class, 'id_invoice', 'id');
+    }
+
 
     public function storeCart($model){
         $cartContent = Cart::content();
@@ -227,8 +234,17 @@ class Invoice extends Model {
                         $data = json_decode($postResponse->getBody());
                         $model->qris_data = $data->data->data->qrisData;
                     } catch (Exception $e) {
-                        return $e;
-                        exit;
+                        History::create([
+                            'id_user' => auth()->user()->id,
+                            'email' => auth()->user()->email,
+                            'action' => "Create Transaction Qris : Error",
+                            'lokasi_anda' => "System Log",
+                            'deteksi_ip' => "System Log",
+                            'log' => $e,
+                            'status' => 0
+                        ]);
+                        // return $e;
+                        // exit;
                     }
                 } else {
                     $qrisLogin = $qrisAccount->qris_login_user;
@@ -252,8 +268,15 @@ class Invoice extends Model {
                         $data = json_decode($postResponse->getBody());
                         $model->qris_data = $data->data->data->qrisData;
                     } catch (Exception $e) {
-                        return $e;
-                        exit;
+                        History::create([
+                            'id_user' => auth()->user()->id,
+                            'email' => auth()->user()->email,
+                            'action' => "Create Transaction Qris : Error",
+                            'lokasi_anda' => "System Log",
+                            'deteksi_ip' => "System Log",
+                            'log' => $e,
+                            'status' => 0
+                        ]);
                     }
                 }
             }

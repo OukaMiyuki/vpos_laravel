@@ -25,6 +25,10 @@ use App\Models\DetailPenarikan;
 use App\Models\StoreDetail;
 use App\Models\StoreList;
 use App\Models\InvitationCode;
+use App\Models\AgregateWallet;
+use App\Models\QrisWallet;
+use App\Models\HistoryCashbackAdmin;
+use App\Models\NobuWithdrawFeeHistory;
 
 class AdminController extends Controller {
     // Teting github error
@@ -430,6 +434,148 @@ class AdminController extends Controller {
         }
 
         return view('admin.admin_administrator_detail', compact(['admin']));
+    }
+
+    public function adminDashboardSaldo(){
+        $adminQrisWallet = QrisWallet::select(['saldo'])->where('email', auth()->user()->email)->find(auth()->user()->id);
+        $agregateWallet = AgregateWallet::select(['saldo'])->first();
+        $historyCashbackAdmin = HistoryCashbackAdmin::sum('nominal_terima_mdr');
+        $nobuWithdrawFeeHistory = NobuWithdrawFeeHistory::sum('nominal');
+        $withdrawals = Withdrawal::select([
+                                    'withdrawals.id',
+                                    'withdrawals.invoice_pemarikan',
+                                    'withdrawals.id_user',
+                                    'withdrawals.email',
+                                    'withdrawals.tanggal_penarikan',
+                                    'withdrawals.nominal',
+                                    'withdrawals.biaya_admin',
+                                    'withdrawals.status',
+                                ])
+                                ->with([
+                                    'detailWithdraw' => function($query){
+                                        $query->select([
+                                            'detail_penarikans.id',
+                                            'detail_penarikans.id_penarikan',
+                                            'detail_penarikans.nominal_bersih_penarikan',
+                                            'detail_penarikans.biaya_nobu',
+                                            'detail_penarikans.biaya_mitra',
+                                            'detail_penarikans.biaya_tenant',
+                                            'detail_penarikans.biaya_admin_su',
+                                        ]);
+                                    }
+                                ])
+                                ->where('email', '!=', auth()->user()->email)
+                                ->latest()
+                                ->take(10)
+                                ->get();
+        return view('admin.admin_menu_dashboard_saldo', compact(['adminQrisWallet', 'agregateWallet', 'historyCashbackAdmin', 'nobuWithdrawFeeHistory', 'withdrawals']));
+    }
+
+    public function adminDashboardSaldoQris(){
+        $withdrawals = Withdrawal::select([
+                                            'withdrawals.id',
+                                            'withdrawals.invoice_pemarikan',
+                                            'withdrawals.tanggal_penarikan',
+                                            'withdrawals.status',
+                                        ])
+                                        ->with([
+                                            'detailWithdraw' => function($query){
+                                                $query->select([
+                                                    'detail_penarikans.id',
+                                                    'detail_penarikans.id_penarikan',
+                                                    'detail_penarikans.biaya_admin_su',
+                                                ]);
+                                            }
+                                        ])
+                                        ->withSum('detailWithdraw', 'biaya_admin_su')
+                                        ->where('email', '!=', auth()->user()->email)
+                                        ->where('status', 1)
+                                        ->latest()
+                                        ->get();
+        $adminQrisWallet = QrisWallet::select(['saldo'])->where('email', auth()->user()->email)->find(auth()->user()->id);
+        $totalInsentif=0;
+        foreach($withdrawals as $wd){
+            $totalInsentif+=$wd->detail_withdraw_sum_biaya_admin_su;
+        }
+        return view('admin.admin_menu_dashboard_saldo_qris', compact(['withdrawals', 'totalInsentif', 'adminQrisWallet']));
+    }
+
+    public function adminDashboardSaldoAgregate(){
+        $withdrawals = Withdrawal::select([
+                                        'withdrawals.id',
+                                        'withdrawals.invoice_pemarikan',
+                                        'withdrawals.tanggal_penarikan',
+                                        'withdrawals.status',
+                                    ])
+                                    ->with([
+                                        'detailWithdraw' => function($query){
+                                            $query->select([
+                                                'detail_penarikans.id',
+                                                'detail_penarikans.id_penarikan',
+                                                'detail_penarikans.biaya_agregate',
+                                            ]);
+                                        }
+                                    ])
+                                    ->withSum('detailWithdraw', 'biaya_agregate')
+                                    ->where('email', '!=', auth()->user()->email)
+                                    ->where('status', 1)
+                                    ->latest()
+                                    ->get();
+            $totalInsentifAgregate=0;
+            $agregateWallet = AgregateWallet::select(['saldo'])->first();
+            foreach($withdrawals as $wd){
+                $totalInsentifAgregate+=$wd->detail_withdraw_sum_biaya_agregate;
+            }
+            return view('admin.admin_menu_dashboard_saldo_agregate', compact(['withdrawals', 'totalInsentifAgregate', 'agregateWallet']));
+    }
+
+    public function adminDashboardSaldoCashback(){
+        $historyCashback = HistoryCashbackAdmin::select([
+                                                    'history_cashback_admins.id',
+                                                    'history_cashback_admins.id_invoice',
+                                                    'history_cashback_admins.nominal_terima_mdr',
+                                                    'history_cashback_admins.created_at'
+                                                ])
+                                                ->with([
+                                                    'invoice' => function($query){
+                                                        $query->select([
+                                                            'invoices.id',
+                                                            'invoices.nomor_invoice',
+                                                            'invoices.tanggal_transaksi',
+                                                            'invoices.jenis_pembayaran',
+                                                            'invoices.nominal_bayar',
+                                                            'invoices.mdr',
+                                                            'invoices.nominal_mdr',
+                                                            'invoices.nominal_terima_bersih',
+                                                        ]);
+                                                    }
+                                                ])
+                                                ->latest()
+                                                ->get();
+        $totakCashback = $historyCashback->sum('nominal_terima_mdr');
+        return view('admin.admin_menu_dashboard_saldo_history_cashback', compact(['historyCashback', 'totakCashback']));
+    }
+
+    public function adminDashboardNobuFeeTransfer(){
+        $nobuFeeHistory = NobuWithdrawFeeHistory::select([
+                                                'nobu_withdraw_fee_histories.id',
+                                                'nobu_withdraw_fee_histories.id_penarikan',
+                                                'nobu_withdraw_fee_histories.nominal',
+                                            ])
+                                            ->with([
+                                                'withdraw' => function($query){
+                                                    $query->select([
+                                                        'withdrawals.id',
+                                                        'withdrawals.invoice_pemarikan',
+                                                        'withdrawals.tanggal_penarikan',
+                                                        'withdrawals.nominal',
+                                                        'withdrawals.biaya_admin',
+                                                    ]);
+                                                }
+                                            ])
+                                            ->latest()
+                                            ->get();
+        return view('admin.admin_menu_dashboard_saldo_history_nobu_fee_transfer', compact(['nobuFeeHistory']));
     }
 
     public function adminDashboardMarketing(){
@@ -957,5 +1103,99 @@ class AdminController extends Controller {
                     ->latest()
                     ->get();
         return view('admin.admin_mitra_tenant_kasir_list', compact(['kasir']));
+    }
+
+    public function adminDashboardMitraTenantTransactionList(){
+        $tenantInvoice = Tenant::select(['tenants.id', 'tenants.name'])
+                                ->where('id_inv_code', '!=', 0)
+                                ->with([
+                                    'storeDetail' => function($query){
+                                        $query->select([
+                                            'store_details.id',
+                                            'store_details.id_tenant',
+                                            'store_details.email',
+                                            'store_details.store_identifier',
+                                            'store_details.name',
+                                        ])
+                                        ->with([
+                                            'invoice' => function($query){
+                                                $query->select([
+                                                    'invoices.id',
+                                                    'invoices.store_identifier',
+                                                    'invoices.nomor_invoice',
+                                                    'invoices.tanggal_transaksi',
+                                                    'invoices.tanggal_pelunasan',
+                                                    'invoices.jenis_pembayaran',
+                                                    'invoices.status_pembayaran',
+                                                    'invoices.sub_total',
+                                                    'invoices.pajak',
+                                                    'invoices.diskon',
+                                                    'invoices.nominal_bayar',
+                                                    'invoices.kembalian',
+                                                    'invoices.mdr',
+                                                    'invoices.nominal_mdr',
+                                                    'invoices.nominal_terima_bersih',
+                                                ])
+                                                ->latest()
+                                                ->get();
+                                            }
+                                        ]);
+                                    }
+                                ])
+                                ->latest()
+                                ->get();
+        return view('admin.admin_mitra_tenant_transaction_list', compact('tenantInvoice'));
+    }
+
+    public function adminDashboardMitraTenantWithdrawalList(){
+        $tenantWithdraw = Tenant::select(['tenants.id', 'tenants.name', 'tenants.email'])
+                                ->with([
+                                    'withdrawal' => function($query){
+                                        $query->select([
+                                            'withdrawals.id',
+                                            'withdrawals.invoice_pemarikan',
+                                            'withdrawals.id_user',
+                                            'withdrawals.email',
+                                            'withdrawals.tanggal_penarikan',
+                                            'withdrawals.nominal',
+                                            'withdrawals.biaya_admin',
+                                            'withdrawals.status',
+
+                                        ])
+                                        ->with([
+                                            'detailWithdraw' => function($query){
+                                                $query->select([
+                                                    'detail_penarikans.id',
+                                                    'detail_penarikans.id_penarikan',
+                                                    'detail_penarikans.nominal_penarikan',
+                                                    'detail_penarikans.nominal_bersih_penarikan',
+                                                    'detail_penarikans.total_biaya_admin',
+                                                    'detail_penarikans.biaya_nobu',
+                                                    'detail_penarikans.biaya_mitra',
+                                                    'detail_penarikans.biaya_tenant',
+                                                    'detail_penarikans.biaya_admin_su',
+                                                    'detail_penarikans.biaya_agregate',
+                                                ]);
+                                            }
+                                        ])
+                                        ->latest()
+                                        ->get();    
+                                    }
+                                ])
+                                ->where('id_inv_code', '!=', 0)
+                                ->latest()
+                                ->get();
+        return view('admin.admin_mitra_tenant_withdrawal_list', compact('tenantWithdraw'));
+    }
+
+    public function adminDashboardFinance(){
+        $adminQrisWallet = QrisWallet::select(['saldo'])->where('email', auth()->user()->email)->find(auth()->user()->id);
+        $agregateWallet = AgregateWallet::select(['saldo'])->first();
+        $withdrawData = Withdrawal::where('id_user', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->latest();
+        $allData = $withdrawData->get();
+        $allDataSum = $withdrawData->sum('nominal');
+        return view('admin.admin_finance_history', compact(['adminQrisWallet', 'agregateWallet', 'allData', 'allDataSum']));
     }
 }

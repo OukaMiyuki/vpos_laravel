@@ -25,12 +25,18 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileAccountUpdate'])->name('admin.profile.account.update');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileInfoUpdate'])->name('admin.profile.info.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'password'])->name('admin.password');
+    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:10,1'])->name('admin.settings.whatsappotp');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'passwordUpdate'])->name('admin.password.update');
 });
 
 Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function () {
     Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('admin.logout');
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
+
+    Route::get('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningSetting'])->name('admin.rekening.setting');
+    Route::post('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningSettingUpdate'])->name('admin.rekening.setting.update');
+
+    Route::get('settings/wiithdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdraw'])->name('admin.withdraw');
 
     Route::get('/dashboard/admin', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuDashboard'])->name('admin.dashboard.menu');
     Route::get('/dashboard/user/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTransaction'])->name('admin.dashboard.menu.userTransaction');
@@ -50,13 +56,19 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('/dashboard/administrator/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminActivation'])->name('admin.dashboard.administrator.activation');
     Route::get('/dashboard/administrator/detail/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDetail'])->name('admin.dashboard.administrator.detail');
 
-    Route::get('dashboard/marketing', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketing'])->name('admin.dashboard.marketing');
-    Route::get('dashboard/marketing/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingProfile'])->name('admin.dashboard.marketing.profile');
+    Route::get('dashboard/saldo', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldo'])->name('admin.dashboard.saldo');
+    Route::get('dashboard/saldo/qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoQris'])->name('admin.dashboard.saldo.qris');
+    Route::get('dashboard/saldo/agregate', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregate'])->name('admin.dashboard.saldo.agregate');
+    Route::get('dashboard/saldo/data-history-cashback', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoCashback'])->name('admin.dashboard.saldo.cashback');
+    Route::get('dashboard/saldo/data-nobu-fee-transfer', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardNobuFeeTransfer'])->name('admin.dashboard.saldo.nobu.fee.transfer');
 
-    Route::get('dashboard/marketing/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingList'])->name('admin.dashboard.marketing.list');
-    Route::get('dashboard/marketing/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountActivation'])->name('admin.dashboard.marketing.account.activation');
-    Route::get('dashboard/marketing/invitation-code', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingInvitationCodeList'])->name('admin.dashboard.marketing.invitationcode');
-    Route::get('dashboard/marketing/withdraw', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingWithdrawalList'])->name('admin.dashboard.marketing.withdraw');
+    Route::get('dashboard/mitra-aplikasi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketing'])->name('admin.dashboard.marketing');
+    Route::get('dashboard/mitra-aplikasi/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingProfile'])->name('admin.dashboard.marketing.profile');
+
+    Route::get('dashboard/mitra-aplikasi/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingList'])->name('admin.dashboard.marketing.list');
+    Route::get('dashboard/mitra-aplikasi/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountActivation'])->name('admin.dashboard.marketing.account.activation');
+    Route::get('dashboard/mitra-aplikasi/invitation-code', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingInvitationCodeList'])->name('admin.dashboard.marketing.invitationcode');
+    Route::get('dashboard/mitra-aplikasi/withdraw', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingWithdrawalList'])->name('admin.dashboard.marketing.withdraw');
 
     Route::get('dashboard/mitra-bisnis', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnis'])->name('admin.dashboard.mitraBisnis');
     Route::get('dashboard/mitra-bisnis/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisList'])->name('admin.dashboard.mitraBisnis.list');
@@ -68,6 +80,10 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('dashboard/mitra-tenant/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantList'])->name('admin.dashboard.mitraTenant.list');
     Route::get('dashboard/mitra-tenant/store', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantStoreList'])->name('admin.dashboard.mitraTenant.store.list');
     Route::get('dashboard/mitra-tenant/kasir', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantKasirList'])->name('admin.dashboard.mitraTenant.kasir.list');
+    Route::get('dashboard/mitra-tenant/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantTransactionList'])->name('admin.dashboard.mitraTenant.transaction.list');
+    Route::get('dashboard/mitra-tenant/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantWithdrawalList'])->name('admin.dashboard.mitraTenant.withdraw.list');
+
+    Route::get('dashboard/finance', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinance'])->name('admin.dashboard.finance');
 });
 
 

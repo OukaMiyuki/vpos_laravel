@@ -111,7 +111,7 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $merchantTransactionCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Transaction</p>
-                                        <a href="{{ route('admin.dashboard.mitraBisnis.transactionList') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('admin.dashboard.mitraTenant.transaction.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -133,7 +133,7 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $withdrawalCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Withdraw</p>
-                                        <a href="{{ route('admin.dashboard.mitraBisnis.withdrawList') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('admin.dashboard.mitraTenant.withdraw.list') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>

@@ -13,7 +13,7 @@
                                 <li class="breadcrumb-item active">User Transaction List</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Transaksi Mitra Bisnis</h4>
+                        <h4 class="page-title">Data Transaksi Mitra Tenant</h4>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar Transaksi Mitra Bisnis</h4>
+                            <h4 class="header-title mb-3">Tabel Daftar Transaksi Mitra Tenant</h4>
                             <div class="table-responsive">
                                 <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
@@ -38,7 +38,7 @@
                                             <th>No. Invoice</th>
                                             <th>Tenant</th>
                                             <th>Store Identifier</th>
-                                            <th>Merchant Name</th>
+                                            <th>Store Name</th>
                                             <th>Email</th>
                                             <th>Tanggal Transaksi</th>
                                             <th>Tanggal Pelunasan</th>
@@ -53,31 +53,29 @@
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($tenantInvoice as $key => $invoice)
-                                            @foreach ($invoice->storeList as $invoiceStore )
-                                                @foreach ($invoiceStore->invoice as $invoiceList)
-                                                    <tr>
-                                                        <td>{{ $no+=1 }}</td>
-                                                        <td>{{ $invoiceList->nomor_invoice }}</td>
-                                                        <td>{{ $invoice->name }}</td>
-                                                        <td>{{ $invoiceStore->store_identifier }}</td>
-                                                        <td>{{ $invoiceStore->name }}</td>
-                                                        <td>{{ $invoiceStore->email }}</td>
-                                                        <td>{{ \Carbon\Carbon::parse($invoiceList->tanggal_transaksi)->format('d-m-Y') }}</td>
-                                                        <td>{{ \Carbon\Carbon::parse($invoiceList->tanggal_pelunasan)->format('d-m-Y') }}</td>
-                                                        <td>{{ $invoiceList->jenis_pembayaran }}</td>
-                                                        <td>
-                                                            @if($invoiceList->status_pembayaran == 0)
-                                                                <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
-                                                            @elseif($invoiceList->status_pembayaran == 1)
-                                                                <span class="badge bg-soft-success text-success">Selesai</span>
-                                                            @endif
-                                                        </td>
-                                                        <td>{{ $invoiceList->nominal_bayar }}</td>
-                                                        <td>{{ $invoiceList->mdr }}</td>
-                                                        <td>{{ $invoiceList->nominal_mdr }}</td>
-                                                        <td>{{ $invoiceList->nominal_terima_bersih }}</td>
-                                                    </tr>
-                                                @endforeach
+                                            @foreach ($invoice->storeDetail->invoice as $invoiceList )
+                                                <tr>
+                                                    <td>{{ $no+=1 }}</td>
+                                                    <td>{{ $invoiceList->nomor_invoice }}</td>
+                                                    <td>{{ $invoice->name }}</td>
+                                                    <td>{{ $invoice->storeDetail->store_identifier }}</td>
+                                                    <td>{{ $invoice->storeDetail->name }}</td>
+                                                    <td>{{ $invoice->storeDetail->email }}}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($invoiceList->tanggal_transaksi)->format('d-m-Y') }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($invoiceList->tanggal_pelunasan)->format('d-m-Y') }}</td>
+                                                    <td>{{ $invoiceList->jenis_pembayaran }}</td>
+                                                    <td>
+                                                        @if($invoiceList->status_pembayaran == 0)
+                                                            <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
+                                                        @elseif($invoiceList->status_pembayaran == 1)
+                                                            <span class="badge bg-soft-success text-success">Selesai</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $invoiceList->nominal_bayar }}</td>
+                                                    <td>{{ $invoiceList->mdr }}</td>
+                                                    <td>{{ $invoiceList->nominal_mdr }}</td>
+                                                    <td>{{ $invoiceList->nominal_terima_bersih }}</td>
+                                                </tr>
                                             @endforeach
                                         @endforeach
                                     </tbody>
