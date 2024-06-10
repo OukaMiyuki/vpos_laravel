@@ -29,6 +29,7 @@ use App\Models\AgregateWallet;
 use App\Models\QrisWallet;
 use App\Models\HistoryCashbackAdmin;
 use App\Models\NobuWithdrawFeeHistory;
+use App\Models\Rekening;
 
 class AdminController extends Controller {
     // Teting github error
@@ -249,7 +250,7 @@ class AdminController extends Controller {
                 'qris_store_id' => $qris_store_id,
                 'mdr' => $mdr
             ]);
-    
+
             $notification = array(
                 'message' => 'Akun Tenant Qris berhasil dibuat!',
                 'alert-type' => 'success',
@@ -756,12 +757,12 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMitraBisnis(){
-        $tenant = Tenant::select(['tenants.id', 
-                                  'tenants.name', 
-                                  'tenants.email', 
-                                  'tenants.phone', 
-                                  'tenants.email_verified_at', 
-                                  'tenants.phone_number_verified_at', 
+        $tenant = Tenant::select(['tenants.id',
+                                  'tenants.name',
+                                  'tenants.email',
+                                  'tenants.phone',
+                                  'tenants.email_verified_at',
+                                  'tenants.phone_number_verified_at',
                                   'tenants.is_active',
                                   'tenants.created_at'])
                             ->where('id_inv_code', 0)
@@ -796,12 +797,12 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMitraBisnisList(){
-        $tenantList = Tenant::select(['tenants.id', 
-                                'tenants.name', 
-                                'tenants.email', 
-                                'tenants.phone', 
-                                'tenants.email_verified_at', 
-                                'tenants.phone_number_verified_at', 
+        $tenantList = Tenant::select(['tenants.id',
+                                'tenants.name',
+                                'tenants.email',
+                                'tenants.phone',
+                                'tenants.email_verified_at',
+                                'tenants.phone_number_verified_at',
                                 'tenants.is_active',
                                 'tenants.created_at'])
                         ->where('id_inv_code', 0)
@@ -910,7 +911,7 @@ class AdminController extends Controller {
                                     }
                                 ])
                                 ->latest()
-                                ->get();    
+                                ->get();
                             }
                         ])
                         ->where('id_inv_code', 0)
@@ -921,12 +922,12 @@ class AdminController extends Controller {
 
     public function adminDashboardMitraTenant(){
         $tenant = Tenant::select([
-                                'tenants.id', 
-                                'tenants.name', 
-                                'tenants.email', 
-                                'tenants.phone', 
-                                'tenants.email_verified_at', 
-                                'tenants.phone_number_verified_at', 
+                                'tenants.id',
+                                'tenants.name',
+                                'tenants.email',
+                                'tenants.phone',
+                                'tenants.email_verified_at',
+                                'tenants.phone_number_verified_at',
                                 'tenants.is_active',
                                 'tenants.created_at'
                             ])
@@ -1179,7 +1180,7 @@ class AdminController extends Controller {
                                             }
                                         ])
                                         ->latest()
-                                        ->get();    
+                                        ->get();
                                     }
                                 ])
                                 ->where('id_inv_code', '!=', 0)
@@ -1197,5 +1198,31 @@ class AdminController extends Controller {
         $allData = $withdrawData->get();
         $allDataSum = $withdrawData->sum('nominal');
         return view('admin.admin_finance_history', compact(['adminQrisWallet', 'agregateWallet', 'allData', 'allDataSum']));
+    }
+
+    public function adminDashboardFinanceInvoice($id){
+        $withdrawData = Withdrawal::select([ 'withdrawals.id',
+                                             'withdrawals.email',
+                                             'withdrawals.tanggal_penarikan',
+                                             'withdrawals.nominal',
+                                             'withdrawals.biaya_admin',
+                                             'withdrawals.tanggal_masuk',
+                                             'withdrawals.status'
+                                            ])
+                                ->where('email', auth()->user()->email)
+                                ->find($id);
+        if(is_null($withdrawData) || empty($withdrawData)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'info',
+            );
+
+            return redirect()->route('admin.dashboard.finance')->with($notification);
+        }
+        $rekening = Rekening::select(['swift_code', 'no_rekening'])
+                            ->where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        return view('admin.admin_finance_history_invoice', compact(['withdrawData', 'withdrawData', 'rekening']));
     }
 }

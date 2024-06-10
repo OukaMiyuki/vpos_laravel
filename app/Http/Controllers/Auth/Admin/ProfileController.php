@@ -16,6 +16,9 @@ use App\Models\DetailAdmin;
 use App\Models\Rekening;
 use App\Models\AgregateWallet;
 use App\Models\QrisWallet;
+use App\Models\Withdrawal;
+use App\Models\DetailPenarikan;
+use App\Models\NobuWithdrawFeeHistory;
 use Exception;
 
 class ProfileController extends Controller {
@@ -121,11 +124,11 @@ class ProfileController extends Controller {
                     );
                     return redirect()->back()->with($notification);
                 }
-        
+
                 Admin::whereId(auth()->user()->id)->update([
                     'password' => Hash::make($request->new_password),
                 ]);
-        
+
                 $notification = array(
                     'message' => 'Password berhasil diperbarui!',
                     'alert-type' => 'success',
@@ -140,7 +143,7 @@ class ProfileController extends Controller {
             return redirect()->back()->with($notification);
         }
     }
-    
+
     public function whatsappNotification(){
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
@@ -178,7 +181,7 @@ class ProfileController extends Controller {
            exit;
         }
         $responseCode = $postResponse->getStatusCode();
-        
+
         if($responseCode == 200){
             $notification = array(
                 'message' => 'OTP Sukses dikirim!',
@@ -200,7 +203,7 @@ class ProfileController extends Controller {
                             ->where('email', auth()->user()->email)
                             ->first();
         $dataRekening = "";
-        
+
         if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
             $ip = "36.84.106.3";
             $PublicIP = $this->get_client_ip();
@@ -209,7 +212,7 @@ class ProfileController extends Controller {
             $long = $getLoc->longitude;
             $rekClient = new GuzzleHttpClient();
             $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
-            
+
             try {
                 $getRek = $rekClient->request('POST',  $urlRek, [
                     'form_params' => [
@@ -286,6 +289,246 @@ class ProfileController extends Controller {
         $adminQrisWallet = QrisWallet::select(['saldo'])->where('email', auth()->user()->email)->find(auth()->user()->id);
         $agregateWallet = AgregateWallet::select(['saldo'])->first();
         return view('admin.admin_withdraw', compact('adminQrisWallet', 'agregateWallet'));
+    }
+
+    public function adminWithdrawTarik(Request $request){
+        $ip = "125.164.243.227";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $wallet = "";
+
+        $nominal_tarik = $request->nominal_tarik;
+        $otp = $request->wa_otp;
+        $jenis_tarik = $request->jenis_tarik;
+
+        try{
+            $otp = (new Otp)->validate(auth()->user()->phone, $otp);
+            if(!$otp->status){
+                $notification = array(
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                if($jenis_tarik == "Qris"){
+                    $wallet = QrisWallet::select(['saldo'])
+                                            ->where('email', auth()->user()->email)
+                                            ->find(auth()->user()->id);
+                } else if($jenis_tarik == "Agregate"){
+                    $wallet = AgregateWallet::select(['saldo'])->first();
+                } else {
+                    $notification = array(
+                        'message' => 'Jenis saldo kosong!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+
+                if($wallet->saldo<$nominal_tarik){
+                    $notification = array(
+                        'message' => 'Saldo anda tidak mencukupi!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                } else {
+                    if($nominal_tarik<10000){
+                        $notification = array(
+                            'message' => 'Minimal tarik dana Rp. 10.000!',
+                            'alert-type' => 'warning',
+                        );
+                        return redirect()->back()->with($notification);
+                    }
+
+                    $rekening = Rekening::where('id_user', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
+                                        ->first();
+                    $totalPenarikan = $nominal_tarik+300;
+                    $rekClient = new GuzzleHttpClient();
+                    $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
+                    try {
+                        $getRek = $rekClient->request('POST',  $urlRek, [
+                            'form_params' => [
+                                'latitude' => $lat,
+                                'longitude' => $long,
+                                'bankCode' => $rekening->swift_code,
+                                'accountNo' => $rekening->no_rekening,
+                                'secret_key' => "Vpos71237577Inquiry"
+                            ]
+                        ]);
+                        $responseCode = $getRek->getStatusCode();
+                        $dataRekening = json_decode($getRek->getBody());
+                        return view('admin.admin_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan', 'jenis_tarik']));
+                    } catch (Exception $e) {
+                        $notification = array(
+                            'message' => 'Tarik dana error, harap hubungi admin!',
+                            'alert-type' => 'error',
+                        );
+                        return redirect()->back()->with($notification);
+                    }
+                }
+            }
+        } catch(Exception $e){
+            $notification = array(
+                'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
+    public function adminWithdrawTarikProcess(Request $request){
+        $url = 'https://erp.pt-best.com/api/rek_transfer';
+        $client = new GuzzleHttpClient();
+        $ip = "125.164.243.227";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $wallet = "";
+
+        $nominal_tarik = $request->nominal_penarikan;
+        $total_tarik = $request->total_tarik;
+        $biaya_admin = $request->biaya_admin;
+        $jenis_tarik = $request->jenis_penarikan;
+
+        $rekening = Rekening::select(['swift_code', 'no_rekening'])
+                            ->where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+
+        if($jenis_tarik == "Qris"){
+            $wallet = QrisWallet::where('id_user', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
+        } else if($jenis_tarik == "Agregate"){
+            $wallet = AgregateWallet::first();
+        } else {
+            $notification = array(
+                'message' => 'Jenis saldo kosong!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+
+        try{
+            $nominal_penarikan = filter_var($nominal_tarik, FILTER_SANITIZE_NUMBER_INT);
+            $total_penarikan = $total_tarik;
+            $saldo = $wallet->saldo;
+            if($saldo < $total_penarikan){
+                $notification = array(
+                    'message' => 'Saldo anda tidak mencukupi!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->route('admin.withdraw')->with($notification);
+            } else {
+                try {
+                    $postResponse = $client->request('POST',  $url, [
+                        'form_params' => [
+                            'latitude' => $lat,
+                            'longitude' => $long,
+                            'bankCode' => $rekening->swift_code,
+                            'accountNo' => $rekening->no_rekening,
+                            'amount' => $nominal_penarikan,
+                            'secret_key' => "Vpos71237577Transfer"
+                        ]
+                    ]);
+                    $responseCode = $postResponse->getStatusCode();
+                    $data = json_decode($postResponse->getBody());
+                    $responseCode = $data->responseCode;
+                    $responseMessage = $data->responseMessage;
+                    if($responseCode == 2001800 && $responseMessage == "Request has been processed successfully") {
+                        $withDraw = Withdrawal::create([
+                            'id_user' => auth()->user()->id,
+                            'email' => auth()->user()->email,
+                            'tanggal_penarikan' => Carbon::now(),
+                            'nominal' => $nominal_penarikan,
+                            'biaya_admin' => $biaya_admin,
+                            'tanggal_masuk' => Carbon::now(),
+                            'deteksi_ip_address' => $ip,
+                            'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                            'status' => 1
+                        ]);
+
+                        if(!is_null($withDraw) || !empty($withDraw)){
+                            $wallet->update([
+                                'saldo' => (int) $saldo-$total_penarikan
+                            ]);
+
+                            DetailPenarikan::create([
+                                'id_penarikan' => $withDraw->id,
+                                'nominal_penarikan' => $total_penarikan,
+                                'nominal_bersih_penarikan' => $nominal_penarikan,
+                                'total_biaya_admin' => $biaya_admin,
+                                'biaya_nobu' => 300,
+                                'biaya_mitra' => $nominal_penarikan,
+                                'biaya_tenant' => NULL,
+                                'biaya_admin_su' => NULL,
+                                'biaya_agregate' => NULL
+                            ]);
+
+                            NobuWithdrawFeeHistory::create([
+                                'id_penarikan' => $withDraw->id,
+                                'nominal' => 300
+                            ]);
+
+                            $notification = array(
+                                'message' => 'Penarikan dana sukses!',
+                                'alert-type' => 'success',
+                            );
+                            return redirect()->route('admin.dashboard.finance.withdraw.invoice', array('id' => $withDraw->id))->with($notification);
+                        } else {
+                            $notification = array(
+                                'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                                'alert-type' => 'error',
+                            );
+                            return redirect()->route('admin.withdraw')->with($notification);
+                        }
+                    } else {
+                        $withDraw = Withdrawal::create([
+                            'id_user' => auth()->user()->id,
+                            'email' => auth()->user()->email,
+                            'tanggal_penarikan' => Carbon::now(),
+                            'nominal' => $nominal_penarikan,
+                            'biaya_admin' => $biaya_admin,
+                            'tanggal_masuk' => Carbon::now(),
+                            'deteksi_ip_address' => $ip,
+                            'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                            'status' => 0
+                        ]);
+                        DetailPenarikan::create([
+                            'id_penarikan' => $withDraw->id,
+                            'nominal_penarikan' => NULL,
+                            'nominal_bersih_penarikan' => NULL,
+                            'total_biaya_admin' => NULL,
+                            'biaya_nobu' => NULL,
+                            'biaya_mitra' => NULL,
+                            'biaya_tenant' => NULL,
+                            'biaya_admin_su' => NULL,
+                            'biaya_agregate' => NULL
+                        ]);
+                        $notification = array(
+                            'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                            'alert-type' => 'error',
+                        );
+                        return redirect()->route('admin.withdraw')->with($notification);
+                    }
+                } catch (Exception $e) {
+                    $notification = array(
+                        'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                        'alert-type' => 'error',
+                    );
+                    return redirect()->route('admin.withdraw')->with($notification);
+                }
+            }
+        } catch (Exception $e){
+            $notification = array(
+                'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                'alert-type' => 'error',
+            );
+            return redirect()->route('admin.withdraw')->with($notification);
+        }
     }
 
     function get_client_ip() {

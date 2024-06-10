@@ -37,6 +37,8 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::post('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningSettingUpdate'])->name('admin.rekening.setting.update');
 
     Route::get('settings/wiithdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdraw'])->name('admin.withdraw');
+    Route::post('settings/wiithdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdrawTarik'])->name('admin.withdraw.tarik');
+    Route::post('settings/wiithdraw/process', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdrawTarikProcess'])->name('admin.withdraw.tarik.process');
 
     Route::get('/dashboard/admin', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuDashboard'])->name('admin.dashboard.menu');
     Route::get('/dashboard/user/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTransaction'])->name('admin.dashboard.menu.userTransaction');
@@ -84,6 +86,8 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('dashboard/mitra-tenant/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantWithdrawalList'])->name('admin.dashboard.mitraTenant.withdraw.list');
 
     Route::get('dashboard/finance', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinance'])->name('admin.dashboard.finance');
+    Route::get('dashboard/finance/withdraw-invoice/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinanceInvoice'])->name('admin.dashboard.finance.withdraw.invoice');
+
 });
 
 
@@ -223,7 +227,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestForm'])->name('tenant.request.umi');
     Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');
     Route::post('request/umi/resend', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcessResend'])->name('tenant.request.umi.resend');
-    
+
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'index'])->name('tenant.dashboard');
     Route::get('/dashboard/kasir', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantKasirDashboard'])->name('tenant.kasir');
     Route::get('/dashboard/kasir/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'kasirList'])->name('tenant.kasir.list');

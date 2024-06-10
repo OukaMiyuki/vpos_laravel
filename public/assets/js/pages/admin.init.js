@@ -39,3 +39,27 @@ $(document).ready(function(){
         $("#show #mdr").val(mdr);
     });
 });
+$("#saldo-qris-txt").hide();
+$("#saldo-agregate-txt").hide();
+$(document).ready(function() {
+    $("#dana").on('change', function() {
+        if ($(this).val() == ''){
+            $("#jenis-tarik").val("");
+            $("#saldo-qris-txt").hide();
+            $("#saldo-agregate-txt").hide();
+            $("#tarikDanaButton").attr('disabled',true);
+        } else {
+            $("#tarikDanaButton").attr('disabled',false);
+
+            if($("#dana").val() == 'Qris'){
+                $("#jenis-tarik").val("Qris");
+                $("#saldo-qris-txt").show();
+                $("#saldo-agregate-txt").hide();
+            } else if($("#dana").val() == 'Agregate'){
+                $("#jenis-tarik").val("Agregate");
+                $("#saldo-qris-txt").hide();
+                $("#saldo-agregate-txt").show();
+            }
+        }
+    });
+});

@@ -11,7 +11,7 @@
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="#">Settings</a></li>
-                                <li class="breadcrumb-item active">Profile</li>
+                                <li class="breadcrumb-item active">Withdraw</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Withdraw Saldo Admin</h4>
@@ -33,6 +33,24 @@
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane show active" id="qris">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="no_wa" class="form-label">Nomor Whatsapp</label>
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ auth()->user()->phone }}" placeholder="Masukkan nomor Whatsapp">
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <form method="post" action="{{ route('admin.settings.whatsappotp') }}">
+                                                            @csrf
+                                                            <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-email-outline"></i> Kirim Kode OTP</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-md-12">
                                         <div class="mb-3">
                                             <label for="dana" class="form-label">Pilih Dana</label>
@@ -43,36 +61,25 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-12" id="saldo-qris-txt">
                                         <div class="mb-3">
-                                            <label for="saldo" class="form-label">Saldo Anda (Rp.)</label>
-                                            <input readonly type="text" class="form-control" name="saldo" id="saldo" required value="{{ $adminQrisWallet->saldo }}" placeholder="Masukkan jumlah saldo">
+                                            <label for="saldo-qris" class="form-label">Saldo Insentif Qris Anda (Rp.)</label>
+                                            <input readonly type="text" class="form-control" name="saldo-qris" id="saldo-qris" required value="{{ $adminQrisWallet->saldo }}" placeholder="Masukkan jumlah saldo">
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <label for="no_wa" class="form-label">Nomor Whatsapp</label>
-                                                <div class="row">
-                                                    <div class="col-8">
-                                                        <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="" placeholder="Masukkan nomor Whatsapp">
-                                                    </div>
-                                                    <div class="col-4">
-                                                        <form method="post" action="{{ route('marketing.settings.whatsappotp') }}">
-                                                            @csrf
-                                                            <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-email-outline"></i> Kirim Kode OTP</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <div class="col-md-12" id="saldo-agregate-txt">
+                                        <div class="mb-3">
+                                            <label for="saldo-agregate" class="form-label">Saldo Insentif Agregate (Rp.)</label>
+                                            <input readonly type="text" class="form-control" name="saldo-agregate" id="saldo-agregate" required value="{{ $agregateWallet->saldo }}" placeholder="Masukkan jumlah saldo">
                                         </div>
                                     </div>
-                                    <form method="post" action="{{ route('marketing.profile.tarik') }}">
+                                    <form method="post" action="{{ route('admin.withdraw.tarik') }}">
                                         @csrf
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="nominal" class="form-label">Nominal Tarik (Rp.)</label>
+                                                    <input readonly type="hidden" class="form-control d-none" name="jenis_tarik" id="jenis-tarik" required value="">
                                                     <input type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" name="nominal_tarik" id="nominal_tarik" required value="" placeholder="Masukkan nominal tarik dana">
                                                     <small id="emailHelp" class="form-text text-muted"><strong>Minimal tarik dana Rp. 10.000, Pastikan saldo anda cukup, sebelum melakukan penarikan!</strong></small>
                                                 </div>
@@ -88,7 +95,7 @@
                                             </div>
                                         </div>
                                         <div class="text-end">
-                                            <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Tarik</button>
+                                            <button disabled id="tarikDanaButton" type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Tarik</button>
                                         </div>
                                     </form>
                                 </div>
