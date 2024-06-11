@@ -38,16 +38,16 @@
                                             <th>Action</th>
                                             <th>No. Invoice</th>
                                             <th>User Email</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Nominal</th>
-                                            <th>Nominal Bersih Penarikan</th>
-                                            <th>Biaya Transfer</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th class="text-center">Nominal (Rp.)</th>
+                                            <th class="text-center">Nominal Bersih Penarikan (Rp.)</th>
                                             <th>Status</th>
-                                            <th>Biaya Nobu</th>
-                                            <th>Insentif Mitra Aplikasi</th>
-                                            <th>Nomnial Penarikan Tenant</th>
-                                            <th>Insentif Admin</th>
-                                            <th>Insentif Agregate</th>
+                                            <th>Transfer Bi-Fast (Rp.)</th>
+                                            <th>Transfer Bank (Rp.)</th>
+                                            <th>Mitra Aplikasi (Rp.)</th>
+                                            <th>Tenant (Rp.)</th>
+                                            <th>Insentif Admin (Rp.)</th>
+                                            <th>Insentif Agregate (Rp.)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -56,14 +56,13 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>
-                                                    <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                    <a href="{{ route('admin.dashboard.menu.userWithdrawals.detail', ['id' => $wd->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                 </td>
                                                 <td>{{ $wd->invoice_pemarikan }}</td>
                                                 <td>{{ $wd->email }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }}</td>
-                                                <td>{{ $wd->nominal }}</td>
-                                                <td>{{ $wd->detailWithdraw->nominal_bersih_penarikan }}</td>
-                                                <td>{{ $wd->biaya_admin }}</td>
+                                                <td class="text-center">{{ \Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }}</td>
+                                                <td class="text-center">{{ $wd->nominal }}</td>
+                                                <td class="text-center">{{ $wd->detailWithdraw->nominal_bersih_penarikan }}</td>
                                                 <td>
                                                     @if ($wd->status == 0)
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
@@ -71,6 +70,7 @@
                                                         <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
                                                     @endif
                                                 </td>
+                                                <td>{{ $wd->biaya_admin }}</td>
                                                 <td>{{ $wd->detailWithdraw->biaya_nobu }}</td>
                                                 <td>{{ $wd->detailWithdraw->biaya_mitra }}</td>
                                                 <td>{{ $wd->detailWithdraw->biaya_tenant }}</td>

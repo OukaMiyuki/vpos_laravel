@@ -22,6 +22,11 @@ use App\Models\NobuWithdrawFeeHistory;
 use Exception;
 
 class ProfileController extends Controller {
+
+    public function adminSettings(){
+        return view('admin.admin_setting');
+    }
+
     public function profile(){
         return view('admin.admin_profile');
     }
@@ -462,7 +467,7 @@ class ProfileController extends Controller {
                                 'nominal_bersih_penarikan' => $nominal_penarikan,
                                 'total_biaya_admin' => $biaya_admin,
                                 'biaya_nobu' => 300,
-                                'biaya_mitra' => $nominal_penarikan,
+                                'biaya_mitra' => NULL,
                                 'biaya_tenant' => NULL,
                                 'biaya_admin_su' => NULL,
                                 'biaya_agregate' => NULL

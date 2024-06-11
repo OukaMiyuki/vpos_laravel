@@ -258,7 +258,7 @@
                                     <a href="{{ route('admin.dashboard.saldo.cashback') }}">History Cashback Transaksi</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('admin.dashboard.saldo.nobu.fee.transfer') }}">History Nobu Fee Transfer</a>
+                                    <a href="{{ route('admin.dashboard.saldo.nobu.fee.transfer') }}">History Bank Fee Transfer</a>
                                 </li>
                             </ul>
                         </div>
@@ -422,7 +422,7 @@
                     <li>
                         <a href="#toko" data-bs-toggle="collapse">
                             <i class="mdi mdi-store"></i>
-                            <span> 
+                            <span>
                                 @if (auth()->user()->id_inv_code != 0)
                                     Menu Toko
                                 @else

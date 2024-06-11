@@ -10,7 +10,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="#">Settings</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.marketing.list') }}">Mitra List</a></li>
                                 <li class="breadcrumb-item active">Profile</li>
                             </ol>
                         </div>
@@ -32,7 +32,7 @@
                             </p>
                             @if($marketing->is_active == 1)
                                 <button type="button" class="btn btn-success btn-xs waves-effect mb-2 waves-light">Aktif</button>
-                            @else 
+                            @else
                                 <button type="button" class="btn btn-danger btn-xs waves-effect mb-2 waves-light">Tidak Aktif</button>
                             @endif
                             <div class="text-start mt-3">
@@ -169,10 +169,11 @@
                                                             <th>Invitation Code</th>
                                                             <th>Holder</th>
                                                             <th>Created</th>
+                                                            <th class="text-center">Status</th>
                                                             <th class="text-center">Attempt</th>
                                                             <th class="text-center">Action</th>
                                                         </tr>
-                                                    </thead> 
+                                                    </thead>
                                                     @php
                                                         $no=0;
                                                     @endphp
@@ -183,20 +184,29 @@
                                                                 <td>{{ $invitation->inv_code }}</td>
                                                                 <td>{{ $invitation->holder }}</td>
                                                                 <td>{{ \Carbon\Carbon::parse($invitation->created_at)->format('d-m-Y') }}</td>
+                                                                <td class="text-center">
+                                                                    @if ($invitation->is_active == 0)
+                                                                        <span class="badge bg-soft-warning text-danger">Non Aktif</span>
+                                                                    @elseif($invitation->is_active == 1)
+                                                                        <span class="badge bg-soft-success text-success">Aktif</span>
+                                                                    @endif
+                                                                </td>
                                                                 <td class="text-center">{{ $invitation->tenant->count() }}</td>
                                                                 <td class="text-center">
                                                                     @if ($invitation->is_active == 1)
-                                                                        <a href="" class="btn btn-xs btn-danger"><i class="mdi mdi-power"></i></a>
+                                                                        <a href="{{ route('admin.dashboard.marketing.invitationcode.activation', ['id' => $invitation->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-power"></i></a>
+                                                                    @else
+                                                                        <a href="{{ route('admin.dashboard.marketing.invitationcode.activation', ['id' => $invitation->id]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
                                                                     @endif
                                                                     <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                                 </td>
                                                             </tr>
                                                         @endforeach
                                                     </tbody>
-                                                </table>   
+                                                </table>
                                             </div>
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
                             </div>
                             <!-- end tab-content -->

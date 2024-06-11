@@ -9,7 +9,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Administrator</li>
+                                <li class="breadcrumb-item active">Invitation Code</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Data Invitation Code</h4>
@@ -36,10 +36,11 @@
                                             <th>No.</th>
                                             <th>Nama</th>
                                             <th>Email</th>
-                                            <th>Invitation Code</th>
+                                            <th class="text-center">Invitation Code</th>
                                             <th>Holder</th>
-                                            <th>Attempt</th>
+                                            <th class="text-center">Attempt</th>
                                             <th class="text-center">Status</th>
+                                            <th class="text-center">Store List</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
@@ -50,19 +51,22 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $inv->marketing->name }}</td>
                                                 <td>{{ $inv->marketing->email }}</td>
-                                                <td>{{ $inv->inv_code }}</td>
+                                                <td class="text-center">{{$inv->inv_code}}</td>
                                                 <td>{{ $inv->holder }}</td>
-                                                <td>{{ $inv->tenant->count() }}</td>
+                                                <td class="text-center">{{ $inv->tenant->count() }}</td>
                                                 <td class="text-center">
                                                     @if ($inv->is_active == 0)
-                                                        <span class="badge bg-soft-warning text-warning">Non Aktif</span>
+                                                        <span class="badge bg-soft-warning text-danger">Non Aktif</span>
                                                     @elseif($inv->is_active == 1)
                                                         <span class="badge bg-soft-success text-success">Aktif</span>
                                                     @endif
                                                 </td>
+                                                <td class="text-center"><a href="{{ route('admin.dashboard.marketing.invitationcode.store.list', ['id' => $inv->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a></td>
                                                 <td class="text-center">
                                                     @if ($inv->is_active == 1)
-                                                        <a href="" class="btn btn-xs btn-danger"><i class="mdi mdi-power"></i></a>
+                                                        <a href="{{ route('admin.dashboard.marketing.invitationcode.activation', ['id' => $inv->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-power"></i></a>
+                                                    @else
+                                                        <a href="{{ route('admin.dashboard.marketing.invitationcode.activation', ['id' => $inv  ->id]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
                                                     @endif
                                                     <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                 </td>

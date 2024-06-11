@@ -63,6 +63,19 @@ class Invoice extends Model {
 
     public function storeCart($model){
         $cartContent = Cart::content();
+        $kasir = "";
+        $tenant = "";
+        if(Auth::guard('tenant')->check()){
+            $kasir = NULL;
+            if(auth()->user()->id_inv_code !=0){
+                $tenant = auth()->user()->id;
+            } else {
+                $tenant = NULL;
+            }
+        } else if(Auth::guard('kasir')->check()){
+            $tenant = NULL;
+            $kasir = auth()->user()->id;
+        }
         foreach($cartContent as $cart){
             ShoppingCart::create([
                 'id_invoice' => $model->id,
@@ -70,7 +83,9 @@ class Invoice extends Model {
                 'product_name' => $cart->name,
                 'qty' =>$cart->qty,
                 'harga' => $cart->price,
-                'sub_total' => $cart->price*$cart->qty
+                'sub_total' => $cart->price*$cart->qty,
+                'id_kasir' => $kasir,
+                'id_tenant' => $tenant
             ]);
             $stock = ProductStock::find($cart->id);
             $updateStok = (int) $stock->stok - (int) $cart->qty;

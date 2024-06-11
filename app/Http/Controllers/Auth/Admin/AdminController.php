@@ -115,10 +115,61 @@ class AdminController extends Controller {
                                         'detail_penarikans.biaya_agregate',
                                     ]);
                                 }])
+                                ->where('email', '!=', 'adminsu@visipos.id')
                                 ->latest()
                                 ->get();
 
         return view('admin.admin_menu_dashboard_user_withdrawals', compact(['withdrawals']));
+    }
+
+    public function adminMenuUserWithdrawalDetail($id){
+        $withdraw = Withdrawal::select([
+                                'withdrawals.id',
+                                'withdrawals.invoice_pemarikan',
+                                'withdrawals.email',
+                                'withdrawals.tanggal_penarikan',
+                                'withdrawals.nominal',
+                                'withdrawals.biaya_admin',
+                                'withdrawals.status',
+                            ])
+                            ->with([
+                                'detailWithdraw' => function($query){
+                                    $query->select([
+                                        'detail_penarikans.id',
+                                        'detail_penarikans.id_penarikan',
+                                        'detail_penarikans.nominal_bersih_penarikan',
+                                        'detail_penarikans.biaya_nobu',
+                                        'detail_penarikans.biaya_mitra',
+                                        'detail_penarikans.biaya_tenant',
+                                        'detail_penarikans.biaya_admin_su',
+                                        'detail_penarikans.biaya_agregate',
+                                    ]);
+                                }
+                            ])
+                            ->where('email', '!=', 'adminsu@visipos.id')
+                            ->find($id);
+        if(is_null($withdraw) || empty($withdraw) || $withdraw == NULL){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.menu.userWithdrawals')->with($notification);
+        }
+        $rekening = Rekening::where('email', $withdraw->email)->first();
+        $user = "";
+        $userType = "";
+        $user = Marketing::select(['marketings.id', 'marketings.email', 'marketings.name', 'marketings.phone', 'marketings.is_active'])->where('email', $withdraw->email)->first();
+        $userType = "Mitra Aplikasi";
+        if(is_null($user) || empty($user)){
+            $user = Tenant::select(['tenants.id', 'tenants.email', 'tenants.phone', 'tenants.name', 'tenants.is_active', 'tenants.id_inv_code'])->where('email', $withdraw->email)->first();
+            if($user->id_inv_code == 0){
+                $userType = "Mitra Bisnis";
+            } else {
+                $userType = "Mitra Tenant";
+            }
+        }
+
+        return view('admin.admin_user_withdraw_invoice', compact(['withdraw', 'user', 'userType', 'rekening']));
     }
 
     public function adminMenuUserUmiRequest(){
@@ -462,10 +513,11 @@ class AdminController extends Controller {
                                             'detail_penarikans.biaya_mitra',
                                             'detail_penarikans.biaya_tenant',
                                             'detail_penarikans.biaya_admin_su',
+                                            'detail_penarikans.biaya_agregate',
                                         ]);
                                     }
                                 ])
-                                ->where('email', '!=', auth()->user()->email)
+                                ->where('email', '!=', 'adminsu@visipos.id')
                                 ->latest()
                                 ->take(10)
                                 ->get();
@@ -716,6 +768,79 @@ class AdminController extends Controller {
                                         ->latest()
                                         ->get();
         return view('admin.admin_marketing_invitation_code', compact('invitationCode'));
+    }
+
+    public function adminDashboardMarketingInvitationCodeListActivation($id){
+        $invitationCode = InvitationCode::find($id);
+        if(is_null($invitationCode) || empty($invitationCode) || $invitationCode == NULL){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.marketing.invitationcode')->with($notification);
+        }
+        if($invitationCode->is_active == 0){
+            $invitationCode->update([
+                'is_active' => 1
+            ]);
+        } else {
+            $invitationCode->update([
+                'is_active' => 0
+            ]);
+        }
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
+            'alert-type' => 'info',
+        );
+        return redirect()->route('admin.dashboard.marketing.invitationcode')->with($notification);
+    }
+
+    public function adminDashboardMarketingInvitationCodeStoreList($id){
+        $storeList = InvitationCode::select([
+                                        'invitation_codes.id',
+                                        'invitation_codes.id_marketing',
+                                        'invitation_codes.inv_code',
+                                        'invitation_codes.holder',
+                                        'invitation_codes.is_active',
+                                    ])
+                                    ->with([
+                                        'marketing' => function($query){
+                                            $query->select([
+                                                'marketings.id',
+                                                'marketings.name'
+                                            ]);
+                                        },
+                                        'tenant' => function($query){
+                                            $query->select([
+                                                'tenants.id',
+                                                'tenants.name',
+                                                'tenants.created_at',
+                                                'tenants.id_inv_code',
+                                                'tenants.is_active'
+                                            ])
+                                            ->with([
+                                                'storeDetail'=> function($query){
+                                                    $query->select([
+                                                        'store_details.id',
+                                                        'store_details.store_identifier',
+                                                        'store_details.id_tenant',
+                                                        'store_details.name'
+                                                    ]);
+                                                }
+                                            ])
+                                            ->latest()
+                                            ->get();
+                                        }
+                                    ])
+                                    ->find($id);
+        if(is_null($storeList) || empty($storeList) || $storeList == NULL){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.marketing.invitationcode')->with($notification);
+        }
+        return view('admin.admin_marketing_invitation_code_store_list', compact('storeList'));
     }
 
     public function adminDashboardMarketingWithdrawalList(){

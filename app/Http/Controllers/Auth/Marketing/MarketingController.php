@@ -62,14 +62,14 @@ class MarketingController extends Controller {
                                     ->latest()
                                     ->limit(5)
                                     ->get();
-                                    
+
         $pemasukanTerbaru = Marketing::select(['marketings.id'])
                                     ->with(['invitationCodeTenant' => function($query){
                                         $query->select('tenants.id', 'tenants.name', 'tenants.phone', 'tenants.is_active', 'tenants.id_inv_code')
                                                 ->with(['withdrawal' => function($query){
                                                     $query->select(['withdrawals.id', 'withdrawals.id_user', 'withdrawals.tanggal_penarikan', 'withdrawals.status'])
                                                             ->with(['detailWithdraw' => function($query){
-                                                                $query->select(['detail_penarikans.id', 
+                                                                $query->select(['detail_penarikans.id',
                                                                                 'detail_penarikans.id_penarikan',
                                                                                 'detail_penarikans.biaya_mitra',
                                                                             ])->get();
@@ -101,10 +101,10 @@ class MarketingController extends Controller {
             return view('marketing.auth.not_active')->with($notification);
         } else if(auth()->user()->is_active == 1) {
             $code = InvitationCode::where('id_marketing', auth()->user()->id)->count();
-            $invitationCode = InvitationCode::select(['invitation_codes.id', 
-                                                        'invitation_codes.id_marketing', 
-                                                        'invitation_codes.inv_code', 
-                                                        'invitation_codes.holder', 
+            $invitationCode = InvitationCode::select(['invitation_codes.id',
+                                                        'invitation_codes.id_marketing',
+                                                        'invitation_codes.inv_code',
+                                                        'invitation_codes.holder',
                                                         'invitation_codes.is_active',
                                                         'invitation_codes.created_at'])
                                             ->with(['tenant' => function($query){
@@ -153,7 +153,7 @@ class MarketingController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
- 
+
         $inv_code = Str::upper($request->code);
         $code_check = InvitationCode::where('inv_code', $inv_code)->first();
 
@@ -162,7 +162,7 @@ class MarketingController extends Controller {
                 'message' => 'Kode telah didaftarkan, silahkan buat kode lain!',
                 'alert-type' => 'warning',
             );
-            
+
             return redirect()->back()->with($notification);
         }
 
@@ -203,6 +203,7 @@ class MarketingController extends Controller {
                                             'tenants.id',
                                             'tenants.id_inv_code',
                                             'tenants.name',
+                                            'tenants.email'
                                         ])
                                         ->with([
                                             'storeDetail' => function($query){
@@ -218,6 +219,7 @@ class MarketingController extends Controller {
                                                 $query->select([
                                                     'withdrawals.id',
                                                     'withdrawals.id_user',
+                                                    'withdrawals.email',
                                                     'withdrawals.tanggal_penarikan',
                                                     'withdrawals.nominal'
                                                 ])
@@ -238,6 +240,7 @@ class MarketingController extends Controller {
                                     ])
                                     ->where('id_marketing', auth()->user()->id)
                                     ->first();
+
             $totalInsentif=0;
             foreach ($withdrawList->tenant as $tenantWD){
                 foreach ($tenantWD->withdrawal as $wd){
@@ -320,10 +323,10 @@ class MarketingController extends Controller {
             );
             return view('marketing.auth.not_active')->with($notification);
         }else if(auth()->user()->is_active == 1) {
-            $tenant = Tenant::select(['tenants.id', 
-                                        'tenants.name', 
-                                        'tenants.email', 
-                                        'tenants.phone', 
+            $tenant = Tenant::select(['tenants.id',
+                                        'tenants.name',
+                                        'tenants.email',
+                                        'tenants.phone',
                                         'tenants.is_active',
                                         'tenants.id_inv_code'
                                     ])
@@ -350,20 +353,20 @@ class MarketingController extends Controller {
                                 $query->select([
                                     'invitation_codes.id',
                                     'invitation_codes.id_marketing',
-                                    'invitation_codes.inv_code', 
-                                    'invitation_codes.holder', 
+                                    'invitation_codes.inv_code',
+                                    'invitation_codes.holder',
                                 ])->first();
                             }
                             , 'withdrawal' => function($query){
                                 $query->select([
                                     'withdrawals.id',
                                     'withdrawals.id_user',
-                                    'withdrawals.tanggal_penarikan', 
-                                    'withdrawals.nominal', 
+                                    'withdrawals.tanggal_penarikan',
+                                    'withdrawals.nominal',
                                     'withdrawals.status'
                                 ])
                                 ->with(['detailWithdraw' => function($query){
-                                    $query->select(['detail_penarikans.id', 
+                                    $query->select(['detail_penarikans.id',
                                                     'detail_penarikans.id_penarikan',
                                                     'detail_penarikans.biaya_mitra',
                                                 ])->get();
@@ -407,7 +410,7 @@ class MarketingController extends Controller {
                                                     ->with(['withdrawal' => function($query){
                                                         $query->select(['withdrawals.id', 'withdrawals.id_user', 'withdrawals.tanggal_penarikan', 'withdrawals.status'])
                                                                 ->with(['detailWithdraw' => function($query){
-                                                                    $query->select(['detail_penarikans.id', 
+                                                                    $query->select(['detail_penarikans.id',
                                                                                     'detail_penarikans.id_penarikan',
                                                                                     'detail_penarikans.biaya_mitra',
                                                                                 ])->get();
@@ -460,7 +463,7 @@ class MarketingController extends Controller {
                                                     ->with(['withdrawal' => function($query){
                                                         $query->select(['withdrawals.id', 'withdrawals.id_user', 'withdrawals.tanggal_penarikan', 'withdrawals.status'])
                                                                 ->with(['detailWithdraw' => function($query){
-                                                                    $query->select(['detail_penarikans.id', 
+                                                                    $query->select(['detail_penarikans.id',
                                                                                     'detail_penarikans.id_penarikan',
                                                                                     'detail_penarikans.biaya_mitra',
                                                                                 ])->get();
@@ -497,7 +500,7 @@ class MarketingController extends Controller {
                                                     ->with(['withdrawal' => function($query){
                                                         $query->select(['withdrawals.id', 'withdrawals.id_user', 'withdrawals.tanggal_penarikan', 'withdrawals.status'])
                                                                 ->with(['detailWithdraw' => function($query){
-                                                                    $query->select(['detail_penarikans.id', 
+                                                                    $query->select(['detail_penarikans.id',
                                                                                     'detail_penarikans.id_penarikan',
                                                                                     'detail_penarikans.biaya_mitra',
                                                                                 ])->get();
@@ -595,7 +598,7 @@ class MarketingController extends Controller {
                                              'withdrawals.nominal',
                                              'withdrawals.biaya_admin',
                                              'withdrawals.tanggal_masuk',
-                                             'withdrawals.status' 
+                                             'withdrawals.status'
                                             ])
                                 ->where('email', auth()->user()->email)
                                 ->find($id);
@@ -604,7 +607,7 @@ class MarketingController extends Controller {
                 'message' => 'Data tidak ditemukan!',
                 'alert-type' => 'info',
             );
-    
+
             return redirect()->route('marketing.finance.history_penarikan')->with($notification);
         }
         $rekening = Rekening::select(['swift_code', 'no_rekening'])
@@ -620,7 +623,7 @@ class MarketingController extends Controller {
         $wa_from= getenv("TWILIO_WHATSAPP_FROM");
         $twilio = new Client($sid, $token);
         $nomor = "6285156719832";
-        
+
         $body = "Hello, welcome to codelapan.com.";
 
         return $twilio->messages->create("whatsapp:$nomor",["from" => "whatsapp:$wa_from", "body" => $body]);

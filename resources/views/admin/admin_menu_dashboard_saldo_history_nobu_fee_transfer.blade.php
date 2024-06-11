@@ -9,11 +9,11 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="">Saldo</a></li>
-                                <li class="breadcrumb-item active">Nobu Fee Transfer</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.saldo') }}">Saldo</a></li>
+                                <li class="breadcrumb-item active">Bank Fee Transfer</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data History Nobu Fee Transfer</h4>
+                        <h4 class="page-title">Data History Bank Fee Transfer</h4>
                     </div>
                 </div>
             </div>
@@ -29,18 +29,17 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">History Cashback Nobu Fee Transfer</h4>
+                            <h4 class="header-title mb-3">History Cashback Bank Fee Transfer</h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>No. Invoice</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Nominal Penarikan</th>
-                                            <th>Total Biaya Transfer</th>
-                                            <th>Nobu Transfer Fee</th>
-                                            <th>Detail</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th class="text-center">Nominal Penarikan (Rp.)</th>
+                                            <th class="text-center">Total Biaya Transfer (Rp.)</th>
+                                            <th class="text-center">Bank Transfer Fee (Rp.)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -49,15 +48,12 @@
                                         @endphp
                                         @foreach ($nobuFeeHistory as $fee)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $fee->withdraw->invoice_pemarikan }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($fee->withdraw->tanggal_penarikan)->format('d-m-Y') }}</td>
-                                                <td>{{ $fee->withdraw->nominal }}</td>
-                                                <td>{{ $fee->withdraw->biaya_admin }}</td>
-                                                <td>{{ $fee->nominal }}</td>
-                                                <td>
-                                                    <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
-                                                </td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$fee->withdraw->invoice_pemarikan}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($fee->withdraw->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                <td class="text-center">{{$fee->withdraw->nominal}}</td>
+                                                <td class="text-center">{{$fee->withdraw->biaya_admin}}</td>
+                                                <td class="text-center">{{$fee->nominal}}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

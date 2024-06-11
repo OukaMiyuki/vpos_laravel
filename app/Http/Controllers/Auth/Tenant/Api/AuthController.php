@@ -36,7 +36,7 @@ use Exception;
 
 class AuthController extends Controller {
     // tetsing github
-    
+
     public function register(Request $request) {
         //EDIT DISINI
         // $validator = Validator::make($request->all(), [
@@ -226,7 +226,7 @@ class AuthController extends Controller {
                 return $ex;
             }
             $responseCode = $postResponse->getStatusCode();
-            
+
             if($responseCode == 200){
                 return response()->json([
                     'message' => 'OTP Sent!',
@@ -286,35 +286,6 @@ class AuthController extends Controller {
     public function userDetail(Request $request) : JsonResponse {
         $user = "";
         try {
-            // $user = Tenant::select(['tenants.id','tenants.name', 'tenants.email as mail', 'tenants.phone', 'tenants.email_verified_at', 'tenants.phone_number_verified_at', 'tenants.is_active'])
-            //                     ->with(['detail', 'storeDetail'])
-            //                     ->whereHas('detail', function($q) {
-            //                         $q->select(
-            //                             'detail_tenants.id as detail_id',
-            //                             'detail_tenants.id_tenant as id_detail_tenant',
-            //                             'no_ktp',
-            //                             'tempat_lahir',
-            //                             'tanggal_lahir',
-            //                             'jenis_kelamin',
-            //                             'detail_tenants.alamat as alamat_tenant',
-            //                             'detail_tenants.photo as tenant_photo_profile'
-            //                         );
-            //                     })
-            //                     ->whereHas('storeDetail', function($q) {
-            //                         $q->select(
-            //                             'store_details.id as store_detail_id',
-            //                             'store_details.id_tenant as id_store_detail_tenant',
-            //                             'store_details.name as nama_toko',
-            //                             'store_details.alamat as alamat_toko',
-            //                             'store_details.no_telp_toko as no_telp_toko',
-            //                             'jenis_usaha',
-            //                             'status_umi',
-            //                             'catatan_kaki',
-            //                             'store_details.photo as photo_toko'
-            //                         );
-            //                     })
-            //                     ->where('id', Auth::user()->id)
-            //                     ->firstOrFail();
             $user = Tenant::select(['tenants.id','tenants.name', 'tenants.email as mail', 'tenants.phone', 'tenants.email_verified_at', 'tenants.phone_number_verified_at', 'tenants.is_active'])
                             ->with(['detail' => function($query){
                                     $query->select(['detail_tenants.id',
@@ -329,7 +300,7 @@ class AuthController extends Controller {
                                     ->where('id_tenant', Auth::user()->id)
                                     ->where('email', Auth::user()->email)
                                     ->first();
-                            }, 
+                            },
                             'storeDetail' => function($query){
                                 $query->select([
                                     'store_details.id',
@@ -587,7 +558,7 @@ class AuthController extends Controller {
             'status' => 200
         ]);
     }
-    
+
     public function tarikDana(Request $request){
         $url = 'https://erp.pt-best.com/api/rek_transfer';
         $client = new GuzzleHttpClient();
@@ -683,7 +654,7 @@ class AuthController extends Controller {
                                     'saldo' => $saldo_tenant-$total_tarik
                                 ]);
                                 $adminSaldo = $qrisAdmin->saldo;
-    
+
                                 $qrisAdmin->update([
                                     'saldo' => $adminSaldo+$aplikator
                                 ]);
@@ -696,7 +667,7 @@ class AuthController extends Controller {
                                 $agregateWallet->update([
                                     'saldo' =>$agregateSaldo+$agregate
                                 ]);
-    
+
                                 DetailPenarikan::create([
                                     'id_penarikan' => $withDraw->id,
                                     'nominal_penarikan' => $total_tarik,
@@ -708,12 +679,12 @@ class AuthController extends Controller {
                                     'biaya_admin_su' => $aplikator,
                                     'biaya_agregate' => $agregate
                                 ]);
-    
+
                                 NobuWithdrawFeeHistory::create([
                                     'id_penarikan' => $withDraw->id,
                                     'nominal' => 300
                                 ]);
-                                
+
                                 return response()->json([
                                     'message' => 'Penarikan Berhasil!',
                                     'data-withdraw' => $withDraw,

@@ -21,6 +21,9 @@ Route::post('request-qris', [\App\Http\Controllers\Api\PaymentQrisConfirm::class
 Route::middleware(['guest:tenant', 'guest:kasir', 'throttle:100,1', 'custom.restrict'])->group( function () {
     Route::post('register', [\App\Http\Controllers\Auth\Api\RegisterController::class, 'registerTenant']);
     Route::post('login', [\App\Http\Controllers\Auth\Api\LoginController::class, 'login']);
+    Route::post('check-user', [\App\Http\Controllers\Auth\Api\LoginController::class, 'checkUser']);
+    Route::post('otp-send', [\App\Http\Controllers\Auth\Api\LoginController::class, 'sendOTPResetPaass']);
+    Route::post('reset-password', [\App\Http\Controllers\Auth\Api\LoginController::class, 'verifyOTPReset']);
 });
 
 Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throttle:100,1', 'custom.restrict'])->group(function () {
@@ -82,6 +85,8 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:100,1', 'custom
 
 
     Route::get('/transaction/detail/{id}', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionDetail']);
+
+    Route::post('/withdraw', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'withdrawList']);
 });
 
 Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:100,1', 'custom.restrict'])->prefix('kasir')->group(function () {

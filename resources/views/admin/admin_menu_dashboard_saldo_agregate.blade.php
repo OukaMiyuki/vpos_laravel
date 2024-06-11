@@ -9,7 +9,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="">Saldo</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.saldo') }}">Saldo</a></li>
                                 <li class="breadcrumb-item active">Agregate</li>
                             </ol>
                         </div>
@@ -76,10 +76,9 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>No. Invoice</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Insentif Transfer</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th class="text-center">Insentif Transfer</th>
                                             <th>Status</th>
-                                            <th>Detail</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -90,17 +89,14 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $wd->invoice_pemarikan }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_agregate }}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                <td class="text-center">{{ $wd->detailWithdraw->biaya_agregate }}</td>
                                                 <td>
                                                     @if ($wd->status == 0)
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
                                                     @else
                                                         <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
                                                     @endif
-                                                </td>
-                                                <td>
-                                                    <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                 </td>
                                             </tr>
                                         @endforeach

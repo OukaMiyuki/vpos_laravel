@@ -95,7 +95,7 @@
                         <!-- item-->
                         <a href="#" class="dropdown-item notify-item active">
                             <div class="notify-icon">
-                                <img src="{{ asset('assets/images/users/user-1.jpg') }}" class="img-fluid rounded-circle" alt="" /> 
+                                <img src="{{ asset('assets/images/users/user-1.jpg') }}" class="img-fluid rounded-circle" alt="" />
                             </div>
                             <p class="notify-details">Cristina Pride</p>
                             <p class="text-muted mb-0 user-msg">
@@ -114,7 +114,7 @@
                         <!-- item-->
                         <a href="#" class="dropdown-item notify-item">
                             <div class="notify-icon">
-                                <img src="{{ asset('assets/images/users/user-4.jpg') }}" class="img-fluid rounded-circle" alt="" /> 
+                                <img src="{{ asset('assets/images/users/user-4.jpg') }}" class="img-fluid rounded-circle" alt="" />
                             </div>
                             <p class="notify-details">Karen Robinson</p>
                             <p class="text-muted mb-0 user-msg">
@@ -161,7 +161,7 @@
                 <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     <img src="{{ !empty(auth()->user()->detail->photo) ? Storage::url('images/profile/'.auth()->user()->detail->photo) : asset('assets/images/blank_profile.png') }}" alt="user-image" class="rounded-circle">
                     <span class="pro-user-name ms-1">
-                        {{ auth()->user()->name }} <i class="mdi mdi-chevron-down"></i> 
+                        {{ auth()->user()->name }} <i class="mdi mdi-chevron-down"></i>
                     </span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end profile-dropdown ">
@@ -187,14 +187,6 @@
                         <i class="fe-user"></i>
                         <span>My Account</span>
                     </a>
-                    @auth('admin')
-                        @if (auth()->user()->access_level == 0)
-                            <a href="{{ route('admin.withdraw') }}" class="dropdown-item notify-item">
-                                <span class="mdi mdi-cash-multiple"></span>&nbsp;
-                                <span>Withdraw</span>
-                            </a>
-                        @endif
-                    @endauth
                     @auth('tenant')
                         @if (auth()->user()->id_inv_code != 0)
                             <a href="{{ route('tenant.store.profile') }}" class="dropdown-item notify-item">
@@ -225,6 +217,14 @@
                             </a>
                         @endif
                     @endauth
+                    @auth('admin')
+                        @if (auth()->user()->access_level == 0)
+                            <a href="{{ route('admin.withdraw') }}" class="dropdown-item notify-item">
+                                <span class="mdi mdi-cash-multiple"></span>&nbsp;
+                                <span>Withdraw</span>
+                            </a>
+                        @endif
+                    @endauth
                     <a href="
                         @auth('admin')
                             {{ route('admin.password') }}
@@ -243,6 +243,9 @@
                         <span>Change Password</span>
                     </a>
                     <a href="
+                        @auth('admin')
+                            {{ route('admin.setting') }}
+                        @endauth
                         @auth('marketing')
                             {{ route('marketing.settings') }}
                         @endauth
@@ -343,7 +346,7 @@
             <li class="dropdown d-none d-xl-block">
                 <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     Quick Menu
-                    <i class="mdi mdi-chevron-down"></i> 
+                    <i class="mdi mdi-chevron-down"></i>
                 </a>
                 <div class="dropdown-menu">
                     @auth('admin')
@@ -402,7 +405,7 @@
                 <li class="dropdown dropdown-mega d-none d-xl-block">
                     <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     Mnager Toko
-                    <i class="mdi mdi-chevron-down"></i> 
+                    <i class="mdi mdi-chevron-down"></i>
                     </a>
                     <div class="dropdown-menu dropdown-megamenu">
                         <div class="row">
@@ -479,7 +482,7 @@
                 <li class="dropdown dropdown-mega d-none d-xl-block">
                     <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     Other Menu
-                    <i class="mdi mdi-chevron-down"></i> 
+                    <i class="mdi mdi-chevron-down"></i>
                     </a>
                     <div class="dropdown-menu dropdown-megamenu">
                         <div class="row">
@@ -527,7 +530,7 @@
             <li class="dropdown dropdown-mega d-none d-xl-block">
                 <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                 Menu Transaksi
-                <i class="mdi mdi-chevron-down"></i> 
+                <i class="mdi mdi-chevron-down"></i>
                 </a>
                 <div class="dropdown-menu dropdown-megamenu">
                     <div class="row">

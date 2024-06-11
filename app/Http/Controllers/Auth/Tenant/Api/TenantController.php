@@ -21,6 +21,7 @@ use App\Models\InvoiceField;
 use App\Models\ShoppingCart;
 use App\Models\Tax;
 use App\Models\Discount;
+use App\Models\Withdrawal;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -1330,6 +1331,29 @@ class TenantController extends Controller {
             'transaction-data' => $invoice,
             'data-alias' => $alias,
             'store-detail' => $storeDetail,
+            'status' => 200
+        ]);
+    }
+
+    public function withdrawList(){
+        $withdrawData = Withdrawal::select([
+                                    'withdrawals.id',
+                                    'withdrawals.invoice_pemarikan',
+                                    'withdrawals.id_user',
+                                    'withdrawals.email',
+                                    'withdrawals.tanggal_penarikan',
+                                    'withdrawals.nominal',
+                                    'withdrawals.biaya_admin',
+                                    'withdrawals.status',
+                                ])
+                                ->where('id_user', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->latest()
+                                ->get();
+
+        return response()->json([
+            'message' => 'Fetch Success',
+            'withdraw-data' => $withdrawData,
             'status' => 200
         ]);
     }

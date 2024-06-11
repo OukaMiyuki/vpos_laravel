@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>VPOS | Login - Area</title>
+        <title>VPOS | Lupa Password</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
         <meta content="Coderthemes" name="author" />
@@ -27,7 +27,7 @@
                         <div class="card bg-pattern">
                             <div class="card-body p-4">
                                 <div class="text-center w-75 m-auto">
-                                    <div class="auth-logo">
+                                   <div class="auth-logo">
                                         <a href="index.html" class="logo logo-dark text-center">
                                             <span class="logo-lg">
                                                 <img src="{{ asset('assets/images/logo/Logo1.png') }}" alt="" height="100">
@@ -39,37 +39,35 @@
                                             </span>
                                         </a>
                                     </div>
-                                    <p class="text-muted mb-4 mt-3">Masukkan Email dan Password untuk login!</p>
+                                    <p class="text-muted mb-4 mt-3">Masukkan password baru untuk mereset password lama anda!</p>
                                 </div>
-                                <form method="POST" action="{{ route('process.login') }}">
+                                <form action="{{ route('access.reset.password.process') }}" method="POST">
                                     @csrf
-                                    <div class="mb-3">
-                                        <label for="email" class="form-label">Email</label>
-                                        <input class="form-control @error('email') is-invalid @enderror" type="email" value="{{ old('email') }}" id="email" required="" name="email" placeholder="Masukkan E-mail anda">
-                                        @error('email')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                    </div>
+                                    <input type="hidden" class="form-control d-none" id="phone" name="phone" required="" value="{{ $phone}}">
                                     <div class="mb-3">
                                         <label for="password" class="form-label">Password</label>
                                         <div class="input-group input-group-merge">
-                                            <input type="password" id="password" class="form-control @error('password') is-invalid @enderror" required name="password" placeholder="Masukkan Password">
+                                            <input type="password" id="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Masukkan password" required>
                                             <div class="input-group-text" data-password="false">
                                                 <span class="password-eye"></span>
                                             </div>
                                         </div>
+                                        <small id="emailHelp" class="form-text text-muted">Password minimal 8 karakter dan harus sesuai!</small>
                                         @error('password')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="mb-3">
-                                        <div class="form-check">
-                                            <input id="remember_me" name="remember_me" type="checkbox" class="form-check-input" id="checkbox-signin" checked>
-                                            <label class="form-check-label" for="checkbox-signin">Remember me</label>
+                                        <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
+                                        <div class="input-group input-group-merge">
+                                            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Masukkan ulang password" required>
+                                            <div class="input-group-text" data-password="false">
+                                                <span class="password-eye"></span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="text-center d-grid">
-                                        <button class="btn btn-primary" type="submit"> Log In </button>
+                                        <button class="btn btn-primary" type="submit"> Ubah Password </button>
                                     </div>
                                 </form>
                             </div>
@@ -78,11 +76,8 @@
                         <!-- end card -->
                         <div class="row mt-3">
                             <div class="col-12 text-center">
-                                <p> <a href="{{ route('access.reset.password') }}" class="text-white-50 ms-1">Forgot your password?</a></p>
-                            </div>
-                            {{-- <div class="col-12 text-center">
-                                <p> <a href="{{ route('access.forgot.password') }}" class="text-white-50 ms-1">Forgot your password?</a></p>
-                            </div> --}}
+                                <p class="text-white-50">Back to <a href="{{ route('access.login') }}" class="text-white ms-1"><b>Log in</b></a></p>
+                            </div> <!-- end col -->
                             <!-- end col -->
                         </div>
                         <!-- end row -->

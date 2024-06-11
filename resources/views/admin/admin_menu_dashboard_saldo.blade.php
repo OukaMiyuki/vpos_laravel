@@ -8,26 +8,16 @@
                 <div class="col-12">
                     <div class="page-title-box">
                         <div class="page-title-right">
-                            <form class="d-flex align-items-center mb-3">
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control border-0" id="dash-daterange">
-                                    <span class="input-group-text bg-blue border-blue text-white">
-                                    <i class="mdi mdi-calendar-range"></i>
-                                    </span>
-                                </div>
-                                <a href="#" class="btn btn-blue btn-sm ms-2">
-                                <i class="mdi mdi-autorenew"></i>
-                                </a>
-                                <a href="#" class="btn btn-blue btn-sm ms-1">
-                                <i class="mdi mdi-filter-variant"></i>
-                                </a>
-                            </form>
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Saldo</li>
+                            </ol>
                         </div>
                         <h4 class="page-title">Dashboard Saldo Admin</h4>
                     </div>
                 </div>
             </div>
-            <!-- end page title --> 
+            <!-- end page title -->
             <div class="row">
                 <div class="col-md-3 col-xl-3">
                     <div class="widget-rounded-circle card">
@@ -107,7 +97,7 @@
                                 <div class="col-8">
                                     <div class="text-end">
                                         <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $nobuWithdrawFeeHistory }}</span></h4>
-                                        <p class="text-muted mb-1 text-truncate">Total Nobu Fee Transfer</p>
+                                        <p class="text-muted mb-1 text-truncate">Total Bank Fee Transfer</p>
                                         <a href="{{ route('admin.dashboard.saldo.nobu.fee.transfer') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
@@ -140,16 +130,16 @@
                                             <th>No.</th>
                                             <th>No. Invoice</th>
                                             <th>Email</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Nominal</th>
-                                            <th>Total Biaya Transfer</th>
-                                            <th>Nominal Bersih Penarikan</th>
-                                            <th>Nobu</th>
-                                            <th>Mitra</th>
-                                            <th>Tenant</th>
-                                            <th>Insentif Admin</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th class="text-center">Total Penarikan (Rp.)</th>
+                                            <th class="text-center">Total Biaya Transfer (Rp.)</th>
+                                            <th class="text-center">Nominal Bersih Penarikan</th>
+                                            <th class="text-center">Biaya Transfer Bank (Rp.)</th>
+                                            <th class="text-center">Mitra (Rp.)</th>
+                                            <th class="text-center">Tenant (Rp.)</th>
+                                            <th class="text-center">Insentif Admin (Rp.)</th>
+                                            <th class="text-center">Insentif Agregate (Rp.)</th>
+                                            <th class="text-center">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -161,23 +151,21 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $wd->invoice_pemarikan }}</td>
                                                 <td>{{ $wd->email }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }}</td>
-                                                <td>{{ $wd->nominal }}</td>
-                                                <td>{{ $wd->biaya_admin }}</td>
-                                                <td>{{ $wd->detailWithdraw->nominal_bersih_penarikan }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_nobu }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_mitra }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_tenant }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_admin_su }}</td>
+                                                <td class="text-center">{{ \Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }}</td>
+                                                <td class="text-center">{{ $wd->nominal+$wd->biaya_admin }}</td>
+                                                <td class="text-center">{{ $wd->biaya_admin }}</td>
+                                                <td class="text-center">{{ $wd->detailWithdraw->nominal_bersih_penarikan }}</td>
+                                                <td class="text-center">{{ $wd->detailWithdraw->biaya_nobu }}</td>
+                                                <td class="text-center">{{ $wd->detailWithdraw->biaya_mitra }}</td>
+                                                <td class="text-center">{{ $wd->detailWithdraw->biaya_tenant }}</td>
+                                                <td class="text-center">{{ $wd->detailWithdraw->biaya_admin_su }}</td>
+                                                <td class="text-center">{{ $wd->detailWithdraw->biaya_agregate }}</td>
                                                 <td>
                                                     @if ($wd->status == 0)
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
                                                     @else
                                                         <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
                                                     @endif
-                                                </td>
-                                                <td>
-                                                    <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                 </td>
                                             </tr>
                                         @endforeach

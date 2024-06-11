@@ -24,7 +24,7 @@ use App\Models\TenantQrisAccount;
 use Exception;
 
 class PosController extends Controller {
-    
+
     public function getStoreIdentifier(){
         $store = StoreDetail::select(['store_identifier'])
                             ->where('id_tenant', auth()->user()->id)
@@ -186,7 +186,7 @@ class PosController extends Controller {
                     'tanggal_pelunasan' => Carbon::now(),
                     'tanggal_transaksi' => Carbon::now()
                 ]);
-    
+
                 if(!is_null($invoice)) {
                     $invoice->storeCart($invoice);
                     $invoice->fieldSave($invoice);
@@ -206,7 +206,7 @@ class PosController extends Controller {
                     'nominal_bayar' => $total,
                     'tanggal_transaksi' => Carbon::now()
                 ]);
-    
+
                 if(!is_null($invoice)) {
                     $invoice->storeCart($invoice);
                     $invoice->fieldSave($invoice);
@@ -224,7 +224,7 @@ class PosController extends Controller {
             ]);
 
             session()->forget('cart');
-    
+
             $notification = array(
                 'message' => 'Transaksi berhasil diproses!',
                 'alert-type' => 'success',
@@ -298,7 +298,7 @@ class PosController extends Controller {
         $identifier = $this->getStoreIdentifier();
         $invoice = Invoice::where('store_identifier', $identifier)
                             ->find($request->id);
-        
+
         if(is_null($invoice) || empty($invoice)){
             $notification = array(
                 'message' => 'Transaksi tidak ditemukan!',
@@ -307,7 +307,7 @@ class PosController extends Controller {
 
             return redirect()->back()->with($notification);
         }
-        
+
         try{
             $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalian);
             $invoice->update([
@@ -331,12 +331,12 @@ class PosController extends Controller {
                 'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
                 'status' => 1
             ]);
-    
+
             $notification = array(
                 'message' => 'Pembayaran berhasil diubah!',
                 'alert-type' => 'success',
             );
-    
+
             return redirect()->route('tenant.pos.invoice', array('id' => $invoice->id))->with($notification);
         } catch(Exception $e){
             History::create([
@@ -437,7 +437,7 @@ class PosController extends Controller {
                 'message' => 'Transaksi tidak ditemukan!',
                 'alert-type' => 'warning',
             );
-    
+
             return redirect()->route('tenant.transaction.list.pending')->with($notification);
         }
 
@@ -477,7 +477,7 @@ class PosController extends Controller {
                     'message' => 'Transaksi tidak ditemukan!',
                     'alert-type' => 'warning',
                 );
-    
+
                 return redirect()->back()->with($notification);
             }
             $invoice->deleteCart($invoice);
@@ -658,13 +658,13 @@ class PosController extends Controller {
             $identifier = $this->getStoreIdentifier();
             $invoice = Invoice::where('store_identifier', $identifier)
                             ->find($request->id_invoice);
-                            
+
             if(empty($invoice) || is_null($invoice)){
                 $notification = array(
                     'message' => 'Transaksi tidak ditemukan!',
                     'alert-type' => 'warning',
                 );
-        
+
                 return redirect()->back()->with($notification);
             }
 
@@ -705,7 +705,7 @@ class PosController extends Controller {
                     ]);
                     $responseCode = $postResponse->getStatusCode();
                     $data = json_decode($postResponse->getBody());
-    
+
                     $invoice->update([
                         'jenis_pembayaran' => $request->jenisPembayaran,
                         'tanggal_pelunasan' => Carbon::now(),
@@ -716,7 +716,7 @@ class PosController extends Controller {
                         'diskon' => $request->nominal_diskon,
                         'nominal_bayar' => $total,
                     ]);
-    
+
                     if(!is_null($invoice)) {
                         $invoice->fieldSave($invoice);
                     }
@@ -734,7 +734,7 @@ class PosController extends Controller {
                                 'nominal_mdr' => $nominal_mdr,
                                 'nominal_terima_bersih' => $total-$nominal_mdr
                             ]);
-                        }   
+                        }
                     } else {
                         $nominal_mdr = $total*0.007;
                         $invoice->update([

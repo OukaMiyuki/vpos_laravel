@@ -37,9 +37,9 @@
                                             <th>No.</th>
                                             <th>No. Invoice</th>
                                             <th>Store Identifier</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Tanggal Pelunasan</th>
-                                            <th>Jenis Pembayaran</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Tanggal Pelunasan</th>
+                                            <th class="text-center">Jenis Pembayaran</th>
                                             <th>Status Pembayaran</th>
                                             <th>Nominal Bayar</th>
                                             <th>MDR (%)</th>
@@ -54,9 +54,9 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
                                                 <td>{{ $invoice->store_identifier }}</td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->tanggal_pelunasan }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
+                                                <td class="text-center">{{ $invoice->tanggal_transaksi }}</td>
+                                                <td class="text-center">{{ $invoice->tanggal_pelunasan }}</td>
+                                                <td class="text-center">{{ $invoice->jenis_pembayaran }}</td>
                                                 <td>
                                                     @if (!empty($invoice->jenis_pembayaran) || !is_null($invoice->jenis_pembayaran) || $invoice->jenis_pembayaran != "")
                                                         @if($invoice->status_pembayaran == 0)

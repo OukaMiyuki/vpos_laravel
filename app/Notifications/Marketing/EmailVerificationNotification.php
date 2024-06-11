@@ -36,7 +36,7 @@ class EmailVerificationNotification extends Notification {
      * Get the mail representation of the notification.
      */
     public function toMail($notifiable) {
-        $otp = (new Otp)->generate($notifiable->email, 'numeric', 6, 30);
+        $otp = (new Otp)->generate($notifiable->email, 'numeric', 6, 5);
         $verificationUrl = $this->verificationUrl($notifiable);
 
         if (static::$toMailCallback) {
@@ -52,7 +52,7 @@ class EmailVerificationNotification extends Notification {
             ->line(Lang::get('Terima Kasih Sudah mendaftar! Harap masukkan kode OTP Berikut untuk memverifikasi akun anda!'))
             ->line('Kode OTP Akun : '.$otp->token)
             // ->action(Lang::get('Verify Email Address'), $url)
-            ->line(Lang::get('Kode OTP ini hanya valid selama 30 menit!'));
+            ->line(Lang::get('Kode OTP ini hanya valid selama 5 menit!'));
     }
 
     protected function verificationUrl($notifiable) {
