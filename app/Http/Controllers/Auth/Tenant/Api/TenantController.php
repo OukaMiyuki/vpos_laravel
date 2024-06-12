@@ -831,7 +831,7 @@ class TenantController extends Controller {
         }
 
         if(!is_null($invoice)) {
-            $invoice->fieldSave($invoice);
+            $invoice->fieldSave($invoice, $identifier);
         }
 
         return response()->json([

@@ -9,11 +9,11 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraBisnis') }}">Mitra Bisnis</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraTenant') }}">Mitra Tenant</a></li>
                                 <li class="breadcrumb-item active">Tenant Qris</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Mitra Business's Qris Accounts</h4>
+                        <h4 class="page-title">Data Tenant Qris Accounts</h4>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar Mitra Bisnis Qris&nbsp;&nbsp;&nbsp;<button data-bs-toggle="modal" data-bs-target="#add-qris" title="Tambah kode baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Akun Qris</button></h4>
+                            <h4 class="header-title mb-3">Tabel Daftar Tenant Qris&nbsp;&nbsp;&nbsp;<button data-bs-toggle="modal" data-bs-target="#add-qris" title="Tambah kode baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Akun Qris</button></h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
                                     <thead>
@@ -50,13 +50,13 @@
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($qris as $key => $tqris)
-                                            @foreach ($tqris->tenantQrisAccountStoreList as $qrisacc)
+                                            @foreach ($tqris->tenantQrisAccountStoreDetail as $qrisacc)
                                                 <tr>
                                                     <td>{{ $no+=1 }}</td>
                                                     <td>{{ $tqris->name }}</td>
                                                     <td>{{ $tqris->email }}</td>
-                                                    <td>{{ $qrisacc->storeList->store_identifier }}</td>
-                                                    <td>{{ $qrisacc->storeList->name }}</td>
+                                                    <td>{{ $qrisacc->storeDetail->store_identifier }}</td>
+                                                    <td>{{ $qrisacc->storeDetail->name }}</td>
                                                     <td>{{ $qrisacc->qris_login_user }}</td>
                                                     <td>{{ $qrisacc->qris_password }}</td>
                                                     <td>{{ $qrisacc->qris_merchant_id }}</td>

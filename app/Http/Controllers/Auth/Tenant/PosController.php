@@ -189,7 +189,7 @@ class PosController extends Controller {
 
                 if(!is_null($invoice)) {
                     $invoice->storeCart($invoice);
-                    $invoice->fieldSave($invoice);
+                    $invoice->fieldSave($invoice, $identifier);
                     $invoice->updateTunaiWallet($total);
                 }
             } else if($request->jenisPembayaran == "Qris"){
@@ -209,7 +209,7 @@ class PosController extends Controller {
 
                 if(!is_null($invoice)) {
                     $invoice->storeCart($invoice);
-                    $invoice->fieldSave($invoice);
+                    $invoice->fieldSave($invoice, $identifier);
                 }
             }
 
@@ -685,7 +685,7 @@ class PosController extends Controller {
                 ]);
                 $total = $request->sub_total_belanja+$request->nominal_pajak;
                 if(!is_null($invoice)) {
-                    $invoice->fieldSave($invoice);
+                    $invoice->fieldSave($invoice, $identifier);
                     $invoice->updateTunaiWallet($total);
                 }
             } else if($request->jenisPembayaran == "Qris"){
@@ -718,7 +718,7 @@ class PosController extends Controller {
                     ]);
 
                     if(!is_null($invoice)) {
-                        $invoice->fieldSave($invoice);
+                        $invoice->fieldSave($invoice, $identifier);
                     }
 
                     if($storeDetail->status_umi == 1){

@@ -1780,6 +1780,44 @@ class AdminController extends Controller {
         return view('admin.admin_mitra_tenant_umi_list', compact('umi'));
     }
 
+    public function adminDashboardMitraTenantQrisList(){
+        $qris = Tenant::select([
+                            'tenants.id',
+                            'tenants.name',
+                            'tenants.email'
+                        ])
+                        ->with([
+                            'tenantQrisAccountStoreDetail' => function($query){
+                                $query->select([
+                                    'tenant_qris_accounts.id',
+                                    'tenant_qris_accounts.store_identifier',
+                                    'tenant_qris_accounts.qris_login_user',
+                                    'tenant_qris_accounts.qris_password',
+                                    'tenant_qris_accounts.qris_merchant_id',
+                                    'tenant_qris_accounts.qris_store_id',
+                                    'tenant_qris_accounts.mdr',
+                                ])
+                                ->with([
+                                    'storeDetail' => function($query){
+                                        $query->select([
+                                            'store_details.id',
+                                            'store_details.store_identifier',
+                                            'store_details.name',
+                                        ]);
+                                    }
+                                ])
+                                ->orderBy('tenant_qris_accounts.created_at', 'DESC')
+                                ->get();
+                            }
+                        ])
+                        ->where('is_active', 1)
+                        ->where('id_inv_code', '!=',0)
+                        ->latest()
+                        ->get();
+
+        return view('admin.admin_mitra_tenant_qris_list', compact('qris'));
+    }
+
     public function adminDashboardMitraTenantTransactionList(){
         $tenantInvoice = Tenant::select(['tenants.id', 'tenants.name'])
                                 ->where('id_inv_code', '!=', 0)

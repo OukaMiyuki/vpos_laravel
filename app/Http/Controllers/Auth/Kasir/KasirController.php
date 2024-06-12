@@ -304,7 +304,7 @@ class KasirController extends Controller {
 
                 if(!is_null($invoice)) {
                     $invoice->storeCart($invoice);
-                    $invoice->fieldSave($invoice);
+                    $invoice->fieldSave($invoice, auth()->user()->id_store);
                     $invoice->updateTunaiWallet($total);
                 }
             } else if($request->jenisPembayaran == "Qris"){
@@ -324,7 +324,7 @@ class KasirController extends Controller {
 
                 if(!is_null($invoice)) {
                     $invoice->storeCart($invoice);
-                    $invoice->fieldSave($invoice);
+                    $invoice->fieldSave($invoice, auth()->user()->id_store);
                 }
             }
 
@@ -666,7 +666,7 @@ class KasirController extends Controller {
                 ]);
                 $total = $request->sub_total_belanja+$request->nominal_pajak;
                 if(!is_null($invoice)) {
-                    $invoice->fieldSave($invoice);
+                    $invoice->fieldSave($invoice, auth()->user()->id_store);
                     $invoice->updateTunaiWallet($total);
                 }
             } else if($request->jenisPembayaran == "Qris"){
@@ -724,7 +724,7 @@ class KasirController extends Controller {
                 ]);
 
                 if(!is_null($invoice)) {
-                    $invoice->fieldSave($invoice);
+                    $invoice->fieldSave($invoice, auth()->user()->id_store);
                 }
 
                 if($storeDetail->status_umi == 1){

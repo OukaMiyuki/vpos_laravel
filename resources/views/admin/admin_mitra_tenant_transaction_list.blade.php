@@ -44,10 +44,14 @@
                                             <th>Tanggal Pelunasan</th>
                                             <th>Jenis Pembayaran</th>
                                             <th>Status Pembayaran</th>
-                                            <th>Nominal Bayar</th>
+                                            <th>Sub Total (Rp.)</th>
+                                            <th>Diskon (Rp.)</th>
+                                            <th>Pajak (Rp.)</th>
+                                            <th>Nominal Bayar (Rp.)</th>
+                                            <th>Kembailan (Rp.)</th>
                                             <th>MDR (%)</th>
-                                            <th>Nominal MDR</th>
-                                            <th>Nominal Terima Bersih Qris</th>
+                                            <th>Nominal MDR (Rp.)</th>
+                                            <th>Nominal Terima Bersih Qris (Rp.)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -71,7 +75,11 @@
                                                             <span class="badge bg-soft-success text-success">Selesai</span>
                                                         @endif
                                                     </td>
+                                                    <td>{{ $invoiceList->sub_total }}</td>
+                                                    <td>{{ $invoiceList->diskon }}</td>
+                                                    <td>{{ $invoiceList->pajak }}</td>
                                                     <td>{{ $invoiceList->nominal_bayar }}</td>
+                                                    <td>{{ $invoiceList->kembalian }}</td>
                                                     <td>{{ $invoiceList->mdr }}</td>
                                                     <td>{{ $invoiceList->nominal_mdr }}</td>
                                                     <td>{{ $invoiceList->nominal_terima_bersih }}</td>

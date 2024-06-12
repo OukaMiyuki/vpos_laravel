@@ -342,7 +342,7 @@
                                     <a href="{{ route('admin.dashboard.mitraTenant.umi.list') }}">Request UMI</a>
                                 </li>
                                 <li>
-                                    <a href="#">Tenant Qris Account</a>
+                                    <a href="{{ route('admin.dashboard.mitraTenant.qris.list') }}">Tenant Qris Account</a>
                                 </li>
                                 <li>
                                     <a href="{{ route('admin.dashboard.mitraTenant.transaction.list') }}">Transaction List</a>

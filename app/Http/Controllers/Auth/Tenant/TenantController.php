@@ -1724,6 +1724,8 @@ class TenantController extends Controller {
                                         'invoices.sub_total',
                                         'invoices.pajak',
                                         'invoices.diskon',
+                                        'invoices.nominal_bayar',
+                                        'invoices.kembalian',
                                         'invoices.mdr',
                                         'invoices.nominal_mdr',
                                         'invoices.nominal_terima_bersih',

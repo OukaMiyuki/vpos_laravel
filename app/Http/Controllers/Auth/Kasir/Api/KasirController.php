@@ -592,7 +592,7 @@ class KasirController extends Controller {
         }
 
         if(!is_null($invoice)) {
-            $invoice->fieldSave($invoice);
+            $invoice->fieldSave($invoice, auth()->user()->id_store);
         }
 
         return response()->json([

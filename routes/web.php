@@ -103,6 +103,7 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('dashboard/mitra-tenant/kasir', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantKasirList'])->name('admin.dashboard.mitraTenant.kasir.list');
     Route::get('dashboard/mitra-tenant/kasir/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantKasirProfile'])->name('admin.dashboard.mitraTenant.kasir.profile');
     Route::get('dashboard/mitra-tenant/umi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantUMIList'])->name('admin.dashboard.mitraTenant.umi.list');
+    Route::get('dashboard/mitra-tenant/qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantQrisList'])->name('admin.dashboard.mitraTenant.qris.list');
     Route::get('dashboard/mitra-tenant/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantTransactionList'])->name('admin.dashboard.mitraTenant.transaction.list');
     Route::get('dashboard/mitra-tenant/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantWithdrawalList'])->name('admin.dashboard.mitraTenant.withdraw.list');
 

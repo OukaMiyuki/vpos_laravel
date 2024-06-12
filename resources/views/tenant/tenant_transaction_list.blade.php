@@ -47,6 +47,8 @@
                                             <th>Sub Total (Rp.)</th>
                                             <th>Pajak (Rp.)</th>
                                             <th>Diskon (Rp.)</th>
+                                            <th>Nominal Bayar (Rp.)</th>
+                                            <th>Kembalian (Rp.)</th>
                                             <th>MDR (%)</th>
                                             <th>Nominal MDR (Rp.)</th>
                                             <th>Nominal Terima Bersih Qris (Rp.)</th>
@@ -101,6 +103,14 @@
                                                 <td>{{ $invoice->sub_total }}</td>
                                                 <td>{{ $invoice->pajak }}</td>
                                                 <td>{{ $invoice->diskon }}</td>
+                                                <td>{{ $invoice->nominal_bayar }}</td>
+                                                <td>
+                                                    @if(is_null($invoice->kembalian) || empty($invoice->kembalian) || $invoice->kembalian == NULL)
+                                                        0
+                                                    @else
+                                                        {{$invoice->kembalian}}
+                                                    @endif
+                                                </td>
                                                 <td>{{ $invoice->mdr }}</td>
                                                 <td>{{ $invoice->nominal_mdr }}</td>
                                                 <td>{{ $invoice->nominal_terima_bersih }}</td>

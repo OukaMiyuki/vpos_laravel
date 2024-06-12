@@ -139,6 +139,17 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         );
     }
 
+    public function tenantQrisAccountStoreDetail(){
+        return $this->hasManyThrough(
+            TenantQrisAccount::class,
+            StoreDetail::class,
+            'id_tenant',
+            'store_identifier',
+            'id',
+            'store_identifier'
+        );
+    }
+
     public function withdrawalDetail(){
         return $this->hasManyThrough(
             DetailPenarikan::class,

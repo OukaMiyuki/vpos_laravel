@@ -95,7 +95,16 @@ class Invoice extends Model {
         }
     }
 
-    public function fieldSave($model){
+    public function fieldSave($model, $identifier){
+        $kasir = "";
+        $tenant = "";
+        if(Auth::guard('tenant')->check()){
+            if(auth()->user()->id_inv_code != 0){
+                $kasir = NULL;
+            }
+        } else if(Auth::guard('kasir')->check()){
+            $kasir = auth()->user()->id;
+        }
         $content1="";
         $content2="";
         $content3="";
@@ -120,6 +129,8 @@ class Invoice extends Model {
         }
         $InvoiceField = new InvoiceField();
         $InvoiceField->id_invoice = $model->id;
+        $InvoiceField->id_kasir = $kasir;
+        $InvoiceField->store_identifier = $identifier;
         $InvoiceField->content1 = $content1;
         $InvoiceField->content2 = $content2;
         $InvoiceField->content3 = $content3;
