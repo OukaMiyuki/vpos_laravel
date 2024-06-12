@@ -72,18 +72,24 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('dashboard/saldo/data-bank-fee-transfer', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardNobuFeeTransfer'])->name('admin.dashboard.saldo.nobu.fee.transfer');
 
     Route::get('dashboard/mitra-aplikasi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketing'])->name('admin.dashboard.marketing');
-    Route::get('dashboard/mitra-aplikasi/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingProfile'])->name('admin.dashboard.marketing.profile');
-
     Route::get('dashboard/mitra-aplikasi/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingList'])->name('admin.dashboard.marketing.list');
+    Route::get('dashboard/mitra-aplikasi/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingProfile'])->name('admin.dashboard.marketing.profile');
     Route::get('dashboard/mitra-aplikasi/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMarketingAccountActivation'])->name('admin.dashboard.marketing.account.activation');
     Route::get('dashboard/mitra-aplikasi/invitation-code', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingInvitationCodeList'])->name('admin.dashboard.marketing.invitationcode');
     Route::get('dashboard/mitra-aplikasi/invitation-code/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingInvitationCodeListActivation'])->name('admin.dashboard.marketing.invitationcode.activation');
     Route::get('dashboard/mitra-aplikasi/invitation-code/store/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingInvitationCodeStoreList'])->name('admin.dashboard.marketing.invitationcode.store.list');
+    Route::get('dashboard/mitra-aplikasi/invitation-code/income/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingInvitationCodeIncomeList'])->name('admin.dashboard.marketing.invitationcode.income.list');
     Route::get('dashboard/mitra-aplikasi/withdraw', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingWithdrawalList'])->name('admin.dashboard.marketing.withdraw');
 
     Route::get('dashboard/mitra-bisnis', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnis'])->name('admin.dashboard.mitraBisnis');
     Route::get('dashboard/mitra-bisnis/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisList'])->name('admin.dashboard.mitraBisnis.list');
+    Route::get('dashboard/mitra-bisnis/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisProfile'])->name('admin.dashboard.mitraBisnis.profile');
+    Route::get('dashboard/mitra-bisnis/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisActivation'])->name('admin.dashboard.mitraBisnis.activation');
     Route::get('dashboard/mitra-bisnis/merchant', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisMerchantList'])->name('admin.dashboard.mitraBisnis.merchantList');
+    Route::get('dashboard/mitra-bisnis/merchant/invoice/{id}/{store_identifier}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisMerchantInvoiceList'])->name('admin.dashboard.mitraBisnis.merchantList.invoice');
+    Route::get('dashboard/mitra-bisnis/merchant/detail/{id}/{store_identifier}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisMerchantDetail'])->name('admin.dashboard.mitraBisnis.merchantList.detail');
+    Route::get('dashboard/mitra-bisnis/merchant/activation/{id}/{store_identifier}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisMerchantActivation'])->name('admin.dashboard.mitraBisnis.merchantList.activation');
+    Route::get('dashboard/mitra-bisnis/umi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisUMIList'])->name('admin.dashboard.mitraBisnis.umi.list');
     Route::get('dashboard/mitra-bisnis/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisTransactionList'])->name('admin.dashboard.mitraBisnis.transactionList');
     Route::get('dashboard/mitra-bisnis/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisWithdrawalList'])->name('admin.dashboard.mitraBisnis.withdrawList');
 

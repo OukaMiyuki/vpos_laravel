@@ -9,7 +9,8 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Administrator</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraBisnis') }}">Mitra Bisnis</a></li>
+                                <li class="breadcrumb-item active">Merchant List</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Data Merchant Mitra Bisnis</h4>
@@ -36,10 +37,11 @@
                                             <th>No.</th>
                                             <th>Merchant Name</th>
                                             <th>Store Identifier</th>
-                                            <th>Tenant</th>
+                                            <th>MItra Bisnis</th>
                                             <th>Email</th>
                                             <th>Jenis Usaha</th>
-                                            <th class="text-center">Status UMI</th>
+                                            <th class="text-center">Status</th>
+                                            <th>Status UMI</th>
                                             <th class="text-center">Total Transaksi</th>
                                             <th class="text-center">Lihat Invoice</th>
                                             <th class="text-center">Action</th>
@@ -55,6 +57,13 @@
                                                 <td>{{ $store->tenant->name }}</td>
                                                 <td>{{ $store->tenant->email }}</td>
                                                 <td>{{ $store->jenis_usaha }}</td>
+                                                <td class="text-center">
+                                                    @if($store->is_active == 0)
+                                                        <span class="badge bg-soft-danger text-danger">Non Aktif</span>
+                                                    @elseif($store->is_active == 1)
+                                                        <span class="badge bg-soft-success text-success">Aktif</span>
+                                                    @endif
+                                                </td>
                                                 <td>
                                                     @if ($store->status_umi == 0)
                                                         <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
@@ -66,13 +75,23 @@
                                                 </td>
                                                 <td class="text-center">{{ $store->invoice_count }}</td>
                                                 <td class="text-center">
-                                                    <a href="">
+                                                    <a href="{{ route('admin.dashboard.mitraBisnis.merchantList.invoice', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
                                                         <button title="Lihat daftar invoice" type="button" class="btn btn-primary rounded-pill waves-effect waves-light">Lihat Invoice</button>&nbsp;
                                                     </a>
                                                 </td>
                                                 <td class="text-center">
-                                                    <a href="">
-                                                        <button title="Lihat data admin" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
+                                                    @if ($store->is_active == 0)
+                                                        <a href="{{ route('admin.dashboard.mitraBisnis.merchantList.activation', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
+                                                            <button title="Lihat detail merchant" type="button" class="btn btn-success waves-effect waves-light"><span class="mdi mdi-power"></span></button>
+                                                        </a>
+                                                    @elseif($store->is_active == 1)
+                                                        <a href="{{ route('admin.dashboard.mitraBisnis.merchantList.activation', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
+                                                            <button title="Lihat detail merchant" type="button" class="btn btn-danger waves-effect waves-light"><span class="mdi mdi-power"></span></button>
+                                                        </a>
+                                                    @endif
+                                                    &nbsp;
+                                                    <a href="{{ route('admin.dashboard.mitraBisnis.merchantList.detail', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
+                                                        <button title="Lihat detail merchant" type="button" class="btn btn-info waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
                                                     </a>
                                                 </td>
                                             </tr>

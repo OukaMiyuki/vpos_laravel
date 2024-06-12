@@ -9,7 +9,8 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Administrator</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraBisnis') }}">Mitra Bisnis</a></li>
+                                <li class="breadcrumb-item active">Mitra Bisnis</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Data Mitra Bisnis</h4>
@@ -66,13 +67,13 @@
                                                 </td>
                                                 <td class="text-center">
                                                     @if($tenant->is_active == 0)
-                                                        <a href="" class="btn btn-warning rounded-pill waves-effect waves-light"><i class="mdi mdi-check-all"></i></a>
+                                                        <a href="{{ route('admin.dashboard.mitraBisnis.activation', ['id' => $tenant->id]) }}" class="btn btn-warning rounded-pill waves-effect waves-light"><i class="mdi mdi-check-all"></i></a>
                                                     @elseif($tenant->is_active == 1)
-                                                        <a href="" class="btn btn-danger rounded-pill waves-effect waves-light"><i class="mdi mdi-power"></i></a>
+                                                        <a href="{{ route('admin.dashboard.mitraBisnis.activation', ['id' => $tenant->id]) }}" class="btn btn-danger rounded-pill waves-effect waves-light"><i class="mdi mdi-power"></i></a>
                                                     @elseif($tenant->is_active == 2)
-                                                        <a href="" class="btn btn-success rounded-pill waves-effect waves-light"><i class="mdi mdi-power"></i></a>
+                                                        <a href="{{ route('admin.dashboard.mitraBisnis.activation', ['id' => $tenant->id]) }}" class="btn btn-success rounded-pill waves-effect waves-light"><i class="mdi mdi-power"></i></a>
                                                     @endif
-                                                    <a href="">
+                                                    <a href="{{ route('admin.dashboard.mitraBisnis.profile', ['id' => $tenant->id]) }}">
                                                         <button title="Lihat data admin" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
                                                     </a>
                                                 </td>

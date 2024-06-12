@@ -824,7 +824,9 @@ class AdminController extends Controller {
                                                         'store_details.id',
                                                         'store_details.store_identifier',
                                                         'store_details.id_tenant',
-                                                        'store_details.name'
+                                                        'store_details.name',
+                                                        'store_details.jenis_usaha',
+                                                        'store_details.status_umi',
                                                     ]);
                                                 }
                                             ])
@@ -833,6 +835,7 @@ class AdminController extends Controller {
                                         }
                                     ])
                                     ->find($id);
+
         if(is_null($storeList) || empty($storeList) || $storeList == NULL){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -841,6 +844,81 @@ class AdminController extends Controller {
             return redirect()->route('admin.dashboard.marketing.invitationcode')->with($notification);
         }
         return view('admin.admin_marketing_invitation_code_store_list', compact('storeList'));
+    }
+
+    public function adminDashboardMarketingInvitationCodeIncomeList($id){
+        $storeList = InvitationCode::select([
+                                        'invitation_codes.id',
+                                        'invitation_codes.id_marketing',
+                                        'invitation_codes.inv_code',
+                                        'invitation_codes.holder',
+                                        'invitation_codes.is_active',
+                                    ])
+                                    ->with([
+                                        'marketing' => function($query){
+                                            $query->select([
+                                                'marketings.id',
+                                                'marketings.name'
+                                            ]);
+                                        },
+                                        'tenant' => function($query){
+                                            $query->select([
+                                                'tenants.id',
+                                                'tenants.email',
+                                                'tenants.name',
+                                                'tenants.created_at',
+                                                'tenants.id_inv_code',
+                                                'tenants.is_active'
+                                            ])
+                                            ->with([
+                                                'storeDetail'=> function($query){
+                                                    $query->select([
+                                                        'store_details.id',
+                                                        'store_details.store_identifier',
+                                                        'store_details.id_tenant',
+                                                        'store_details.name',
+                                                    ]);
+                                                },
+                                                'withdrawal' => function($query){
+                                                    $query->select([
+                                                        'withdrawals.id',
+                                                        'withdrawals.id_user',
+                                                        'withdrawals.invoice_pemarikan',
+                                                        'withdrawals.email',
+                                                        'withdrawals.tanggal_penarikan',
+                                                        'withdrawals.nominal',
+                                                        'withdrawals.biaya_admin',
+                                                        'withdrawals.status',
+                                                    ])
+                                                    ->with([
+                                                        'detailWithdraw' => function($query){
+                                                            $query->select([
+                                                                'detail_penarikans.id',
+                                                                'detail_penarikans.id_penarikan',
+                                                                'detail_penarikans.nominal_bersih_penarikan',
+                                                                'detail_penarikans.biaya_nobu',
+                                                                'detail_penarikans.biaya_mitra',
+                                                                'detail_penarikans.biaya_tenant',
+                                                                'detail_penarikans.biaya_admin_su',
+                                                                'detail_penarikans.biaya_agregate',
+                                                            ]);
+                                                        }
+                                                    ]);
+                                                }
+                                            ])
+                                            ->latest()
+                                            ->get();
+                                        }
+                                    ])
+                                    ->find($id);
+        $pemasukan = 0;
+        foreach($storeList->tenant as $tenant){
+            foreach($tenant->withdrawal as $wdList){
+                $pemasukan+=$wdList->detailWithdraw->biaya_mitra;
+            }
+        }
+
+        return view('admin.admin_marketing_invitation_code_income_list', compact(['storeList', 'pemasukan']));
     }
 
     public function adminDashboardMarketingWithdrawalList(){
@@ -938,6 +1016,85 @@ class AdminController extends Controller {
         return view('admin.admin_mitra_bisnis_list', compact('tenantList'));
     }
 
+    public function adminDashboardMitraBisnisProfile($id){
+        $tenantProfile = Tenant::select([
+                                    'tenants.id',
+                                    'tenants.name',
+                                    'tenants.email',
+                                    'tenants.email_verified_at',
+                                    'tenants.phone',
+                                    'tenants.phone_number_verified_at',
+                                    'tenants.is_active'
+                                ])
+                                ->with([
+                                    'detail' => function($query){
+                                        $query->select([
+                                            'detail_tenants.id',
+                                            'detail_tenants.id_tenant',
+                                            'detail_tenants.no_ktp',
+                                            'detail_tenants.tempat_lahir',
+                                            'detail_tenants.tanggal_lahir',
+                                            'detail_tenants.jenis_kelamin',
+                                            'detail_tenants.alamat',
+                                            'detail_tenants.photo',
+                                        ]);
+                                    }
+                                ])
+                                ->where('id_inv_code', 0)
+                                ->find($id);
+
+        if(is_null($tenantProfile) || empty($tenantProfile)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
+        }
+
+        return view('admin.admin_mitra_bisnis_profile', compact('tenantProfile'));
+    }
+
+    public function adminDashboardMitraBisnisActivation($id){
+        $tenant = Tenant::where('id_inv_code', 0)->find($id);
+
+        if(is_null($tenant) || empty($tenant)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
+        }
+
+        if($tenant->is_active == 0){
+            $tenant->update([
+                'is_active' => 1
+            ]);
+            $notification = array(
+                'message' => 'Data berhasil diupdate!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
+        } else if($tenant->is_active == 1){
+            $tenant->update([
+                'is_active' => 2
+            ]);
+            $notification = array(
+                'message' => 'Data berhasil diupdate!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
+        } else if($tenant->is_active == 2){
+            $tenant->update([
+                'is_active' => 1
+            ]);
+            $notification = array(
+                'message' => 'Data berhasil diupdate!',
+                'alert-type' => 'success',
+            );
+            return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
+        }
+    }
+
     public function adminDashboardMitraBisnisMerchantList(){
         $storeList = StoreList::select([
                                 'store_lists.id',
@@ -947,6 +1104,7 @@ class AdminController extends Controller {
                                 'store_lists.name',
                                 'store_lists.jenis_usaha',
                                 'store_lists.status_umi',
+                                'store_lists.is_active',
                             ])
                             ->with(['tenant' => function($query){
                                 $query->select([
@@ -960,6 +1118,170 @@ class AdminController extends Controller {
                             ->get();
 
         return view('admin.admin_mitra_bisnis_merchant_list', compact('storeList'));
+    }
+
+    public function adminDashboardMitraBisnisMerchantInvoiceList($id, $store_identifier){
+        $storeList = StoreList::select([
+                                    'store_lists.id',
+                                    'store_lists.id_user',
+                                    'store_lists.store_identifier',
+                                    'store_lists.name',
+                                ])
+                                ->with([
+                                    'invoice' => function($query){
+                                        $query->select([
+                                            'invoices.id',
+                                            'invoices.store_identifier',
+                                            'invoices.email',
+                                            'invoices.id_tenant',
+                                            'invoices.nomor_invoice',
+                                            'invoices.tanggal_transaksi',
+                                            'invoices.tanggal_pelunasan',
+                                            'invoices.jenis_pembayaran',
+                                            'invoices.status_pembayaran',
+                                            'invoices.nominal_bayar',
+                                            'invoices.kembalian',
+                                            'invoices.mdr',
+                                            'invoices.nominal_mdr',
+                                            'invoices.nominal_terima_bersih',
+                                        ])
+                                        ->latest()
+                                        ->get();
+                                    },
+                                    'tenant' => function($query){
+                                        $query->select([
+                                            'tenants.id',
+                                            'tenants.name'
+                                        ]);
+                                    }
+                                ])
+                                ->where('store_identifier', $store_identifier)
+                                ->find($id);
+  
+        if(is_null($storeList) || empty($storeList)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraBisnis.merchantList')->with($notification);
+        }
+                        
+        return view('admin.admin_mitra_bisnis_merchant_invoice_list', compact('storeList'));
+    }
+
+    public function adminDashboardMitraBisnisMerchantDetail($id, $store_identifier){
+        $storeDetail = StoreList::select([
+                                    'store_lists.id',
+                                    'store_lists.id_user',
+                                    'store_lists.email',
+                                    'store_lists.store_identifier',
+                                    'store_lists.name',
+                                    'store_lists.alamat',
+                                    'store_lists.kabupaten',
+                                    'store_lists.kode_pos',
+                                    'store_lists.no_telp_toko',
+                                    'store_lists.jenis_usaha',
+                                    'store_lists.status_umi',
+                                    'store_lists.photo',
+                                    'store_lists.is_active',
+                                ])
+                                ->with([
+                                    'tenant' => function($query){
+                                        $query->select([
+                                            'tenants.id',
+                                            'tenants.name'
+                                        ]);
+                                    }
+                                ])
+                                ->where('store_identifier', $store_identifier)
+                                ->find($id);
+
+        if(is_null($storeDetail) || empty($storeDetail)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraBisnis.merchantList')->with($notification);
+        }
+
+        $umiRequest = "";
+        $umiRequest = UmiRequest::where('store_identifier', $store_identifier)->first();
+
+        if(empty($umiRequest)){
+            $umiRequest = "Empty";
+        }
+
+        return view('admin.admin_mitra_bisnis_merchant_detail', compact('storeDetail', 'umiRequest'));
+    }
+
+    public function adminDashboardMitraBisnisMerchantActivation($id, $store_identifier){
+        $storeActivation = StoreList::where('id', $id)->where('store_identifier', $store_identifier)->first();
+        
+        if(is_null($storeActivation) || empty($storeActivation)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraBisnis.merchantList')->with($notification);
+        }
+
+        if($storeActivation->is_active == 0){
+            $storeActivation->update([
+                'is_active' => 1
+            ]);
+        } else if($storeActivation->is_active == 1){
+            $storeActivation->update([
+                'is_active' => 0
+            ]);
+        }
+
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+
+        return redirect()->route('admin.dashboard.mitraBisnis.merchantList')->with($notification);
+    }
+
+    public function adminDashboardMitraBisnisUMIList(){
+        $umi = Tenant::select([
+                        'tenants.id',
+                        'tenants.name',
+                    ])
+                    ->with([
+                        'storeListUMI' => function($query){
+                            $query->select([
+                                'umi_requests.id',
+                                'umi_requests.id_tenant',
+                                'umi_requests.store_identifier',
+                                'umi_requests.tanggal_pengajuan',
+                                'umi_requests.tanggal_approval',
+                                'umi_requests.is_active',
+                                'umi_requests.file_path',
+                                'umi_requests.note',
+                            ])
+                            ->with([
+                                'storeList' => function($query){
+                                    $query->select([
+                                        'store_lists.id',
+                                        'store_lists.id_user',
+                                        'store_lists.store_identifier',
+                                        'store_lists.name',
+                                        'store_lists.jenis_usaha',
+                                        'store_lists.status_umi',
+                                        'store_lists.is_active',
+                                    ]);
+                                }
+                            ])
+                            ->orderBy('umi_requests.tanggal_approval', 'DESC')
+                            ->get();
+                        }
+                    ])
+                    ->where('is_active', 1)
+                    ->where('id_inv_code', 0)
+                    ->latest()
+                    ->get();
+        return view('admin.admin_mitra_bisnis_merchant_umi_list', compact('umi'));
     }
 
     public function adminDashboardMitraBisnisTransactionList(){
@@ -1339,7 +1661,7 @@ class AdminController extends Controller {
         if(is_null($withdrawData) || empty($withdrawData)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
-                'alert-type' => 'info',
+                'alert-type' => 'warning',
             );
 
             return redirect()->route('admin.dashboard.finance')->with($notification);

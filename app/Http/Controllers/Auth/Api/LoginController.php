@@ -131,7 +131,7 @@ class LoginController extends Controller {
                 ]);
             } else {
                 return response()->json([
-                    'message' => 'User tidak terdaftar pada sistem kamiooooo',
+                    'message' => 'User tidak terdaftar pada sistem kami',
                     'status' => 404
                 ]);
             }
@@ -146,7 +146,7 @@ class LoginController extends Controller {
             ]);
         } else {
             return response()->json([
-                'message' => 'User tidak terdaftar pada sistem kamirtrtrt',
+                'message' => 'User tidak terdaftar pada sistem kami',
                 'status' => 404
             ]);
         }

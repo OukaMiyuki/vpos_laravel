@@ -9,6 +9,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.marketing') }}">Mitra Aplikasi</a></li>
                                 <li class="breadcrumb-item active">Mitra List</li>
                             </ol>
                         </div>
@@ -36,8 +37,8 @@
                                             <th>No.</th>
                                             <th>Nama</th>
                                             <th>No. KTP</th>
-                                            <th>Email</th>
                                             <th>Phone</th>
+                                            <th>Email</th>
                                             <th>Jenis Kelamin</th>
                                             <th class="text-center">Status</th>
                                             <th class="text-center">Action</th>
@@ -50,8 +51,8 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $marketing->name }}</td>
                                                 <td>{{ $marketing->detail->no_ktp }}</td>
-                                                <td>{{ $marketing->email }}</td>
-                                                <td>{{ $marketing->phone }}</td>
+                                                <td>{{ $marketing->phone }}}&nbsp;@if(!is_null($marketing->phone_number_verified_at) || !empty($marketing->phone_number_verified_at) || $marketing->phone_number_verified_at != "" || $marketing->phone_number_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
+                                                <td>{{ $marketing->email }}&nbsp;@if(!is_null($marketing->email_verified_at) || !empty($marketing->email_verified_at) || $marketing->email_verified_at != "" || $marketing->email_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
                                                 <td>{{ $marketing->detail->jenis_kelamin }}</td>
                                                 <td class="text-center">
                                                     @if ($marketing->is_active == 0)

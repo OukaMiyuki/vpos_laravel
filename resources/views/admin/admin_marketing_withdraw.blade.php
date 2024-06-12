@@ -9,8 +9,9 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.marketing') }}">Mitra Aplikasi</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.menu') }}">Admin Menu</a></li>
-                                <li class="breadcrumb-item active">Mitra Aplikasi Withdrawals List</li>
+                                <li class="breadcrumb-item active">Withdrawals</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Data Withdraw Mitra Aplikasi</h4>
@@ -39,16 +40,15 @@
                                             <th>No. Invoice</th>
                                             <th>Nama</th>
                                             <th>User Email</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Nominal</th>
-                                            <th>Nominal Bersih Penarikan</th>
-                                            <th>Biaya Transfer</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th class="text-center">Nominal (Rp.)</th>
+                                            <th class="text-center">Nominal Bersih Penarikan (Rp.)</th>
+                                            <th>Total Biaya Transfer (Rp.)</th>
+                                            <th>Transfer Bank (Rp.)</th>
+                                            <th>Mitra Aplikasi (Rp.)</th>
+                                            <th>Insentif Admin (Rp.)</th>
+                                            <th>Insentif Agregate (Rp.)</th>
                                             <th>Status</th>
-                                            <th>Biaya Nobu</th>
-                                            <th>Insentif Mitra Aplikasi</th>
-                                            <th>Nomnial Penarikan Tenant</th>
-                                            <th>Insentif Admin</th>
-                                            <th>Insentif Agregate</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -58,15 +58,19 @@
                                                 <tr>
                                                     <td>{{ $no+=1 }}</td>
                                                     <td>
-                                                        <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                        <a href="{{ route('admin.dashboard.menu.userWithdrawals.detail', ['id' => $withdraw->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                     </td>
                                                     <td>{{ $withdraw->invoice_pemarikan }}</td>
                                                     <td>{{ $wd->name }}</td>
                                                     <td>{{ $wd->email }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($withdraw->tanggal_penarikan)->format('d-m-Y') }}</td>
-                                                    <td>{{ $withdraw->nominal }}</td>
-                                                    <td>{{ $withdraw->detailWithdraw->nominal_bersih_penarikan }}</td>
+                                                    <td class="text-center">{{\Carbon\Carbon::parse($withdraw->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                    <td class="text-center">{{ $withdraw->nominal+$withdraw->biaya_admin }}</td>
+                                                    <td class="text-center">{{ $withdraw->detailWithdraw->nominal_bersih_penarikan }}</td>
                                                     <td>{{ $withdraw->biaya_admin }}</td>
+                                                    <td>{{ $withdraw->detailWithdraw->biaya_nobu }}</td>
+                                                    <td>{{ $withdraw->detailWithdraw->biaya_mitra }}</td>
+                                                    <td>{{ $withdraw->detailWithdraw->biaya_admin_su }}</td>
+                                                    <td>{{ $withdraw->detailWithdraw->biaya_agregate }}</td>
                                                     <td>
                                                         @if ($withdraw->status == 0)
                                                             <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
@@ -74,11 +78,6 @@
                                                             <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
                                                         @endif
                                                     </td>
-                                                    <td>{{ $withdraw->detailWithdraw->biaya_nobu }}</td>
-                                                    <td>{{ $withdraw->detailWithdraw->biaya_mitra }}</td>
-                                                    <td>{{ $withdraw->detailWithdraw->biaya_tenant }}</td>
-                                                    <td>{{ $withdraw->detailWithdraw->biaya_admin_su }}</td>
-                                                    <td>{{ $withdraw->detailWithdraw->biaya_agregate }}</td>
                                                 </tr>
                                             @endforeach
                                         @endforeach

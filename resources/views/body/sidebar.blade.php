@@ -304,6 +304,12 @@
                                     <a href="{{ route('admin.dashboard.mitraBisnis.merchantList') }}">Merchant List</a>
                                 </li>
                                 <li>
+                                    <a href="{{ route('admin.dashboard.mitraBisnis.umi.list') }}">Request UMI</a>
+                                </li>
+                                <li>
+                                    <a href="#">Tenant Qris Account</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('admin.dashboard.mitraBisnis.transactionList') }}">Transaction List</a>
                                 </li>
                                 <li>
@@ -331,6 +337,12 @@
                                 </li>
                                 <li>
                                     <a href="{{ route('admin.dashboard.mitraTenant.kasir.list') }}">Kasir List</a>
+                                </li>
+                                <li>
+                                    <a href="#">Request UMI</a>
+                                </li>
+                                <li>
+                                    <a href="#">Tenant Qris Account</a>
                                 </li>
                                 <li>
                                     <a href="{{ route('admin.dashboard.mitraTenant.transaction.list') }}">Transaction List</a>

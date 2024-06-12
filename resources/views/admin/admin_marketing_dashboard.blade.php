@@ -178,9 +178,16 @@
                                             <th>Action</th>
                                         </tr>
                                     </thead>
+                                    @php
+                                        $nomer=0;
+                                    @endphp
                                     <tbody>
                                         @foreach ($marketingAktivasi as $marketingAktivasi)
                                             <tr>
+                                                <td>
+                                                    <a href="{{ route('admin.dashboard.marketing.account.activation', ['id'=>$marketingAktivasi->id]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
+                                                </td>
+                                                <td>{{ $nomer+=1 }}</td>
                                                 <td>
                                                     <h5 class="m-0 fw-normal">{{ $marketingAktivasi->name }}</h5>
                                                 </td>
@@ -189,9 +196,6 @@
                                                 </td>
                                                 <td>
                                                     <span class="badge bg-soft-warning text-warning">Non Aktif</span>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('admin.dashboard.marketing.account.activation', ['id'=>$marketingAktivasi->id]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
                                                 </td>
                                             </tr> 
                                         @endforeach

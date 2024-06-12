@@ -38,7 +38,7 @@
                                             <th>No. Invoice</th>
                                             <th>Store Identifier</th>
                                             <th class="text-center">Tanggal Transaksi</th>
-                                            <th class="text-center">Tanggal Pelunasan</th>
+                                            <th class="text-center">Tanggal Pembayaran</th>
                                             <th class="text-center">Jenis Pembayaran</th>
                                             <th>Status Pembayaran</th>
                                             <th>Nominal Bayar</th>

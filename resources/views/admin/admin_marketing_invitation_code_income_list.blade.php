@@ -13,7 +13,7 @@
                                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.marketing') }}">Mitra Aplikasi</a></li>
                                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.marketing.invitationcode') }}">Invitation Code</a></li>
-                                    <li class="breadcrumb-item active">Store Lists</li>
+                                    <li class="breadcrumb-item active">Income List</li>
                                 </ol>
                             </div>
                             <h4 class="page-title">Invitation Code's Info</h4>
@@ -38,6 +38,9 @@
                                 <div class="col-6">
                                     <h3 class="mb-3"><span>Invitation Code : </span>{{ $storeList->inv_code }} - {{ $storeList->holder }}</h3>
                                 </div>
+                                <div class="col-6 text-end">
+                                    <h3 class="mb-3"><span>Total Pemasukan : </span>Rp. {{ $pemasukan }}</h3>
+                                </div>
                             </div>
                             <div class="responsive-table-plugin">
                                 <div class="table-rep-plugin">
@@ -48,11 +51,17 @@
                                                     <th>No.</th>
                                                     <th>Mitra Aplikasi</th>
                                                     <th>Nama Tenant</th>
+                                                    <th>User Email</th>
                                                     <th>Nama Toko</th>
-                                                    <th>Jenis Usaha</th>
-                                                    <th class="text-center">Status UMI</th>
-                                                    <th class="text-center">Tanggal Gabung</th>
+                                                    <th class="text-center">Tanggal Penarikan</th>
+                                                    <th class="text-center">Nominal (Rp.)</th>
+                                                    <th class="text-center">Nominal Bersih Penarikan (Rp.)</th>
                                                     <th class="text-center">Status</th>
+                                                    <th class="text-center">Total Biaya Transfer (Rp.)</th>
+                                                    <th class="text-center">Transfer Bank (Rp.)</th>
+                                                    <th class="text-center">Mitra Aplikasi (Rp.)</th>
+                                                    <th class="text-center">Insentif Admin (Rp.)</th>
+                                                    <th class="text-center">Insentif Agregate (Rp.)</th>
                                                 </tr>
                                             </thead>
                                             @php
@@ -60,28 +69,30 @@
                                             @endphp
                                             <tbody>
                                                 @foreach ($storeList->tenant as $tenantList)
-                                                    <td>{{ $no+=1 }}</td>
-                                                    <td>{{ $storeList->marketing->name }}</td>
-                                                    <td>{{ $tenantList->name }}</td>
-                                                    <td>{{ $tenantList->storeDetail->name }}</td>
-                                                    <td>{{ $tenantList->storeDetail->jenis_usaha }}</td>
-                                                    <td class="text-center">
-                                                        @if ($tenantList->storeDetail->status_umi == 0)
-                                                            <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
-                                                        @elseif($tenantList->storeDetail->status_umi == 1)
-                                                            <span class="badge bg-soft-success text-success">Terdaftar</span>
-                                                        @elseif($tenantList->storeDetail->status_umi == 2)
-                                                            <span class="badge bg-soft-danger text-danger">Ditolak</span>
-                                                        @endif
-                                                    </td>
-                                                    <td class="text-center">{{\Carbon\Carbon::parse($tenantList->tanggal_penarikan)->format('d-m-Y')}}</td>
-                                                    <td class="text-center">
-                                                        @if ($storeList->is_active == 0)
-                                                            <span class="badge bg-soft-danger text-danger">Tidak Aktif</span>
-                                                        @else
-                                                            <span class="badge bg-soft-success text-success">Aktif</span>
-                                                        @endif
-                                                    </td>
+                                                    @foreach ($tenantList->withdrawal as $wd)
+                                                        <tr>
+                                                            <td>{{ $no+=1 }}</td>
+                                                            <td>{{ $storeList->marketing->name }}</td>
+                                                            <td>{{ $tenantList->name }}</td>
+                                                            <td>{{ $tenantList->email }}</td>
+                                                            <td>{{ $tenantList->storeDetail->name }}</td>
+                                                            <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                            <td class="text-center">{{ $wd->nominal+$wd->biaya_admin }}</td>
+                                                            <td class="text-center">{{ $wd->detailWithdraw->nominal_bersih_penarikan }}</td>
+                                                            <td class="text-center">
+                                                                @if ($wd->status == 0)
+                                                                    <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
+                                                                @else
+                                                                    <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
+                                                                @endif
+                                                            </td>
+                                                            <td class="text-center">{{ $wd->biaya_admin }}</td>
+                                                            <td class="text-center">{{ $wd->detailWithdraw->biaya_nobu }}</td>
+                                                            <td class="text-center">{{ $wd->detailWithdraw->biaya_mitra }}</td>
+                                                            <td class="text-center">{{ $wd->detailWithdraw->biaya_admin_su }}</td>
+                                                            <td class="text-center">{{ $wd->detailWithdraw->biaya_agregate }}</td>
+                                                        </tr>
+                                                    @endforeach
                                                 @endforeach
                                             </tbody>
                                         </table>

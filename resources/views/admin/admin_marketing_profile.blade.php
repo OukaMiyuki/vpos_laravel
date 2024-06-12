@@ -10,6 +10,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.marketing') }}">Mitra Aplikasi</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.marketing.list') }}">Mitra List</a></li>
                                 <li class="breadcrumb-item active">Profile</li>
                             </ol>

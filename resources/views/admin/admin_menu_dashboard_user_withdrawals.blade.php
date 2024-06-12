@@ -42,7 +42,7 @@
                                             <th class="text-center">Nominal (Rp.)</th>
                                             <th class="text-center">Nominal Bersih Penarikan (Rp.)</th>
                                             <th>Status</th>
-                                            <th>Transfer Bi-Fast (Rp.)</th>
+                                            <th>Total Biaya Transfer (Rp.)</th>
                                             <th>Transfer Bank (Rp.)</th>
                                             <th>Mitra Aplikasi (Rp.)</th>
                                             <th>Tenant (Rp.)</th>

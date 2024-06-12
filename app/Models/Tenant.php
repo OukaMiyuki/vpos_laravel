@@ -40,7 +40,8 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         'phone',
         'phone_number_verified_at',
         'password',
-        'id_inv_code'
+        'id_inv_code',
+        'is_active'
     ];
 
     protected $hidden = [
@@ -76,9 +77,9 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
 
     public function invoiceStoreList(){
         return $this->hasManyThrough(
-            Invoice::class, 
-            StoreList::class, 
-            'store_lists.id_user', 
+            Invoice::class,
+            StoreList::class,
+            'store_lists.id_user',
             'invoices.store_identifier',
             'tenants.id',
             'store_lists.id'
@@ -87,9 +88,9 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
 
     public function invoiceStoreDetail(){
         return $this->hasManyThrough(
-            Invoice::class, 
-            StoreDetail::class, 
-            'id_tenant', 
+            Invoice::class,
+            StoreDetail::class,
+            'id_tenant',
             'store_identifier',
             'id',
             'id'
@@ -104,12 +105,23 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         return $this->hasMany(Withdrawal::class, 'email', 'email');
     }
 
-    
+    public function storeListUMI(){
+        return $this->hasManyThrough(
+            UmiRequest::class,
+            StoreList::class,
+            'id_user',
+            'store_identifier',
+            'id',
+            'store_identifier'
+        );
+    }
+
+
     public function withdrawalDetail(){
         return $this->hasManyThrough(
-            DetailPenarikan::class, 
-            Withdrawal::class, 
-            'id_user', 
+            DetailPenarikan::class,
+            Withdrawal::class,
+            'id_user',
             'id_penarikan',
             'id',
             'id'
@@ -138,7 +150,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
             $model->is_active = 1;
             $model->save();
         }
-            
+
     }
 
     public function storeInsert($model, $randomString){

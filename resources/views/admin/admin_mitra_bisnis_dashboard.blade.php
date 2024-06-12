@@ -189,22 +189,26 @@
                             </div>
                             <h4 class="header-title mb-3">Waiting Account Activation</h4>
                             <div class="table-responsive">
-                                <table id="scroll-vertical-datatable" class="table dt-responsive nowrap w-100">
+                                <table class="table table-borderless table-hover table-nowrap table-centered m-0">
                                     <thead class="table-light">
                                         <tr>
+                                            <th>Action</th>
                                             <th>No.</th>
                                             <th>Nama</th>
                                             <th>Email</th>
                                             <th>Phone</th>
                                             <th>Tanggal Gabung</th>
                                             <th class="text-center">Status</th>
-                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        @php $nomer=0; @endphp
                                         @foreach($tenantActivation as $tenant)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
+                                                <td>
+                                                    <a href="{{ route('admin.dashboard.mitraBisnis.activation', ['id' => $tenant->id]) }}" class="btn btn-xs btn-warning"><i class="mdi mdi-check-all"></i></a>
+                                                </td>
+                                                <td>{{ $nomer+=1 }}</td>
                                                 <td>{{ $tenant->name }}</td>
                                                 <td>{{ $tenant->email }}&nbsp;@if(!is_null($tenant->phone_number_verified_at) || !empty($tenant->phone_number_verified_at) || $tenant->phone_number_verified_at != "" || $tenant->phone_number_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
                                                 <td>{{ $tenant->phone }}&nbsp;@if(!is_null($tenant->email_verified_at) || !empty($tenant->email_verified_at) || $tenant->email_verified_at != "" || $tenant->email_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
@@ -217,9 +221,6 @@
                                                     @elseif($tenant->is_active == 2)
                                                         <span class="badge bg-soft-danger text-danger">Non Aktif</span>
                                                     @endif
-                                                </td>
-                                                <td>
-                                                    <a href="" class="btn btn-xs btn-warning"><i class="mdi mdi-check-all"></i></a>
                                                 </td>
                                             </tr>
                                         @endforeach

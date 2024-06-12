@@ -9,6 +9,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.marketing') }}">Mitra Aplikasi</a></li>
                                 <li class="breadcrumb-item active">Invitation Code</li>
                             </ol>
                         </div>
@@ -61,14 +62,14 @@
                                                         <span class="badge bg-soft-success text-success">Aktif</span>
                                                     @endif
                                                 </td>
-                                                <td class="text-center"><a href="{{ route('admin.dashboard.marketing.invitationcode.store.list', ['id' => $inv->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a></td>
+                                                <td class="text-center"><a title="Lihat daftar tenant" href="{{ route('admin.dashboard.marketing.invitationcode.store.list', ['id' => $inv->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a></td>
                                                 <td class="text-center">
                                                     @if ($inv->is_active == 1)
-                                                        <a href="{{ route('admin.dashboard.marketing.invitationcode.activation', ['id' => $inv->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-power"></i></a>
+                                                        <a title="Nonaktifkan" href="{{ route('admin.dashboard.marketing.invitationcode.activation', ['id' => $inv->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-power"></i></a>
                                                     @else
-                                                        <a href="{{ route('admin.dashboard.marketing.invitationcode.activation', ['id' => $inv  ->id]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
+                                                        <a title="Aktifkan" href="{{ route('admin.dashboard.marketing.invitationcode.activation', ['id' => $inv->id]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
                                                     @endif
-                                                    <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                    <a title="Lihat daftar pemasukan" href="{{ route('admin.dashboard.marketing.invitationcode.income.list', ['id' => $inv->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                 </td>
                                             </tr>
                                         @endforeach
