@@ -39,7 +39,8 @@
                                             <th>No. KTP</th>
                                             <th>Phone</th>
                                             <th>Email</th>
-                                            <th>Jenis Kelamin</th>
+                                            <th class="text-center">Tanggal Gabung</th>
+                                            <th class="text-center">Jenis Kelamin</th>
                                             <th class="text-center">Status</th>
                                             <th class="text-center">Action</th>
                                         </tr>
@@ -53,7 +54,8 @@
                                                 <td>{{ $marketing->detail->no_ktp }}</td>
                                                 <td>{{ $marketing->phone }}}&nbsp;@if(!is_null($marketing->phone_number_verified_at) || !empty($marketing->phone_number_verified_at) || $marketing->phone_number_verified_at != "" || $marketing->phone_number_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
                                                 <td>{{ $marketing->email }}&nbsp;@if(!is_null($marketing->email_verified_at) || !empty($marketing->email_verified_at) || $marketing->email_verified_at != "" || $marketing->email_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
-                                                <td>{{ $marketing->detail->jenis_kelamin }}</td>
+                                                <td class="text-center">{{ \Carbon\Carbon::parse($marketing->created_at)->format('d-m-Y') }}</td>
+                                                <td class="text-center">{{ $marketing->detail->jenis_kelamin }}</td>
                                                 <td class="text-center">
                                                     @if ($marketing->is_active == 0)
                                                         <span class="badge bg-soft-warning text-warning">Belum Aktif</span>

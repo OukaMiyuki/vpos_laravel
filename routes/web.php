@@ -90,12 +90,15 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('dashboard/mitra-bisnis/merchant/detail/{id}/{store_identifier}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisMerchantDetail'])->name('admin.dashboard.mitraBisnis.merchantList.detail');
     Route::get('dashboard/mitra-bisnis/merchant/activation/{id}/{store_identifier}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisMerchantActivation'])->name('admin.dashboard.mitraBisnis.merchantList.activation');
     Route::get('dashboard/mitra-bisnis/umi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisUMIList'])->name('admin.dashboard.mitraBisnis.umi.list');
+    Route::get('dashboard/mitra-bisnis/qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisQrisList'])->name('admin.dashboard.mitraBisnis.qris.list');
     Route::get('dashboard/mitra-bisnis/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisTransactionList'])->name('admin.dashboard.mitraBisnis.transactionList');
     Route::get('dashboard/mitra-bisnis/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisWithdrawalList'])->name('admin.dashboard.mitraBisnis.withdrawList');
 
     Route::get('dashboard/mitra-tenant', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenant'])->name('admin.dashboard.mitraTenant');
     Route::get('dashboard/mitra-tenant/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantList'])->name('admin.dashboard.mitraTenant.list');
+    Route::get('dashboard/mitra-tenant/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantDetail'])->name('admin.dashboard.mitraTenant.detail');
     Route::get('dashboard/mitra-tenant/store', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantStoreList'])->name('admin.dashboard.mitraTenant.store.list');
+    Route::get('dashboard/mitra-tenant/store/invoice/{id}/{store_identifier}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantStoreInvoiceList'])->name('admin.dashboard.mitraTenant.store.invoice');
     Route::get('dashboard/mitra-tenant/kasir', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantKasirList'])->name('admin.dashboard.mitraTenant.kasir.list');
     Route::get('dashboard/mitra-tenant/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantTransactionList'])->name('admin.dashboard.mitraTenant.transaction.list');
     Route::get('dashboard/mitra-tenant/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantWithdrawalList'])->name('admin.dashboard.mitraTenant.withdraw.list');

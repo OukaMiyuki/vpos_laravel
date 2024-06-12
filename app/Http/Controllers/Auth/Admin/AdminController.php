@@ -1157,7 +1157,7 @@ class AdminController extends Controller {
                                 ])
                                 ->where('store_identifier', $store_identifier)
                                 ->find($id);
-  
+
         if(is_null($storeList) || empty($storeList)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -1165,7 +1165,7 @@ class AdminController extends Controller {
             );
             return redirect()->route('admin.dashboard.mitraBisnis.merchantList')->with($notification);
         }
-                        
+
         return view('admin.admin_mitra_bisnis_merchant_invoice_list', compact('storeList'));
     }
 
@@ -1216,7 +1216,7 @@ class AdminController extends Controller {
 
     public function adminDashboardMitraBisnisMerchantActivation($id, $store_identifier){
         $storeActivation = StoreList::where('id', $id)->where('store_identifier', $store_identifier)->first();
-        
+
         if(is_null($storeActivation) || empty($storeActivation)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -1282,6 +1282,44 @@ class AdminController extends Controller {
                     ->latest()
                     ->get();
         return view('admin.admin_mitra_bisnis_merchant_umi_list', compact('umi'));
+    }
+
+    public function adminDashboardMitraBisnisQrisList(){
+        $qris = Tenant::select([
+                            'tenants.id',
+                            'tenants.name',
+                            'tenants.email'
+                        ])
+                        ->with([
+                            'tenantQrisAccountStoreList' => function($query){
+                                $query->select([
+                                    'tenant_qris_accounts.id',
+                                    'tenant_qris_accounts.store_identifier',
+                                    'tenant_qris_accounts.qris_login_user',
+                                    'tenant_qris_accounts.qris_password',
+                                    'tenant_qris_accounts.qris_merchant_id',
+                                    'tenant_qris_accounts.qris_store_id',
+                                    'tenant_qris_accounts.mdr',
+                                ])
+                                ->with([
+                                    'storeList' => function($query){
+                                        $query->select([
+                                            'store_lists.id',
+                                            'store_lists.store_identifier',
+                                            'store_lists.name',
+                                        ]);
+                                    }
+                                ])
+                                ->orderBy('tenant_qris_accounts.created_at', 'DESC')
+                                ->get();
+                            }
+                        ])
+                        ->where('is_active', 1)
+                        ->where('id_inv_code', 0)
+                        ->latest()
+                        ->get();
+
+        return view('admin.admin_mitra_bisnis_merchant_qris_list', compact('qris'));
     }
 
     public function adminDashboardMitraBisnisTransactionList(){
@@ -1455,6 +1493,7 @@ class AdminController extends Controller {
                                     'tenants.phone_number_verified_at',
                                     'tenants.is_active',
                                     'tenants.id_inv_code',
+                                    'tenants.created_at'
                                 ])
                                 ->with([
                                     'detail' => function($query){
@@ -1490,6 +1529,35 @@ class AdminController extends Controller {
         return view('admin.admin_mitra_tenant_list', compact(['tenantMitra']));
     }
 
+    public function adminDashboardMitraTenantDetail($id){
+        $tenantDetail = Tenant::select([
+                                'tenants.id',
+                                'tenants.name',
+                                'tenants.email',
+                                'tenants.phone',
+                                'tenants.email_verified_at',
+                                'tenants.phone_number_verified_at',
+                                'tenants.is_active',
+                            ])
+                            ->with([
+                                'detail' => function($query){
+                                    $query->select([
+                                        'detail_tenants.id',
+                                        'detail_tenants.id_tenant',
+                                        'detail_tenants.no_ktp',
+                                        'detail_tenants.tempat_lahir',
+                                        'detail_tenants.tanggal_lahir',
+                                        'detail_tenants.jenis_kelamin',
+                                        'detail_tenants.alamat',
+                                        'detail_tenants.photo',
+                                    ]);
+                                }
+                            ])
+                            ->where('id_inv_code', '!=', 0)
+                            ->find($id);
+        return view('admin.admin_mitra_tenant_detail', compact(['tenantDetail']));
+    }
+
     public function adminDashboardMitraTenantStoreList(){
         $storeDetail = StoreDetail::select([
                                     'store_details.id',
@@ -1504,7 +1572,8 @@ class AdminController extends Controller {
                                     'tenant' => function($query){
                                         $query->select([
                                             'tenants.id',
-                                            'tenants.name'
+                                            'tenants.name',
+                                            'tenants.email'
                                         ]);
                                     }
                                 ])
@@ -1512,6 +1581,54 @@ class AdminController extends Controller {
                                 ->latest()
                                 ->get();
         return view('admin.admin_mitra_tenant_store_list', compact(['storeDetail']));
+    }
+
+    public function adminDashboardMitraTenantStoreInvoiceList($id, $store_identifier){
+        $storeDetail = StoreDetail::select([
+                                    'store_details.id',
+                                    'store_details.id_tenant',
+                                    'store_details.store_identifier',
+                                    'store_details.name',
+                                ])
+                                ->with([
+                                    'invoice' => function($query){
+                                        $query->select([
+                                            'invoices.id',
+                                            'invoices.store_identifier',
+                                            'invoices.email',
+                                            'invoices.id_tenant',
+                                            'invoices.nomor_invoice',
+                                            'invoices.tanggal_transaksi',
+                                            'invoices.tanggal_pelunasan',
+                                            'invoices.jenis_pembayaran',
+                                            'invoices.status_pembayaran',
+                                            'invoices.nominal_bayar',
+                                            'invoices.kembalian',
+                                            'invoices.mdr',
+                                            'invoices.nominal_mdr',
+                                            'invoices.nominal_terima_bersih',
+                                        ])
+                                        ->latest()
+                                        ->get();
+                                    },
+                                    'tenant' => function($query){
+                                        $query->select([
+                                            'tenants.id',
+                                            'tenants.name'
+                                        ]);
+                                    }
+                                ])
+                                ->where('store_identifier', $store_identifier)
+                                ->find($id);
+        if(is_null($storeDetail) || empty($storeDetail)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraTenant.store.list')->with($notification);
+        }
+
+        return view('admin.admin_mitra_tenant_store_invoice', compact('storeDetail'));
     }
 
     public function adminDashboardMitraTenantKasirList(){

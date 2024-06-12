@@ -1033,18 +1033,32 @@ class ProfileController extends Controller{
                             $agregateWallet->update([
                                 'saldo' =>$agregateSaldo+$agregate
                             ]);
-
-                            DetailPenarikan::create([
-                                'id_penarikan' => $withDraw->id,
-                                'nominal_penarikan' => $total_penarikan,
-                                'nominal_bersih_penarikan' => $nominal_penarikan,
-                                'total_biaya_admin' => $biaya_admin,
-                                'biaya_nobu' => 300,
-                                'biaya_tenant' => $nominal_penarikan,
-                                'biaya_mitra' => $mitra,
-                                'biaya_admin_su' => $aplikator,
-                                'biaya_agregate' => $agregate
-                            ]);
+                            
+                            if(auth()->user()->id_inv_code != 0){
+                                DetailPenarikan::create([
+                                    'id_penarikan' => $withDraw->id,
+                                    'nominal_penarikan' => $total_penarikan,
+                                    'nominal_bersih_penarikan' => $nominal_penarikan,
+                                    'total_biaya_admin' => $biaya_admin,
+                                    'biaya_nobu' => 300,
+                                    'biaya_tenant' => $nominal_penarikan,
+                                    'biaya_mitra' => $mitra,
+                                    'biaya_admin_su' => $aplikator,
+                                    'biaya_agregate' => $agregate
+                                ]);
+                            } else if(auth()->user()->id_inv_code == 0) {
+                                DetailPenarikan::create([
+                                    'id_penarikan' => $withDraw->id,
+                                    'nominal_penarikan' => $total_penarikan,
+                                    'nominal_bersih_penarikan' => $nominal_penarikan,
+                                    'total_biaya_admin' => $biaya_admin,
+                                    'biaya_nobu' => 300,
+                                    'biaya_tenant' => $nominal_penarikan,
+                                    'biaya_mitra' => NULL,
+                                    'biaya_admin_su' => $aplikator+$mitra,
+                                    'biaya_agregate' => $agregate
+                                ]);
+                            }
 
                             NobuWithdrawFeeHistory::create([
                                 'id_penarikan' => $withDraw->id,

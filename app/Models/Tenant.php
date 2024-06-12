@@ -28,6 +28,7 @@ use App\Models\Withdrawal;
 use App\Models\DetailPenarikan;
 use App\Models\Kasir;
 use App\Models\StoreList;
+use App\Models\TenantQrisAccount;
 
 class Tenant extends Authenticatable implements MustVerifyEmail {
     use HasApiTokens, HasFactory, Notifiable;
@@ -116,6 +117,16 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         );
     }
 
+    public function tenantQrisAccountStoreList(){
+        return $this->hasManyThrough(
+            TenantQrisAccount::class,
+            StoreList::class,
+            'id_user',
+            'store_identifier',
+            'id',
+            'store_identifier'
+        );
+    }
 
     public function withdrawalDetail(){
         return $this->hasManyThrough(

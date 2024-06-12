@@ -36,9 +36,9 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>Nama</th>
-                                            <th>Email</th>
                                             <th>Phone</th>
-                                            <th>Tanggal Gabung</th>
+                                            <th>Email</th>
+                                            <th class="text-center">Tanggal Gabung</th>
                                             <th class="text-center">Total Merchant</th>
                                             <th class="text-center">Total Withdraw</th>
                                             <th class="text-center">Status</th>
@@ -51,9 +51,9 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $tenant->name }}</td>
-                                                <td>{{ $tenant->email }}&nbsp;@if(!is_null($tenant->phone_number_verified_at) || !empty($tenant->phone_number_verified_at) || $tenant->phone_number_verified_at != "" || $tenant->phone_number_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
-                                                <td>{{ $tenant->phone }}&nbsp;@if(!is_null($tenant->email_verified_at) || !empty($tenant->email_verified_at) || $tenant->email_verified_at != "" || $tenant->email_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
-                                                <td>{{ \Carbon\Carbon::parse($tenant->created_at)->format('d-m-Y') }}</td>
+                                                <td>{{ $tenant->phone }}&nbsp;@if(!is_null($tenant->phone_number_verified_at) || !empty($tenant->phone_number_verified_at) || $tenant->phone_number_verified_at != "" || $tenant->phone_number_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
+                                                <td>{{ $tenant->email }}&nbsp;@if(!is_null($tenant->email_verified_at) || !empty($tenant->email_verified_at) || $tenant->email_verified_at != "" || $tenant->email_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
+                                                <td class="text-center">{{ \Carbon\Carbon::parse($tenant->created_at)->format('d-m-Y') }}</td>
                                                 <td class="text-center">{{ $tenant->store_list_count }}</td>
                                                 <td class="text-center">{{ $tenant->withdrawal_count }}</td>
                                                 <td class="text-center">

@@ -9,8 +9,8 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.menu') }}">Admin Menu</a></li>
-                                <li class="breadcrumb-item active">Tenant Qris Account</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraBisnis') }}">Mitra Bisnis</a></li>
+                                <li class="breadcrumb-item active">Tenant Qris</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Data Tenant Qris Accounts</h4>
@@ -35,33 +35,40 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Store Identifier</th>
+                                            <th>Mitra Bisnis</th>
                                             <th>Email</th>
+                                            <th>Store Identifier</th>
+                                            <th>Merchant Name</th>
                                             <th>Qris Login</th>
                                             <th>Qris Password</th>
                                             <th>Qris Merchant ID</th>
                                             <th>Qris Store ID</th>
-                                            <th>MDR</th>
-                                            <th>Action</th>
+                                            <th class="text-center">MDR</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
-                                        @foreach($tenantQris as $key => $qris)
-                                            <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $qris->store_identifier }}</td>
-                                                <td>{{ $qris->email }}</td>
-                                                <td>{{ $qris->qris_login_user }}</td>
-                                                <td>{{ $qris->qris_password }}</td>
-                                                <td>{{ $qris->qris_merchant_id }}</td>
-                                                <td>{{ $qris->qris_store_id }}</td>
-                                                <td>{{ $qris->mdr }}</td>
-                                                <td class="text-center">
-                                                    <a href="" id="edit-data-qris" data-id="{{ $qris->id }}" data-store_identifier="{{ $qris->store_identifier }}" data-qris_login="{{ $qris->qris_login_user }}" data-qris_password="{{ $qris->qris_password }}" data-qris_merchant_id="{{ $qris->qris_merchant_id }}" data-qris_store_id="{{ $qris->qris_store_id }}" data-mdr="{{ $qris->mdr }}" data-bs-toggle="modal" data-bs-target="#edit-qris" class="btn btn-xs btn-info"><i class="mdi mdi-pencil"></i></a>
-                                                    <a href="{{ route('admin.dashboard.menu.userTenantQris.delete', ['id' => $qris->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-trash-can-outline"></i></a>
-                                                </td>
-                                            </tr>
+                                        @foreach($qris as $key => $tqris)
+                                            @foreach ($tqris->tenantQrisAccountStoreList as $qrisacc)
+                                                <tr>
+                                                    <td>{{ $no+=1 }}</td>
+                                                    <td>{{ $tqris->name }}</td>
+                                                    <td>{{ $tqris->email }}</td>
+                                                    <td>{{ $qrisacc->storeList->store_identifier }}</td>
+                                                    <td>{{ $qrisacc->storeList->name }}</td>
+                                                    <td>{{ $qrisacc->qris_login_user }}</td>
+                                                    <td>{{ $qrisacc->qris_password }}</td>
+                                                    <td>{{ $qrisacc->qris_merchant_id }}</td>
+                                                    <td>{{ $qrisacc->qris_store_id }}</td>
+                                                    <td class="text-center">{{$qrisacc->mdr}}</td>
+                                                    <td class="text-center">
+                                                        <a href="" id="edit-data-qris" data-id="{{ $qrisacc->id }}" data-store_identifier="{{ $qrisacc->store_identifier }}" data-qris_login="{{ $qrisacc->qris_login_user }}" data-qris_password="{{ $qrisacc->qris_password }}" data-qris_merchant_id="{{ $qrisacc->qris_merchant_id }}" data-qris_store_id="{{ $qrisacc->qris_store_id }}" data-mdr="{{ $qrisacc->mdr }}" data-bs-toggle="modal" data-bs-target="#edit-qris" class="btn btn-xs btn-info"><i class="mdi mdi-pencil"></i></a>
+                                                        &nbsp;
+                                                        <a href="{{ route('admin.dashboard.menu.userTenantQris.delete', ['id' => $qrisacc->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-trash-can-outline"></i></a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @endforeach
                                     </tbody>
                                 </table>

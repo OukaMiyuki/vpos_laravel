@@ -9,7 +9,8 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Administrator</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraTenant') }}">Mitra Tenant</a></li>
+                                <li class="breadcrumb-item active">Mitra Tenant List</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Data Mitra Tenant</h4>
@@ -35,9 +36,10 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>Nama</th>
-                                            <th>Email</th>
                                             <th>Phone</th>
-                                            <th>Jenis Kelamin</th>
+                                            <th>Email</th>
+                                            <th class="text-center">Tanggal Gabung</th>
+                                            <th class="text-center">Jenis Kelamin</th>
                                             <th class="text-center">Status</th>
                                             <th class="text-center">Total Invoice</th>
                                             <th class="text-center">Total Withdraw</th>
@@ -53,9 +55,10 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $mitra->name }}</td>
-                                                <td>{{ $mitra->email }}</td>
-                                                <td>{{ $mitra->phone }}</td>
-                                                <td>{{ $mitra->detail->jenis_kelamin }}</td>
+                                                <td>{{ $mitra->phone }}&nbsp;@if(!is_null($mitra->phone_number_verified_at) || !empty($mitra->phone_number_verified_at) || $mitra->phone_number_verified_at != "" || $mitra->phone_number_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
+                                                <td>{{ $mitra->email }}&nbsp;@if(!is_null($mitra->email_verified_at) || !empty($mitra->email_verified_at) || $mitra->email_verified_at != "" || $mitra->email_verified_at != NULL) </span><span class="text-success mdi mdi-check-decagram-outline"></span> @else <span class="text-warning mdi mdi-clock-outline"></span> @endif</td>
+                                                <td class="text-center">{{ \Carbon\Carbon::parse($mitra->created_at)->format('d-m-Y') }}</td>
+                                                <td class="text-center">{{ $mitra->detail->jenis_kelamin }}</td>
                                                 <td class="text-center">
                                                     @if ($mitra->is_active == 1)
                                                         <span class="badge bg-soft-success text-success">Aktif</span>
@@ -69,7 +72,7 @@
                                                 <td class="text-center">{{ $mitra->invitationCode->holder }}</td>
                                                 <td class="text-center">{{ $mitra->invitationCode->marketing->name }}</td>
                                                 <td class="text-center">
-                                                    <a href="">
+                                                    <a href="{{ route('admin.dashboard.mitraTenant.detail', ['id' => $mitra->id]) }}">
                                                         <button title="Lihat data admin" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
                                                     </a>
                                                 </td>

@@ -34,10 +34,10 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Store Identifier</th>
-                                            <th>Store Name</th>
                                             <th>Tenant</th>
                                             <th>Email</th>
+                                            <th>Store Identifier</th>
+                                            <th>Store Name</th>
                                             <th>Jenis Usaha</th>
                                             <th class="text-center">Status UMI</th>
                                             <th class="text-center">Total Invoice</th>
@@ -50,10 +50,10 @@
                                         @foreach ($storeDetail as $store)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
-                                                <td>{{ $store->store_identifier }}</td>
-                                                <td>{{ $store->name }}</td>
                                                 <td>{{ $store->tenant->name }}</td>
                                                 <td>{{ $store->tenant->email }}</td>
+                                                <td>{{ $store->store_identifier }}</td>
+                                                <td>{{ $store->name }}</td>
                                                 <td>{{ $store->jenis_usaha }}</td>
                                                 <td class="text-center">
                                                     @if ($store->status_umi == 0)
@@ -66,7 +66,7 @@
                                                 </td>
                                                 <td>{{ $store->invoice_count }}</td>
                                                 <td>
-                                                    <a href="">
+                                                    <a href="{{ route('admin.dashboard.mitraTenant.store.invoice', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
                                                         <button title="Lihat daftar invoice" type="button" class="btn btn-primary rounded-pill waves-effect waves-light">Lihat Invoice</button>&nbsp;
                                                     </a>
                                                 </td>

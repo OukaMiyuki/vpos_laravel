@@ -104,7 +104,7 @@
                                                     <th width="width:25%">Invoice</th>
                                                     <th width="width:25%">Email</th>
                                                     <th width="width:10%">Nominal</th>
-                                                    <th width="width:25%">Biaya Transfer</th>
+                                                    <th width="width:25%">Total Biaya Transfer</th>
                                                     <th width="width:25%">Tanggal</th>
                                                 </tr>
                                             </thead>
@@ -143,8 +143,7 @@
                                 </div> <!-- end col -->
                                 <div class="col-sm-6">
                                     <div class="float-end">
-                                        <p><b>Biaya Bank (Rp.) :</b> <span class="float-end">{{ $withdraw->detailWithdraw->biaya_nobu }}</span></p>
-                                        <p><b>Biaya TRansfer (Rp.) :</b> <span class="float-end">300</span></p>
+                                        <p><b>Transfer Bank (Rp.) :</b> <span class="float-end">{{ $withdraw->detailWithdraw->biaya_nobu }}</span></p>
                                         <p><b>Mitra Aplikasi (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{ $withdraw->detailWithdraw->biaya_mitra }}</span></p>
                                         <p><b>Tenant (Rp.) :</b> <span class="float-end">{{ $withdraw->detailWithdraw->biaya_tenant }}</span></p>
                                         <p><b>Admin SU (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{ $withdraw->detailWithdraw->biaya_admin_su }}</span></p>
