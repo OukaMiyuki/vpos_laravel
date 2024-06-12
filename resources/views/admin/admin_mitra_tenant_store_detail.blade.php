@@ -23,12 +23,12 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraBisnis') }}">Mitra Bisnis</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraBisnis.merchantList') }}">Merchant List</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraTenant') }}">Mitra Tenant</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraTenant.store.list') }}">Store List</a></li>
                                 <li class="breadcrumb-item active">Detail</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Detail Merchant</h4>
+                        <h4 class="page-title">Detail Store</h4>
                     </div>
                 </div>
             </div>
@@ -37,17 +37,12 @@
                 <div class="col-lg-4 col-xl-4">
                     <div class="card text-center">
                         <div class="card-body">
-                            <img src="{{ !empty($storeDetail->photo) ? Storage::url('images/profile/store_list/'.$storeDetail->photo) : asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                            <img src="{{ !empty($storeDetail->photo) ? Storage::url('images/profile/'.$storeDetail->photo) : asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
                             <h4 class="mb-0">
                                 {{ $storeDetail->name }}&nbsp;
-                                @if ($storeDetail->is_active == 0)
-                                    <span class="badge bg-soft-danger text-danger">Tidak Aktif</span>
-                                @else
-                                    <span class="badge bg-soft-success text-success">Aktif</span>
-                                @endif
                             </h4>
                             <p class="text-muted">
-                                Merchant
+                                Toko
                             </p>
                             @php
                                 echo htmlspecialchars_decode($umi);

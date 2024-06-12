@@ -9,7 +9,8 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Administrator</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraTenant') }}">Mitra Tenant</a></li>
+                                <li class="breadcrumb-item active">Store List</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Data Store Mitra Tenant</h4>
@@ -71,8 +72,8 @@
                                                     </a>
                                                 </td>
                                                 <td class="text-center">
-                                                    <a href="">
-                                                        <button title="Lihat data admin" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
+                                                    <a href="{{ route('admin.dashboard.mitraTenant.store.detail', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
+                                                        <button title="Lihat data admin" type="button" class="btn btn-info waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
                                                     </a>
                                                 </td>
                                             </tr>

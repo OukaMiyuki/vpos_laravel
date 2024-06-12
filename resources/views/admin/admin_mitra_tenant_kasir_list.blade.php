@@ -9,7 +9,8 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Administrator</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraTenant') }}">Mitra Tenant</a></li>
+                                <li class="breadcrumb-item active">Kasir List</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Data Kasir List</h4>
@@ -37,7 +38,7 @@
                                             <th>Nama</th>
                                             <th>Email</th>
                                             <th>Phone</th>
-                                            <th>Jenis Kelamin</th>
+                                            <th class="text-center">Jenis Kelamin</th>
                                             <th class="text-center">Status</th>
                                             <th>Store Identifier</th>
                                             <th>Store Name</th>
@@ -53,7 +54,7 @@
                                                 <td>{{ $kasir->name }}</td>
                                                 <td>{{ $kasir->email }}</td>
                                                 <td>{{ $kasir->phone }}</td>
-                                                <td>{{ $kasir->detail->jenis_kelamin }}</td>
+                                                <td class="text-center">{{ $kasir->detail->jenis_kelamin }}</td>
                                                 <td class="text-center">
                                                     @if ($kasir->is_active == 1)
                                                         <span class="badge bg-soft-success text-success">Aktif</span>
@@ -65,7 +66,7 @@
                                                 <td>{{ $kasir->store->name }}</td>
                                                 <td>{{ $kasir->store->tenant->name }}</td>
                                                 <td class="text-center">
-                                                    <a href="">
+                                                    <a href="{{ route('admin.dashboard.mitraTenant.kasir.profile', ['id' =>  $kasir->id]) }}">
                                                         <button title="Lihat data admin" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
                                                     </a>
                                                 </td>

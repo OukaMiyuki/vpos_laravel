@@ -47,6 +47,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:100,1', 'custom
     Route::post('/kasir-list', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'kasirList']);
     Route::post('/kasir/detail', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'kasirDetail']);
     Route::post('/kasir/register', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'kasirRegister']);
+    Route::post('/kasir/activation', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'kasirActivation']);
 
     Route::post('/setting/alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'aliasList']);
     Route::post('/setting/alias/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'aliasUpdate']);

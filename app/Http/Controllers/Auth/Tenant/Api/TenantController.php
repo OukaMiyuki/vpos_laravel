@@ -306,6 +306,42 @@ class TenantController extends Controller {
         }
     }
 
+    public function kasirActivation(Request $request) : JsonResponse{
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $kasir = Kasir::where('id_store', $identifier)->find($request->id_kasir);
+
+            if(is_null($kasir) || empty($kasir)){
+                return response()->json([
+                    'message' => 'Account not Found!',
+                    'status' => 404,
+                ]);
+            }
+
+            if($kasir->is_active == 0){
+                $kasir->update([
+                    'is_active' => 1
+                ]);
+            } else if($kasir->is_active == 1){
+                $kasir->update([
+                    'is_active' => 0
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Update Success!',
+                'status' => 200,
+            ]);
+
+        } catch(Exception $e){
+            return response()->json([
+                'message' => 'Database Error!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+        }
+    }
+
     public function productList() : JsonResponse{
         $identifier = $this->getStoreIdentifier();
         $product = "";

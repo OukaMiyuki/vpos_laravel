@@ -9,11 +9,11 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraBisnis') }}">Mitra Bisnis</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraTenant') }}">Mitra Tenant</a></li>
                                 <li class="breadcrumb-item active">Umi Request</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Umi Request Merchant</h4>
+                        <h4 class="page-title">Data Umi Request Tenant</h4>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar UMI Request Merchant</h4>
+                            <h4 class="header-title mb-3">Tabel Daftar UMI Request Tenant</h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
                                     <thead>
@@ -51,18 +51,18 @@
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach ($umi as $tt)
-                                            @foreach ($tt->storeListUMI as $umiReq)
+                                            @foreach ($tt->storeDetailUMI as $umiReq)
                                                 <td>{{ $no+=1 }}</td>
-                                                <td>{{ $umiReq->storeList->name }}</td>
-                                                <td>{{ $umiReq->storeList->store_identifier }}</td>
+                                                <td>{{ $umiReq->storeDetail->name }}</td>
+                                                <td>{{ $umiReq->storeDetail->store_identifier }}</td>
                                                 <td>{{ $tt->name }}</td>
-                                                <td>{{ $umiReq->storeList->jenis_usaha }}</td>
+                                                <td>{{ $umiReq->storeDetail->jenis_usaha }}</td>
                                                 <td>
-                                                    @if ($umiReq->storeList->status_umi == 0)
+                                                    @if ($umiReq->storeDetail->status_umi == 0)
                                                         <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
-                                                    @elseif($umiReq->storeList->status_umi == 1)
+                                                    @elseif($umiReq->storeDetail->status_umi == 1)
                                                         <span class="badge bg-soft-success text-success">Terdaftar</span>
-                                                    @elseif($umiReq->storeList->status_umi == 2)
+                                                    @elseif($umiReq->storeDetail->status_umi == 2)
                                                         <span class="badge bg-soft-danger text-danger">Ditolak</span>
                                                     @endif
                                                 </td>

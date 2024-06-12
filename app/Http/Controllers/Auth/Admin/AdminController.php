@@ -1631,6 +1631,50 @@ class AdminController extends Controller {
         return view('admin.admin_mitra_tenant_store_invoice', compact('storeDetail'));
     }
 
+    public function adminDashboardMitraTenantStoreDetail($id, $store_identifier){
+        $storeDetail = StoreDetail::select([
+                                        'store_details.id',
+                                        'store_details.id_tenant',
+                                        'store_details.email',
+                                        'store_details.store_identifier',
+                                        'store_details.name',
+                                        'store_details.alamat',
+                                        'store_details.kabupaten',
+                                        'store_details.kode_pos',
+                                        'store_details.no_telp_toko',
+                                        'store_details.jenis_usaha',
+                                        'store_details.status_umi',
+                                        'store_details.photo',
+                                    ])
+                                    ->with([
+                                        'tenant' => function($query){
+                                            $query->select([
+                                                'tenants.id',
+                                                'tenants.name'
+                                            ]);
+                                        }
+                                    ])
+                                    ->where('store_identifier', $store_identifier)
+                                    ->find($id);
+
+        if(is_null($storeDetail) || empty($storeDetail)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraTenant.store.lis')->with($notification);
+        }
+
+        $umiRequest = "";
+        $umiRequest = UmiRequest::where('store_identifier', $store_identifier)->first();
+
+        if(empty($umiRequest)){
+            $umiRequest = "Empty";
+        }
+        
+        return view('admin.admin_mitra_tenant_store_detail', compact('storeDetail', 'umiRequest'));
+    }
+
     public function adminDashboardMitraTenantKasirList(){
         $kasir = Kasir::select([
                         'kasirs.id',
@@ -1668,6 +1712,72 @@ class AdminController extends Controller {
                     ->latest()
                     ->get();
         return view('admin.admin_mitra_tenant_kasir_list', compact(['kasir']));
+    }
+
+    public function adminDashboardMitraTenantKasirProfile($id){
+        $kasirDetail = Kasir::select([
+                                'kasirs.id',
+                                'kasirs.name',
+                                'kasirs.email',
+                                'kasirs.phone',
+                                'kasirs.is_active'
+                            ])
+                            ->with([
+                                'detail' => function($query){
+                                    $query->select([
+                                        'detail_kasirs.id',
+                                        'detail_kasirs.id_kasir',
+                                        'detail_kasirs.no_ktp',
+                                        'detail_kasirs.tempat_lahir',
+                                        'detail_kasirs.tanggal_lahir',
+                                        'detail_kasirs.jenis_kelamin',
+                                        'detail_kasirs.alamat',
+                                        'detail_kasirs.photo',
+                                    ]);
+                                }
+                            ])
+                            ->find($id);
+        return view('admin.admin_mitra_tenant_kasir_detail', compact('kasirDetail'));
+    }
+
+    public function adminDashboardMitraTenantUMIList(){
+        $umi = Tenant::select([
+                                'tenants.id',
+                                'tenants.name',
+                            ])
+                            ->with([
+                                'storeDetailUMI' => function($query){
+                                    $query->select([
+                                        'umi_requests.id',
+                                        'umi_requests.id_tenant',
+                                        'umi_requests.store_identifier',
+                                        'umi_requests.tanggal_pengajuan',
+                                        'umi_requests.tanggal_approval',
+                                        'umi_requests.is_active',
+                                        'umi_requests.file_path',
+                                        'umi_requests.note',
+                                    ])
+                                    ->with([
+                                        'storeDetail' => function($query){
+                                            $query->select([
+                                                'store_details.id',
+                                                'store_details.id_tenant',
+                                                'store_details.store_identifier',
+                                                'store_details.name',
+                                                'store_details.jenis_usaha',
+                                                'store_details.status_umi',
+                                            ]);
+                                        }
+                                    ])
+                                    ->orderBy('umi_requests.tanggal_approval', 'DESC')
+                                    ->get();
+                                }
+                            ])
+                            ->where('is_active', 1)
+                            ->where('id_inv_code', '!=', 0)
+                            ->latest()
+                            ->get();
+        return view('admin.admin_mitra_tenant_umi_list', compact('umi'));
     }
 
     public function adminDashboardMitraTenantTransactionList(){
