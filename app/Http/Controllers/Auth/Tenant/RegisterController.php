@@ -48,7 +48,7 @@ class RegisterController extends Controller {
 
         return $ipaddress;
     }
-    
+
     public function create(): View {
         return view('tenant.auth.register');
     }
@@ -77,6 +77,15 @@ class RegisterController extends Controller {
 
         $invitationcodeid = InvitationCode::where('inv_code', $request->inv_code)->first();
 
+        if($invitationcodeid->is_active == 0){
+
+            $notification = array(
+                'message' => 'Invitation code tidak bisa digunakan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification)->withInput();
+        }
+
         $tenant = Tenant::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -99,7 +108,7 @@ class RegisterController extends Controller {
         }
 
         event(new Registered($tenant));
-                
+
         Auth::guard('tenant')->login($tenant);
 
         History::create([
@@ -152,7 +161,7 @@ class RegisterController extends Controller {
         }
 
         event(new Registered($tenant));
-                
+
         Auth::guard('tenant')->login($tenant);
 
         History::create([

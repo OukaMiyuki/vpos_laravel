@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use App\Models\Kasir;
 use App\Models\Tenant;
+use App\Models\StoreDetail;
 use Exception;
 
 class LoginController extends Controller {
@@ -24,6 +25,38 @@ class LoginController extends Controller {
             }
 
             $kasir = Kasir::where('email', $request->email)->firstOrFail();
+
+            if($kasir->is_active == 0){
+                return response()->json([
+                    'message' => 'Akun telah dinonaktifkan oleh admin!',
+                    'login' => 'Failed',
+                    'status' => 401
+                ]);
+            }
+
+            $storeDetail = StoreDetail::select([
+                                            'store_details.id',
+                                            'store_details.store_identifier',
+                                            'store_details.id_tenant',
+                                        ])
+                                        ->with([
+                                            'tenant' => function($query){
+                                                $query->select([
+                                                    'tenants.id',
+                                                    'tenants.is_active'
+                                                ]);
+                                            }
+                                        ])
+                                        ->where('store_identifier', $kasir->id_store)
+                                        ->first();
+
+            if($storeDetail->tenant->is_active == 2) {
+                return response()->json([
+                    'message' => 'Login gagal, toko telah dinonaktifkan oleh admin!',
+                    'login' => 'Failed',
+                    'status' => 401
+                ]);
+            }
 
             $token = $kasir->createToken('auth_token')->plainTextToken;
 
@@ -46,6 +79,13 @@ class LoginController extends Controller {
         $tenant = Tenant::where('email', $request->email)->firstOrFail();
 
         if($tenant->id_inv_code != 0) {
+
+            if($tenant->is_active == 0){
+                return response()->json([
+                    'message' => 'Akun telah dinonaktifkan oleh admin!',
+                    'status' => 401
+                ]);
+            }
 
             $token = $tenant->createToken('auth_token')->plainTextToken;
 

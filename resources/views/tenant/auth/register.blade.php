@@ -15,6 +15,7 @@
         <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-style"/>
         <!-- icons -->
         <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/toastr/build/toastr.min.css') }}" rel="stylesheet" type="text/css" />
         <!-- Head js -->
         <script src="{{ asset('assets/js/head.js') }}"></script>
     </head>
@@ -193,5 +194,29 @@
         <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
         <!-- App js -->
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
+        <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
+
+        <script>
+            @if(Session::has('message'))
+                var type = "{{ Session::get('alert-type','info') }}"
+                switch(type){
+                    case 'info':
+                    toastr.info(" {{ Session::get('message') }} ");
+                    break;
+
+                    case 'success':
+                    toastr.success(" {{ Session::get('message') }} ");
+                    break;
+
+                    case 'warning':
+                    toastr.warning(" {{ Session::get('message') }} ");
+                    break;
+
+                    case 'error':
+                    toastr.error(" {{ Session::get('message') }} ");
+                    break;
+                }
+            @endif
+        </script>
     </body>
 </html>

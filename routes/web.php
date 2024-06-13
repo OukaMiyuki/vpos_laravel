@@ -97,11 +97,13 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('dashboard/mitra-tenant', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenant'])->name('admin.dashboard.mitraTenant');
     Route::get('dashboard/mitra-tenant/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantList'])->name('admin.dashboard.mitraTenant.list');
     Route::get('dashboard/mitra-tenant/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantDetail'])->name('admin.dashboard.mitraTenant.detail');
+    Route::get('dashboard/mitra-tenant/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantActivation'])->name('admin.dashboard.mitraTenant.activation');
     Route::get('dashboard/mitra-tenant/store', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantStoreList'])->name('admin.dashboard.mitraTenant.store.list');
     Route::get('dashboard/mitra-tenant/store/invoice/{id}/{store_identifier}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantStoreInvoiceList'])->name('admin.dashboard.mitraTenant.store.invoice');
     Route::get('dashboard/mitra-tenant/store/detail/{id}/{store_identifier}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantStoreDetail'])->name('admin.dashboard.mitraTenant.store.detail');
     Route::get('dashboard/mitra-tenant/kasir', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantKasirList'])->name('admin.dashboard.mitraTenant.kasir.list');
     Route::get('dashboard/mitra-tenant/kasir/profile/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantKasirProfile'])->name('admin.dashboard.mitraTenant.kasir.profile');
+    Route::get('dashboard/mitra-tenant/kasir/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantKasirActivation'])->name('admin.dashboard.mitraTenant.kasir.activation');
     Route::get('dashboard/mitra-tenant/umi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantUMIList'])->name('admin.dashboard.mitraTenant.umi.list');
     Route::get('dashboard/mitra-tenant/qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantQrisList'])->name('admin.dashboard.mitraTenant.qris.list');
     Route::get('dashboard/mitra-tenant/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantTransactionList'])->name('admin.dashboard.mitraTenant.transaction.list');
@@ -336,7 +338,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');
 });
 
-Route::middleware(['auth:kasir', 'throttle', 'isKasirActive'])->prefix('kasir')->group( function () {
+Route::middleware(['auth:kasir', 'throttle', 'isKasirActive', 'isKasirStoreActive'])->prefix('kasir')->group( function () {
 
     Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('kasir.logout');
 

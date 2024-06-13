@@ -66,6 +66,16 @@
                                                 <td>{{ $kasir->store->name }}</td>
                                                 <td>{{ $kasir->store->tenant->name }}</td>
                                                 <td class="text-center">
+                                                    @if ($kasir->is_active == 1)
+                                                        <a href="{{ route('admin.dashboard.mitraTenant.kasir.activation', ['id' => $kasir->id]) }}">
+                                                            <button title="Non-aktifkan Tenant" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-power"></span></button>
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('admin.dashboard.mitraTenant.kasir.activation', ['id' => $kasir->id]) }}">
+                                                            <button title="Aktifkan Tenant" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-power"></span></button>
+                                                        </a>
+                                                    @endif
+                                                    &nbsp;
                                                     <a href="{{ route('admin.dashboard.mitraTenant.kasir.profile', ['id' =>  $kasir->id]) }}">
                                                         <button title="Lihat data admin" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
                                                     </a>

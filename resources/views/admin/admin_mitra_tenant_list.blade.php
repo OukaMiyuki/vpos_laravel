@@ -72,6 +72,16 @@
                                                 <td class="text-center">{{ $mitra->invitationCode->holder }}</td>
                                                 <td class="text-center">{{ $mitra->invitationCode->marketing->name }}</td>
                                                 <td class="text-center">
+                                                    @if ($mitra->is_active == 1)
+                                                        <a href="{{ route('admin.dashboard.mitraTenant.activation', ['id' => $mitra->id]) }}">
+                                                            <button title="Non-aktifkan Tenant" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-power"></span></button>
+                                                        </a>
+                                                    @elseif($mitra->is_active == 2)
+                                                        <a href="{{ route('admin.dashboard.mitraTenant.activation', ['id' => $mitra->id]) }}">
+                                                            <button title="Aktifkan Tenant" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-power"></span></button>
+                                                        </a>
+                                                    @endif
+                                                    &nbsp;
                                                     <a href="{{ route('admin.dashboard.mitraTenant.detail', ['id' => $mitra->id]) }}">
                                                         <button title="Lihat data admin" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
                                                     </a>

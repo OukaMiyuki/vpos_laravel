@@ -13,6 +13,7 @@ use App\Models\StoreList;
 use App\Models\ApiKey;
 use App\Models\CallbackApiData;
 use App\Models\History;
+use App\Models\Tenant;
 // use App\Models\HistoryCashbackAdmin;
 // use App\Models\QrisWallet;
 use Exception;
@@ -72,7 +73,7 @@ class PaymentQrisConfirm extends Controller {
                     'nominal_terima_bersih' => $invoice->nominal_terima_bersih,
                     'status' => 'success',
                 ];
-    
+
                 try {
                     $response = $client->post($url, [
                         'headers' => $headers,
@@ -126,7 +127,7 @@ class PaymentQrisConfirm extends Controller {
             ]);
         }
     }
-    
+
     public function requestInvoiceNumber(Request $request) : JsonResponse{
         $store_identifier = $request->store_identifier;
         $password = $request->secret_key;
@@ -176,15 +177,32 @@ class PaymentQrisConfirm extends Controller {
         $tanggal_transaksi = Carbon::now();
         $jenis_pembayaran = "Qris";
 
-        $store = StoreList::select(['id', 'id_user', 'email', 'store_identifier', 'status_umi'])
+        $store = StoreList::select(['id', 'id_user', 'email', 'store_identifier', 'status_umi', 'is_active'])
                             ->where('store_identifier', $store_identifier)
                             ->first();
+
         if(is_null($store) || empty($store)){
             return response()->json([
                 'message' => 'Merchant cannot be found!',
                 'status' => 404
             ]);
         } else {
+            $tenant = Tenant::select(['tenants.id', 'tenants.id_inv_code', 'tenants.is_active'])->where('id_inv_code', 0)->find($store->id_user);
+            if($tenant->is_active == 0 || $tenant->is_active == 2){
+                return response()->json([
+                    'message' => 'Pembuatan Qris gagal, akun anda belum aktif atau telah dinonaktifkan Admin!',
+                    'error' => 'Unauthorized',
+                    'status' => 401
+                ]);
+            }
+
+            if($store->is_active == 0){
+                return response()->json([
+                    'message' => 'Pembuatan Qris gagal, Merchant anda telah dinonaktifkan oleh admin!',
+                    'error' => 'Unauthorized',
+                    'status' => 401
+                ]);
+            }
             $api_key = ApiKey::where('email', $store->email)->where('id_tenant', $store->id_user)->first();
             if(!Hash::check($password, $api_key->key)){
                 return response()->json([

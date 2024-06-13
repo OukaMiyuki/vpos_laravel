@@ -38,6 +38,13 @@ class RegisterController extends Controller {
 
         $invitationcodeid = InvitationCode::where('inv_code', $request->inv_code)->first();
 
+        if($invitationcodeid->is_active == 0){
+            return response()->json([
+                'message' => "Invitation code tidak bisa digunakan",
+                'status' => 401
+            ]);
+        }
+
         $tenant = Tenant::create([
             'name' => $request->name,
             'email' => $request->email,

@@ -82,11 +82,11 @@
                                                 <td class="text-center">
                                                     @if ($store->is_active == 0)
                                                         <a href="{{ route('admin.dashboard.mitraBisnis.merchantList.activation', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
-                                                            <button title="Lihat detail merchant" type="button" class="btn btn-success waves-effect waves-light"><span class="mdi mdi-power"></span></button>
+                                                            <button title="Aktifkan Merchant" type="button" class="btn btn-success waves-effect waves-light"><span class="mdi mdi-power"></span></button>
                                                         </a>
                                                     @elseif($store->is_active == 1)
                                                         <a href="{{ route('admin.dashboard.mitraBisnis.merchantList.activation', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
-                                                            <button title="Lihat detail merchant" type="button" class="btn btn-danger waves-effect waves-light"><span class="mdi mdi-power"></span></button>
+                                                            <button title="Nonaktifkan Merchant" type="button" class="btn btn-danger waves-effect waves-light"><span class="mdi mdi-power"></span></button>
                                                         </a>
                                                     @endif
                                                     &nbsp;

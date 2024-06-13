@@ -1555,7 +1555,50 @@ class AdminController extends Controller {
                             ])
                             ->where('id_inv_code', '!=', 0)
                             ->find($id);
+
+        if(is_null($tenantDetail) || empty($tenantDetail)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraTenant.list')->with($notification);
+        }
+
         return view('admin.admin_mitra_tenant_detail', compact(['tenantDetail']));
+    }
+
+    public function adminDashboardMitraTenantActivation($id){
+        $tenant = Tenant::where('id_inv_code', '!=', 0)->find($id);
+
+
+        if(is_null($tenant) || empty($tenant)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraTenant.list')->with($notification);
+        }
+
+        if($tenant->is_active == 0){
+            $tenant->update([
+                'is_active' => 1
+            ]);
+        } else if($tenant->is_active == 1){
+            $tenant->update([
+                'is_active' => 2
+            ]);
+        } else if($tenant->is_active == 2){
+            $tenant->update([
+                'is_active' => 1
+            ]);
+        }
+
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+
+        return redirect()->route('admin.dashboard.mitraTenant.list')->with($notification);
     }
 
     public function adminDashboardMitraTenantStoreList(){
@@ -1671,7 +1714,7 @@ class AdminController extends Controller {
         if(empty($umiRequest)){
             $umiRequest = "Empty";
         }
-        
+
         return view('admin.admin_mitra_tenant_store_detail', compact('storeDetail', 'umiRequest'));
     }
 
@@ -1737,7 +1780,45 @@ class AdminController extends Controller {
                                 }
                             ])
                             ->find($id);
+
+        if(is_null($kasirDetail) || empty($kasirDetail)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraTenant.kasir.list')->with($notification);
+        }
+
         return view('admin.admin_mitra_tenant_kasir_detail', compact('kasirDetail'));
+    }
+
+    public function adminDashboardMitraTenantKasirActivation($id){
+        $kasir = Kasir::find($id);
+
+        if(is_null($kasir) || empty($kasir)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.mitraTenant.kasir.list')->with($notification);
+        }
+
+        if($kasir->is_active == 0) {
+            $kasir->update([
+                'is_active' => 1
+            ]);
+        } else if($kasir->is_active == 1){
+            $kasir->update([
+                'is_active' => 0
+            ]);
+        }
+
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('admin.dashboard.mitraTenant.kasir.list')->with($notification);
+
     }
 
     public function adminDashboardMitraTenantUMIList(){
