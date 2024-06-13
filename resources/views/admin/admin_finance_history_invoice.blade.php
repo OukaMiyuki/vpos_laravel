@@ -6,9 +6,8 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('tenant.finance') }}">Finance</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.finance') }}">Finance</a></li>
                                 <li class="breadcrumb-item active">Invoice</li>
                             </ol>
                         </div>
@@ -92,7 +91,7 @@
                                     <address>
                                         Nama : {{ auth()->user()->name }}<br>
                                         Email : {{ auth()->user()->email }}<br>
-                                        Level Akun : <strong>Tenant/Pemilik Toko</strong><br>
+                                        Level Akun : <strong>Admin Super User</strong><br>
                                         Nomor Rekening : {{ $rekening->no_rekening }}<br>
                                     </address>
                                 </div> <!-- end col -->

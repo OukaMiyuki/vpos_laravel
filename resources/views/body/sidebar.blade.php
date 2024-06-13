@@ -665,19 +665,22 @@
                         <div class="collapse" id="role">
                             <ul class="nav-second-level">
                                 <li>
-                                    <a href="#">User Login</a>
+                                    <a href="{{ route('admin.dashboard.history') }}">Dashboard</a>
                                 </li>
                                 <li>
-                                    <a href="#">User Regsister</a>
+                                    <a href="{{ route('admin.dashboard.history.user.login') }}">User Login</a>
                                 </li>
                                 <li>
-                                    <a href="#">User Activity</a>
+                                    <a href="{{ route('admin.dashboard.history.user.register') }}">User Regsister</a>
                                 </li>
                                 <li>
-                                    <a href="#">User Withdrawal</a>
+                                    <a href="{{ route('admin.dashboard.history.user.activity') }}">User Activity</a>
                                 </li>
                                 <li>
-                                    <a href="#">Errors</a>
+                                    <a href="{{ route('admin.dashboard.history.user.withdraw') }}">User Withdrawal</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.dashboard.history.user.error') }}">Errors</a>
                                 </li>
                             </ul>
                         </div>

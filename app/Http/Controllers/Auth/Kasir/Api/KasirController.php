@@ -693,11 +693,11 @@ class KasirController extends Controller {
            $invoiceAliasSearch = InvoiceField::with(['invoice'])
                                             ->where('store_identifier', auth()->user()->id_store)
                                             ->where('id_kasir', auth()->user()->id)
-                                            ->where('content1', $alias1)
-                                            ->orWhere('content2', $alias2)
-                                            ->orWhere('content3', $alias3)
-                                            ->orWhere('content4', $alias4)
-                                            ->orWhere('content5', $alias5)
+                                            ->where('content1', 'LIKE', '%'.$alias1.'%')
+                                            ->orWhere('content2', 'LIKE', '%'.$alias2.'%')
+                                            ->orWhere('content3', 'LIKE', '%'.$alias3.'%')
+                                            ->orWhere('content4', 'LIKE', '%'.$alias4.'%')
+                                            ->orWhere('content5', 'LIKE', '%'.$alias5.'%')
                                             ->latest()
                                             ->get();
         } catch (Exception $e) {

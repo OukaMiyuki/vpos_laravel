@@ -112,6 +112,14 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::get('dashboard/finance', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinance'])->name('admin.dashboard.finance');
     Route::get('dashboard/finance/withdraw-invoice/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinanceInvoice'])->name('admin.dashboard.finance.withdraw.invoice');
 
+    Route::get('dashboard/history', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistory'])->name('admin.dashboard.history');
+    Route::get('dashboard/history/user-login', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserLogin'])->name('admin.dashboard.history.user.login');
+    Route::get('dashboard/history/user-register', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserRegister'])->name('admin.dashboard.history.user.register');
+    Route::get('dashboard/history/user-activity', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserActivity'])->name('admin.dashboard.history.user.activity');
+    Route::get('dashboard/history/user-withdrawal', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserWithdrawal'])->name('admin.dashboard.history.user.withdraw');
+    Route::get('dashboard/history/error', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserError'])->name('admin.dashboard.history.user.error');
+    Route::get('dashboard/history/detail/{activity}/{id}', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryDetail'])->name('admin.dashboard.history.user.detail');
+
 });
 
 

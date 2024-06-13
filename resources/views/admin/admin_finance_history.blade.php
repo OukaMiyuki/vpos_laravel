@@ -119,6 +119,9 @@
                                                         <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
                                                     @endif
                                                 </td>
+                                                <td>
+                                                    <a href="{{ route('admin.dashboard.finance.withdraw.invoice', ['id' => $wdData->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
