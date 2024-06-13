@@ -167,7 +167,7 @@ class KasirController extends Controller {
                 Cart::setGlobalDiscount(0);
             }
         }
-        
+
         Cart::update($rowId, $qty);
 
         $notification = array(
@@ -186,7 +186,7 @@ class KasirController extends Controller {
                 Cart::setGlobalDiscount(0);
             }
         }
-        
+
         Cart::remove($id);
 
         $notification = array(
@@ -304,7 +304,7 @@ class KasirController extends Controller {
 
                 if(!is_null($invoice)) {
                     $invoice->storeCart($invoice);
-                    $invoice->fieldSave($invoice, auth()->user()->id_store);
+                    $invoice->fieldSave($invoice, auth()->user()->id_store, auth()->user()->id);
                     $invoice->updateTunaiWallet($total);
                 }
             } else if($request->jenisPembayaran == "Qris"){
@@ -324,7 +324,7 @@ class KasirController extends Controller {
 
                 if(!is_null($invoice)) {
                     $invoice->storeCart($invoice);
-                    $invoice->fieldSave($invoice, auth()->user()->id_store);
+                    $invoice->fieldSave($invoice, auth()->user()->id_store, auth()->user()->id);
                 }
             }
 
@@ -388,7 +388,7 @@ class KasirController extends Controller {
                                         ->count();
         //dd($transactionFinish);
         return view('kasir.kasir_transaction', compact('transaction', 'transactionPending', 'transactionPendingPayment', 'transactionFinish'));
-        
+
     }
 
     public function transactionList(){
@@ -666,7 +666,7 @@ class KasirController extends Controller {
                 ]);
                 $total = $request->sub_total_belanja+$request->nominal_pajak;
                 if(!is_null($invoice)) {
-                    $invoice->fieldSave($invoice, auth()->user()->id_store);
+                    $invoice->fieldSave($invoice, auth()->user()->id_store, auth()->user()->id);
                     $invoice->updateTunaiWallet($total);
                 }
             } else if($request->jenisPembayaran == "Qris"){
@@ -724,7 +724,7 @@ class KasirController extends Controller {
                 ]);
 
                 if(!is_null($invoice)) {
-                    $invoice->fieldSave($invoice, auth()->user()->id_store);
+                    $invoice->fieldSave($invoice, auth()->user()->id_store, auth()->user()->id);
                 }
 
                 if($storeDetail->status_umi == 1){
@@ -740,7 +740,7 @@ class KasirController extends Controller {
                             'nominal_mdr' => $nominal_mdr,
                             'nominal_terima_bersih' => $total-$nominal_mdr
                         ]);
-                    }   
+                    }
                 } else {
                     $nominal_mdr = $total*0.007;
                     $invoice->update([
@@ -868,7 +868,7 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionInvoiceReceipt($id){
-        $invoice = Invoice::with('shoppingCart', 'invoiceField')    
+        $invoice = Invoice::with('shoppingCart', 'invoiceField')
                             ->where('store_identifier', auth()->user()->id_store)
                             ->where('id_kasir', auth()->user()->id)
                             ->where('id_tenant', auth()->user()->store->id_tenant)

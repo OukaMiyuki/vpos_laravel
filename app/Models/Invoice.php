@@ -95,8 +95,13 @@ class Invoice extends Model {
         }
     }
 
-    public function fieldSave($model, $identifier){
-        $kasir = "1";
+    public function fieldSave($model, $identifier, $kasirid){
+        $kasir = "";
+        if(is_null($kasirid) || empty($kasirid)){
+            $kasir = NULL;
+        } else {
+            $kasir = $kasirid;
+        }
         // if(Auth::guard('tenant')->check()){
         //     if(auth()->user()->id_inv_code != 0){
         //         $kasir = NULL;
