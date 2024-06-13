@@ -687,12 +687,12 @@ class KasirController extends Controller {
         $alias3 = $request->alias3;
         $alias4 = $request->alias4;
         $alias5 = $request->alias5;
-        $id_user = $request->id_user;
+        // $id_user = $request->id_user;
         $invoiceAliasSearch = "";
         try {
            $invoiceAliasSearch = InvoiceField::with(['invoice'])
                                             ->where('store_identifier', auth()->user()->id_store)
-                                            ->where('id_kasir', $id_user)
+                                            ->where('id_kasir', auth()->user()->id)
                                             ->where('content1', $alias1)
                                             ->orWhere('content2', $alias2)
                                             ->orWhere('content3', $alias3)

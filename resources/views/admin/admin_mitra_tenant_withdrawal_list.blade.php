@@ -37,18 +37,18 @@
                                             <th>No.</th>
                                             <th>Action</th>
                                             <th>No. Invoice</th>
-                                            <th>Name</th>
-                                            <th>User Email</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Nominal</th>
-                                            <th>Biaya Transfer</th>
-                                            <th>Nominal Bersih Penarikan</th>
+                                            <th>Tenant</th>
+                                            <th>Email</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th class="text-center">Nominal (Rp.)</th>
+                                            <th class="text-center">Nominal Bersih Penarikan (Rp.)</th>
                                             <th>Status</th>
-                                            <th>Biaya Nobu</th>
-                                            <th>Insentif Mitra Aplikasi</th>
-                                            <th>Nomnial Penarikan Tenant</th>
-                                            <th>Insentif Admin</th>
-                                            <th>Insentif Agregate</th>
+                                            <th>Total Biaya Transfer (Rp.)</th>
+                                            <th>Transfer Bank (Rp.)</th>
+                                            <th>Tenant (Rp.)</th>
+                                            <th>Insentif Mitra Aplikasi (Rp.)</th>
+                                            <th>Insentif Admin (Rp.)</th>
+                                            <th>Insentif Agregate (Rp.)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -65,7 +65,6 @@
                                                     <td>{{ $tenant->email }}</td>
                                                     <td>{{ \Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('d-m-Y') }}</td>
                                                     <td>{{ $withdrawal->nominal }}</td>
-                                                    <td>{{ $withdrawal->biaya_admin }}</td>
                                                     <td>{{ $withdrawal->detailWithdraw->nominal_bersih_penarikan }}</td>
                                                     <td>
                                                         @if ($withdrawal->status == 0)
@@ -74,9 +73,10 @@
                                                             <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
                                                         @endif
                                                     </td>
+                                                    <td>{{ $withdrawal->biaya_admin }}</td>
                                                     <td>{{ $withdrawal->detailWithdraw->biaya_nobu }}</td>
-                                                    <td>{{ $withdrawal->detailWithdraw->biaya_mitra }}</td>
                                                     <td>{{ $withdrawal->detailWithdraw->biaya_tenant }}</td>
+                                                    <td>{{ $withdrawal->detailWithdraw->biaya_mitra }}</td>
                                                     <td>{{ $withdrawal->detailWithdraw->biaya_admin_su }}</td>
                                                     <td>{{ $withdrawal->detailWithdraw->biaya_agregate }}</td>
                                                 </tr>
