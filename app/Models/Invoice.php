@@ -97,13 +97,12 @@ class Invoice extends Model {
 
     public function fieldSave($model, $identifier){
         $kasir = "";
-        $tenant = "";
         if(Auth::guard('tenant')->check()){
             if(auth()->user()->id_inv_code != 0){
                 $kasir = NULL;
             }
         } else if(Auth::guard('kasir')->check()){
-            $kasir = auth()->user()->id;
+            $kasir =1;
         }
         $content1="";
         $content2="";

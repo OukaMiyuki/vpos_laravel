@@ -374,8 +374,8 @@ class KasirController extends Controller {
     public function listCart() : JsonResponse {
         $cartContent = "";
         try {
-            $cartContent = ShoppingCart::select(['shopping_carts.id', 
-                                                    'shopping_carts.id_invoice', 
+            $cartContent = ShoppingCart::select(['shopping_carts.id',
+                                                    'shopping_carts.id_invoice',
                                                     'shopping_carts.id_product',
                                                     'shopping_carts.product_name',
                                                     'shopping_carts.qty',
@@ -427,8 +427,8 @@ class KasirController extends Controller {
         $cartContent = "";
         $invoice = $request->id_invoice;
         try {
-            $cartContent = ShoppingCart::select(['shopping_carts.id', 
-                                                    'shopping_carts.id_invoice', 
+            $cartContent = ShoppingCart::select(['shopping_carts.id',
+                                                    'shopping_carts.id_invoice',
                                                     'shopping_carts.id_product',
                                                     'shopping_carts.product_name',
                                                     'shopping_carts.qty',
@@ -533,8 +533,8 @@ class KasirController extends Controller {
             $disc = 0;
         }
 
-        $cartContent = ShoppingCart::select(['shopping_carts.id', 
-                                                'shopping_carts.id_invoice', 
+        $cartContent = ShoppingCart::select(['shopping_carts.id',
+                                                'shopping_carts.id_invoice',
                                                 'shopping_carts.id_product',
                                                 'shopping_carts.product_name',
                                                 'shopping_carts.qty',
@@ -562,7 +562,7 @@ class KasirController extends Controller {
         // foreach($cartContent as $cart){
         //     $subtotal+= (int) $cart->sub_total;
         // }
-        
+
         if($subtotal>=$disc){
             $nominaldiskon = ($disc/100)*$subtotal;
         }
@@ -902,7 +902,7 @@ class KasirController extends Controller {
                     'nominal_mdr' => $nominal_mdr,
                     'nominal_terima_bersih' => $total-$nominal_mdr
                 ]);
-            }   
+            }
         } else {
             $nominal_mdr = $total*0.007;
             $invoice->update([
