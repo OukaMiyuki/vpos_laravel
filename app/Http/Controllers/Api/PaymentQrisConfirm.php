@@ -158,8 +158,8 @@ class PaymentQrisConfirm extends Controller {
                 ]);
             } catch(Exception $e){
                 return response()->json([
-                    'message' => ' testing walla!',
-                    'store' => $store_identifier,
+                    'message' => 'Error!',
+                    'store' => $request->store_identifier,
                     'password' => $password,
                     'nominal' => $nominal,
                     'tanggal' => $tanggal_transaksi,
