@@ -158,7 +158,7 @@ class PaymentQrisConfirm extends Controller {
                 ]);
             } catch(Exception $e){
                 return response()->json([
-                    'message' => 'Error!',
+                    'message' => ' testing walla!',
                     'error' => $e,
                     'status' => 500
                 ]);
