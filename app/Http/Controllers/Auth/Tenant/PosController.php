@@ -34,7 +34,27 @@ class PosController extends Controller {
         return $identifier;
     }
 
-    function get_client_ip() {
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
+    }
+
+    private function get_client_ip() {
         $ipaddress = '';
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
@@ -153,11 +173,6 @@ class PosController extends Controller {
         // $total = (int) substr(str_replace([',', '.'], '', Cart::total()), 0, -2);
         // $tax = (int) substr(str_replace([',', '.'], '', Cart::tax()), 0, -2);
         // $diskon = (int) substr(str_replace([',', '.'], '', Cart::discount()), 0, -2);
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
         DB::connection()->enableQueryLog();
         $invoice = "";
         try{
@@ -212,16 +227,8 @@ class PosController extends Controller {
                     $invoice->fieldSave($invoice, $identifier, NULL);
                 }
             }
-
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Create Transaction Success : ".$invoice->nomor_invoice,
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $action = "Tenant : Create Transaction | ".$invoice->nomor_invoice;
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
             session()->forget('cart');
 
@@ -232,16 +239,8 @@ class PosController extends Controller {
             return redirect()->route('tenant.pos.invoice', array('id' => $invoice->id))->with($notification);
 
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Transaksi Gagal : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $action = "Tenant : Create Transaction | Error";
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Transaksi Gagal di proses!',
                 'alert-type' => 'error',
@@ -288,11 +287,6 @@ class PosController extends Controller {
     }
 
     public function cartTransactionPendingChangePayment(Request $request){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
         DB::connection()->enableQueryLog();
 
         $identifier = $this->getStoreIdentifier();
@@ -308,6 +302,8 @@ class PosController extends Controller {
             return redirect()->back()->with($notification);
         }
 
+        $action = "Tenant : Change Payment | ".$invoice->nomor_invoice;
+
         try{
             $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalian);
             $invoice->update([
@@ -322,15 +318,7 @@ class PosController extends Controller {
                 'nominal_terima_bersih' => 0
             ]);
 
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Change Payment For Transaction : ".$invoice->nomor_invoice,
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
             $notification = array(
                 'message' => 'Pembayaran berhasil diubah!',
@@ -339,16 +327,7 @@ class PosController extends Controller {
 
             return redirect()->route('tenant.pos.invoice', array('id' => $invoice->id))->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Change Payment : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Pembayaran gagal diubah!',
                 'alert-type' => 'error',
@@ -358,11 +337,6 @@ class PosController extends Controller {
     }
 
     public function cartTransactionSave(Request $request){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
         DB::connection()->enableQueryLog();
 
         $invoice = "";
@@ -381,31 +355,16 @@ class PosController extends Controller {
                 $invoice->customerIdentifier($invoice);
                 session()->forget('cart');
             }
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Create Transaction Save : ".$invoice->nomor_invoice,
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $action = "Tenant : Create Transaction Save | ".$invoice->nomor_invoice;
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             $notification = array(
                 'message' => ' Transaksi Sukses disimpan!',
                 'alert-type' => 'success',
             );
             return redirect()->back()->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Create Transaction Save : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $action = "Tenant : Create Transaction Save | Error";
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Transaksi gagal disimpan!',
                 'alert-type' => 'error',
@@ -458,11 +417,6 @@ class PosController extends Controller {
     }
 
     public function transactionPendingDelete($id) {
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
         DB::connection()->enableQueryLog();
 
         try{
@@ -470,7 +424,6 @@ class PosController extends Controller {
             $invoice = Invoice::where('store_identifier', $identifier)
                                 ->where('status_pembayaran', 0)
                                 ->find($id);
-            $invoiceTemp = $invoice->nomor_invoice;
             session()->forget('cart');
             if(is_null($invoice) || empty($invoice)) {
                 $notification = array(
@@ -480,33 +433,19 @@ class PosController extends Controller {
 
                 return redirect()->back()->with($notification);
             }
+            $invoiceTemp = $invoice->nomor_invoice;
+            $action = "Tenant : Transaction Pending Delete | ". $invoiceTemp;
             $invoice->deleteCart($invoice);
             $invoice->delete();
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Delete Pending Transaction : ".$invoiceTemp,
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             $notification = array(
                 'message' => 'Transaction Deleted Successfully!',
                 'alert-type' => 'success',
             );
             return redirect()->back()->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Delete Pending Transaction : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $action = "Tenant : Transaction Pending Delete | Error";
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Transaksi gagal dihapus!',
                 'alert-type' => 'error',
@@ -645,11 +584,6 @@ class PosController extends Controller {
     }
 
     public function cartTransactionPendingProcess(Request $request){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
         DB::connection()->enableQueryLog();
 
         $invoice = "";
@@ -746,33 +680,16 @@ class PosController extends Controller {
                 }
             }
             session()->forget('cart');
-
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Transaction Pending Process : ".$invoice->nomor_invoice,
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
-
+            $action = "Tenant : Transaction Pending Process | ".$invoice->nomor_invoice;
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             $notification = array(
                 'message' => 'Transaksi berhasil diproses!',
                 'alert-type' => 'success',
             );
             return redirect()->route('tenant.pos.invoice', array('id' => $invoice->id))->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Transaction Pending Process : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $action = "Tenant : Transaction Pending Process | Error";
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Transaksi gagal diproses!',
                 'alert-type' => 'error',

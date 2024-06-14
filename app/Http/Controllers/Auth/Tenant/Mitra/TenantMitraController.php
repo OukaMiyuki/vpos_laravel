@@ -34,7 +34,7 @@ class TenantMitraController extends Controller {
         $this->middleware('isTenantIsNotMitra');
     }
 
-    function get_client_ip() {
+    private function get_client_ip() {
         $ipaddress = '';
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
@@ -53,6 +53,26 @@ class TenantMitraController extends Controller {
         }
 
         return $ipaddress;
+    }
+
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
     }
 
     public function index(){
@@ -104,11 +124,7 @@ class TenantMitraController extends Controller {
             return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
         }
 
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "Mintra Bisnis : Merchant Register";
         DB::connection()->enableQueryLog();
 
         try{
@@ -123,15 +139,7 @@ class TenantMitraController extends Controller {
                 try {
                     $file->move($storagePath, $filename);
                 } catch (\Exception $e) {
-                    History::create([
-                        'id_user' => auth()->user()->id,
-                        'email' => auth()->user()->email,
-                        'action' => "Upload Photo : Error",
-                        'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                        'deteksi_ip' => $ip,
-                        'log' => $e,
-                        'status' => 0
-                    ]);
+                    $this->createHistoryUser($action, $e, 0);
                 }
 
                 StoreList::create([
@@ -160,15 +168,7 @@ class TenantMitraController extends Controller {
                 ]);
             }
 
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Create Merchant : Success!",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
             $notification = array(
                 'message' => 'Toko berhasil ditambahkan!',
@@ -176,16 +176,7 @@ class TenantMitraController extends Controller {
             );
             return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Create Merchant : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Gagal membuat data baru, harap hubungi Admin!',
                 'alert-type' => 'error',
@@ -212,11 +203,7 @@ class TenantMitraController extends Controller {
     }
 
     public function storeUpdate(Request $request){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "Mitra Bisnis : Merchant Update";
         DB::connection()->enableQueryLog();
 
         try{
@@ -231,7 +218,7 @@ class TenantMitraController extends Controller {
                     'alert-type' => 'warning',
                 );
                 return redirect()->back()->with($notification);
-            } 
+            }
 
             if($request->hasFile('photo')){
                 $file = $request->file('photo');
@@ -244,30 +231,14 @@ class TenantMitraController extends Controller {
                     try {
                         $file->move($storagePath, $filename);
                     } catch (\Exception $e) {
-                        History::create([
-                            'id_user' => auth()->user()->id,
-                            'email' => auth()->user()->email,
-                            'action' => "Upload Photo : Error",
-                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                            'deteksi_ip' => $ip,
-                            'log' => $e,
-                            'status' => 0
-                        ]);
+                        $this->createHistoryUser($action, $e, 0);
                     }
                 } else {
                     try{
                         Storage::delete('public/images/profile/store_list/'.$tenantStore->photo);
                         $file->move($storagePath, $filename);
                     } catch(Exception $e){
-                        History::create([
-                            'id_user' => auth()->user()->id,
-                            'email' => auth()->user()->email,
-                            'action' => "Upload Photo : Error",
-                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                            'deteksi_ip' => $ip,
-                            'log' => $e,
-                            'status' => 0
-                        ]);
+                        $this->createHistoryUser($action, $e, 0);
                     }
                 }
 
@@ -290,33 +261,14 @@ class TenantMitraController extends Controller {
                     'jenis_usaha' => $request->jenis,
                 ]);
             }
-
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Update Merchant : Success!",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
-
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             $notification = array(
                 'message' => 'Data Toko berhasil diperbarui!',
                 'alert-type' => 'success',
             );
             return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Update Merchant : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Data gagal diupdate, harap hubungi Admin!',
                 'alert-type' => 'error',
@@ -343,7 +295,7 @@ class TenantMitraController extends Controller {
             );
             return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
         }
-            
+
         if(empty($umiRequest)){
             $umiRequest = "Empty";
         }
@@ -367,17 +319,17 @@ class TenantMitraController extends Controller {
             return redirect()->route('tenant.mitra.dashboard.toko.list')->with($notification);
         }
 
-        $invoice = Invoice::select(['invoices.id', 
-                                    'invoices.store_identifier', 
-                                    'invoices.id_tenant', 
-                                    'invoices.nomor_invoice', 
-                                    'invoices.tanggal_transaksi', 
-                                    'invoices.tanggal_pelunasan', 
-                                    'invoices.jenis_pembayaran', 
-                                    'invoices.status_pembayaran', 
-                                    'invoices.nominal_bayar', 
-                                    'invoices.mdr', 
-                                    'invoices.nominal_mdr', 
+        $invoice = Invoice::select(['invoices.id',
+                                    'invoices.store_identifier',
+                                    'invoices.id_tenant',
+                                    'invoices.nomor_invoice',
+                                    'invoices.tanggal_transaksi',
+                                    'invoices.tanggal_pelunasan',
+                                    'invoices.jenis_pembayaran',
+                                    'invoices.status_pembayaran',
+                                    'invoices.nominal_bayar',
+                                    'invoices.mdr',
+                                    'invoices.nominal_mdr',
                                     'invoices.nominal_terima_bersih'
                                 ])
                             ->with(['storeMitra' => function($query){
@@ -399,17 +351,10 @@ class TenantMitraController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "Mitra Bisnis : Request UMI";
         DB::connection()->enableQueryLog();
-
         $store_id = $request->id;
         $store_identifier = $request->store_identifier;
-
         if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
             $notification = array(
                 'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
@@ -424,8 +369,8 @@ class TenantMitraController extends Controller {
                                 ->first();
         $tenant = Tenant::select(['tenants.id', 'tenants.name', 'tenants.email', 'tenants.phone', 'tenants.is_active', 'tenants.phone_number_verified_at', 'tenants.email_verified_at'])
                                 ->with(['detail' => function($query){
-                                    $query->select(['detail_tenants.id', 
-                                                    'detail_tenants.id_tenant', 
+                                    $query->select(['detail_tenants.id',
+                                                    'detail_tenants.id_tenant',
                                                     'detail_tenants.no_ktp',
                                                     'detail_tenants.tempat_lahir',
                                                     'detail_tenants.tanggal_lahir',
@@ -494,20 +439,11 @@ class TenantMitraController extends Controller {
                     'body' => 'This is for testing email using smtp.',
                     'file' => $fileSave
                 ];
-                 
-                Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $store_identifier));
-                   
-                // dd("Email is sent successfully.");
 
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Request UMI : Success",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                    'status' => 1
-                ]);
+                Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $store_identifier));
+
+                // dd("Email is sent successfully.");
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
                 $notification = array(
                     'message' => 'Permintaan UMI berhasil diajukan!',
@@ -515,16 +451,7 @@ class TenantMitraController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             } catch (Exception $e) {
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Request UMI : Error",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => $e,
-                    'status' => 0
-                ]);
-
+                $this->createHistoryUser($action, $e, 0);
                 $notification = array(
                     'message' => 'Pengajuan Umi gagal, harap hubungi admin!',
                     'alert-type' => 'error',
@@ -567,26 +494,6 @@ class TenantMitraController extends Controller {
                                 ->where('status_pembayaran', 1)
                                 ->count();
 
-        // $storeList = Invoice::select([
-        //                                 'id',
-        //                                 "store_identifier",
-        //                                 DB::raw("(count(store_identifier)) as banyak_transaksi")
-        //                             ])
-        //                             ->with(['storeMitra' => function($query){
-        //                                 $query->select([
-        //                                     'store_lists.id',
-        //                                     'store_lists.store_identifier',
-        //                                     'store_lists.name'
-        //                                 ])
-        //                                 ->groupBy(['id','store_identifier', 'name'])
-        //                                 ->get();
-        //                             }])
-        //                             ->where('jenis_pembayaran', 'Qris')
-        //                             ->where('id_tenant', auth()->user()->id)
-        //                             ->where('email', auth()->user()->email)
-        //                             ->groupBy(['id','store_identifier'])
-        //                             ->get();
-
         $storeList = StoreList::where('id_user', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
                                 ->select(['store_lists.id', 'store_lists.id_user', 'store_lists.store_identifier', 'store_lists.name'])
@@ -603,17 +510,17 @@ class TenantMitraController extends Controller {
                                 ])
                                 ->with(['invoice' => function($query){
                                     $query->select([
-                                        'invoices.id', 
-                                        'invoices.store_identifier', 
-                                        'invoices.id_tenant', 
-                                        'invoices.nomor_invoice', 
-                                        'invoices.tanggal_transaksi', 
-                                        'invoices.tanggal_pelunasan', 
-                                        'invoices.jenis_pembayaran', 
-                                        'invoices.status_pembayaran', 
-                                        'invoices.nominal_bayar', 
-                                        'invoices.mdr', 
-                                        'invoices.nominal_mdr', 
+                                        'invoices.id',
+                                        'invoices.store_identifier',
+                                        'invoices.id_tenant',
+                                        'invoices.nomor_invoice',
+                                        'invoices.tanggal_transaksi',
+                                        'invoices.tanggal_pelunasan',
+                                        'invoices.jenis_pembayaran',
+                                        'invoices.status_pembayaran',
+                                        'invoices.nominal_bayar',
+                                        'invoices.mdr',
+                                        'invoices.nominal_mdr',
                                         'invoices.nominal_terima_bersih'
                                     ])->latest()->get();
                                 }])->where('id_user', auth()->user()->id)
@@ -621,21 +528,21 @@ class TenantMitraController extends Controller {
                                 ->where('store_identifier', $store_identifier)
                                 ->first();
         return view('tenant.tenant_mitra.tenant_transaction_store', compact('store_list'));
-        
+
     }
 
     public function transationAll(){
-        $invoice = Invoice::select(['invoices.id', 
-                                    'invoices.store_identifier', 
-                                    'invoices.id_tenant', 
-                                    'invoices.nomor_invoice', 
-                                    'invoices.tanggal_transaksi', 
-                                    'invoices.tanggal_pelunasan', 
-                                    'invoices.jenis_pembayaran', 
-                                    'invoices.status_pembayaran', 
-                                    'invoices.nominal_bayar', 
-                                    'invoices.mdr', 
-                                    'invoices.nominal_mdr', 
+        $invoice = Invoice::select(['invoices.id',
+                                    'invoices.store_identifier',
+                                    'invoices.id_tenant',
+                                    'invoices.nomor_invoice',
+                                    'invoices.tanggal_transaksi',
+                                    'invoices.tanggal_pelunasan',
+                                    'invoices.jenis_pembayaran',
+                                    'invoices.status_pembayaran',
+                                    'invoices.nominal_bayar',
+                                    'invoices.mdr',
+                                    'invoices.nominal_mdr',
                                     'invoices.nominal_terima_bersih'
                                 ])
                         ->with(['storeMitra' => function($query){
@@ -649,17 +556,17 @@ class TenantMitraController extends Controller {
     }
 
     public function transationAllToday(){
-        $invoice = Invoice::select(['invoices.id', 
-                                    'invoices.store_identifier', 
-                                    'invoices.id_tenant', 
-                                    'invoices.nomor_invoice', 
-                                    'invoices.tanggal_transaksi', 
-                                    'invoices.tanggal_pelunasan', 
-                                    'invoices.jenis_pembayaran', 
-                                    'invoices.status_pembayaran', 
-                                    'invoices.nominal_bayar', 
-                                    'invoices.mdr', 
-                                    'invoices.nominal_mdr', 
+        $invoice = Invoice::select(['invoices.id',
+                                    'invoices.store_identifier',
+                                    'invoices.id_tenant',
+                                    'invoices.nomor_invoice',
+                                    'invoices.tanggal_transaksi',
+                                    'invoices.tanggal_pelunasan',
+                                    'invoices.jenis_pembayaran',
+                                    'invoices.status_pembayaran',
+                                    'invoices.nominal_bayar',
+                                    'invoices.mdr',
+                                    'invoices.nominal_mdr',
                                     'invoices.nominal_terima_bersih'
                                 ])
                             ->with(['storeMitra' => function($query){
@@ -673,17 +580,17 @@ class TenantMitraController extends Controller {
     }
 
     public function transationPending(){
-        $invoice = Invoice::select(['invoices.id', 
-                                    'invoices.store_identifier', 
-                                    'invoices.id_tenant', 
-                                    'invoices.nomor_invoice', 
-                                    'invoices.tanggal_transaksi', 
-                                    'invoices.tanggal_pelunasan', 
-                                    'invoices.jenis_pembayaran', 
-                                    'invoices.status_pembayaran', 
-                                    'invoices.nominal_bayar', 
-                                    'invoices.mdr', 
-                                    'invoices.nominal_mdr', 
+        $invoice = Invoice::select(['invoices.id',
+                                    'invoices.store_identifier',
+                                    'invoices.id_tenant',
+                                    'invoices.nomor_invoice',
+                                    'invoices.tanggal_transaksi',
+                                    'invoices.tanggal_pelunasan',
+                                    'invoices.jenis_pembayaran',
+                                    'invoices.status_pembayaran',
+                                    'invoices.nominal_bayar',
+                                    'invoices.mdr',
+                                    'invoices.nominal_mdr',
                                     'invoices.nominal_terima_bersih'
                                 ])
                             ->with(['storeMitra' => function($query){
@@ -698,17 +605,17 @@ class TenantMitraController extends Controller {
     }
 
     public function transationFinish(){
-        $invoice = Invoice::select(['invoices.id', 
-                                    'invoices.store_identifier', 
-                                    'invoices.id_tenant', 
-                                    'invoices.nomor_invoice', 
-                                    'invoices.tanggal_transaksi', 
-                                    'invoices.tanggal_pelunasan', 
-                                    'invoices.jenis_pembayaran', 
-                                    'invoices.status_pembayaran', 
-                                    'invoices.nominal_bayar', 
-                                    'invoices.mdr', 
-                                    'invoices.nominal_mdr', 
+        $invoice = Invoice::select(['invoices.id',
+                                    'invoices.store_identifier',
+                                    'invoices.id_tenant',
+                                    'invoices.nomor_invoice',
+                                    'invoices.tanggal_transaksi',
+                                    'invoices.tanggal_pelunasan',
+                                    'invoices.jenis_pembayaran',
+                                    'invoices.status_pembayaran',
+                                    'invoices.nominal_bayar',
+                                    'invoices.mdr',
+                                    'invoices.nominal_mdr',
                                     'invoices.nominal_terima_bersih'
                                 ])
                             ->with(['storeMitra' => function($query){
@@ -723,17 +630,17 @@ class TenantMitraController extends Controller {
     }
 
     public function transationFinishToday(){
-        $invoice = Invoice::select(['invoices.id', 
-                                    'invoices.store_identifier', 
-                                    'invoices.id_tenant', 
-                                    'invoices.nomor_invoice', 
-                                    'invoices.tanggal_transaksi', 
-                                    'invoices.tanggal_pelunasan', 
-                                    'invoices.jenis_pembayaran', 
-                                    'invoices.status_pembayaran', 
-                                    'invoices.nominal_bayar', 
-                                    'invoices.mdr', 
-                                    'invoices.nominal_mdr', 
+        $invoice = Invoice::select(['invoices.id',
+                                    'invoices.store_identifier',
+                                    'invoices.id_tenant',
+                                    'invoices.nomor_invoice',
+                                    'invoices.tanggal_transaksi',
+                                    'invoices.tanggal_pelunasan',
+                                    'invoices.jenis_pembayaran',
+                                    'invoices.status_pembayaran',
+                                    'invoices.nominal_bayar',
+                                    'invoices.mdr',
+                                    'invoices.nominal_mdr',
                                     'invoices.nominal_terima_bersih'
                                 ])
                             ->with(['storeMitra' => function($query){
@@ -769,7 +676,7 @@ class TenantMitraController extends Controller {
                                     ->where('email', auth()->user()->email)
                                     ->first();
         return view('tenant.tenant_mitra.tenant_application_settings', compact(['apiKey', 'callback']));
-        
+
     }
 
     public function qrisApiSettingGenerateKey(){
@@ -780,17 +687,13 @@ class TenantMitraController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "Mitra Bisnis : Generate API Key";
         DB::connection()->enableQueryLog();
 
         $apiKey = ApiKey::where('id_tenant', auth()->user()->id)
                         ->where('email', auth()->user()->email)
                         ->first();
-        
+
         try{
             $randomString = Str::random(150);
             if(is_null($apiKey) || empty($apiKey)){
@@ -806,16 +709,8 @@ class TenantMitraController extends Controller {
                     'key' => Hash::make($randomString)
                 ]);
             }
-            
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "API Key Generation : Success",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
             $notification = array(
                 'message' => 'Key generated successfully!',
@@ -823,16 +718,7 @@ class TenantMitraController extends Controller {
             );
             return redirect()->back()->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "API Key Generation : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Gagal membuat API Key, Harap hubungi Admin!',
                 'alert-type' => 'error',
@@ -849,11 +735,7 @@ class TenantMitraController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "Mitra Bisnis : Callback API Settings Update";
         DB::connection()->enableQueryLog();
 
         $callback = CallbackApiData::where('id_tenant', auth()->user()->id)
@@ -879,32 +761,15 @@ class TenantMitraController extends Controller {
                 ]);
             }
 
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Callback Update : Success",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
-    
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+
             $notification = array(
                 'message' => 'Callback successfully updated!',
                 'alert-type' => 'success',
             );
             return redirect()->back()->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Callback Update : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Update Callback Error, harap hubungi Admin!',
                 'alert-type' => 'error',
@@ -933,17 +798,17 @@ class TenantMitraController extends Controller {
                                 ->where('jenis_pembayaran', 'Qris')
                                 ->where('status_pembayaran', 1)
                                 ->sum('nominal_terima_bersih');
-        $invoiceQrisSukses = Invoice::select(['invoices.id', 
-                                            'invoices.store_identifier', 
-                                            'invoices.id_tenant', 
-                                            'invoices.nomor_invoice', 
-                                            'invoices.tanggal_transaksi', 
-                                            'invoices.tanggal_pelunasan', 
-                                            'invoices.jenis_pembayaran', 
-                                            'invoices.status_pembayaran', 
-                                            'invoices.nominal_bayar', 
-                                            'invoices.mdr', 
-                                            'invoices.nominal_mdr', 
+        $invoiceQrisSukses = Invoice::select(['invoices.id',
+                                            'invoices.store_identifier',
+                                            'invoices.id_tenant',
+                                            'invoices.nomor_invoice',
+                                            'invoices.tanggal_transaksi',
+                                            'invoices.tanggal_pelunasan',
+                                            'invoices.jenis_pembayaran',
+                                            'invoices.status_pembayaran',
+                                            'invoices.nominal_bayar',
+                                            'invoices.mdr',
+                                            'invoices.nominal_mdr',
                                             'invoices.nominal_terima_bersih'
                                     ])
                                     ->with(['storeMitra' => function($query){
@@ -960,17 +825,17 @@ class TenantMitraController extends Controller {
     }
 
     public function pemasukanQrisPending(){
-        $invoice = Invoice::select(['invoices.id', 
-                                            'invoices.store_identifier', 
-                                            'invoices.id_tenant', 
-                                            'invoices.nomor_invoice', 
-                                            'invoices.tanggal_transaksi', 
-                                            'invoices.tanggal_pelunasan', 
-                                            'invoices.jenis_pembayaran', 
-                                            'invoices.status_pembayaran', 
-                                            'invoices.nominal_bayar', 
-                                            'invoices.mdr', 
-                                            'invoices.nominal_mdr', 
+        $invoice = Invoice::select(['invoices.id',
+                                            'invoices.store_identifier',
+                                            'invoices.id_tenant',
+                                            'invoices.nomor_invoice',
+                                            'invoices.tanggal_transaksi',
+                                            'invoices.tanggal_pelunasan',
+                                            'invoices.jenis_pembayaran',
+                                            'invoices.status_pembayaran',
+                                            'invoices.nominal_bayar',
+                                            'invoices.mdr',
+                                            'invoices.nominal_mdr',
                                             'invoices.nominal_terima_bersih'
                                     ])
                                     ->with(['storeMitra' => function($query){
@@ -987,17 +852,17 @@ class TenantMitraController extends Controller {
     }
 
     public function pemasukanQrisToday(){
-        $invoice = Invoice::select(['invoices.id', 
-                                    'invoices.store_identifier', 
-                                    'invoices.id_tenant', 
-                                    'invoices.nomor_invoice', 
-                                    'invoices.tanggal_transaksi', 
-                                    'invoices.tanggal_pelunasan', 
-                                    'invoices.jenis_pembayaran', 
-                                    'invoices.status_pembayaran', 
-                                    'invoices.nominal_bayar', 
-                                    'invoices.mdr', 
-                                    'invoices.nominal_mdr', 
+        $invoice = Invoice::select(['invoices.id',
+                                    'invoices.store_identifier',
+                                    'invoices.id_tenant',
+                                    'invoices.nomor_invoice',
+                                    'invoices.tanggal_transaksi',
+                                    'invoices.tanggal_pelunasan',
+                                    'invoices.jenis_pembayaran',
+                                    'invoices.status_pembayaran',
+                                    'invoices.nominal_bayar',
+                                    'invoices.mdr',
+                                    'invoices.nominal_mdr',
                                     'invoices.nominal_terima_bersih'
                             ])
                             ->with(['storeMitra' => function($query){
@@ -1014,17 +879,17 @@ class TenantMitraController extends Controller {
     }
 
     public function pemasukanQris(){
-        $invoice = Invoice::select(['invoices.id', 
-                                    'invoices.store_identifier', 
-                                    'invoices.id_tenant', 
-                                    'invoices.nomor_invoice', 
-                                    'invoices.tanggal_transaksi', 
-                                    'invoices.tanggal_pelunasan', 
-                                    'invoices.jenis_pembayaran', 
-                                    'invoices.status_pembayaran', 
-                                    'invoices.nominal_bayar', 
-                                    'invoices.mdr', 
-                                    'invoices.nominal_mdr', 
+        $invoice = Invoice::select(['invoices.id',
+                                    'invoices.store_identifier',
+                                    'invoices.id_tenant',
+                                    'invoices.nomor_invoice',
+                                    'invoices.tanggal_transaksi',
+                                    'invoices.tanggal_pelunasan',
+                                    'invoices.jenis_pembayaran',
+                                    'invoices.status_pembayaran',
+                                    'invoices.nominal_bayar',
+                                    'invoices.mdr',
+                                    'invoices.nominal_mdr',
                                     'invoices.nominal_terima_bersih'
                             ])
                             ->with(['storeMitra' => function($query){
@@ -1056,7 +921,7 @@ class TenantMitraController extends Controller {
                                                 ->where('status_pembayaran', 1)
                                                 ->whereMonth('tanggal_transaksi', Carbon::now()->month)
                                                 ->sum('nominal_terima_bersih');
-        
+
         return view('tenant.tenant_mitra.tenant_finnance_pemasukan_qris', compact(['invoice', 'totalPemasukanQris', 'totalPemasukanQrisHariini', 'totalPemasukanQrisBulanIni']));
     }
 }

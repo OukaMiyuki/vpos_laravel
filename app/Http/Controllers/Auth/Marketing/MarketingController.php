@@ -21,7 +21,7 @@ use Exception;
 
 class MarketingController extends Controller {
 
-    function get_client_ip() {
+    private function get_client_ip() {
         $ipaddress = '';
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
@@ -40,6 +40,26 @@ class MarketingController extends Controller {
         }
 
         return $ipaddress;
+    }
+
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
     }
 
     public function index(){
@@ -140,11 +160,7 @@ class MarketingController extends Controller {
     }
 
     public function invitationCodeInsert(Request $request){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "Mitra Aplikasi : Create Invitation Code";
         DB::connection()->enableQueryLog();
         if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
             $notification = array(
@@ -171,17 +187,7 @@ class MarketingController extends Controller {
             'holder' => $request->holder,
             'inv_code' => $inv_code
         ]);
-
-        History::create([
-            'id_user' => auth()->user()->id,
-            'email' => auth()->user()->email,
-            'action' => "Create Invitation Code : Success!",
-            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-            'deteksi_ip' => $ip,
-            'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-            'status' => 1
-        ]);
-
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Kode telah dibuat!',
             'alert-type' => 'success',

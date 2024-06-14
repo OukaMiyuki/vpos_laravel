@@ -20,7 +20,7 @@ class ProfileController extends Controller {
         return view('kasir.kasir_settings');
     }
 
-    function get_client_ip() {
+    private function get_client_ip() {
         $ipaddress = '';
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
@@ -41,11 +41,31 @@ class ProfileController extends Controller {
         return $ipaddress;
     }
 
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
+    }
+
     public function profile(){
         $profilKasir = Kasir::select(['kasirs.id', 'kasirs.name', 'kasirs.email', 'kasirs.phone', 'kasirs.is_active', 'kasirs.id_store'])
         ->with(['detail' => function($query){
-            $query->select(['detail_kasirs.id', 
-                            'detail_kasirs.id_kasir', 
+            $query->select(['detail_kasirs.id',
+                            'detail_kasirs.id_kasir',
                             'detail_kasirs.no_ktp',
                             'detail_kasirs.tempat_lahir',
                             'detail_kasirs.tanggal_lahir',
@@ -61,31 +81,9 @@ class ProfileController extends Controller {
         return view('kasir.kasir_profile', compact('profilKasir'));
     }
 
-    // Tidak digunakan karena akun tidak bisa diubah
-    public function profileAccountUpdate(Request $request){
-        $profileInfo = Kasir::where('email', auth()->user()->email)
-                        ->find(auth()->user()->id);
-
-        $profileInfo->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-        ]);
-
-        $notification = array(
-            'message' => 'Data akun berhasil diupdate!',
-            'alert-type' => 'success',
-        );
-        return redirect()->back()->with($notification);
-    }
-    // Tidak digunakan karena akun tidak bisa diubah
-
     public function profileInfoUpdate(Request $request){
         $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "Kasir : Update Profile";
         DB::connection()->enableQueryLog();
 
         try{
@@ -106,7 +104,7 @@ class ProfileController extends Controller {
                     try {
                         $file->move($storagePath, $filename);
                     } catch (\Exception $e) {
-                        return $e->getMessage();
+                        $this->createHistoryUser($action, $e, 0);
                     }
                 } else {
                     Storage::delete('public/images/profile/'.$profileInfo->detail->photo);
@@ -135,31 +133,14 @@ class ProfileController extends Controller {
             $account->update([
                 'name' => $request->name
             ]);
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Change profile information : Success",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             $notification = array(
                 'message' => 'Data akun berhasil diupdate!',
                 'alert-type' => 'success',
             );
             return redirect()->back()->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Change profile information : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Error data gagal diupdate!',
                 'alert-type' => 'error',
@@ -173,13 +154,8 @@ class ProfileController extends Controller {
     }
 
     public function passwordUpdate(Request $request){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "Kasir : Password Update";
         DB::connection()->enableQueryLog();
-
         $request->validate([
             'old_password' => 'required',
             'new_password' => 'required|confirmed',
@@ -193,35 +169,18 @@ class ProfileController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             }
-    
+
             Kasir::whereId(auth()->user()->id)->update([
                 'password' => Hash::make($request->new_password),
             ]);
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Change Password : Success!",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             $notification = array(
                 'message' => 'Password berhasil diperbarui!',
                 'alert-type' => 'success',
             );
             return redirect()->back()->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Change Password : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Update Password Error!',
                 'alert-type' => 'error',

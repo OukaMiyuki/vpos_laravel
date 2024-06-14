@@ -36,9 +36,47 @@ use Mail;
 use Exception;
 
 class ProfileController extends Controller{
-    // public function __construct() {
-    //     $this->middleware('isTenantIsMitra');
-    // }
+    private function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
+
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
+    }
 
     public function tenantSettings(){
         return view('tenant.tenant_settings');
@@ -47,8 +85,8 @@ class ProfileController extends Controller{
     public function profile(){
         $profilTenant = Tenant::select(['tenants.id', 'tenants.name', 'tenants.email', 'tenants.phone', 'tenants.is_active', 'tenants.phone_number_verified_at', 'tenants.email_verified_at'])
                                 ->with(['detail' => function($query){
-                                    $query->select(['detail_tenants.id', 
-                                                    'detail_tenants.id_tenant', 
+                                    $query->select(['detail_tenants.id',
+                                                    'detail_tenants.id_tenant',
                                                     'detail_tenants.no_ktp',
                                                     'detail_tenants.tempat_lahir',
                                                     'detail_tenants.tanggal_lahir',
@@ -72,32 +110,13 @@ class ProfileController extends Controller{
         return view('tenant.tenant_profile', compact('profilTenant', 'rekening', 'qrisWallet'));
     }
 
-    public function tarikDana(Request $request){
-
-    }
-
-    // public function profileAccountUpdate(Request $request){
-    //     $profileInfo = Tenant::find(auth()->user()->id);
-
-    //     $profileInfo->update([
-    //         'name' => $request->name,
-    //         'email' => $request->email,
-    //         'phone' => $request->phone,
-    //     ]);
-        
-    //     $notification = array(
-    //         'message' => 'Data akun berhasil diupdate!',
-    //         'alert-type' => 'success',
-    //     );
-    //     return redirect()->back()->with($notification);
-    // }
-
     public function profileInfoUpdate(Request $request){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "";
+        if(auth()->user()->id_inv_code == 0){
+            $action = "Mitra Bisnis : Update Profile";
+        } else {
+            $action = "Tenant : Update Profile";
+        }
         DB::connection()->enableQueryLog();
         try {
             $profileInfo = DetailTenant::where('id_tenant', auth()->user()->id)
@@ -118,16 +137,7 @@ class ProfileController extends Controller{
                     try {
                         $file->move($storagePath, $filename);
                     } catch (\Exception $e) {
-                        History::create([
-                            'id_user' => auth()->user()->id,
-                            'email' => auth()->user()->email,
-                            'action' => "Change profile information : Error",
-                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                            'deteksi_ip' => $ip,
-                            'log' => $e,
-                            'status' => 0
-                        ]);
-            
+                        $this->createHistoryUser($action, $e, 0);
                         $notification = array(
                             'message' => 'Error data gagal diupdate!',
                             'alert-type' => 'error',
@@ -139,15 +149,7 @@ class ProfileController extends Controller{
                         Storage::delete('public/images/profile/'.$profileInfo->detail->photo);
                         $file->move($storagePath, $filename);
                     } catch(Exception $e){
-                        History::create([
-                            'id_user' => auth()->user()->id,
-                            'email' => auth()->user()->email,
-                            'action' => "Change profile information : Error",
-                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                            'deteksi_ip' => $ip,
-                            'log' => $e,
-                            'status' => 0
-                        ]);
+                        $this->createHistoryUser($action, $e, 0);
                     }
                 }
 
@@ -180,15 +182,7 @@ class ProfileController extends Controller{
                 ]);
             }
 
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Change profile information : Success",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
             $notification = array(
                 'message' => 'Data akun berhasil diupdate!',
@@ -196,15 +190,7 @@ class ProfileController extends Controller{
             );
             return redirect()->back()->with($notification);
         } catch (Exception $e) {
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Change profile information : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
+            $this->createHistoryUser($action, $e, 0);
 
             $notification = array(
                 'message' => 'Error data gagal diupdate!',
@@ -219,11 +205,12 @@ class ProfileController extends Controller{
     }
 
     public function passwordUpdate(Request $request){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "";
+        if(auth()->user()->id_inv_code == 0){
+            $action = "Mitra Bisnis : Update Password";
+        } else {
+            $action = "Tenant : Update Password";
+        }
         DB::connection()->enableQueryLog();
 
         $request->validate([
@@ -235,16 +222,6 @@ class ProfileController extends Controller{
         try{
             $otp = (new Otp)->validate(auth()->user()->phone, $request->otp);
             if(!$otp->status){
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Change Password : OTP Fail doesn't match",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => str_replace("'", "\'", json_encode($otp)),
-                    'status' => 0
-                ]);
-
                 $notification = array(
                     'message' => 'OTP salah atau tidak sesuai!',
                     'alert-type' => 'error',
@@ -258,21 +235,11 @@ class ProfileController extends Controller{
                     );
                     return redirect()->back()->with($notification);
                 }
-        
+
                 Tenant::whereId(auth()->user()->id)->update([
                     'password' => Hash::make($request->new_password),
                 ]);
-
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Change Password : Success!",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                    'status' => 1
-                ]);
-                
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                 $notification = array(
                     'message' => 'Password berhasil diperbarui!',
                     'alert-type' => 'success',
@@ -280,16 +247,7 @@ class ProfileController extends Controller{
                 return redirect()->back()->with($notification);
             }
         } catch (Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Change Password : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Update Password Error!',
                 'alert-type' => 'error',
@@ -297,7 +255,7 @@ class ProfileController extends Controller{
             return redirect()->back()->with($notification);
         }
     }
-    
+
     public function storeProfileSettings(){
         $tenantStore = StoreDetail::where('id_tenant', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
@@ -306,11 +264,7 @@ class ProfileController extends Controller{
     }
 
     public function storeProfileSettingsUPdate(Request $request) {
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "Tenant : Store Profile Update";
         DB::connection()->enableQueryLog();
 
         try{
@@ -324,7 +278,7 @@ class ProfileController extends Controller{
                     'alert-type' => 'warning',
                 );
                 return redirect()->back()->with($notification);
-            } 
+            }
 
             if($request->hasFile('photo')){
                 $file = $request->file('photo');
@@ -366,15 +320,7 @@ class ProfileController extends Controller{
                 ]);
             }
 
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Update Store Profile : Success",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
             $notification = array(
                 'message' => 'Data berhasil diperbarui!',
@@ -382,16 +328,7 @@ class ProfileController extends Controller{
             );
             return redirect()->back()->with($notification);
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Update Store Profile : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Error data gagal diupdate!',
                 'alert-type' => 'error',
@@ -445,25 +382,17 @@ class ProfileController extends Controller{
         $swift_code = $request->swift_code;
         $rekening = $request->no_rekening;
 
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "";
+        if(auth()->user()->id_inv_code == 0){
+            $action = "Mitra Bisnis : Update Profile";
+        } else {
+            $action = "Tenant : Update Profile";
+        }
         DB::connection()->enableQueryLog();
 
         try{
             $otp = (new Otp)->validate(auth()->user()->phone, $kode);
             if(!$otp->status){
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Change Rekening : OTP Fail doesn't match",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => str_replace("'", "\'", json_encode($otp)),
-                    'status' => 0
-                ]);
                 $notification = array(
                     'message' => 'OTP salah atau tidak sesuai!',
                     'alert-type' => 'error',
@@ -478,15 +407,7 @@ class ProfileController extends Controller{
                     'swift_code' => $swift_code,
                 ]);
 
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Change Rekening : Success!",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                    'status' => 1
-                ]);
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
                 $notification = array(
                     'message' => 'Update nomor rekening berhasil!',
@@ -495,16 +416,7 @@ class ProfileController extends Controller{
                 return redirect()->back()->with($notification);
             }
         } catch(Exception $e) {
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Change Rekening : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Update Rekening Error!',
                 'alert-type' => 'error',
@@ -524,12 +436,7 @@ class ProfileController extends Controller{
     }
 
     public function umiRequestProcess(Request $request){
-        $ip = "125.164.243.227";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
-
+        $action = "Tenant : Store UMI Request";
         $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
                                 ->where('store_identifier', $request->store_identifier)
@@ -545,20 +452,20 @@ class ProfileController extends Controller{
             $alamat = $request->alamat;
             $kab_kota = $request->kab_kota;
             $kode_pos = $request->kode_pos;
-            if(empty($nama_usaha) 
-                || is_null($nama_usaha) 
-                || $nama_usaha == "" 
-                || empty($jenis_usaha) 
-                || is_null($jenis_usaha) 
+            if(empty($nama_usaha)
+                || is_null($nama_usaha)
+                || $nama_usaha == ""
+                || empty($jenis_usaha)
+                || is_null($jenis_usaha)
                 || $jenis_usaha == ""
-                || empty($alamat) 
-                || is_null($alamat) 
+                || empty($alamat)
+                || is_null($alamat)
                 || $alamat == ""
-                || empty($kab_kota) 
-                || is_null($kab_kota) 
+                || empty($kab_kota)
+                || is_null($kab_kota)
                 || $kab_kota == ""
-                || empty($kode_pos) 
-                || is_null($kode_pos) 
+                || empty($kode_pos)
+                || is_null($kode_pos)
                 || $kode_pos == ""
             ) {
                 $notification = array(
@@ -607,18 +514,10 @@ class ProfileController extends Controller{
                     'body' => 'This is for testing email using smtp.',
                     'file' => $fileSave
                 ];
-                 
+
                 Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
-                   
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Umi Request : Success",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                    'status' => 1
-                ]);
+
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
                 $notification = array(
                     'message' => 'Permintaan UMI berhasil diajukan!',
@@ -626,15 +525,7 @@ class ProfileController extends Controller{
                 );
                 return redirect()->back()->with($notification);
             } catch (Exception $e) {
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Umi Request : Error!",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => $e,
-                    'status' => 0
-                ]);
+                $this->createHistoryUser($action, $e, 0);
 
                 $notification = array(
                     'message' => 'Permintaan UMI gagal, silahkan hubungi admin!',
@@ -652,11 +543,6 @@ class ProfileController extends Controller{
     }
 
     public function whatsappNotification(){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
         DB::connection()->enableQueryLog();
 
         $api_key    = getenv("WHATZAPP_API_KEY");
@@ -691,16 +577,13 @@ class ProfileController extends Controller{
                 'json' => $data,
             ]);
         } catch(Exception $ex){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Send OTP : Error!",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $ex,
-                'status' => 0
-            ]);
-
+            $action = "";
+            if(auth()->user()->id_inv_code == 0){
+                $action = "Mitra Bisnis : Send Whatsapp OTP Fail";
+            } else {
+                $action = "Tenant : Send Whatsapp OTP Fail";
+            }
+            $this->createHistoryUser($action, $ex, 0);
             $notification = array(
                 'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
                 'alert-type' => 'error',
@@ -708,17 +591,15 @@ class ProfileController extends Controller{
             return redirect()->back()->with($notification);
         }
         $responseCode = $postResponse->getStatusCode();
-        
+
         if($responseCode == 200){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Send OTP : Success!",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $action = "";
+            if(auth()->user()->id_inv_code == 0){
+                $action = "Mitra Bisnis : Send Whatsapp OTP Success";
+            } else {
+                $action = "Tenant : Send Whatsapp OTP Success";
+            }
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
             $notification = array(
                 'message' => 'OTP Sukses dikirim!',
@@ -726,16 +607,13 @@ class ProfileController extends Controller{
             );
             return redirect()->back()->with($notification);
         } else {
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Send OTP : Error!",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 0
-            ]);
-
+            $action = "";
+            if(auth()->user()->id_inv_code == 0){
+                $action = "Mitra Bisnis : Send Whatsapp OTP Fail | Status : ".$responseCode;
+            } else {
+                $action = "Tenant : Send Whatsapp OTP Fail | Status : ".$responseCode;
+            }
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
             $notification = array(
                 'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
                 'alert-type' => 'error',
@@ -745,11 +623,12 @@ class ProfileController extends Controller{
     }
 
     public function whatsappOTPSubmit(Request $request){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $action = "";
+        if(auth()->user()->id_inv_code == 0){
+            $action = "Mitra Bisnis : Whatsapp Number Verification Process";
+        } else {
+            $action = "Tenant : Whatsapp Number Verification Process";
+        }
         DB::connection()->enableQueryLog();
         if(!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "") {
             return redirect()->route('tenant.dashboard');
@@ -758,15 +637,6 @@ class ProfileController extends Controller{
                 $kode = (int) $request->otp;
                 $otp = (new Otp)->validate(auth()->user()->phone, $kode);
                 if(!$otp->status){
-                    History::create([
-                        'id_user' => auth()->user()->id,
-                        'email' => auth()->user()->email,
-                        'action' => "Whatsapp Number Verification : OTP Fail doesn't match",
-                        'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                        'deteksi_ip' => $ip,
-                        'log' => str_replace("'", "\'", json_encode($otp)),
-                        'status' => 0
-                    ]);
                     $notification = array(
                         'message' => 'OTP salah atau tidak sesuai!',
                         'alert-type' => 'error',
@@ -777,15 +647,7 @@ class ProfileController extends Controller{
                     $user->update([
                         'phone_number_verified_at' => now()
                     ]);
-                    History::create([
-                        'id_user' => auth()->user()->id,
-                        'email' => auth()->user()->email,
-                        'action' => "Whatsapp Number Verification : Success!",
-                        'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                        'deteksi_ip' => $ip,
-                        'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                        'status' => 1
-                    ]);
+                    $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                     $notification = array(
                         'message' => 'Nomor anda telah diverifikasi!',
                         'alert-type' => 'success',
@@ -793,16 +655,7 @@ class ProfileController extends Controller{
                     return redirect()->back()->with($notification);
                 }
             } catch(Exception $e){
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Whatsapp Number Verification : Error",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => $e,
-                    'status' => 0
-                ]);
-    
+                $this->createHistoryUser($action, $e, 0);
                 $notification = array(
                     'message' => 'Whatsapp Verification Error!',
                     'alert-type' => 'error',
@@ -818,23 +671,13 @@ class ProfileController extends Controller{
         $getLoc = Location::get($ip);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
-        
+
         $nominal_tarik = $request->nominal_tarik;
         $otp = $request->wa_otp;
 
         try{
             $otp = (new Otp)->validate(auth()->user()->phone, $otp);
             if(!$otp->status){
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Tarik dana Qris : OTP Fail doesn't match",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => str_replace("'", "\'", json_encode($otp)),
-                    'status' => 0
-                ]);
-
                 $notification = array(
                     'message' => 'OTP salah atau tidak sesuai!',
                     'alert-type' => 'error',
@@ -879,16 +722,13 @@ class ProfileController extends Controller{
                         $dataRekening = json_decode($getRek->getBody());
                         return view('tenant.tenant_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan']));
                     } catch (Exception $e) {
-                        History::create([
-                            'id_user' => auth()->user()->id,
-                            'email' => auth()->user()->email,
-                            'action' => "Failed to fetch rekening data : Error",
-                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                            'deteksi_ip' => $ip,
-                            'log' => $e,
-                            'status' => 0
-                        ]);
-
+                        $action = "";
+                        if(auth()->user()->id_inv_code == 0){
+                            $action = "Mitra Bisnis : Cek Rekening Error";
+                        } else {
+                            $action = "Tenant : Cek Rekening Error";
+                        }
+                        $this->createHistoryUser($action, $e, 0);
                         $notification = array(
                             'message' => 'Tarik dana error, harap hubungi admin!',
                             'alert-type' => 'error',
@@ -898,16 +738,13 @@ class ProfileController extends Controller{
                 }
             }
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Withdraw Process : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $action = "";
+            if(auth()->user()->id_inv_code == 0){
+                $action = "Mitra Bisnis : Withdrawal Process Error";
+            } else {
+                $action = "Tenant : Withdrawal Process Error";
+            }
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Penarikan dana gagal, harap hubungi admin!',
                 'alert-type' => 'error',
@@ -932,7 +769,7 @@ class ProfileController extends Controller{
         $nominal_tarik = $request->nominal_penarikan;
         $total_tarik = $request->total_tarik;
         $biaya_admin = $request->biaya_admin;
-        
+
         $rekening = Rekening::select(['swift_code', 'no_rekening'])
                             ->where('id_user', auth()->user()->id)
                             ->where('email', auth()->user()->email)
@@ -966,15 +803,6 @@ class ProfileController extends Controller{
             $total_penarikan = $total_tarik;
             $saldo = $qrisWallet->saldo;
             if($saldo < $total_penarikan){
-                History::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'action' => "Withdraw Process : Fail (Saldo tidak mencukupi)",
-                    'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                    'deteksi_ip' => $ip,
-                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                    'status' => 0
-                ]);
                 $notification = array(
                     'message' => 'Saldo anda tidak mencukupi!',
                     'alert-type' => 'warning',
@@ -1033,7 +861,7 @@ class ProfileController extends Controller{
                             $agregateWallet->update([
                                 'saldo' =>$agregateSaldo+$agregate
                             ]);
-                            
+
                             if(auth()->user()->id_inv_code != 0){
                                 DetailPenarikan::create([
                                     'id_penarikan' => $withDraw->id,
@@ -1065,32 +893,29 @@ class ProfileController extends Controller{
                                 'nominal' => 300
                             ]);
 
-                            History::create([
-                                'id_user' => auth()->user()->id,
-                                'email' => auth()->user()->email,
-                                'action' => "Withdraw Process : Success!",
-                                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                                'deteksi_ip' => $ip,
-                                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                                'status' => 1
-                            ]);
-                            
+                            $action = "";
+                            if(auth()->user()->id_inv_code == 0){
+                                $action = "Mitra Bisnis : Withdrawal Process Success";
+                            } else {
+                                $action = "Tenant : Withdrawal Process Success";
+                            }
+
+                            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+
                             $notification = array(
                                 'message' => 'Penarikan dana sukses!',
                                 'alert-type' => 'success',
                             );
                             return redirect()->route('tenant.finance.history_penarikan.invoice', array('id' => $withDraw->id))->with($notification);
                         } else {
-                            History::create([
-                                'id_user' => auth()->user()->id,
-                                'email' => auth()->user()->email,
-                                'action' => "Withdraw Process : Error!",
-                                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                                'deteksi_ip' => $ip,
-                                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                                'status' => 0
-                            ]);
 
+                            $action = "";
+                            if(auth()->user()->id_inv_code == 0){
+                                $action = "Mitra Bisnis : Withdrawal Process Failed";
+                            } else {
+                                $action = "Tenant : Withdrawal Process Failed";
+                            }
+                            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
                             $notification = array(
                                 'message' => 'Penarikan dana gagal, harap hubungi admin!',
                                 'alert-type' => 'error',
@@ -1120,15 +945,16 @@ class ProfileController extends Controller{
                             'biaya_admin_su' => NULL,
                             'biaya_agregate' => NULL
                         ]);
-                        History::create([
-                            'id_user' => auth()->user()->id,
-                            'email' => auth()->user()->email,
-                            'action' => "Withdraw Process : Transaction fail invalid",
-                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                            'deteksi_ip' => $ip,
-                            'log' => $responseMessage,
-                            'status' => 0
-                        ]);
+
+                        $action = "";
+                        if(auth()->user()->id_inv_code == 0){
+                            $action = "Mitra Bisnis : Withdrawal Transaction fail invalid";
+                        } else {
+                            $action = "Tenant : Withdrawal Transaction fail invalid";
+                        }
+
+                        $this->createHistoryUser($action, $responseMessage, 0);
+
                         $notification = array(
                             'message' => 'Penarikan dana gagal, harap hubungi admin!',
                             'alert-type' => 'error',
@@ -1136,15 +962,13 @@ class ProfileController extends Controller{
                         return redirect()->route('tenant.profile')->with($notification);
                     }
                 } catch (Exception $e) {
-                    History::create([
-                        'id_user' => auth()->user()->id,
-                        'email' => auth()->user()->email,
-                        'action' => "Withdraw Process : Error (HTTP API Error)",
-                        'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                        'deteksi_ip' => $ip,
-                        'log' => $e,
-                        'status' => 0
-                    ]);
+                    $action = "";
+                    if(auth()->user()->id_inv_code == 0){
+                        $action = "Mitra Bisnis : Withdraw Process | Error (HTTP API Error)";
+                    } else {
+                        $action = "Tenant : Withdraw Process | Error (HTTP API Error)";
+                    }
+                    $this->createHistoryUser($action, $e, 0);
                     $notification = array(
                         'message' => 'Penarikan dana gagal, harap hubungi admin!',
                         'alert-type' => 'error',
@@ -1153,15 +977,13 @@ class ProfileController extends Controller{
                 }
             }
         } catch (Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Withdraw Process : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
+            $action = "";
+            if(auth()->user()->id_inv_code == 0){
+                $action = "Mitra Bisnis : Withdraw Process | Error";
+            } else {
+                $action = "Tenant : Withdraw Process | Error";
+            }
+            $this->createHistoryUser($action, $e, 0);
 
             $notification = array(
                 'message' => 'Penarikan dana gagal, harap hubungi admin!',
@@ -1169,26 +991,5 @@ class ProfileController extends Controller{
             );
             return redirect()->route('tenant.profile')->with($notification);
         }
-    }
-
-    function get_client_ip() {
-        $ipaddress = '';
-        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
-            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
-            $ipaddress = $_SERVER['HTTP_FORWARDED'];
-        } else if (isset($_SERVER['REMOTE_ADDR'])) {
-            $ipaddress = $_SERVER['REMOTE_ADDR'];
-        } else {
-            $ipaddress = 'UNKNOWN';
-        }
-
-        return $ipaddress;
     }
 }

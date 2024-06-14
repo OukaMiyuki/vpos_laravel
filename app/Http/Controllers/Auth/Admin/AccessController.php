@@ -47,8 +47,7 @@ class AccessController extends Controller {
     }
 
     public function adminDashboardHistoryUserError(){
-        $activity = "Error";
-        $history = History::where('action', 'LIKE', '%'.$activity.'%')->where('status', 0)->latest()->get();
+        $history = History::where('status', 0)->latest()->get();
         return view('admin.admin_history_dashboard_user_error_history', compact(['history']));
     }
 

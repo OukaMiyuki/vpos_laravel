@@ -24,7 +24,7 @@ use App\Models\History;
 use Exception;
 
 class KasirController extends Controller {
-    function get_client_ip() {
+    private function get_client_ip() {
         $ipaddress = '';
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
@@ -43,6 +43,26 @@ class KasirController extends Controller {
         }
 
         return $ipaddress;
+    }
+
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
     }
 
     public function index(){
@@ -197,13 +217,7 @@ class KasirController extends Controller {
     }
 
     public function cartTransactionSave(Request $request){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
         DB::connection()->enableQueryLog();
-
         $invoice = "";
 
         try{
@@ -219,15 +233,8 @@ class KasirController extends Controller {
                 $invoice->customerIdentifier($invoice);
                 session()->forget('cart');
             }
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Create Transaction Save : ".$invoice->nomor_invoice,
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                'status' => 1
-            ]);
+            $action = "Kasir : Create Transaction Save | ".$invoice->nomor_invoice;
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             $notification = array(
                 'message' => 'Sukses disimpan!',
                 'alert-type' => 'success',
@@ -235,16 +242,8 @@ class KasirController extends Controller {
             return redirect()->back()->with($notification);
 
         } catch(Exception $e){
-            History::create([
-                'id_user' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'action' => "Create Transaction Save : Error",
-                'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                'deteksi_ip' => $ip,
-                'log' => $e,
-                'status' => 0
-            ]);
-
+            $action = "Kasir : Create Transaction Save | Error";
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Transaksi gagal disimpan!',
                 'alert-type' => 'error',
