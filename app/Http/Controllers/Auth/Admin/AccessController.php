@@ -7,7 +7,7 @@ use App\Models\History;
 use App\Models\Tenant;
 use App\Models\Admin;
 use App\Models\Marketing;
-use App\MOdels\Kasir;
+use App\Models\Kasir;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
 
