@@ -400,7 +400,7 @@ class AdminController extends Controller {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
-            'no_ktp' => ['required', 'string', 'numeric', 'digits:16', 'unique:'.DetailAdmin::class, 'unique:'.DetailMarketing::class, 'unique:'.DetailTenant::class, 'unique:'.DetailKasir::class],
+            // 'no_ktp' => ['required', 'string', 'numeric', 'digits:16', 'unique:'.DetailAdmin::class, 'unique:'.DetailMarketing::class, 'unique:'.DetailTenant::class, 'unique:'.DetailKasir::class],
             'phone' => ['required', 'string', 'numeric', 'digits_between:1,20', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
             'jenis_kelamin' => ['required'],
             'tempat_lahir' => ['required'],
@@ -659,6 +659,14 @@ class AdminController extends Controller {
     public function adminMarketingAccountActivation($id){
         $marketing = Marketing::find($id);
 
+        if(is_null($marketing) || empty($marketing)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.marketing.list')->with($notification);
+        }
+
         if($marketing->is_active == 0){
             $marketing->is_active = 1;
         } else if($marketing->is_active == 1){
@@ -666,6 +674,27 @@ class AdminController extends Controller {
         } else if($marketing->is_active == 2){
             $marketing->is_active = 1;
         }
+
+        if($marketing->is_active == 2) {
+            $invCode = InvitationCode::where('id_marketing', $marketing->id)->latest()->get();
+            if(!is_null($invCode) || !empty($invCode)){
+                foreach($invCode as $inv){
+                    $inv->update([
+                        'is_active' => 0
+                    ]);
+                }
+            }
+        } else if($marketing->is_active == 1){
+            $invCode = InvitationCode::where('id_marketing', $marketing->id)->latest()->get();
+            if(!is_null($invCode) || !empty($invCode)){
+                foreach($invCode as $inv){
+                    $inv->update([
+                        'is_active' => 1
+                    ]);
+                }
+            }
+        }
+
         $marketing->save();
         $notification = array(
             'message' => 'Data akun berhasil diupdate!',
@@ -715,6 +744,14 @@ class AdminController extends Controller {
                                 }
                                 ])
                                 ->find($id);
+
+        if(is_null($marketing) || empty($marketing)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.marketing.list')->with($notification);
+        }
 
         return view('admin.admin_marketing_profile', compact('marketing'));
     }
@@ -779,6 +816,17 @@ class AdminController extends Controller {
             );
             return redirect()->route('admin.dashboard.marketing.invitationcode')->with($notification);
         }
+
+        $cekMarketing = Marketing::find($invitationCode->id_marketing);
+
+        if($cekMarketing->is_active == 2){
+            $notification = array(
+                'message' => 'Mitra Aplikasi tidak aktif!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.marketing.invitationcode')->with($notification);
+        }
+
         if($invitationCode->is_active == 0){
             $invitationCode->update([
                 'is_active' => 1

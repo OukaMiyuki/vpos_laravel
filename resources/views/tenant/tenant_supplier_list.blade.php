@@ -254,11 +254,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="alamat" class="form-label">Alamat</label>
-                            <textarea placeholder="Masukkan alamat supplier" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! old('alamat') !!}</textarea>
+                            <textarea placeholder="Masukkan alamat supplier" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false">{!! old('alamat') !!}</textarea>
                         </div>
                         <div class="mb-3">
                             <label for="keterangan" class="form-label">Keterangan</label>
-                            <textarea placeholder="Masukkan keterangan" class="form-control" id="keterangan" name="keterangan" rows="5" spellcheck="false" required>{!! old('keterangan') !!}</textarea>
+                            <textarea placeholder="Masukkan keterangan" class="form-control" id="keterangan" name="keterangan" rows="5" spellcheck="false">{!! old('keterangan') !!}</textarea>
                         </div>
                     </div>
                     <div class="modal-footer">

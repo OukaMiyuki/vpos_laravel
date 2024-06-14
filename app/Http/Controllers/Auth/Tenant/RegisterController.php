@@ -28,7 +28,7 @@ use Illuminate\Database\Query\Builder;
 
 class RegisterController extends Controller {
 
-    function get_client_ip() {
+    private function get_client_ip() {
         $ipaddress = '';
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
@@ -49,21 +49,35 @@ class RegisterController extends Controller {
         return $ipaddress;
     }
 
-    public function create(): View {
-        return view('tenant.auth.register');
-    }
-
-    public function store(Request $request): RedirectResponse {
+    private function createHistoryUser($action, $user_id,  $user_email, $log, $status){
         $ip = "125.164.244.223";
         $PublicIP = $this->get_client_ip();
         $getLoc = Location::get($ip);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
+    }
+
+    public function create(): View {
+        return view('tenant.auth.register');
+    }
+
+    public function store(Request $request): RedirectResponse {
         DB::connection()->enableQueryLog();
+        $action = "Register : Tenant";
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
-            'no_ktp' => ['required', 'string', 'numeric', 'digits:16', 'unique:'.DetailAdmin::class, 'unique:'.DetailMarketing::class, 'unique:'.DetailTenant::class, 'unique:'.DetailKasir::class],
+            // 'no_ktp' => ['required', 'string', 'numeric', 'digits:16', 'unique:'.DetailAdmin::class, 'unique:'.DetailMarketing::class, 'unique:'.DetailTenant::class, 'unique:'.DetailKasir::class],
             'phone' => ['required', 'string', 'numeric', 'digits_between:1,20', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
             'jenis_kelamin' => ['required'],
             'tempat_lahir' => ['required'],
@@ -96,10 +110,6 @@ class RegisterController extends Controller {
 
         $randomString = Str::random(30);
 
-        // Auth::guard('tenant')->login($tenant);
-
-        // return redirect(RouteServiceProvider::TENANT_DASHBOARD);
-
         if(!is_null($tenant)) {
             $tenant->detailTenantStore($tenant);
             $tenant->fieldInsert($randomString);
@@ -111,16 +121,9 @@ class RegisterController extends Controller {
 
         Auth::guard('tenant')->login($tenant);
 
-        History::create([
-            'id_user' => NULL,
-            'email' => $request->email,
-            'action' => "Register Tenant : Success!",
-            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-            'deteksi_ip' => $ip,
-            'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-            'status' => 1
-        ]);
-
+        $login_id = NULL;
+        $login_email = $request->email;
+        $this->createHistoryUser($action, $login_id, $login_email, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         return redirect(RouteServiceProvider::TENANT_DASHBOARD);
     }
 
@@ -129,12 +132,8 @@ class RegisterController extends Controller {
     }
 
     public function storeMitra(Request $request): RedirectResponse {
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
         DB::connection()->enableQueryLog();
+        $action = "Register : Mitra Bisnis";
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
@@ -164,16 +163,9 @@ class RegisterController extends Controller {
 
         Auth::guard('tenant')->login($tenant);
 
-        History::create([
-            'id_user' => NULL,
-            'email' => $request->email,
-            'action' => "Register Tenant Mitra Bisnis : Success!",
-            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-            'deteksi_ip' => $ip,
-            'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-            'status' => 1
-        ]);
-
+        $login_id = NULL;
+        $login_email = $request->email;
+        $this->createHistoryUser($action, $login_id, $login_email, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         return redirect(RouteServiceProvider::TENANT_MITRA_DASHBOARD);
     }
 }

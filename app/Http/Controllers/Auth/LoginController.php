@@ -27,7 +27,7 @@ use Exception;
 
 class LoginController extends Controller {
 
-    function get_client_ip() {
+    private function get_client_ip() {
         $ipaddress = '';
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
@@ -48,6 +48,25 @@ class LoginController extends Controller {
         return $ipaddress;
     }
 
+    private function createHistoryUser($user_id,  $user_email, $log, $status){
+        $action = "User Login";
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
+    }
+
     public function index(): View {
         return view('auth.login');
     }
@@ -57,11 +76,6 @@ class LoginController extends Controller {
     }
 
     public function store(Request $request) : RedirectResponse {
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
         DB::connection()->enableQueryLog();
         $this->ensureIsNotRateLimited($request);
         $request->validate([
@@ -73,15 +87,9 @@ class LoginController extends Controller {
             if(! Auth::guard('marketing')->attempt($request->only('email', 'password'), $request->boolean('remember'))){
                 if(! Auth::guard('tenant')->attempt($request->only('email', 'password'), $request->boolean('remember'))){
                     if(! Auth::guard('kasir')->attempt($request->only('email', 'password'), $request->boolean('remember'))){
-                        History::create([
-                            'id_user' => NULL,
-                            'email' => $request->email,
-                            'action' => "Login : Login Gagal (Username atau Password salah!)",
-                            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                            'deteksi_ip' => $ip,
-                            'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-                            'status' => 0
-                        ]);
+                        $login_id = NULL;
+                        $login_email = $request->email;
+                        $this->createHistoryUser($login_id, $login_email, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
                         RateLimiter::hit($this->throttleKey());
                         throw ValidationException::withMessages([
                             'email' => trans('auth.failed'),
@@ -96,15 +104,9 @@ class LoginController extends Controller {
         );
         $request->session()->regenerate();
         RateLimiter::clear($this->throttleKey());
-        History::create([
-            'id_user' => NULL,
-            'email' => $request->email,
-            'action' => "Login : Success!",
-            'lokasi_anda' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-            'deteksi_ip' => $ip,
-            'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
-            'status' => 1
-        ]);
+        $login_id = NULL;
+        $login_email = $request->email;
+        $this->createHistoryUser($login_id, $login_email, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         if(Auth::guard('admin')->check()){
             return redirect()->intended(RouteServiceProvider::ADMIN_DASHBOARD)->with($notification);
         } else if(Auth::guard('marketing')->check()){

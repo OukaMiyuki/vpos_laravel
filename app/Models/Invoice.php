@@ -212,102 +212,101 @@ class Invoice extends Model {
             $model->nomor_invoice = $generate_nomor_invoice;
             $tenant = Tenant::select(['id_inv_code'])->find($model->id_tenant);
             if($model->jenis_pembayaran == "Qris"){
-                if($tenant->id_inv_code != 0){
-                    $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $model->store_identifier)->first();
-                    if($storeDetail->status_umi == 1){
-                        if($model->nominal_bayar <= 100000){
-                            $model->mdr = 0;
-                            $model->nominal_mdr = 0;
-                            $model->nominal_terima_bersih = $model->nominal_bayar;
+                if(is_null($model->qris_data) || empty($model->qris_data) || $model->qris_data == NULL){
+                    if($tenant->id_inv_code != 0){
+                        $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $model->store_identifier)->first();
+                        if($storeDetail->status_umi == 1){
+                            if($model->nominal_bayar <= 100000){
+                                $model->mdr = 0;
+                                $model->nominal_mdr = 0;
+                                $model->nominal_terima_bersih = $model->nominal_bayar;
+                            } else {
+                                $nominal_mdr = self::hitungMDR($model->nominal_bayar);
+                                $model->nominal_mdr = $nominal_mdr;
+                                $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                            }
                         } else {
                             $nominal_mdr = self::hitungMDR($model->nominal_bayar);
                             $model->nominal_mdr = $nominal_mdr;
                             $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
                         }
-                    } else {
-                        $nominal_mdr = self::hitungMDR($model->nominal_bayar);
-                        $model->nominal_mdr = $nominal_mdr;
-                        $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
-                    }
-                } else if($tenant->id_inv_code == 0) {
-                    $store = StoreList::select(['status_umi'])->where('store_identifier', $model->store_identifier)->first();
-                    if($store->status_umi == 1) {
-                        if($model->nominal_bayar <= 100000){
-                            $model->mdr = 0;
-                            $model->nominal_mdr = 0;
-                            $model->nominal_terima_bersih = $model->nominal_bayar;
+                    } else if($tenant->id_inv_code == 0) {
+                        $store = StoreList::select(['status_umi'])->where('store_identifier', $model->store_identifier)->first();
+                        if($store->status_umi == 1) {
+                            if($model->nominal_bayar <= 100000){
+                                $model->mdr = 0;
+                                $model->nominal_mdr = 0;
+                                $model->nominal_terima_bersih = $model->nominal_bayar;
+                            } else {
+                                $nominal_mdr = self::hitungMDR($model->nominal_bayar);
+                                $model->nominal_mdr = $nominal_mdr;
+                                $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                            }
                         } else {
                             $nominal_mdr = self::hitungMDR($model->nominal_bayar);
                             $model->nominal_mdr = $nominal_mdr;
                             $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
                         }
+                    }
+
+                    $qrisAccount = TenantQrisAccount::where('store_identifier', $model->store_identifier)->where('id_tenant', $model->id_tenant)->first();
+
+                    if(is_null($qrisAccount) || empty($qrisAccount)){
+                        try {
+                            $postResponse = $client->request('POST',  $url, [
+                                'form_params' => [
+                                    'amount' => $model->nominal_bayar,
+                                    'transactionNo' => $generate_nomor_invoice,
+                                    'pos_id' => "VP",
+                                    'secret_key' => "Vpos71237577"
+                                ]
+                            ]);
+                            $responseCode = $postResponse->getStatusCode();
+                            $data = json_decode($postResponse->getBody());
+                            $model->qris_data = $data->data->data->qrisData;
+                        } catch (Exception $e) {
+                            History::create([
+                                'id_user' => auth()->user()->id,
+                                'email' => auth()->user()->email,
+                                'action' => "Create Transaction Qris : Error",
+                                'lokasi_anda' => "System Log",
+                                'deteksi_ip' => "System Log",
+                                'log' => $e,
+                                'status' => 0
+                            ]);
+                        }
                     } else {
-                        $nominal_mdr = self::hitungMDR($model->nominal_bayar);
-                        $model->nominal_mdr = $nominal_mdr;
-                        $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
-                    }
-                }
-
-                $qrisAccount = TenantQrisAccount::where('store_identifier', $model->store_identifier)->where('id_tenant', $model->id_tenant)->first();
-
-                if(is_null($qrisAccount) || empty($qrisAccount)){
-                    try {
-                        $postResponse = $client->request('POST',  $url, [
-                            'form_params' => [
-                                'amount' => $model->nominal_bayar,
-                                'transactionNo' => $generate_nomor_invoice,
-                                'pos_id' => "VP",
-                                'secret_key' => "Vpos71237577"
-                            ]
-                        ]);
-                        $responseCode = $postResponse->getStatusCode();
-                        $data = json_decode($postResponse->getBody());
-                        $model->qris_data = $data->data->data->qrisData;
-                    } catch (Exception $e) {
-                        History::create([
-                            'id_user' => auth()->user()->id,
-                            'email' => auth()->user()->email,
-                            'action' => "Create Transaction Qris : Error",
-                            'lokasi_anda' => "System Log",
-                            'deteksi_ip' => "System Log",
-                            'log' => $e,
-                            'status' => 0
-                        ]);
-                        // return $e;
-                        // exit;
-                    }
-                } else {
-                    $qrisLogin = $qrisAccount->qris_login_user;
-                    $qrisPassword = $qrisAccount->qris_password;
-                    $qrisMerchantID = $qrisAccount->qris_merchant_id;
-                    $qrisStoreID = $qrisAccount->qris_store_id;
-                    try {
-                        $postResponse = $client->request('POST',  $url, [
-                            'form_params' => [
-                                'login' => $qrisLogin,
-                                'password' => $qrisPassword,
-                                'merchantID' => $qrisMerchantID,
-                                'storeID' => $qrisStoreID,
-                                'amount' => $model->nominal_bayar,
-                                'transactionNo' => $generate_nomor_invoice,
-                                'pos_id' => "VP",
-                                'secret_key' => "Vpos71237577"
-                            ]
-                        ]);
-                        $responseCode = $postResponse->getStatusCode();
-                        $data = json_decode($postResponse->getBody());
-                        $model->qris_data = $data->data->data->qrisData;
-                    } catch (Exception $e) {
-                        History::create([
-                            'id_user' => auth()->user()->id,
-                            'email' => auth()->user()->email,
-                            'action' => "Create Transaction Qris : Error",
-                            'lokasi_anda' => "System Log",
-                            'deteksi_ip' => "System Log",
-                            'log' => $e,
-                            'status' => 0
-                        ]);
-                        // testing
+                        $qrisLogin = $qrisAccount->qris_login_user;
+                        $qrisPassword = $qrisAccount->qris_password;
+                        $qrisMerchantID = $qrisAccount->qris_merchant_id;
+                        $qrisStoreID = $qrisAccount->qris_store_id;
+                        try {
+                            $postResponse = $client->request('POST',  $url, [
+                                'form_params' => [
+                                    'login' => $qrisLogin,
+                                    'password' => $qrisPassword,
+                                    'merchantID' => $qrisMerchantID,
+                                    'storeID' => $qrisStoreID,
+                                    'amount' => $model->nominal_bayar,
+                                    'transactionNo' => $generate_nomor_invoice,
+                                    'pos_id' => "VP",
+                                    'secret_key' => "Vpos71237577"
+                                ]
+                            ]);
+                            $responseCode = $postResponse->getStatusCode();
+                            $data = json_decode($postResponse->getBody());
+                            $model->qris_data = $data->data->data->qrisData;
+                        } catch (Exception $e) {
+                            History::create([
+                                'id_user' => auth()->user()->id,
+                                'email' => auth()->user()->email,
+                                'action' => "Create Transaction Qris : Error",
+                                'lokasi_anda' => "System Log",
+                                'deteksi_ip' => "System Log",
+                                'log' => $e,
+                                'status' => 0
+                            ]);
+                        }
                     }
                 }
             }

@@ -147,7 +147,8 @@ class PaymentQrisConfirm extends Controller {
                     'id_tenant' => $store->id_user,
                     'tanggal_transaksi' => $tanggal_transaksi,
                     'jenis_pembayaran' => $jenis_pembayaran,
-                    'nominal_bayar' => $nominal
+                    'nominal_bayar' => $nominal,
+                    'qris_data' => "Internal Qris"
                 ]);
 
                 return response()->json([

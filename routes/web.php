@@ -25,7 +25,7 @@ Route::middleware(['guest', 'throttle'])->prefix('/')->group( function () {
     Route::post('/login/reset-password/change-password/process', [App\Http\Controllers\Auth\LoginController::class, 'resetPasswordChangePassword'])->name('access.reset.password.process');
 });
 
-Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function () {
+Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( function () {
     Route::get('settings', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminSettings'])->name('admin.setting');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profile'])->name('admin.profile');
     Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileAccountUpdate'])->name('admin.profile.account.update');
@@ -35,7 +35,7 @@ Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function 
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'passwordUpdate'])->name('admin.password.update');
 });
 
-Route::middleware(['auth:admin', 'throttle'])->prefix('admin')->group( function () {
+Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( function () {
     Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('admin.logout');
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
 
@@ -129,7 +129,7 @@ Route::middleware(['guest:marketing', 'throttle'])->prefix('marketing')->group( 
 
 });
 
-Route::middleware(['auth:marketing', 'throttle'])->prefix('marketing')->group( function () {
+Route::middleware(['auth:marketing', 'auth', 'throttle'])->prefix('marketing')->group( function () {
     Route::get('/verify-email', [App\Http\Controllers\Auth\Marketing\EmailVerificationPromptController::class, 'emailVerificationView'])->name('marketing.verification.notice');
     Route::post('verify-email', [App\Http\Controllers\Auth\Marketing\VerifyEmailController::class, 'processVerification'])
                 ->middleware(['throttle:6,1'])
@@ -141,7 +141,7 @@ Route::middleware(['auth:marketing', 'throttle'])->prefix('marketing')->group( f
     Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('marketing.logout');
 });
 
-Route::middleware(['auth:marketing', 'marketingemailverified', 'throttle', 'isMarketingActive'])->prefix('mitra')->group( function () {
+Route::middleware(['auth:marketing', 'auth', 'marketingemailverified', 'throttle', 'isMarketingActive'])->prefix('mitra')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'index'])->name('marketing.dashboard');
 
     Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:6,1'])->name('marketing.settings.whatsappotp');
@@ -188,7 +188,7 @@ Route::middleware(['guest:tenant', 'throttle'])->prefix('tenant')->group( functi
     });
 });
 
-Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( function () {
+Route::middleware(['auth:tenant', 'auth', 'throttle'])->prefix('tenant')->group( function () {
     Route::get('/verify-email', [App\Http\Controllers\Auth\Tenant\EmailVerificationPromptController::class, 'emailVerificationView'])->name('tenant.verification.notice');
     Route::post('verify-email', [App\Http\Controllers\Auth\Tenant\VerifyEmailController::class, 'processVerification'])
                     ->middleware(['throttle:6,1'])
@@ -200,7 +200,7 @@ Route::middleware(['auth:tenant', 'throttle'])->prefix('tenant')->group( functio
     Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('tenant.logout');
 });
 
-Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive'])->prefix('tenant')->group( function () {
+Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'isTenantActive'])->prefix('tenant')->group( function () {
     Route::get('settings', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tenantSettings'])->name('tenant.settings');
     Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:10,1'])->name('tenant.settings.whatsappotp');
     Route::post('settings/validate/whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappOTPSubmit'])->name('tenant.settings.whatsappotp.validate');
@@ -219,7 +219,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/finance/history-penarikan/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'invoiceTarikDana'])->name('tenant.finance.history_penarikan.invoice');
 });
 
-Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsNotMitra'])->prefix('/tenant/mitra')->group( function () {
+Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsNotMitra'])->prefix('/tenant/mitra')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'index'])->name('tenant.mitra.dashboard');
 
     Route::get('/dashboard/store', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeDashboard'])->name('tenant.mitra.dashboard.toko');
@@ -255,7 +255,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-all', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'pemasukanQris'])->name('tenant.mitra.dashboard.finance.pemasukan.qris.all');
 });
 
-Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsMitra'])->prefix('tenant')->group( function () {
+Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsMitra'])->prefix('tenant')->group( function () {
     Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestForm'])->name('tenant.request.umi');
     Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');
     Route::post('request/umi/resend', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcessResend'])->name('tenant.request.umi.resend');
@@ -346,7 +346,7 @@ Route::middleware(['auth:tenant', 'tenantemailverivied', 'throttle', 'isTenantAc
     Route::post('settings/store', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'storeProfileSettingsUPdate'])->name('tenant.store.profile.update');
 });
 
-Route::middleware(['auth:kasir', 'throttle', 'isKasirActive', 'isKasirStoreActive'])->prefix('kasir')->group( function () {
+Route::middleware(['auth:kasir', 'auth', 'throttle', 'isKasirActive', 'isKasirStoreActive'])->prefix('kasir')->group( function () {
 
     Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('kasir.logout');
 

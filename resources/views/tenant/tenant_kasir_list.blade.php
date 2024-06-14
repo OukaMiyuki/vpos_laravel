@@ -127,6 +127,7 @@
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
                                     <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="email" required value="{{ old('email') }}" placeholder="Masukkan email akun">
+                                    <small id="emailHelp" class="form-text text-muted">Pastikan email aktif!</small>
                                     @error('email')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -139,6 +140,7 @@
                                 <div class="mb-3">
                                     <label for="phone" class="form-label">No Telp. / Whatsapp</label>
                                     <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" id="phone" required value="{{ old('phone') }}" placeholder="Contoh : 081XXXXXXXXX">
+                                    <small id="emailHelp" class="form-text text-muted">Pastikan nomor aktif dan terdaftar whatsapp!</small>
                                     @error('phone')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
