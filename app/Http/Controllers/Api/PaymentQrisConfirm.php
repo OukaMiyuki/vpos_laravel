@@ -183,6 +183,10 @@ class PaymentQrisConfirm extends Controller {
                     ]);
                 }
 
+                if(is_null($lokasi) || empty($lokasi)){
+                    $lokasi = "Internal Qris";
+                }
+
                 $invoice = Invoice::create([
                     'store_identifier' => $store_identifier,
                     'email' => $store->email,
@@ -190,7 +194,7 @@ class PaymentQrisConfirm extends Controller {
                     'tanggal_transaksi' => $tanggal_transaksi,
                     'jenis_pembayaran' => $jenis_pembayaran,
                     'nominal_bayar' => $nominal,
-                    'qris_data' => "Internal Qris"
+                    'qris_data' => $lokasi
                 ]);
 
                 $action = "Request Invoice Number by Merchant : ".$store->store_identifier." Creation Success | ".$invoice->nomor_invoice;

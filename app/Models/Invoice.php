@@ -212,8 +212,14 @@ class Invoice extends Model {
             if(is_null($model->qris_data) || empty($model->qris_data) || $model->qris_data == NULL){
                 $model->nomor_invoice = $generate_nomor_invoice;
             } else {
-                $date = date('YmdHisU');
-                $model->nomor_invoice = $date;
+                if($model->qris_data == "Internal Qris"){
+                    $date = date('YmdHisU');
+                    $model->nomor_invoice = $date;
+                } else {
+                    $date = date('YmdHis');
+                    $invoice_generated = $model->qris_data.$date;
+                    $model->nomor_invoice = $invoice_generated;
+                }
             }
             $tenant = Tenant::select(['id_inv_code'])->find($model->id_tenant);
             if($model->jenis_pembayaran == "Qris"){
