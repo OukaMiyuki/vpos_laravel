@@ -154,6 +154,15 @@ class PaymentQrisConfirm extends Controller {
                 'status' => 200
             ]);
         } else {
+            History::create([
+                'action' => 'Unauthorized',
+                'id_user' => NULL,
+                'email' => NULL,
+                'lokasi_anda' => 'System Report',
+                'deteksi_ip' => 'System Report',
+                'log' => $invoice_number,
+                'status' => 1
+            ]);
             return response()->json([
                 'message' => 'Unauthorized!',
                 'status' => 500
