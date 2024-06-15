@@ -342,6 +342,7 @@ class ProfileController extends Controller{
                             ->where('email', auth()->user()->email)
                             ->first();
         $dataRekening = "";
+        $action = "";
         if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
             $ip = "36.84.106.3";
             $PublicIP = $this->get_client_ip();
@@ -363,8 +364,12 @@ class ProfileController extends Controller{
                 $responseCode = $getRek->getStatusCode();
                 $dataRekening = json_decode($getRek->getBody());
             } catch (Exception $e) {
-                return $e;
-                exit;
+                if(auth()->user()->id_inv_code == 0){
+                    $action = "Mitra Bisnis : Update Profile";
+                } else {
+                    $action = "Tenant : Update Profile";
+                }
+                $this->createHistoryUser($action, $e, 0);
             }
         }
         $client = new GuzzleHttpClient();
@@ -406,9 +411,7 @@ class ProfileController extends Controller{
                     'no_rekening' => $rekening,
                     'swift_code' => $swift_code,
                 ]);
-
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
-
                 $notification = array(
                     'message' => 'Update nomor rekening berhasil!',
                     'alert-type' => 'success',

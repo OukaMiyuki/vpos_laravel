@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
+use Stevebauman\Location\Facades\Location;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -30,9 +32,51 @@ use App\Models\QrisWallet;
 use App\Models\HistoryCashbackAdmin;
 use App\Models\NobuWithdrawFeeHistory;
 use App\Models\Rekening;
+use App\Models\History;
 
 class AdminController extends Controller {
-    // Teting github error
+
+    private function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
+    }
+
     public function index(){
         $marketingCount = Marketing::count();
         $mitraBisnis = Tenant::where('id_inv_code', '==', 0)->count();
@@ -206,8 +250,14 @@ class AdminController extends Controller {
     }
 
     public function adminMenuUserUmiRequestApprove(Request $request){
+        $action="";
         $umiRequest = UmiRequest::where('store_identifier', $request->store_identifier)->find($request->id);
-
+        DB::connection()->enableQueryLog();
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Approve UMI";
+        } else {
+            $action = "Administrator : Approve UMI";
+        }
         if(is_null($umiRequest) || empty($umiRequest)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -215,7 +265,6 @@ class AdminController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-
         $umiRequest->update([
             'tanggal_approval' => Carbon::now(),
             'is_active' => 1,
@@ -223,7 +272,6 @@ class AdminController extends Controller {
         ]);
         $store = "";
         $store = StoreDetail::where('store_identifier', $request->store_identifier)->first();
-
         if(is_null($store) || empty($store) || $store == ""){
             $store = StoreList::where('store_identifier', $request->store_identifier)->first();
         }
@@ -231,7 +279,7 @@ class AdminController extends Controller {
         $store->update([
             'status_umi' => 1
         ]);
-
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Umi berhasil disetujui!',
             'alert-type' => 'success',
@@ -240,8 +288,14 @@ class AdminController extends Controller {
     }
 
     public function adminMenuUserUmiRequestReject(Request $request){
+        DB::connection()->enableQueryLog();
+        $action="";
         $umiRequest = UmiRequest::where('store_identifier', $request->store_identifier)->find($request->id);
-
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Reject UMI";
+        } else {
+            $action = "Administrator : Reject UMI";
+        }
         if(is_null($umiRequest) || empty($umiRequest)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -265,7 +319,7 @@ class AdminController extends Controller {
         $store->update([
             'status_umi' => 2
         ]);
-
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Umi berhasil ditolak!',
             'alert-type' => 'success',
@@ -279,6 +333,13 @@ class AdminController extends Controller {
     }
 
     public function adminMenuUserTenantQrisRegister(Request $request){
+        DB::connection()->enableQueryLog();
+        $action = "";
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Qris ACcount Register | ".$request->store_identifier;
+        } else {
+            $action = "Administrator : Qris ACcount Register | ".$request->store_identifier;
+        }
         $store_identifier = $request->store_identifier;
         $qris_login = $request->qris_login;
         $qris_password = $request->qris_password;
@@ -287,10 +348,8 @@ class AdminController extends Controller {
         $mdr = $request->mdr;
         $store = "";
         $store = StoreDetail::where('store_identifier', $store_identifier)->first();
-
         if(is_null($store) || empty($store) || $store == ""){
             $store = StoreList::where('store_identifier', $store_identifier)->first();
-
             TenantQrisAccount::create([
                 'store_identifier' => $store_identifier,
                 'id_tenant' => $store->id_user,
@@ -301,14 +360,13 @@ class AdminController extends Controller {
                 'qris_store_id' => $qris_store_id,
                 'mdr' => $mdr
             ]);
-
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             $notification = array(
                 'message' => 'Akun Tenant Qris berhasil dibuat!',
                 'alert-type' => 'success',
             );
             return redirect()->back()->with($notification);
         }
-
         TenantQrisAccount::create([
             'store_identifier' => $store_identifier,
             'id_tenant' => $store->id_tenant,
@@ -319,7 +377,7 @@ class AdminController extends Controller {
             'qris_store_id' => $qris_store_id,
             'mdr' => $mdr
         ]);
-
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Akun Tenant Qris berhasil dibuat!',
             'alert-type' => 'success',
@@ -328,6 +386,13 @@ class AdminController extends Controller {
     }
 
     public function adminMenuUserTenantQrisUpdate(Request $request){
+        DB::connection()->enableQueryLog();
+        $action = "";
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Update Qris Account | ".$request->store_identifier;
+        } else {
+            $action = "Administrator : Update Qris Account | ".$request->store_identifier;
+        }
         $id = $request->id;
         $store_identifier = $request->store_identifier;
         $qris_login = $request->qris_login;
@@ -336,7 +401,13 @@ class AdminController extends Controller {
         $qris_store_id = $request->qris_store_id;
         $mdr = $request->mdr;
         $qris = TenantQrisAccount::where('store_identifier', $store_identifier)->find($id);
-
+        if(is_null($qris) || empty($qris)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
         $qris->update([
             'qris_login_user' => $qris_login,
             'qris_password' => $qris_password,
@@ -344,7 +415,7 @@ class AdminController extends Controller {
             'qris_store_id' => $qris_store_id,
             'mdr' => $mdr
         ]);
-
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Akun Tenant Qris berhasil diupdate!',
             'alert-type' => 'success',
@@ -353,8 +424,9 @@ class AdminController extends Controller {
     }
 
     public function adminMenuUserTenantQrisDelete($id){
+        DB::connection()->enableQueryLog();
+        $action = "";
         $qris = TenantQrisAccount::find($id);
-
         if(is_null($qris) || empty($qris)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -362,7 +434,13 @@ class AdminController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Delete Qris Account";
+        } else {
+            $action = "Administrator : Delete Qris Account";
+        }
         $qris->delete();
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Data akun qris berhasil dihapus!',
             'alert-type' => 'success',
@@ -397,6 +475,8 @@ class AdminController extends Controller {
     }
 
     public function adminRegister(Request $request){
+        DB::connection()->enableQueryLog();
+        $action = "Admin Super User : Register new Administrator";
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
@@ -420,6 +500,8 @@ class AdminController extends Controller {
             $admin->detailAdminStore($admin);
         }
 
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+
         $notification = array(
             'message' => 'Admin berhasil diregister!',
             'alert-type' => 'success',
@@ -428,6 +510,8 @@ class AdminController extends Controller {
     }
 
     public function adminActivation($id){
+        DB::connection()->enableQueryLog();
+        $action = "";
         $admin = Admin::find($id);
 
         if(is_null($admin) || empty($admin)){
@@ -439,15 +523,17 @@ class AdminController extends Controller {
         }
 
         if($admin->is_active == 0){
+            $action = "Admin Super User : Activate Administrator";
             $admin->update([
                 'is_active' => 1
             ]);
         } else {
+            $action = "Admin Super User : Deactivate Administrator";
             $admin->update([
                 'is_active' => 0
             ]);
         }
-
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Admin berhasil diupdate!',
             'alert-type' => 'success',
@@ -658,7 +744,8 @@ class AdminController extends Controller {
 
     public function adminMarketingAccountActivation($id){
         $marketing = Marketing::find($id);
-
+        DB::connection()->enableQueryLog();
+        $action = "";
         if(is_null($marketing) || empty($marketing)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -668,10 +755,25 @@ class AdminController extends Controller {
         }
 
         if($marketing->is_active == 0){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Activating Mitra Aplikasi | ".$marketing->name;
+            } else {
+                $action = "Administrator : Activating Mitra Aplikasi | ".$marketing->name;
+            }
             $marketing->is_active = 1;
         } else if($marketing->is_active == 1){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Deactivating Mitra Aplikasi | ".$marketing->name;
+            } else {
+                $action = "Administrator : Deactivating Mitra Aplikasi | ".$marketing->name;
+            }
             $marketing->is_active = 2;
         } else if($marketing->is_active == 2){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Reactivating Mitra Aplikasi | ".$marketing->name;
+            } else {
+                $action = "Administrator : Reactivating Mitra Aplikasi | ".$marketing->name;
+            }
             $marketing->is_active = 1;
         }
 
@@ -696,6 +798,7 @@ class AdminController extends Controller {
         }
 
         $marketing->save();
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Data akun berhasil diupdate!',
             'alert-type' => 'success',
@@ -808,6 +911,8 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMarketingInvitationCodeListActivation($id){
+        DB::connection()->enableQueryLog();
+        $action = "";
         $invitationCode = InvitationCode::find($id);
         if(is_null($invitationCode) || empty($invitationCode) || $invitationCode == NULL){
             $notification = array(
@@ -828,14 +933,25 @@ class AdminController extends Controller {
         }
 
         if($invitationCode->is_active == 0){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Activating Invitation Code | ".$invitationCode->inv_code;
+            } else {
+                $action = "Administrator : Activating Invitation Code | ".$invitationCode->inv_code;
+            }
             $invitationCode->update([
                 'is_active' => 1
             ]);
         } else {
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Deactivating Invitation Code | ".$invitationCode->inv_code;
+            } else {
+                $action = "Administrator : Deactivating Invitation Code | ".$invitationCode->inv_code;
+            }
             $invitationCode->update([
                 'is_active' => 0
             ]);
         }
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Data berhasil diupdate!',
             'alert-type' => 'info',
@@ -1103,8 +1219,9 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMitraBisnisActivation($id){
+        DB::connection()->enableQueryLog();
+        $action = "";
         $tenant = Tenant::where('id_inv_code', 0)->find($id);
-
         if(is_null($tenant) || empty($tenant)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -1114,33 +1231,39 @@ class AdminController extends Controller {
         }
 
         if($tenant->is_active == 0){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Activating Mitra Bisnis | ".$tenant->name;
+            } else {
+                $action = "Administrator : Activating Mitra Bisnis | ".$tenant->name;
+            }
             $tenant->update([
                 'is_active' => 1
             ]);
-            $notification = array(
-                'message' => 'Data berhasil diupdate!',
-                'alert-type' => 'success',
-            );
-            return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
         } else if($tenant->is_active == 1){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Deactivating Mitra Bisnis | ".$tenant->name;
+            } else {
+                $action = "Administrator : Deactivating Mitra Bisnis | ".$tenant->name;
+            }
             $tenant->update([
                 'is_active' => 2
             ]);
-            $notification = array(
-                'message' => 'Data berhasil diupdate!',
-                'alert-type' => 'success',
-            );
-            return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
         } else if($tenant->is_active == 2){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Reactivating Mitra Bisnis | ".$tenant->name;
+            } else {
+                $action = "Administrator : Reactivating Mitra Bisnis | ".$tenant->name;
+            }
             $tenant->update([
                 'is_active' => 1
             ]);
-            $notification = array(
-                'message' => 'Data berhasil diupdate!',
-                'alert-type' => 'success',
-            );
-            return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
         }
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
     }
 
     public function adminDashboardMitraBisnisMerchantList(){
@@ -1263,8 +1386,9 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMitraBisnisMerchantActivation($id, $store_identifier){
+        DB::connection()->enableQueryLog();
+        $action = "";
         $storeActivation = StoreList::where('id', $id)->where('store_identifier', $store_identifier)->first();
-
         if(is_null($storeActivation) || empty($storeActivation)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -1274,20 +1398,29 @@ class AdminController extends Controller {
         }
 
         if($storeActivation->is_active == 0){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Activating Merchant | ".$storeActivation->store_identifier;
+            } else {
+                $action = "Administrator : Activating Merchant | ".$storeActivation->store_identifier;
+            }
             $storeActivation->update([
                 'is_active' => 1
             ]);
         } else if($storeActivation->is_active == 1){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Deactivating Merchant | ".$storeActivation->store_identifier;
+            } else {
+                $action = "Administrator : Deactivating Merchant | ".$storeActivation->store_identifier;
+            }
             $storeActivation->update([
                 'is_active' => 0
             ]);
         }
-
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Data berhasil diupdate!',
             'alert-type' => 'success',
         );
-
         return redirect()->route('admin.dashboard.mitraBisnis.merchantList')->with($notification);
     }
 
@@ -1616,9 +1749,9 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMitraTenantActivation($id){
+        DB::connection()->enableQueryLog();
+        $action = "";
         $tenant = Tenant::where('id_inv_code', '!=', 0)->find($id);
-
-
         if(is_null($tenant) || empty($tenant)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -1626,21 +1759,35 @@ class AdminController extends Controller {
             );
             return redirect()->route('admin.dashboard.mitraTenant.list')->with($notification);
         }
-
         if($tenant->is_active == 0){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Activating Tenant | ".$tenant->name;
+            } else {
+                $action = "Administrator : Activating Tenant | ".$tenant->name;
+            }
             $tenant->update([
                 'is_active' => 1
             ]);
         } else if($tenant->is_active == 1){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Deactivating Tenant | ".$tenant->name;
+            } else {
+                $action = "Administrator : Deactivating Tenant | ".$tenant->name;
+            }
             $tenant->update([
                 'is_active' => 2
             ]);
         } else if($tenant->is_active == 2){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Reactivating Tenant | ".$tenant->name;
+            } else {
+                $action = "Administrator : Reactivating Tenant | ".$tenant->name;
+            }
             $tenant->update([
                 'is_active' => 1
             ]);
         }
-
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Data berhasil diupdate!',
             'alert-type' => 'success',
@@ -1841,8 +1988,9 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMitraTenantKasirActivation($id){
+        DB::connection()->enableQueryLog();
+        $action = "";
         $kasir = Kasir::find($id);
-
         if(is_null($kasir) || empty($kasir)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',
@@ -1852,15 +2000,25 @@ class AdminController extends Controller {
         }
 
         if($kasir->is_active == 0) {
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Activating Kasir | ".$kasir->name;
+            } else {
+                $action = "Administrator : Activating Kasir | ".$kasir->name;
+            }
             $kasir->update([
                 'is_active' => 1
             ]);
         } else if($kasir->is_active == 1){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Deactivating Kasir | ".$kasir->name;
+            } else {
+                $action = "Administrator : Deactivating Kasir | ".$kasir->name;
+            }
             $kasir->update([
                 'is_active' => 0
             ]);
         }
-
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Data berhasil diupdate!',
             'alert-type' => 'success',

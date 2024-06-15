@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use Stevebauman\Location\Facades\Location;
+use Illuminate\Support\Facades\DB;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -19,9 +20,51 @@ use App\Models\QrisWallet;
 use App\Models\Withdrawal;
 use App\Models\DetailPenarikan;
 use App\Models\NobuWithdrawFeeHistory;
+use App\Models\History;
 use Exception;
 
 class ProfileController extends Controller {
+
+    private function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
+    }
 
     public function adminSettings(){
         return view('admin.admin_setting');
@@ -48,9 +91,15 @@ class ProfileController extends Controller {
     }
 
     public function profileInfoUpdate(Request $request) {
+        DB::connection()->enableQueryLog();
         $id = auth()->user()->detail->id;
         $accountInfo = DetailAdmin::find($id);
-
+        $action = "";
+        if(auth()->user()->access_level == 0){
+             $action = "Admin Super User : Update Profile";
+        } else {
+            $action = "Administrator : Update Profile";
+        }
         if($request->hasFile('photo')){
             $file = $request->file('photo');
             $namaFile = auth()->user()->name;
@@ -62,11 +111,25 @@ class ProfileController extends Controller {
                 try {
                     $file->move($storagePath, $filename);
                 } catch (\Exception $e) {
-                    return $e->getMessage();
+                    if(auth()->user()->access_level == 0){
+                        $action = "Admin Super User : Update Profile | Upload Photo Error";
+                    } else {
+                        $action = "Administrator : Update Profile | Upload Photo Error";
+                    }
+                    $this->createHistoryUser($action, $e, 0);
                 }
             } else {
-                Storage::delete('public/images/profile/'.$accountInfo->photo);
-                $file->move($storagePath, $filename);
+                try {
+                    Storage::delete('public/images/profile/'.$accountInfo->photo);
+                    $file->move($storagePath, $filename);
+                } catch (\Exception $e) {
+                    if(auth()->user()->access_level == 0){
+                        $action = "Admin Super User : Update Profile | Upload Photo Error";
+                    } else {
+                        $action = "Administrator : Update Profile | Upload Photo Error";
+                    }
+                    $this->createHistoryUser($action, $e, 0);
+                }
             }
 
             $accountInfo->update([
@@ -79,12 +142,6 @@ class ProfileController extends Controller {
                 'updated_at' => Carbon::now()
             ]);
 
-            $notification = array(
-                'message' => 'Data akun berhasil diupdate!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
-
         } else {
             $accountInfo->update([
                 'no_ktp' => $request->no_ktp,
@@ -94,13 +151,13 @@ class ProfileController extends Controller {
                 'alamat' => $request->alamat,
                 'updated_at' => Carbon::now()
             ]);
-
-            $notification = array(
-                'message' => 'Data akun berhasil diupdate!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
         }
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+        $notification = array(
+            'message' => 'Data akun berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
     }
 
     public function password(){
@@ -108,11 +165,17 @@ class ProfileController extends Controller {
     }
 
     public function passwordUpdate(Request $request){
+        $action = "";
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Update Password";
+        } else {
+            $action = "Administrator : Update Password";
+        }
+        DB::connection()->enableQueryLog();
         $request->validate([
             'old_password' => 'required',
             'new_password' => 'required|confirmed',
         ]);
-
         try{
             $otp = (new Otp)->validate(auth()->user()->phone, $request->otp);
             if(!$otp->status){
@@ -129,11 +192,10 @@ class ProfileController extends Controller {
                     );
                     return redirect()->back()->with($notification);
                 }
-
                 Admin::whereId(auth()->user()->id)->update([
                     'password' => Hash::make($request->new_password),
                 ]);
-
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                 $notification = array(
                     'message' => 'Password berhasil diperbarui!',
                     'alert-type' => 'success',
@@ -141,6 +203,7 @@ class ProfileController extends Controller {
                 return redirect()->back()->with($notification);
             }
         } catch(Exception $e){
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Update Password Error!',
                 'alert-type' => 'error',
@@ -150,6 +213,8 @@ class ProfileController extends Controller {
     }
 
     public function whatsappNotification(){
+        DB::connection()->enableQueryLog();
+        $action = "";
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
         $client = new GuzzleHttpClient();
@@ -182,18 +247,38 @@ class ProfileController extends Controller {
                 'json' => $data,
             ]);
         } catch(Exception $ex){
-           return $ex;
-           exit;
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Send Whatsapp OTP Fail";
+            } else {
+                $action = "Administrator : Send Whatsapp OTP Fail";
+            }
+            $this->createHistoryUser($action, $ex, 0);
+            $notification = array(
+                'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
         }
         $responseCode = $postResponse->getStatusCode();
-
         if($responseCode == 200){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Send Whatsapp OTP Success";
+            } else {
+                $action = "Administrator : Send Whatsapp OTP Success";
+            }
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             $notification = array(
                 'message' => 'OTP Sukses dikirim!',
                 'alert-type' => 'success',
             );
             return redirect()->back()->with($notification);
         } else {
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Send Whatsapp OTP Fail | Status : ".$responseCode;
+            } else {
+                $action = "Administrator : Send Whatsapp OTP Fail | Status : ".$responseCode;
+            }
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
             $notification = array(
                 'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
                 'alert-type' => 'error',
@@ -208,7 +293,7 @@ class ProfileController extends Controller {
                             ->where('email', auth()->user()->email)
                             ->first();
         $dataRekening = "";
-
+        $action = "";
         if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
             $ip = "36.84.106.3";
             $PublicIP = $this->get_client_ip();
@@ -217,7 +302,6 @@ class ProfileController extends Controller {
             $long = $getLoc->longitude;
             $rekClient = new GuzzleHttpClient();
             $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
-
             try {
                 $getRek = $rekClient->request('POST',  $urlRek, [
                     'form_params' => [
@@ -231,8 +315,12 @@ class ProfileController extends Controller {
                 $responseCode = $getRek->getStatusCode();
                 $dataRekening = json_decode($getRek->getBody());
             } catch (Exception $e) {
-                return $e;
-                exit;
+                if(auth()->user()->access_level == 0){
+                    $action = "Admin Super User : Rekening Cek Error HTTP API";
+                } else {
+                    $action = "Administrator : Rekening Cek Error HTTP API";
+                }
+                $this->createHistoryUser($action, $e, 0);
             }
         }
 
@@ -250,13 +338,13 @@ class ProfileController extends Controller {
         $swift_code = $request->swift_code;
         $nama_bank = $request->nama_bank;
         $rekening = $request->no_rekening;
-
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
-
+        $action = "";
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Rekening Update";
+        } else {
+            $action = "Administrator : Rekening Update";
+        }
+        DB::connection()->enableQueryLog();
         try{
             $otp = (new Otp)->validate(auth()->user()->phone, $kode);
             if(!$otp->status){
@@ -274,7 +362,7 @@ class ProfileController extends Controller {
                     'nama_bank' => $nama_bank,
                     'swift_code' => $swift_code,
                 ]);
-
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                 $notification = array(
                     'message' => 'Update nomor rekening berhasil!',
                     'alert-type' => 'success',
@@ -282,6 +370,7 @@ class ProfileController extends Controller {
                 return redirect()->back()->with($notification);
             }
         } catch(Exception $e){
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Update Rekening Error!',
                 'alert-type' => 'error',
@@ -297,12 +386,14 @@ class ProfileController extends Controller {
     }
 
     public function adminWithdrawTarik(Request $request){
+        DB::connection()->enableQueryLog();
         $ip = "125.164.243.227";
         $PublicIP = $this->get_client_ip();
         $getLoc = Location::get($ip);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $wallet = "";
+        $action = "";
 
         $nominal_tarik = $request->nominal_tarik;
         $otp = $request->wa_otp;
@@ -366,6 +457,12 @@ class ProfileController extends Controller {
                         $dataRekening = json_decode($getRek->getBody());
                         return view('admin.admin_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan', 'jenis_tarik']));
                     } catch (Exception $e) {
+                        if(auth()->user()->access_level == 0){
+                            $action = "Admin Super User :Cek Rekening Error";
+                        } else {
+                            $action = "Administrator : Cek Rekening Error";
+                        }
+                        $this->createHistoryUser($action, $e, 0);
                         $notification = array(
                             'message' => 'Tarik dana error, harap hubungi admin!',
                             'alert-type' => 'error',
@@ -375,6 +472,12 @@ class ProfileController extends Controller {
                 }
             }
         } catch(Exception $e){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Withdrawal Process Error";
+            } else {
+                $action = "Administrator : Withdrawal Process Error";
+            }
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
                 'message' => 'Penarikan dana gagal, harap hubungi admin!',
                 'alert-type' => 'error',
@@ -392,17 +495,16 @@ class ProfileController extends Controller {
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $wallet = "";
-
+        $action = "";
+        DB::connection()->enableQueryLog();
         $nominal_tarik = $request->nominal_penarikan;
         $total_tarik = $request->total_tarik;
         $biaya_admin = $request->biaya_admin;
         $jenis_tarik = $request->jenis_penarikan;
-
         $rekening = Rekening::select(['swift_code', 'no_rekening'])
                             ->where('id_user', auth()->user()->id)
                             ->where('email', auth()->user()->email)
                             ->first();
-
         if($jenis_tarik == "Qris"){
             $wallet = QrisWallet::where('id_user', auth()->user()->id)
                                     ->where('email', auth()->user()->email)
@@ -478,12 +580,26 @@ class ProfileController extends Controller {
                                 'nominal' => 300
                             ]);
 
+                            if(auth()->user()->access_level == 0){
+                                $action = "Admin Super User : Update Profile";
+                            } else {
+                                $action = "Administrator : Update Profile";
+                            }
+
+                            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+
                             $notification = array(
                                 'message' => 'Penarikan dana sukses!',
                                 'alert-type' => 'success',
                             );
                             return redirect()->route('admin.dashboard.finance.withdraw.invoice', array('id' => $withDraw->id))->with($notification);
                         } else {
+                            if(auth()->user()->access_level == 0){
+                                $action = "Admin Super User : Withdrawal Process Error";
+                            } else {
+                                $action = "Administrator : Withdrawal Process Error";
+                            }
+                            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
                             $notification = array(
                                 'message' => 'Penarikan dana gagal, harap hubungi admin!',
                                 'alert-type' => 'error',
@@ -513,47 +629,44 @@ class ProfileController extends Controller {
                             'biaya_admin_su' => NULL,
                             'biaya_agregate' => NULL
                         ]);
+                        if(auth()->user()->access_level == 0){
+                            $action = "Admin Super User : Withdrawal Transaction fail invalid";
+                        } else {
+                            $action = "Administrator : Withdrawal Transaction fail invalid";
+                        }
+                        $this->createHistoryUser($action, $responseMessage, 0);
                         $notification = array(
-                            'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                            'message' => 'Penarikan dana gagal!',
                             'alert-type' => 'error',
                         );
                         return redirect()->route('admin.withdraw')->with($notification);
                     }
                 } catch (Exception $e) {
+                    if(auth()->user()->access_level == 0){
+                        $action = "Admin Super User :  Withdraw Process | Error (HTTP API Error)";
+                    } else {
+                        $action = "Administrator :  Withdraw Process | Error (HTTP API Error)";
+                    }
+                    $this->createHistoryUser($action, $e, 0);
                     $notification = array(
-                        'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                        'message' => 'Penarikan dana gagal!',
                         'alert-type' => 'error',
                     );
                     return redirect()->route('admin.withdraw')->with($notification);
                 }
             }
         } catch (Exception $e){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Withdraw Process | Error";
+            } else {
+                $action = "Administrator : Withdraw Process | Error";
+            }
+            $this->createHistoryUser($action, $e, 0);
             $notification = array(
-                'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                'message' => 'Penarikan dana gagal!',
                 'alert-type' => 'error',
             );
             return redirect()->route('admin.withdraw')->with($notification);
         }
-    }
-
-    function get_client_ip() {
-        $ipaddress = '';
-        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
-            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
-            $ipaddress = $_SERVER['HTTP_FORWARDED'];
-        } else if (isset($_SERVER['REMOTE_ADDR'])) {
-            $ipaddress = $_SERVER['REMOTE_ADDR'];
-        } else {
-            $ipaddress = 'UNKNOWN';
-        }
-
-        return $ipaddress;
     }
 }

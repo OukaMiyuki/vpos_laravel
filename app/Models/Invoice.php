@@ -209,7 +209,11 @@ class Invoice extends Model {
             // $index_number = $model->id + 1;
             // $index_number = (int) $model->id;
             $generate_nomor_invoice = $invoice_code.$date.str_pad($index_number, 9, '0', STR_PAD_LEFT);
-            $model->nomor_invoice = $generate_nomor_invoice;
+            if(is_null($model->qris_data) || empty($model->qris_data) || $model->qris_data == NULL){
+                $model->nomor_invoice = $generate_nomor_invoice;
+            } else {
+                $model->nomor_invoice = $date;
+            }
             $tenant = Tenant::select(['id_inv_code'])->find($model->id_tenant);
             if($model->jenis_pembayaran == "Qris"){
                 if($tenant->id_inv_code != 0){

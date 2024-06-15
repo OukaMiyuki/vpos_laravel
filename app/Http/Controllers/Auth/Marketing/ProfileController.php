@@ -273,7 +273,6 @@ class ProfileController extends Controller {
 
     public function whatsappNotification(){
         DB::connection()->enableQueryLog();
-
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
         $client = new GuzzleHttpClient();
@@ -315,7 +314,6 @@ class ProfileController extends Controller {
             return redirect()->back()->with($notification);
         }
         $responseCode = $postResponse->getStatusCode();
-
         if($responseCode == 200){
             $action = "Mitra Aplikasi : Send Whatsapp OTP Success";
             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
@@ -368,6 +366,7 @@ class ProfileController extends Controller {
                             ->where('email', auth()->user()->email)
                             ->first();
         $dataRekening = "";
+        $action = "";
         if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
             $ip = "36.84.106.3";
             $PublicIP = $this->get_client_ip();
@@ -389,8 +388,8 @@ class ProfileController extends Controller {
                 $responseCode = $getRek->getStatusCode();
                 $dataRekening = json_decode($getRek->getBody());
             } catch (Exception $e) {
-                return $e;
-                exit;
+                $action = "Mitra Aplikasi : Rekening Cek Error HTTP API";
+                $this->createHistoryUser($action, $e, 0);
             }
         }
 
@@ -410,7 +409,6 @@ class ProfileController extends Controller {
         $rekening = $request->no_rekening;
         $action = "Mitra Aplikasi : Rekening Update";
         DB::connection()->enableQueryLog();
-
         try{
             $otp = (new Otp)->validate(auth()->user()->phone, $kode);
             if(!$otp->status){
@@ -534,11 +532,9 @@ class ProfileController extends Controller {
         $agregate = 350;
         $aplikator = 850;
         DB::connection()->enableQueryLog();
-
         $nominal_tarik = $request->nominal_penarikan;
         $total_tarik = $request->total_tarik;
         $biaya_admin = $request->biaya_admin;
-
         $rekening = Rekening::select(['swift_code', 'no_rekening'])
                             ->where('id_user', auth()->user()->id)
                             ->where('email', auth()->user()->email)
@@ -551,7 +547,6 @@ class ProfileController extends Controller {
                                 ->where('email', 'adminsu@visipos.id')
                                 ->find(1);
         $agregateSaldo = $agregateWallet->saldo;
-
         try{
             $nominal_penarikan = filter_var($nominal_tarik, FILTER_SANITIZE_NUMBER_INT);
             $total_penarikan = $total_tarik;

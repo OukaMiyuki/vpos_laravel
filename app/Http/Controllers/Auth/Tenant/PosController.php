@@ -288,7 +288,6 @@ class PosController extends Controller {
 
     public function cartTransactionPendingChangePayment(Request $request){
         DB::connection()->enableQueryLog();
-
         $identifier = $this->getStoreIdentifier();
         $invoice = Invoice::where('store_identifier', $identifier)
                             ->find($request->id);
@@ -301,9 +300,7 @@ class PosController extends Controller {
 
             return redirect()->back()->with($notification);
         }
-
         $action = "Tenant : Change Payment | ".$invoice->nomor_invoice;
-
         try{
             $kembalian = (int) str_replace(['.', ' ', 'Rp'], '', $request->kembalian);
             $invoice->update([
@@ -317,9 +314,7 @@ class PosController extends Controller {
                 'nominal_mdr' => 0,
                 'nominal_terima_bersih' => 0
             ]);
-
             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
-
             $notification = array(
                 'message' => 'Pembayaran berhasil diubah!',
                 'alert-type' => 'success',
@@ -418,7 +413,6 @@ class PosController extends Controller {
 
     public function transactionPendingDelete($id) {
         DB::connection()->enableQueryLog();
-
         try{
             $identifier = $this->getStoreIdentifier();
             $invoice = Invoice::where('store_identifier', $identifier)
@@ -585,9 +579,7 @@ class PosController extends Controller {
 
     public function cartTransactionPendingProcess(Request $request){
         DB::connection()->enableQueryLog();
-
         $invoice = "";
-
         try{
             $identifier = $this->getStoreIdentifier();
             $invoice = Invoice::where('store_identifier', $identifier)
