@@ -217,7 +217,7 @@ class Invoice extends Model {
                     $model->nomor_invoice = $date;
                 } else {
                     $date = date('YmdHis');
-                    $invoice_generated = $model->qris_data.$date;
+                    $invoice_generated = $date.$model->qris_data;
                     $model->nomor_invoice = $invoice_generated;
                 }
             }
