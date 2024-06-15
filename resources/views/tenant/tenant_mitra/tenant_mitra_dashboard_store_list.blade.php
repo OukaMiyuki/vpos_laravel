@@ -30,14 +30,14 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Merchant List&nbsp;&nbsp;&nbsp;<a href="{{ route('tenant.mitra.dashboard.toko.create') }}"><button title="Tambah merchant baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan merchant baru</button></a></h4>
-                        
+
                                 <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>Merchant ID</th>
                                             <th>Name</th>
-                                            <th>No. Telp Toko</th>
+                                            <th>No. Telp Merchant</th>
                                             <th>Jenis Usaha</th>
                                             <th>Status Umi</th>
                                             <th>Banyak Invoice</th>
@@ -85,7 +85,7 @@
                                         @endforeach
                                     </tbody>
                                 </table>
-                           
+
                         </div>
                     </div>
                 </div>

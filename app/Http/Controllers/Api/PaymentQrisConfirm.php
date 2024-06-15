@@ -164,6 +164,7 @@ class PaymentQrisConfirm extends Controller {
     public function requestInvoiceNumber(Request $request) : JsonResponse{
         $store_identifier = $request->store_identifier;
         $password = $request->secret_key;
+        $lokasi = $request->lokasi;
         $nominal = $request->amount;
         $tanggal_transaksi = Carbon::now();
         $secret_key = "VPOS_Request_No_Invoice_71237577";

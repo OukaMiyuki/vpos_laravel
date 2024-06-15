@@ -23,12 +23,12 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard.toko') }}">Store</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard.toko.list') }}">Store List</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard.toko') }}">Merchant</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard.toko.list') }}">Merchant List</a></li>
                                 <li class="breadcrumb-item active">Profile</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Detail Toko</h4>
+                        <h4 class="page-title">Detail Merchant</h4>
                     </div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                                 {{ $store->name }}
                             </h4>
                             <p class="text-muted">
-                                Toko
+                                Merchant
                             </p>
                             @php
                                 echo htmlspecialchars_decode($umi);
@@ -57,7 +57,7 @@
                             <ul class="nav nav-pills nav-fill navtab-bg" id="tab-profile">
                                 <li class="nav-item">
                                     <a href="#settings" data-bs-toggle="tab" aria-expanded="true" class="nav-link active">
-                                        Store Detail
+                                        Merchant Detail
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -70,20 +70,20 @@
                                 <div class="tab-pane show active" id="settings">
                                     <form method="post" action="" enctype="multipart/form-data">
                                         @csrf
-                                        <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Detail Informasi Toko</h5>
+                                        <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Detail Informasi Merchant</h5>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="name" class="form-label">Nama Toko</label>
-                                                    <input type="text" class="form-control" readonly name="name" id="name" required value="{{ $store->name }}" placeholder="Masukkan nama toko">
+                                                    <label for="name" class="form-label">Nama Merchant</label>
+                                                    <input type="text" class="form-control" readonly name="name" id="name" required value="{{ $store->name }}" placeholder="Masukkan nama Merchant">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="no_telp" class="form-label">No. Telp. Toko</label>
-                                                    <input type="text" class="form-control" readonly name="no_telp" id="no_telp" required value="{{ $store->no_telp_toko }}" placeholder="Masukkan nomor telepon toko">
+                                                    <label for="no_telp" class="form-label">No. Telp. Merchant</label>
+                                                    <input type="text" class="form-control" readonly name="no_telp" id="no_telp" required value="{{ $store->no_telp_toko }}" placeholder="Masukkan nomor telepon Merchant">
                                                 </div>
                                             </div>
                                         </div>
@@ -98,8 +98,8 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="alamat" class="form-label">Alamat Toko</label>
-                                                    <textarea placeholder="Masukkan alamat anda" readonly class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $store->alamat !!}</textarea>
+                                                    <label for="alamat" class="form-label">Alamat Merchant</label>
+                                                    <textarea placeholder="Masukkan alamat Merchant" readonly class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $store->alamat !!}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -114,7 +114,7 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="kode_pos" class="form-label">Kode Pos Toko</label>
+                                                    <label for="kode_pos" class="form-label">Kode Pos Merchant</label>
                                                     <input type="text" class="form-control" name="kode_pos" id="kode_pos" readonly required value="{{ $store->kode_pos }}" placeholder="Masukkan kode pos">
                                                 </div>
                                             </div>

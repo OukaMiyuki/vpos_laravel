@@ -1540,7 +1540,6 @@ class AdminController extends Controller {
                                         ]);
                                     }
                                 ])
-                                ->latest()
                                 ->get();
         return view('admin.admin_mitra_bisnis_transaction_list', compact('tenantInvoice'));
     }
