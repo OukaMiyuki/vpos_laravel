@@ -521,7 +521,8 @@ class TenantMitraController extends Controller {
                                         'invoices.nominal_bayar',
                                         'invoices.mdr',
                                         'invoices.nominal_mdr',
-                                        'invoices.nominal_terima_bersih'
+                                        'invoices.nominal_terima_bersih',
+                                        'invoices.created_at'
                                     ])->latest()->get();
                                 }])->where('id_user', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
@@ -543,7 +544,9 @@ class TenantMitraController extends Controller {
                                     'invoices.nominal_bayar',
                                     'invoices.mdr',
                                     'invoices.nominal_mdr',
-                                    'invoices.nominal_terima_bersih'
+                                    'invoices.nominal_terima_bersih',
+                                    'invoices.created_at',
+                                    'invoices.updated_at'
                                 ])
                         ->with(['storeMitra' => function($query){
                             $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();
@@ -567,13 +570,16 @@ class TenantMitraController extends Controller {
                                     'invoices.nominal_bayar',
                                     'invoices.mdr',
                                     'invoices.nominal_mdr',
-                                    'invoices.nominal_terima_bersih'
+                                    'invoices.nominal_terima_bersih',
+                                    'invoices.created_at',
+                                    'invoices.updated_at'
                                 ])
                             ->with(['storeMitra' => function($query){
-                            $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();
+                                $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();
                             }])
                             ->where('id_tenant', auth()->user()->id)
                             ->where('email', auth()->user()->email)
+                            ->whereDate('tanggal_transaksi', Carbon::now())
                             ->latest()
                             ->get();
         return view('tenant.tenant_mitra.tenant_transaction_list_today', compact('invoice'));
@@ -591,7 +597,9 @@ class TenantMitraController extends Controller {
                                     'invoices.nominal_bayar',
                                     'invoices.mdr',
                                     'invoices.nominal_mdr',
-                                    'invoices.nominal_terima_bersih'
+                                    'invoices.nominal_terima_bersih',
+                                    'invoices.created_at',
+                                    'invoices.updated_at'
                                 ])
                             ->with(['storeMitra' => function($query){
                                     $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();
@@ -616,7 +624,9 @@ class TenantMitraController extends Controller {
                                     'invoices.nominal_bayar',
                                     'invoices.mdr',
                                     'invoices.nominal_mdr',
-                                    'invoices.nominal_terima_bersih'
+                                    'invoices.nominal_terima_bersih',
+                                    'invoices.created_at',
+                                    'invoices.updated_at'
                                 ])
                             ->with(['storeMitra' => function($query){
                                     $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();
@@ -641,7 +651,9 @@ class TenantMitraController extends Controller {
                                     'invoices.nominal_bayar',
                                     'invoices.mdr',
                                     'invoices.nominal_mdr',
-                                    'invoices.nominal_terima_bersih'
+                                    'invoices.nominal_terima_bersih',
+                                    'invoices.created_at',
+                                    'invoices.updated_at',
                                 ])
                             ->with(['storeMitra' => function($query){
                                     $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();
@@ -809,7 +821,9 @@ class TenantMitraController extends Controller {
                                             'invoices.nominal_bayar',
                                             'invoices.mdr',
                                             'invoices.nominal_mdr',
-                                            'invoices.nominal_terima_bersih'
+                                            'invoices.nominal_terima_bersih',
+                                            'invoices.created_at',
+                                            'invoices.updated_at'
                                     ])
                                     ->with(['storeMitra' => function($query){
                                         $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();
@@ -836,7 +850,9 @@ class TenantMitraController extends Controller {
                                             'invoices.nominal_bayar',
                                             'invoices.mdr',
                                             'invoices.nominal_mdr',
-                                            'invoices.nominal_terima_bersih'
+                                            'invoices.nominal_terima_bersih',
+                                            'invoices.created_at',
+                                            'invoices.updated_at'
                                     ])
                                     ->with(['storeMitra' => function($query){
                                         $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();
@@ -863,7 +879,9 @@ class TenantMitraController extends Controller {
                                     'invoices.nominal_bayar',
                                     'invoices.mdr',
                                     'invoices.nominal_mdr',
-                                    'invoices.nominal_terima_bersih'
+                                    'invoices.nominal_terima_bersih',
+                                    'invoices.created_at',
+                                    'invoices.updated_at'
                             ])
                             ->with(['storeMitra' => function($query){
                                 $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();
@@ -890,7 +908,9 @@ class TenantMitraController extends Controller {
                                     'invoices.nominal_bayar',
                                     'invoices.mdr',
                                     'invoices.nominal_mdr',
-                                    'invoices.nominal_terima_bersih'
+                                    'invoices.nominal_terima_bersih',
+                                    'invoices.created_at',
+                                    'invoices.updated_at'
                             ])
                             ->with(['storeMitra' => function($query){
                                 $query->select(['store_lists.id', 'store_lists.store_identifier','store_lists.name'])->get();

@@ -89,7 +89,7 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $wd->invoice_pemarikan }}</td>
-                                                <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s')}}</td>
                                                 <td class="text-center">{{ $wd->detailWithdraw->biaya_agregate }}</td>
                                                 <td>
                                                     @if ($wd->status == 0)

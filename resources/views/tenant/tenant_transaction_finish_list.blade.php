@@ -38,18 +38,20 @@
                                             <th>No.</th>
                                             <th>Invoice</th>
                                             <th>Kasir</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Tanggal Pelunasan</th>
-                                            <th>Pembayaran</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Tanggal Pembayaran</th>
+                                            <th class="text-center">Pembayaran</th>
                                             <th>Transaksi Oleh</th>
                                             <th>Status Transaksi</th>
                                             <th>Status Pembayaran</th>
-                                            <th>Sub Total (Rp.)</th>
-                                            <th>Pajak (Rp.)</th>
-                                            <th>Diskon (Rp.)</th>
-                                            <th>MDR (%)</th>
-                                            <th>Nominal MDR (Rp.)</th>
-                                            <th>Nominal Terima Bersih Qris (Rp.)</th>
+                                            <th class="text-center">Sub Total (Rp.)</th>
+                                            <th class="text-center">Pajak (Rp.)</th>
+                                            <th class="text-center">Diskon (Rp.)</th>
+                                            <th class="text-center">Nominal Bayar (Rp.)</th>
+                                            <th class="text-center">Kembalian (Rp.)</th>
+                                            <th class="text-center">MDR (%)</th>
+                                            <th class="text-center">Nominal MDR (Rp.)</th>
+                                            <th class="text-center">Nominal Terima Bersih Qris (Rp.)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -61,18 +63,18 @@
                                                         <button title="Lihat Invoice" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                 </td>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$invoice->nomor_invoice}}</td>
                                                 <td>
                                                     @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
                                                         Transaksi Oleh Tenant
                                                     @else
-                                                        {{ $invoice->kasir->name }}
+                                                        {{$invoice->kasir->name}}
                                                     @endif
                                                 </td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->tanggal_pelunasan }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">@if(!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan)){{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}@endif</td>
+                                                <td class="text-center">{{$invoice->jenis_pembayaran}}</td>
                                                 <td>
                                                     @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
                                                         Tenant
@@ -98,12 +100,20 @@
                                                         <span class="badge bg-soft-success text-success">Dibayar</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $invoice->sub_total }}</td>
-                                                <td>{{ $invoice->pajak }}</td>
-                                                <td>{{ $invoice->diskon }}</td>
-                                                <td>{{ $invoice->mdr }}</td>
-                                                <td>{{ $invoice->nominal_mdr }}</td>
-                                                <td>{{ $invoice->nominal_terima_bersih }}</td>
+                                                <td class="text-center">{{$invoice->sub_total}}</td>
+                                                <td class="text-center">{{$invoice->pajak}}</td>
+                                                <td class="text-center">{{$invoice->diskon}}</td>
+                                                <td class="text-center">{{$invoice->nominal_bayar}}</td>
+                                                <td class="text-center">
+                                                    @if(is_null($invoice->kembalian) || empty($invoice->kembalian) || $invoice->kembalian == NULL)
+                                                        0
+                                                    @else
+                                                        {{$invoice->kembalian}}
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">{{$invoice->mdr}}</td>
+                                                <td class="text-center">{{$invoice->nominal_mdr}}</td>
+                                                <td class="text-center">{{$invoice->nominal_terima_bersih}}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

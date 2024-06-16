@@ -97,12 +97,12 @@
                                             <th>Action</th>
                                             <th>No.</th>
                                             <th>Invoice</th>
-                                            <th>Nilai Transaksi (Rp.)</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Pembayaran</th>
-                                            <th>Transaksi Oleh</th>
-                                            <th>Status Transaksi</th>
-                                            <th>Status Pembayaran</th>
+                                            <th class="text-center">Nilai Transaksi (Rp.)</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Pembayaran</th>
+                                            <th class="text-center">Transaksi Oleh</th>
+                                            <th class="text-center">Status Transaksi</th>
+                                            <th class="text-center">Status Pembayaran</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -114,19 +114,19 @@
                                                         <button title="Lihat Invoice" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                 </td>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->sub_total+$invoice->pajak }}</td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
-                                                <td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$invoice->nomor_invoice}}</td>
+                                                <td class="text-center">{{$invoice->sub_total+$invoice->pajak}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">{{$invoice->jenis_pembayaran}}</td>
+                                                <td class="text-center">
                                                     @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
                                                         Tenant
                                                     @else
                                                         Kasir
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     @if (!empty($invoice->jenis_pembayaran) || !is_null($invoice->jenis_pembayaran) || $invoice->jenis_pembayaran != "")
                                                         @if($invoice->status_pembayaran == 0)
                                                             <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
@@ -137,7 +137,7 @@
                                                         <span class="badge bg-soft-danger text-danger">Belum Diproses</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     @if($invoice->status_pembayaran == 0)
                                                         <span class="badge bg-soft-warning text-warning">Belum Bayar</span>
                                                     @elseif($invoice->status_pembayaran == 1)

@@ -37,13 +37,12 @@
                                             <th>No.</th>
                                             <th>No. Invoice</th>
                                             <th>Tenant</th>
-                                            <th>Store Identifier</th>
                                             <th>Store Name</th>
-                                            <th>Email</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Tanggal Pelunasan</th>
-                                            <th>Jenis Pembayaran</th>
                                             <th>Status Pembayaran</th>
+                                            <th>Tanggal Transaksi</th>
+                                            <th>Tanggal Pembayaran</th>
+                                            <td>Nilai Transaksi</td>
+                                            <th>Jenis Pembayaran</th>
                                             <th>Sub Total (Rp.)</th>
                                             <th>Diskon (Rp.)</th>
                                             <th>Pajak (Rp.)</th>
@@ -59,15 +58,10 @@
                                         @foreach($tenantInvoice as $key => $invoice)
                                             @foreach ($invoice->storeDetail->invoice as $invoiceList )
                                                 <tr>
-                                                    <td>{{ $no+=1 }}</td>
-                                                    <td>{{ $invoiceList->nomor_invoice }}</td>
-                                                    <td>{{ $invoice->name }}</td>
-                                                    <td>{{ $invoice->storeDetail->store_identifier }}</td>
-                                                    <td>{{ $invoice->storeDetail->name }}</td>
-                                                    <td>{{ $invoice->storeDetail->email }}}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($invoiceList->tanggal_transaksi)->format('d-m-Y') }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($invoiceList->tanggal_pelunasan)->format('d-m-Y') }}</td>
-                                                    <td>{{ $invoiceList->jenis_pembayaran }}</td>
+                                                    <td>{{$no+=1}}</td>
+                                                    <td>{{$invoiceList->nomor_invoice}}</td>
+                                                    <td>{{$invoice->name}}</td>
+                                                    <td>{{$invoice->storeDetail->name}}</td>
                                                     <td>
                                                         @if($invoiceList->status_pembayaran == 0)
                                                             <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
@@ -75,14 +69,22 @@
                                                             <span class="badge bg-soft-success text-success">Selesai</span>
                                                         @endif
                                                     </td>
-                                                    <td>{{ $invoiceList->sub_total }}</td>
-                                                    <td>{{ $invoiceList->diskon }}</td>
-                                                    <td>{{ $invoiceList->pajak }}</td>
-                                                    <td>{{ $invoiceList->nominal_bayar }}</td>
-                                                    <td>{{ $invoiceList->kembalian }}</td>
-                                                    <td>{{ $invoiceList->mdr }}</td>
-                                                    <td>{{ $invoiceList->nominal_mdr }}</td>
-                                                    <td>{{ $invoiceList->nominal_terima_bersih }}</td>
+                                                    <td>{{\Carbon\Carbon::parse($invoiceList->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoiceList->created_at)->format('H:i:s')}}</td>
+                                                    <td>
+                                                        @if (!is_null($invoiceList->tanggal_pelunasan) || !empty($invoiceList->tanggal_pelunasan))
+                                                            {{\Carbon\Carbon::parse($invoiceList->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoiceList->updated_at)->format('H:i:s')}}
+                                                        @endif
+                                                    </td>
+                                                    <td>{{$invoiceList->sub_total+$invoiceList->pajak}}</td>
+                                                    <td>{{$invoiceList->jenis_pembayaran}}</td>
+                                                    <td>{{$invoiceList->sub_total}}</td>
+                                                    <td>{{$invoiceList->diskon}}</td>
+                                                    <td>{{$invoiceList->pajak}}</td>
+                                                    <td>{{$invoiceList->nominal_bayar}}</td>
+                                                    <td>{{$invoiceList->kembalian}}</td>
+                                                    <td>{{$invoiceList->mdr}}</td>
+                                                    <td>{{$invoiceList->nominal_mdr}}</td>
+                                                    <td>{{$invoiceList->nominal_terima_bersih}}</td>
                                                 </tr>
                                             @endforeach
                                         @endforeach

@@ -74,22 +74,27 @@
                                 <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
+                                            <th>No.</th>
                                             <th>Email</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Nominal</th>
-                                            <th>Tanggal Masuk</th>
-                                            <th>Status</th>
-                                            <th>Detail</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th class="text-center">Nominal (Rp.)</th>
+                                            <th class="text-center">Biaya Transfer (Rp.)</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Detail</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        @php
+                                            $no=0;
+                                        @endphp
                                         @foreach ($allData as $data)
                                             <tr>
-                                                <td>{{ $data->email }}</td>
-                                                <td>{{ $data->tanggal_penarikan }}</td>
-                                                <td>{{ $data->nominal }}</td>
-                                                <td>{{ $data->tanggal_masuk }}</td>
-                                                <td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$data->email}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($data->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($data->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">{{$data->nominal}}</td>
+                                                <td class="text-center">{{$data->biaya_admin}}</td>
+                                                <td class="text-center">
                                                     @if ($data->status == 0)
                                                         <span class="badge bg-soft-warning text-warning">Pending</span>
                                                     @elseif($data->status == 1)
@@ -98,7 +103,7 @@
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="{{ route('tenant.finance.history_penarikan.invoice', ['id' => $data->id]) }}">
                                                         <button title="Lihat detail invoice" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
                                                     </a>

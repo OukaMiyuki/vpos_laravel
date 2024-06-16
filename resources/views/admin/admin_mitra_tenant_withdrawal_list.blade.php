@@ -63,7 +63,7 @@
                                                     <td>{{ $withdrawal->invoice_pemarikan }}</td>
                                                     <td>{{ $tenant->name }}</td>
                                                     <td>{{ $tenant->email }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('d-m-Y') }}</td>
+                                                    <td class="text-center">{{\Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($withdrawal->created_at)->format('H:i:s')}}</td>
                                                     <td>{{ $withdrawal->nominal }}</td>
                                                     <td>{{ $withdrawal->detailWithdraw->nominal_bersih_penarikan }}</td>
                                                     <td>

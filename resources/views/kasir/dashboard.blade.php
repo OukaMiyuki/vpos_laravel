@@ -138,10 +138,10 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>Invoice</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Jenis Pembayaran</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Jenis Pembayaran</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     @php
@@ -150,11 +150,11 @@
                                     <tbody>
                                         @foreach ($transaksiTerbaru as $invoice)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
-                                                <td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$invoice->nomor_invoice}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">{{$invoice->jenis_pembayaran}}</td>
+                                                <td class="text-center">
                                                     @if (!empty($invoice->jenis_pembayaran) || !is_null($invoice->jenis_pembayaran) || $invoice->jenis_pembayaran != "")
                                                         @if($invoice->status_pembayaran == 0)
                                                             <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
@@ -165,7 +165,7 @@
                                                         <span class="badge bg-soft-danger text-danger">Belum Diproses</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="{{ route('kasir.pos.transaction.invoice', ['id' => $invoice->id ]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                 </td>
                                             </tr>
@@ -195,10 +195,10 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>Invoice</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Jenis Pembayaran</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Jenis Pembayaran</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     @php
@@ -207,14 +207,14 @@
                                     <tbody>
                                         @foreach ($transaksiQrisPending as $invoice)
                                             <tr>
-                                                <td>{{ $number+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
-                                                <td>
+                                                <td>{{$number+=1}}</td>
+                                                <td>{{$invoice->nomor_invoice}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">{{$invoice->jenis_pembayaran}}</td>
+                                                <td class="text-center">
                                                     <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="{{ route('kasir.pos.transaction.invoice', ['id' => $invoice->id ]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                     <a href="{{ route('kasir.transaction.pending.delete', ['id' => $invoice->id ]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-trash-can"></i></a>
                                                 </td>

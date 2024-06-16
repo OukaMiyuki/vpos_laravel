@@ -117,28 +117,28 @@
                                             <th>No. Invoice</th>
                                             <th>Merchant Identifier</th>
                                             <th>Nama Merchant</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Tanggal Pelunasan</th>
-                                            <th>Jenis Pembayaran</th>
-                                            <th>Status Pembayaran</th>
-                                            <th>Nominal Bayar</th>
-                                            <th>MDR (%)</th>
-                                            <th>Nominal MDR</th>
-                                            <th>Nominal Terima Bersih</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Tanggal Pembayaran</th>
+                                            <th class="text-center">Jenis Pembayaran</th>
+                                            <th class="text-center">Status Pembayaran</th>
+                                            <th class="text-center">Nominal Bayar</th>
+                                            <th class="text-center">MDR (%)</th>
+                                            <th class="text-center">Nominal MDR</th>
+                                            <th class="text-center">Nominal Terima Bersih</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($invoiceNew as $key => $all)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $all->nomor_invoice }}</td>
-                                                <td>{{ $all->store_identifier }}</td>
-                                                <td>{{ $all->storeMitra->name }}</td>
-                                                <td>{{ $all->tanggal_transaksi }}</td>
-                                                <td>{{ $all->tanggal_pelunasan }}</td>
-                                                <td>{{ $all->jenis_pembayaran }}</td>
-                                                <td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$all->nomor_invoice}}</td>
+                                                <td>{{$all->store_identifier}}</td>
+                                                <td>{{$all->storeMitra->name}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($all->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($all->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">@if(!is_null($all->tanggal_pelunasan) || !empty($all->tanggal_pelunasan)){{\Carbon\Carbon::parse($all->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($all->updated_at)->format('H:i:s')}}@endif</td>
+                                                <td class="text-center">{{ $all->jenis_pembayaran }}</td>
+                                                <td class="text-center">
                                                     @if (!empty($all->jenis_pembayaran) || !is_null($all->jenis_pembayaran) || $all->jenis_pembayaran != "")
                                                         @if($all->status_pembayaran == 0)
                                                             <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
@@ -149,10 +149,10 @@
                                                         <span class="badge bg-soft-danger text-danger">Belum Diproses</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $all->nominal_bayar }}</td>
-                                                <td>{{ $all->mdr }}</td>
-                                                <td>{{ $all->nominal_mdr }}</td>
-                                                <td>{{ $all->nominal_terima_bersih }}</td>
+                                                <td class="text-center">{{$all->nominal_bayar}}</td>
+                                                <td class="text-center">{{$all->mdr}}</td>
+                                                <td class="text-center">{{$all->nominal_mdr}}</td>
+                                                <td class="text-center">{{$all->nominal_terima_bersih}}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

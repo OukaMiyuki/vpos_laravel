@@ -1400,6 +1400,9 @@ class TenantController extends Controller {
                                                 'invoices.mdr',
                                                 'invoices.nominal_mdr',
                                                 'invoices.nominal_terima_bersih',
+                                                'invoices.created_at',
+                                                'invoices.updated_at',
+                                                'invoices.nominal_bayar',
                                             ])
                                     ->with(['kasir' => function($query){
                                         $query->select(['kasirs.id', 'kasirs.name']);
@@ -1426,6 +1429,8 @@ class TenantController extends Controller {
                                                 'invoices.mdr',
                                                 'invoices.nominal_mdr',
                                                 'invoices.nominal_terima_bersih',
+                                                'invoices.created_at',
+                                                'invoices.nominal_bayar',
                                             ])
                                     ->with(['kasir' => function($query){
                                         $query->select(['kasirs.id', 'kasirs.name']);
@@ -1453,6 +1458,8 @@ class TenantController extends Controller {
                                                 'invoices.mdr',
                                                 'invoices.nominal_mdr',
                                                 'invoices.nominal_terima_bersih',
+                                                'invoices.created_at',
+                                                'invoices.nominal_bayar',
                                             ])
                                     ->with(['kasir' => function($query){
                                         $query->select(['kasirs.id', 'kasirs.name']);
@@ -1470,7 +1477,7 @@ class TenantController extends Controller {
                             ->where('store_identifier', $identifier)
                             ->where('jenis_pembayaran', NULL)
                             ->where('status_pembayaran', 0)
-                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran'])
+                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran', 'invoices.created_at'])
                             ->with(['kasir' => function($query){
                                 $query->select(['kasirs.id', 'kasirs.name', 'kasirs.id_store']);
                             }])
@@ -1497,6 +1504,7 @@ class TenantController extends Controller {
                                     'invoices.mdr',
                                     'invoices.nominal_mdr',
                                     'invoices.nominal_terima_bersih',
+                                    'invoices.created_at',
                                 ])
                         ->with(['kasir' => function($query){
                             $query->select(['kasirs.id', 'kasirs.name']);
@@ -1545,6 +1553,8 @@ class TenantController extends Controller {
                                         'invoices.mdr',
                                         'invoices.nominal_mdr',
                                         'invoices.nominal_terima_bersih',
+                                        'invoices.nominal_bayar',
+                                        'invoices.created_at',
                                     ])
                             ->with(['kasir' => function($query){
                                 $query->select(['kasirs.id', 'kasirs.name']);
@@ -1595,7 +1605,7 @@ class TenantController extends Controller {
     public function pemasukanTunai(){
         $identifier = $this->getStoreIdentifier();
         $invoice = Invoice::where('store_identifier', $identifier)
-                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran', 'invoices.sub_total', 'invoices.pajak'])
+                            ->select(['invoices.id', 'invoices.id_kasir', 'invoices.nomor_invoice', 'invoices.tanggal_transaksi', 'invoices.jenis_pembayaran', 'invoices.status_pembayaran', 'invoices.sub_total', 'invoices.pajak', 'invoices.created_at'])
                             ->with(['kasir' => function($query){
                                 $query->select(['kasirs.id', 'kasirs.name']);
                             }])

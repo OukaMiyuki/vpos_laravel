@@ -39,8 +39,8 @@
                                             <th>Store Identifier</th>
                                             <th>Mitra Bisnis</th>
                                             <th>Jenis Usaha</th>
-                                            <th>Status UMI</th>
-                                            <th>Status Request UMI</th>
+                                            <th class="text-center">Status UMI</th>
+                                            <th class="text-center">Status Request UMI</th>
                                             <th class="text-center">Tanggal Pengajuan</th>
                                             <th class="text-center">Tanggal Approval</th>
                                             <th class="text-center">FIle Attachment</th>
@@ -52,12 +52,12 @@
                                         @php $no=0; @endphp
                                         @foreach ($umi as $tt)
                                             @foreach ($tt->storeDetailUMI as $umiReq)
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $umiReq->storeDetail->name }}</td>
-                                                <td>{{ $umiReq->storeDetail->store_identifier }}</td>
-                                                <td>{{ $tt->name }}</td>
-                                                <td>{{ $umiReq->storeDetail->jenis_usaha }}</td>
-                                                <td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$umiReq->storeDetail->name}}</td>
+                                                <td>{{$umiReq->storeDetail->store_identifier}}</td>
+                                                <td>{{$tt->name}}</td>
+                                                <td>{{$umiReq->storeDetail->jenis_usaha}}</td>
+                                                <td class="text-center">
                                                     @if ($umiReq->storeDetail->status_umi == 0)
                                                         <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
                                                     @elseif($umiReq->storeDetail->status_umi == 1)
@@ -66,7 +66,7 @@
                                                         <span class="badge bg-soft-danger text-danger">Ditolak</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     @if ($umiReq->is_active == 0)
                                                         <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
                                                     @elseif($umiReq->is_active == 1)
@@ -82,12 +82,12 @@
                                                         <i class="dripicons-download"></i>
                                                     </a>
                                                 </td>
-                                                <td>{{ $umiReq->note }}</td>
+                                                <td>{{$umiReq->note}}</td>
                                                 <td class="text-center">
                                                     @if ($umiReq->is_active == 0)
-                                                        <a href="" id="approval-umi" data-id="{{ $umiReq->id }}" data-store_identifier="{{ $umiReq->store_identifier }}" data-bs-toggle="modal" data-bs-target="#approve-umi-modal" class="btn btn-success"><i class="mdi mdi-check-bold"></i></a>
+                                                        <a href="" id="approval-umi" data-id="{{$umiReq->id}}" data-store_identifier="{{ $umiReq->store_identifier }}" data-bs-toggle="modal" data-bs-target="#approve-umi-modal" class="btn btn-success"><i class="mdi mdi-check-bold"></i></a>
                                                         &nbsp;
-                                                        <a href="" id="reject-umi" data-id="{{ $umiReq->id }}" data-store_identifier="{{ $umiReq->store_identifier }}" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reject-umi-modal"><i class="mdi mdi-close-thick"></i></a>
+                                                        <a href="" id="reject-umi" data-id="{{$umiReq->id}}" data-store_identifier="{{ $umiReq->store_identifier }}" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reject-umi-modal"><i class="mdi mdi-close-thick"></i></a>
                                                     @endif
                                                 </td>
                                             @endforeach

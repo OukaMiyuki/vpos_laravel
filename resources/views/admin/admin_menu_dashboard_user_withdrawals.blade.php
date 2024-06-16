@@ -60,7 +60,9 @@
                                                 </td>
                                                 <td>{{ $wd->invoice_pemarikan }}</td>
                                                 <td>{{ $wd->email }}</td>
-                                                <td class="text-center">{{ \Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }}</td>
+                                                <td class="text-center">
+                                                    {{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s')}}
+                                                </td>
                                                 <td class="text-center">{{ $wd->nominal }}</td>
                                                 <td class="text-center">{{ $wd->detailWithdraw->nominal_bersih_penarikan }}</td>
                                                 <td>

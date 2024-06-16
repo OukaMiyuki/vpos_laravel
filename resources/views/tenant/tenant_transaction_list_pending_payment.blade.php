@@ -37,8 +37,8 @@
                                             <th>No.</th>
                                             <th>Invoice</th>
                                             <th>Kasir</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Pembayaran</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Pembayaran</th>
                                             <th>Transaksi Oleh</th>
                                             <th>Status Pembayaran</th>
                                             <th>Action</th>
@@ -48,17 +48,17 @@
                                         @php $no=0; @endphp
                                         @foreach($invoice as $invoice)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$invoice->nomor_invoice}}</td>
                                                 <td>
                                                     @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
                                                         Transaksi Oleh Tenant
                                                     @else
-                                                        {{ $invoice->kasir->name }}
+                                                        {{$invoice->kasir->name}}
                                                     @endif
                                                 </td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">{{$invoice->jenis_pembayaran}}</td>
                                                 <td>
                                                     @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
                                                         Tenant

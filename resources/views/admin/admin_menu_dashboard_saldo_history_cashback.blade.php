@@ -75,14 +75,14 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $cashback->invoice->nomor_invoice }}</td>
-                                                <td class="text-center">{{\Carbon\Carbon::parse($cashback->invoice->tanggal_transaksi)->format('d-m-Y') }}</td>
-                                                <td class="text-center">{{ $cashback->invoice->jenis_pembayaran }}</td>
-                                                <td class="text-center">{{ $cashback->invoice->mdr }}</td>
-                                                <td class="text-center">{{ $cashback->invoice->nominal_mdr }}</td>
-                                                <td class="text-center">{{ $cashback->invoice->nominal_bayar }}</td>
-                                                <td class="text-center">{{ $cashback->invoice->nominal_terima_bersih }}</td>
-                                                <td class="text-center">{{ $cashback->nominal_terima_mdr }}</td>
-                                                <td class="text-center">{{\Carbon\Carbon::parse($cashback->created_at)->format('d-m-Y') }}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($cashback->invoice->tanggal_transaksi)->format('d-m-Y') }} {{\Carbon\Carbon::parse($cashback->invoice->created_at)->format('H:i:s') }}</td>
+                                                <td class="text-center">{{$cashback->invoice->jenis_pembayaran}}</td>
+                                                <td class="text-center">{{$cashback->invoice->mdr}}</td>
+                                                <td class="text-center">{{$cashback->invoice->nominal_mdr}}</td>
+                                                <td class="text-center">{{$cashback->invoice->nominal_bayar}}</td>
+                                                <td class="text-center">{{$cashback->invoice->nominal_terima_bersih}}</td>
+                                                <td class="text-center">{{$cashback->nominal_terima_mdr}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($cashback->created_at)->format('d-m-Y') }} {{\Carbon\Carbon::parse($cashback->created_at)->format('H:i:s')}}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

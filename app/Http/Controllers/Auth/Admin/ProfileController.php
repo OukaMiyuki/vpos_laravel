@@ -549,6 +549,7 @@ class ProfileController extends Controller {
                         $withDraw = Withdrawal::create([
                             'id_user' => auth()->user()->id,
                             'email' => auth()->user()->email,
+                            'jenis_penarikan' => $jenis_tarik,
                             'tanggal_penarikan' => Carbon::now(),
                             'nominal' => $nominal_penarikan,
                             'biaya_admin' => $biaya_admin,

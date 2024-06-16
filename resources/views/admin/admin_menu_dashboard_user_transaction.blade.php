@@ -54,8 +54,12 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
                                                 <td>{{ $invoice->store_identifier }}</td>
-                                                <td class="text-center">{{ $invoice->tanggal_transaksi }}</td>
-                                                <td class="text-center">{{ $invoice->tanggal_pelunasan }}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">
+                                                    @if (!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan))
+                                                        {{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}
+                                                    @endif
+                                                </td>
                                                 <td class="text-center">{{ $invoice->jenis_pembayaran }}</td>
                                                 <td>
                                                     @if (!empty($invoice->jenis_pembayaran) || !is_null($invoice->jenis_pembayaran) || $invoice->jenis_pembayaran != "")

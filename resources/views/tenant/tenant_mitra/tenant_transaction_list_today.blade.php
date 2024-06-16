@@ -37,29 +37,29 @@
                                             <th>No.</th>
                                             <th>No. Invoice</th>
                                             <th>Store Identifier</th>
-                                            <th>Nama Toko</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Tanggal Pelunasan</th>
-                                            <th>Jenis Pembayaran</th>
-                                            <th>Status Pembayaran</th>
-                                            <th>Nominal Bayar</th>
-                                            <th>MDR (%)</th>
-                                            <th>Nominal MDR</th>
-                                            <th>Nominal Terima Bersih</th>
+                                            <th>Nama Merchant</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Tanggal Pembayaran</th>
+                                            <th class="text-center">Jenis Pembayaran</th>
+                                            <th class="text-center">Status Pembayaran</th>
+                                            <th class="text-center">Nominal Bayar</th>
+                                            <th class="text-center">MDR (%)</th>
+                                            <th class="text-center">Nominal MDR</th>
+                                            <th class="text-center">Nominal Terima Bersih</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($invoice as $key => $invoice)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->store_identifier }}</td>
-                                                <td>{{ $invoice->storeMitra->name }}</td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->tanggal_pelunasan }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
-                                                <td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$invoice->nomor_invoice}}</td>
+                                                <td>{{$invoice->store_identifier}}</td>
+                                                <td>{{$invoice->storeMitra->name}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">@if(!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan)){{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}@endif</td>
+                                                <td class="text-center">{{$invoice->jenis_pembayaran}}</td>
+                                                <td class="text-center">
                                                     @if (!empty($invoice->jenis_pembayaran) || !is_null($invoice->jenis_pembayaran) || $invoice->jenis_pembayaran != "")
                                                         @if($invoice->status_pembayaran == 0)
                                                             <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
@@ -70,10 +70,10 @@
                                                         <span class="badge bg-soft-danger text-danger">Belum Diproses</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $invoice->nominal_bayar }}</td>
-                                                <td>{{ $invoice->mdr }}</td>
-                                                <td>{{ $invoice->nominal_mdr }}</td>
-                                                <td>{{ $invoice->nominal_terima_bersih }}</td>
+                                                <td class="text-center">{{$invoice->nominal_bayar}}</td>
+                                                <td class="text-center">{{$invoice->mdr}}</td>
+                                                <td class="text-center">{{$invoice->nominal_mdr}}</td>
+                                                <td class="text-center">{{$invoice->nominal_terima_bersih}}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

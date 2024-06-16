@@ -50,7 +50,7 @@
                                             <tr>
                                                 <td>{{$no+=1}}</td>
                                                 <td>{{$fee->withdraw->invoice_pemarikan}}</td>
-                                                <td class="text-center">{{\Carbon\Carbon::parse($fee->withdraw->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($fee->withdraw->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($fee->withdraw->created_at)->format('H:i:s')}}</td>
                                                 <td class="text-center">{{$fee->withdraw->nominal}}</td>
                                                 <td class="text-center">{{$fee->withdraw->biaya_admin}}</td>
                                                 <td class="text-center">{{$fee->nominal}}</td>

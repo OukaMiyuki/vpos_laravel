@@ -37,9 +37,9 @@
                                             <th>No.</th>
                                             <th>User Email</th>
                                             <th>Store Identifier</th>
-                                            <th>Tanggal Pengajuan</th>
-                                            <th>Tanggal Approval</th>
-                                            <th>Status</th>
+                                            <th class="text-center">Tanggal Pengajuan</th>
+                                            <th class="text-center">Tanggal Approval</th>
+                                            <th class="text-center">Status</th>
                                             <th class="text-center">File Attachment</th>
                                             <th>Note</th>
                                             <th class="text-center">Action</th>
@@ -52,9 +52,15 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $umi->email }}</td>
                                                 <td>{{ $umi->store_identifier }}</td>
-                                                <td>{{ $umi->tanggal_pengajuan }}</td>
-                                                <td>{{ $umi->tanggal_approval }}</td>
-                                                <td>
+                                                <td class="text-center">
+                                                    {{\Carbon\Carbon::parse($umi->tanggal_pengajuan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($umi->created_at)->format('H:i:s')}}
+                                                </td>
+                                                <td class="text-center">
+                                                    @if (!is_null($umi->tanggal_approval) || !empty($umi->tanggal_approval))
+                                                        {{\Carbon\Carbon::parse($umi->tanggal_approval)->format('d-m-Y')}} {{\Carbon\Carbon::parse($umi->updated_at)->format('H:i:s')}}
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
                                                     @if ($umi->is_active == 0)
                                                         <span class="badge bg-soft-warning text-warning">Belum Disetujui</span>
                                                     @elseif($umi->is_active == 1)

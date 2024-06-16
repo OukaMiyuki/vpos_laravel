@@ -57,12 +57,12 @@
                                             <tr>
                                                 <td><p><strong>Tanggal Transaksi</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $invoice->tanggal_transaksi }}</span></p></td>
+                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</span></p></td>
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Tanggal Pembayaran</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $invoice->tanggal_pelunasan }}</span></p></td>
+                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;@if (!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan)){{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}@endif
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Status Pembayaran</strong></p></td>

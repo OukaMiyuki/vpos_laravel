@@ -94,9 +94,9 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>No. Invoice</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Nominal</th>
-                                            <th>Biaya Transfer</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th class="text-center">Nominal</th>
+                                            <th class="text-center">Biaya Transfer</th>
                                             <th>Jenis Penarikan</th>
                                             <th>Status</th>
                                         </tr>
@@ -109,9 +109,9 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $wdData->invoice_pemarikan }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($wdData->tanggal_penarikan)->format('d-m-Y') }}</td>
-                                                <td>{{ $wdData->nominal }}</td>
-                                                <td>300</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($wdData->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wdData->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">{{ $wdData->nominal }}</td>
+                                                <td class="text-center">300</td>
                                                 <td>
                                                     @if ($wdData->status == 0)
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>

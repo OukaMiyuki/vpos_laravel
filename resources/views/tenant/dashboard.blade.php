@@ -165,23 +165,23 @@
                                             <th>No.</th>
                                             <th>Invoice</th>
                                             <th>Kasir</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Jenis Pembayaran</th>
-                                            <th>Nilai Transaksi</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Jenis Pembayaran</th>
+                                            <th class="text-center">Nilai Transaksi</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($latestInvoice as $invoice)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$invoice->nomor_invoice}}</td>
                                                 <td>@if(!empty($invoice->kasir) || !is_null($invoice->kasir)) {{ $invoice->kasir->name }} @else Transaction by Tenant @endif</td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
-                                                <td>{{ $invoice->sub_total+$invoice->pajak }}</td>
-                                                <td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">{{$invoice->jenis_pembayaran}}</td>
+                                                <td class="text-center">{{$invoice->sub_total+$invoice->pajak}}</td>
+                                                <td class="text-center">
                                                     <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}"" class="btn btn-xs btn-success"><i class="mdi mdi-eye"></i></a>
                                                 </td>
                                             </tr>

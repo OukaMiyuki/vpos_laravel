@@ -39,11 +39,10 @@
                                             <th>Tenant</th>
                                             <th>Store Identifier</th>
                                             <th>Merchant Name</th>
-                                            <th>Email</th>
+                                            <th class="text-center">Status Pembayaran</th>
                                             <th>Tanggal Transaksi</th>
-                                            <th>Tanggal Pelunasan</th>
+                                            <th>Tanggal Pembayaran</th>
                                             <th>Jenis Pembayaran</th>
-                                            <th>Status Pembayaran</th>
                                             <th>Nominal Bayar</th>
                                             <th>MDR (%)</th>
                                             <th>Nominal MDR</th>
@@ -61,17 +60,20 @@
                                                         <td>{{ $invoice->name }}</td>
                                                         <td>{{ $invoiceStore->store_identifier }}</td>
                                                         <td>{{ $invoiceStore->name }}</td>
-                                                        <td>{{ $invoiceStore->email }}</td>
-                                                        <td>{{ \Carbon\Carbon::parse($invoiceList->tanggal_transaksi)->format('d-m-Y') }}</td>
-                                                        <td>{{ \Carbon\Carbon::parse($invoiceList->tanggal_pelunasan)->format('d-m-Y') }}</td>
-                                                        <td>{{ $invoiceList->jenis_pembayaran }}</td>
-                                                        <td>
+                                                        <td class="text-center">
                                                             @if($invoiceList->status_pembayaran == 0)
                                                                 <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
                                                             @elseif($invoiceList->status_pembayaran == 1)
                                                                 <span class="badge bg-soft-success text-success">Selesai</span>
                                                             @endif
                                                         </td>
+                                                        <td>{{\Carbon\Carbon::parse($invoiceList->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                        <td>
+                                                            @if (!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan))
+                                                                {{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ $invoiceList->jenis_pembayaran }}</td>
                                                         <td>{{ $invoiceList->nominal_bayar }}</td>
                                                         <td>{{ $invoiceList->mdr }}</td>
                                                         <td>{{ $invoiceList->nominal_mdr }}</td>

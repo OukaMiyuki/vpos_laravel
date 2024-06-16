@@ -101,24 +101,24 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>Invoice</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Pembayaran</th>
-                                            <th>Status Transaksi</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Pembayaran</th>
+                                            <th class="text-center">Status Transaksi</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($invoiceQrisSukses as $invoice)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td>{{ $invoice->jenis_pembayaran }}</td>
-                                                <td>
+                                                <td>{{$no+=1}}</td>
+                                                <td>{{$invoice->nomor_invoice}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">{{$invoice->jenis_pembayaran}}</td>
+                                                <td class="text-center">
                                                     <span class="badge bg-soft-success text-success">Selesai</span>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
                                                         <button title="Restor transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>

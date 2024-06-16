@@ -31,27 +31,27 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Data Pending Transaction List</h4>
                             <div class="table-responsive">
-                                <table id="datatable-buttons" class="table table-striped dt-responsive nowrap w-100">
+                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>Invoice</th>
                                             <th>Customer Info</th>
-                                            <th>Tanggal Transaksi</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($invoice as $invoice)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->customer->customer_info }}</td>
-                                                <td>{{ $invoice->tanggal_transaksi }}</td>
-                                                <td><span class="badge bg-soft-danger text-danger">Belum Diproses</span></td>
-                                                <td>
+                                                <td>{{$no+=1}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center">{{$invoice->customer->customer_info}}</td>
+                                                <td class="text-center">{{$invoice->tanggal_transaksi}}</td>
+                                                <td class="text-center"><span class="badge bg-soft-danger text-danger">Belum Diproses</span></td>
+                                                <td class="text-center">
                                                     <a href="{{ route('kasir.transaction.pending.restore', ['id' => $invoice->id ]) }}">
                                                         <button title="Restore transaction" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-history"></span></button>&nbsp;
                                                     </a>

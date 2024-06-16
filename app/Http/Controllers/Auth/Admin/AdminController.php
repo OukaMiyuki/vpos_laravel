@@ -146,6 +146,8 @@ class AdminController extends Controller {
                                     'withdrawals.nominal',
                                     'withdrawals.biaya_admin',
                                     'withdrawals.status',
+                                    'withdrawals.created_at',
+                                    'withdrawals.updated_at',
                                 ])
                                 ->with(['detailWithdraw' => function($query){
                                     $query->select([
@@ -226,7 +228,9 @@ class AdminController extends Controller {
                                     'umi_requests.tanggal_approval',
                                     'umi_requests.is_active',
                                     'umi_requests.file_path',
-                                    'umi_requests.note'
+                                    'umi_requests.note',
+                                    'umi_requests.created_at',
+                                    'umi_requests.updated_at'
                                 ])
                                 ->latest()
                                 ->get();
@@ -588,6 +592,8 @@ class AdminController extends Controller {
                                     'withdrawals.nominal',
                                     'withdrawals.biaya_admin',
                                     'withdrawals.status',
+                                    'withdrawals.created_at',
+                                    'withdrawals.updated_at',
                                 ])
                                 ->with([
                                     'detailWithdraw' => function($query){
@@ -616,6 +622,7 @@ class AdminController extends Controller {
                                             'withdrawals.invoice_pemarikan',
                                             'withdrawals.tanggal_penarikan',
                                             'withdrawals.status',
+                                            'withdrawals.created_at',
                                         ])
                                         ->with([
                                             'detailWithdraw' => function($query){
@@ -645,6 +652,7 @@ class AdminController extends Controller {
                                         'withdrawals.invoice_pemarikan',
                                         'withdrawals.tanggal_penarikan',
                                         'withdrawals.status',
+                                        'withdrawals.created_at',
                                     ])
                                     ->with([
                                         'detailWithdraw' => function($query){
@@ -686,6 +694,7 @@ class AdminController extends Controller {
                                                             'invoices.mdr',
                                                             'invoices.nominal_mdr',
                                                             'invoices.nominal_terima_bersih',
+                                                            'invoices.created_at',
                                                         ]);
                                                     }
                                                 ])
@@ -1101,6 +1110,7 @@ class AdminController extends Controller {
                                     'withdrawals.nominal',
                                     'withdrawals.biaya_admin',
                                     'withdrawals.status',
+                                    'withdrawals.created_at',
                                 ])
                                 ->with(['detailWithdraw' => function($query){
                                     $query->select([
@@ -1118,7 +1128,6 @@ class AdminController extends Controller {
                                 ->latest()
                                 ->get();
                             }])
-                            ->latest()
                             ->get();
         return view('admin.admin_marketing_withdraw', compact('marketingWD'));
     }
@@ -1315,6 +1324,7 @@ class AdminController extends Controller {
                                             'invoices.mdr',
                                             'invoices.nominal_mdr',
                                             'invoices.nominal_terima_bersih',
+                                            'invoices.created_at'
                                         ])
                                         ->latest()
                                         ->get();
@@ -1533,6 +1543,8 @@ class AdminController extends Controller {
                                                     'invoices.mdr',
                                                     'invoices.nominal_mdr',
                                                     'invoices.nominal_terima_bersih',
+                                                    'invoices.created_at',
+                                                    'invoices.updated_at'
                                                 ])
                                                 ->latest()
                                                 ->get();
@@ -1557,6 +1569,7 @@ class AdminController extends Controller {
                                     'withdrawals.nominal',
                                     'withdrawals.biaya_admin',
                                     'withdrawals.status',
+                                    'withdrawals.created_at'
 
                                 ])
                                 ->with([
@@ -1580,7 +1593,6 @@ class AdminController extends Controller {
                             }
                         ])
                         ->where('id_inv_code', 0)
-                        ->latest()
                         ->get();
         return view('admin.admin_mitra_bisnis_withdrawal_list', compact('tenantWithdraw'));
     }
@@ -1844,6 +1856,8 @@ class AdminController extends Controller {
                                             'invoices.mdr',
                                             'invoices.nominal_mdr',
                                             'invoices.nominal_terima_bersih',
+                                            'invoices.created_at',
+                                            'invoices.updated_at',
                                         ])
                                         ->latest()
                                         ->get();
@@ -2134,6 +2148,8 @@ class AdminController extends Controller {
                                                     'invoices.mdr',
                                                     'invoices.nominal_mdr',
                                                     'invoices.nominal_terima_bersih',
+                                                    'invoices.created_at',
+                                                    'invoices.updated_at',
                                                 ])
                                                 ->latest()
                                                 ->get();
@@ -2141,7 +2157,6 @@ class AdminController extends Controller {
                                         ]);
                                     }
                                 ])
-                                ->latest()
                                 ->get();
         return view('admin.admin_mitra_tenant_transaction_list', compact('tenantInvoice'));
     }
@@ -2159,6 +2174,7 @@ class AdminController extends Controller {
                                             'withdrawals.nominal',
                                             'withdrawals.biaya_admin',
                                             'withdrawals.status',
+                                            'withdrawals.created_at',
 
                                         ])
                                         ->with([

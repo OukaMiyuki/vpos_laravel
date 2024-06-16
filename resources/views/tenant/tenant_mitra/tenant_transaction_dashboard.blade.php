@@ -119,7 +119,7 @@
                                     <a href="javascript:void(0);" class="dropdown-item">Lihat Semua Laporan</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Frekuensi Transaksi Per-Toko</h4>
+                            <h4 class="header-title mb-3">Frekuensi Transaksi Per-Merchant</h4>
                             <div class="table-responsive">
                                 <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>

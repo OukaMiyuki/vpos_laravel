@@ -45,7 +45,7 @@
                             <div class="responsive-table-plugin">
                                 <div class="table-rep-plugin">
                                     <div class="table-responsive" data-pattern="priority-columns">
-                                        <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                        <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                             <thead>
                                                 <tr>
                                                     <th>No.</th>
@@ -74,8 +74,12 @@
                                                         <td>{{ $storeList->name }}</td>
                                                         <td>{{ $invoice->store_identifier }}</td>
                                                         <td>{{ $invoice->nomor_invoice }}</td>
-                                                        <td class="text-center">{{ \Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y') }}</td>
-                                                        <td class="text-center">{{ \Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y') }}</td>
+                                                        <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y') }} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                        <td class="text-center">
+                                                            @if (!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan))
+                                                                {{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}
+                                                            @endif
+                                                        </td>
                                                         <td class="text-center">{{ $invoice->jenis_pembayaran }}</td>
                                                         <td class="text-center">
                                                             @if($invoice->status_pembayaran == 0)
