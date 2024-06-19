@@ -9,12 +9,33 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.menu') }}">Admin Menu</a></li>
-                                <li class="breadcrumb-item active">User Withdrawals List</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.saldo') }}">Saldo</a></li>
+                                <li class="breadcrumb-item active">Agregate Transfer</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Withdraw Mitra Bisnis</h4>
+                        <h4 class="page-title">Data Insentif Agregate Transfer</h4>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-xl-4">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/walletadminagregate.png') }}" class="img-fluid" alt="">
+                                </div>
+                                <div class="col-8">
+                                    <div class="text-end">
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $agregateSaldoAplikasi->saldo }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Saldo Agregate Aplikasi</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
                 </div>
             </div>
             <div class="row">
@@ -29,39 +50,33 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar Withdraw Mitra Bisnis</h4>
+                            <h4 class="header-title mb-3">History Insentif Agregate Transfer</h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Action</th>
                                             <th>No. Invoice</th>
-                                            <th>Nama</th>
-                                            <th>User Email</th>
+                                            <th>Jenis Penarikan</th>
                                             <th class="text-center">Tanggal Penarikan</th>
-                                            <th>Nominal (Rp.)</th>
-                                            <th>Total Biaya Transfer (Rp.)</th>
+                                            <th class="text-center">Insentif Transfer (Rp.)</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
-                                        @foreach($tenantWithdraw as $key => $wd)
-                                            @foreach ($wd->withdrawal as $withdraw)
+                                        @php
+                                            $no=0;
+                                        @endphp
+                                        @foreach ($withdrawals as $wd)
+                                            @foreach ($wd->detailWithdraw as $wddt)
                                                 <tr>
-                                                    <td>{{$no+=1}}</td>
+                                                    <td>{{ $no+=1 }}</td>
+                                                    <td>{{ $wd->invoice_pemarikan }}</td>
+                                                    <td>{{ $wd->jenis_penarikan }}</td>
+                                                    <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s')}}</td>
+                                                    <td class="text-center">{{$wddt->nominal}}</td>
                                                     <td>
-                                                        <a href="{{ route('admin.dashboard.menu.userWithdrawals.detail', ['id' => $withdraw->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
-                                                    </td>
-                                                    <td>{{$withdraw->invoice_pemarikan}}</td>
-                                                    <td>{{$wd->name}}</td>
-                                                    <td>{{$wd->email}}</td>
-                                                    <td class="text-center">{{\Carbon\Carbon::parse($withdraw->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($withdraw->created_at)->format('H:i:s')}}</td>
-                                                    <td>{{$withdraw->nominal}}</td>
-                                                    <td>{{$withdraw->biaya_admin}}</td>
-                                                    <td>
-                                                        @if ($withdraw->status == 0)
+                                                        @if ($wd->status == 0)
                                                             <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
                                                         @else
                                                             <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
@@ -78,5 +93,6 @@
                 </div>
             </div>
         </div>
+        <!-- container -->
     </div>
 </x-admin-layout>

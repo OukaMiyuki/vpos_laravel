@@ -255,6 +255,12 @@
                                     <a href="{{ route('admin.dashboard.saldo.agregate') }}">Saldo Agregate</a>
                                 </li>
                                 <li>
+                                    <a href="{{ route('admin.dashboard.saldo.agregate.aplikasi') }}">Saldo Agregate Aplikasi</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.dashboard.saldo.agregate.transfer') }}">Saldo Agregate Transfer</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('admin.dashboard.saldo.cashback') }}">History Cashback Transaksi</a>
                                 </li>
                                 <li>
@@ -363,6 +369,9 @@
                             <ul class="nav-second-level">
                                 <li>
                                     <a href="{{ route('admin.dashboard.finance') }}">History Saldo</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.dashboard.finance.insentif.list') }}">Pengaturan Insentif</a>
                                 </li>
                             </ul>
                         </div>

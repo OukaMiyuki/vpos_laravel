@@ -39,7 +39,10 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('admin.logout');
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
 
-    Route::get('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningSetting'])->name('admin.rekening.setting');
+    Route::get('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningList'])->name('admin.rekening.setting');
+    Route::get('settings/rekening/add', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningListAdd'])->name('admin.rekening.setting.add');
+    Route::post('settings/rekening/add', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningListInsert'])->name('admin.rekening.setting.insert');
+    Route::get('settings/rekening/edit/{id}', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningListEdit'])->name('admin.rekening.setting.edit');
     Route::post('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningSettingUpdate'])->name('admin.rekening.setting.update');
 
     Route::get('settings/wiithdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdraw'])->name('admin.withdraw');
@@ -68,6 +71,8 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::get('dashboard/saldo', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldo'])->name('admin.dashboard.saldo');
     Route::get('dashboard/saldo/qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoQris'])->name('admin.dashboard.saldo.qris');
     Route::get('dashboard/saldo/agregate', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregate'])->name('admin.dashboard.saldo.agregate');
+    Route::get('dashboard/saldo/agregate-aplikasi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregateAplikasi'])->name('admin.dashboard.saldo.agregate.aplikasi');
+    Route::get('dashboard/saldo/agregate-transfer', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregateTransfer'])->name('admin.dashboard.saldo.agregate.transfer');
     Route::get('dashboard/saldo/data-history-cashback', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoCashback'])->name('admin.dashboard.saldo.cashback');
     Route::get('dashboard/saldo/data-bank-fee-transfer', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardNobuFeeTransfer'])->name('admin.dashboard.saldo.nobu.fee.transfer');
 
@@ -111,6 +116,10 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
 
     Route::get('dashboard/finance', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinance'])->name('admin.dashboard.finance');
     Route::get('dashboard/finance/withdraw-invoice/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinanceInvoice'])->name('admin.dashboard.finance.withdraw.invoice');
+    Route::get('dashboard/finance/insentif', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingList'])->name('admin.dashboard.finance.insentif.list');
+    Route::post('dashboard/finance/insentif', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingInsert'])->name('admin.dashboard.finance.insentif.insert');
+    Route::post('dashboard/finance/insentif/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingUpdate'])->name('admin.dashboard.finance.insentif.update');
+    Route::get('dashboard/finance/insentif/delete/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingDelete'])->name('admin.dashboard.finance.insentif.delete');
 
     Route::get('dashboard/history', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistory'])->name('admin.dashboard.history');
     Route::get('dashboard/history/user-login', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserLogin'])->name('admin.dashboard.history.user.login');

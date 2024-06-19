@@ -47,7 +47,7 @@
                                     <div class="mt-3">
                                         {{-- <p><b>Hello, Stanley Jones</b></p> --}}
                                         <p class="text-muted">
-                                            Berikut terlampir bukti invoice untuk penarikan dana Qris</strong>
+                                            Berikut terlampir bukti invoice untuk penarikan dana Qris :  <strong>{{ $withdrawData->invoice_pemarikan }}</strong>
                                         </p>
                                     </div>
 
@@ -56,14 +56,9 @@
                                     <div class="mt-3 float-end">
                                         <table>
                                             <tr>
-                                                <td><p><strong>Tanggal Transaksi</strong></p></td>
+                                                <td><p><strong>Tanggal Penarikan</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $withdrawData->tanggal_penarikan }}</span></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td><p><strong>Tanggal Masuk</strong></p></td>
-                                                <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $withdrawData->tanggal_masuk }}</span></p></td>
+                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ \Carbon\Carbon::parse($withdrawData->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($withdrawData->created_at)->format('H:i:s')}}</span></p></td>
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Status Transfer</strong></p></td>
@@ -90,10 +85,28 @@
                                 <div class="col-sm-6">
                                     <h6>Info Penarikan</h6>
                                     <address>
-                                        Nama : {{ auth()->user()->name }}<br>
-                                        Email : {{ auth()->user()->email }}<br>
-                                        Level Akun : <strong>Tenant/Pemilik Toko</strong><br>
-                                        Nomor Rekening : {{ $rekening->no_rekening }}<br>
+                                        <table>
+                                            <tr>
+                                                <td><strong>Nama</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ auth()->user()->name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Email</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ auth()->user()->email }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Level Akun</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td><strong>Tenant/Pemilik Toko</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>No. Rekening</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $rekening->no_rekening }}</td>
+                                            </tr>
+                                        </table>
                                     </address>
                                 </div> <!-- end col -->
                             </div>

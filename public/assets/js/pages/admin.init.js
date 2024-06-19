@@ -1,5 +1,13 @@
 $(document).ready(function(){
 
+    $('#swift_code').on('change',function(){
+            if($(this).val() != "default"){
+            $('#nama_bank').val($( "#swift_code option:selected" ).text());
+        }else{
+            $('#nama_bank').val('');
+        }
+    });
+
     $('#image').change(function(e){
         var reader = new FileReader();
         reader.onload = function(e){
@@ -38,15 +46,25 @@ $(document).ready(function(){
         $("#show #qris_store_id").val(qris_store_id);
         $("#show #mdr").val(mdr);
     });
+    $(document).on("click", "#edit-data-insentif", function() {
+        var id = $(this).data('id');
+        var jenis_insentif = $(this).data('jenis_insentif');
+        var nominal = $(this).data('nominal');
+        $("#show #id").val(id);
+        $("#show #name").val(jenis_insentif);
+        $("#show #nominal_insentif").val(nominal);
+    });
 });
 $("#saldo-qris-txt").hide();
-$("#saldo-agregate-txt").hide();
+$("#saldo-agregate-aplikasi-txt").hide();
+$("#saldo-agregate-transfer-txt").hide();
 $(document).ready(function() {
     $("#dana").on('change', function() {
         if ($(this).val() == ''){
             $("#jenis-tarik").val("");
             $("#saldo-qris-txt").hide();
-            $("#saldo-agregate-txt").hide();
+            $("#saldo-agregate-aplikasi-txt").hide();
+            $("#saldo-agregate-transfer-txt").hide();
             $("#tarikDanaButton").attr('disabled',true);
         } else {
             $("#tarikDanaButton").attr('disabled',false);
@@ -54,11 +72,24 @@ $(document).ready(function() {
             if($("#dana").val() == 'Qris'){
                 $("#jenis-tarik").val("Qris");
                 $("#saldo-qris-txt").show();
-                $("#saldo-agregate-txt").hide();
-            } else if($("#dana").val() == 'Agregate'){
-                $("#jenis-tarik").val("Agregate");
+                $("#saldo-agregate-transfer-txt").hide();
+                $("#saldo-agregate-aplikasi-txt").hide();
+            } else if($("#dana").val() == 'Aplikasi'){
+                $("#jenis-tarik").val("Aplikasi");
                 $("#saldo-qris-txt").hide();
-                $("#saldo-agregate-txt").show();
+                $("#saldo-agregate-transfer-txt").hide();
+                $("#saldo-agregate-aplikasi-txt").show();
+            } else if($("#dana").val() == 'Transfer'){
+                $("#jenis-tarik").val("Transfer");
+                $("#saldo-qris-txt").hide();
+                $("#saldo-agregate-transfer-txt").show();
+                $("#saldo-agregate-aplikasi-txt").hide();
+            } else {
+                $("#jenis-tarik").val("");
+                $("#saldo-qris-txt").hide();
+                $("#saldo-agregate-aplikasi-txt").hide();
+                $("#saldo-agregate-transfer-txt").hide();
+                $("#tarikDanaButton").attr('disabled',true);
             }
         }
     });

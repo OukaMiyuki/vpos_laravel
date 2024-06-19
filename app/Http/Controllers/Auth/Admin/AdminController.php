@@ -31,6 +31,7 @@ use App\Models\AgregateWallet;
 use App\Models\QrisWallet;
 use App\Models\HistoryCashbackAdmin;
 use App\Models\NobuWithdrawFeeHistory;
+use App\Models\BiayaAdminTransferDana;
 use App\Models\Rekening;
 use App\Models\History;
 
@@ -82,11 +83,35 @@ class AdminController extends Controller {
         $mitraBisnis = Tenant::where('id_inv_code', '==', 0)->count();
         $mitraTenant = Tenant::where('id_inv_code', '!=', 0)->count();
         $withdrawals = Withdrawal::where('email', '!=' , auth()->user()->email);
-        $withDrawToday = Withdrawal::where('email', '!=' , auth()->user()->email)
+        $withDrawToday = Withdrawal::select([
+                                        'withdrawals.id',
+                                        'withdrawals.invoice_pemarikan',
+                                        'withdrawals.id_user',
+                                        'withdrawals.id_rekening',
+                                        'withdrawals.email',
+                                        'withdrawals.jenis_penarikan',
+                                        'withdrawals.tanggal_penarikan',
+                                        'withdrawals.nominal',
+                                        'withdrawals.biaya_admin',
+                                        'withdrawals.tanggal_masuk',
+                                        'withdrawals.status',
+                                    ])
+                                    ->where('email', '!=' , auth()->user()->email)
                                      ->whereDate('tanggal_penarikan', Carbon::now())
                                      ->where('status', 1)
-                                     ->withSum('detailWithdraw', 'biaya_admin_su')
+                                     ->with([
+                                        'detailWithdraw' => function($query){
+                                            $query->select([
+                                                        'detail_penarikans.id',
+                                                        'detail_penarikans.id_insentif',
+                                                        'detail_penarikans.id_penarikan',
+                                                        'detail_penarikans.nominal'
+                                                    ])
+                                                    ->where('id_insentif', 3);
+                                        }
+                                      ])
                                      ->get();
+
         $marketing = Marketing::select([
                                         'marketings.id',
                                         'marketings.name',
@@ -102,7 +127,7 @@ class AdminController extends Controller {
                                     ->get();
         $totalWithdrawToday = 0;
         foreach($withDrawToday as $wd){
-            $totalWithdrawToday+=$wd->detail_withdraw_sum_biaya_admin_su;
+            $totalWithdrawToday+=$wd->detailWithdraw->sum('nominal');
         }
 
         $withdrawCount = $withdrawals->count();
@@ -112,19 +137,21 @@ class AdminController extends Controller {
                                 'withdrawals.tanggal_penarikan',
                                 'withdrawals.nominal',
                                 'withdrawals.status',
+                                'withdrawals.created_at',
                             ])
                             ->with(['detailWithdraw' => function($query){
                                 $query->select([
                                     'detail_penarikans.id',
+                                    'detail_penarikans.id_insentif',
                                     'detail_penarikans.id_penarikan',
-                                    'detail_penarikans.nominal_penarikan',
-                                    'detail_penarikans.biaya_admin_su'
-                                ]);
+                                    'detail_penarikans.nominal'
+                                ])
+                                ->where('id_insentif', 3);
                             }])
                             ->take(5)
                             ->latest()
                             ->get();
-        //dd($withdrawNew);
+
         return view('admin.dashboard', compact(['marketingCount', 'mitraBisnis', 'mitraTenant', 'withdrawCount', 'totalWithdrawToday', 'marketing', 'withdrawNew']));
     }
 
@@ -142,6 +169,7 @@ class AdminController extends Controller {
                                     'withdrawals.id',
                                     'withdrawals.invoice_pemarikan',
                                     'withdrawals.email',
+                                    'withdrawals.jenis_penarikan',
                                     'withdrawals.tanggal_penarikan',
                                     'withdrawals.nominal',
                                     'withdrawals.biaya_admin',
@@ -149,18 +177,6 @@ class AdminController extends Controller {
                                     'withdrawals.created_at',
                                     'withdrawals.updated_at',
                                 ])
-                                ->with(['detailWithdraw' => function($query){
-                                    $query->select([
-                                        'detail_penarikans.id',
-                                        'detail_penarikans.id_penarikan',
-                                        'detail_penarikans.nominal_bersih_penarikan',
-                                        'detail_penarikans.biaya_nobu',
-                                        'detail_penarikans.biaya_mitra',
-                                        'detail_penarikans.biaya_tenant',
-                                        'detail_penarikans.biaya_admin_su',
-                                        'detail_penarikans.biaya_agregate',
-                                    ]);
-                                }])
                                 ->where('email', '!=', 'adminsu@visipos.id')
                                 ->latest()
                                 ->get();
@@ -177,18 +193,23 @@ class AdminController extends Controller {
                                 'withdrawals.nominal',
                                 'withdrawals.biaya_admin',
                                 'withdrawals.status',
+                                'withdrawals.created_at',
                             ])
                             ->with([
                                 'detailWithdraw' => function($query){
                                     $query->select([
                                         'detail_penarikans.id',
+                                        'detail_penarikans.id_insentif',
                                         'detail_penarikans.id_penarikan',
-                                        'detail_penarikans.nominal_bersih_penarikan',
-                                        'detail_penarikans.biaya_nobu',
-                                        'detail_penarikans.biaya_mitra',
-                                        'detail_penarikans.biaya_tenant',
-                                        'detail_penarikans.biaya_admin_su',
-                                        'detail_penarikans.biaya_agregate',
+                                        'detail_penarikans.nominal'
+                                    ])
+                                    ->with([
+                                        'insentif' => function($query){
+                                            $query->select([
+                                                'biaya_admin_transfer_danas.id',
+                                                'biaya_admin_transfer_danas.jenis_insentif',  
+                                            ]);
+                                        }
                                     ]);
                                 }
                             ])
@@ -580,14 +601,16 @@ class AdminController extends Controller {
 
     public function adminDashboardSaldo(){
         $adminQrisWallet = QrisWallet::select(['saldo'])->where('email', auth()->user()->email)->find(auth()->user()->id);
-        $agregateWallet = AgregateWallet::select(['saldo'])->first();
+        $agregateWalletforMaintenance = AgregateWallet::where('wallet_type', 'maintenance')->select(['saldo'])->first();
+        $agregateWalletforTransfer = AgregateWallet::where('wallet_type', 'transfer')->select(['saldo'])->first();
+        $totalAgregate = $agregateWalletforMaintenance->saldo+$agregateWalletforTransfer->saldo;
         $historyCashbackAdmin = HistoryCashbackAdmin::sum('nominal_terima_mdr');
         $nobuWithdrawFeeHistory = NobuWithdrawFeeHistory::sum('nominal');
         $withdrawals = Withdrawal::select([
                                     'withdrawals.id',
                                     'withdrawals.invoice_pemarikan',
-                                    'withdrawals.id_user',
                                     'withdrawals.email',
+                                    'withdrawals.jenis_penarikan',
                                     'withdrawals.tanggal_penarikan',
                                     'withdrawals.nominal',
                                     'withdrawals.biaya_admin',
@@ -595,55 +618,88 @@ class AdminController extends Controller {
                                     'withdrawals.created_at',
                                     'withdrawals.updated_at',
                                 ])
-                                ->with([
-                                    'detailWithdraw' => function($query){
-                                        $query->select([
-                                            'detail_penarikans.id',
-                                            'detail_penarikans.id_penarikan',
-                                            'detail_penarikans.nominal_bersih_penarikan',
-                                            'detail_penarikans.biaya_nobu',
-                                            'detail_penarikans.biaya_mitra',
-                                            'detail_penarikans.biaya_tenant',
-                                            'detail_penarikans.biaya_admin_su',
-                                            'detail_penarikans.biaya_agregate',
-                                        ]);
-                                    }
-                                ])
                                 ->where('email', '!=', 'adminsu@visipos.id')
                                 ->latest()
                                 ->take(10)
                                 ->get();
-        return view('admin.admin_menu_dashboard_saldo', compact(['adminQrisWallet', 'agregateWallet', 'historyCashbackAdmin', 'nobuWithdrawFeeHistory', 'withdrawals']));
+        return view('admin.admin_menu_dashboard_saldo', compact(['adminQrisWallet', 'totalAgregate', 'agregateWalletforMaintenance', 'agregateWalletforTransfer', 'historyCashbackAdmin', 'nobuWithdrawFeeHistory', 'withdrawals']));
     }
 
     public function adminDashboardSaldoQris(){
-        $withdrawals = Withdrawal::select([
+        $withdrawalTenant = Withdrawal::select([
                                             'withdrawals.id',
-                                            'withdrawals.invoice_pemarikan',
-                                            'withdrawals.tanggal_penarikan',
-                                            'withdrawals.status',
-                                            'withdrawals.created_at',
                                         ])
                                         ->with([
                                             'detailWithdraw' => function($query){
                                                 $query->select([
                                                     'detail_penarikans.id',
                                                     'detail_penarikans.id_penarikan',
-                                                    'detail_penarikans.biaya_admin_su',
-                                                ]);
+                                                    'detail_penarikans.nominal',
+                                                ])
+                                                ->where('id_insentif', 3);
                                             }
                                         ])
-                                        ->withSum('detailWithdraw', 'biaya_admin_su')
                                         ->where('email', '!=', auth()->user()->email)
+                                        ->where('jenis_penarikan', 'Penarikan Dana Tenant')
                                         ->where('status', 1)
                                         ->latest()
                                         ->get();
-        $adminQrisWallet = QrisWallet::select(['saldo'])->where('email', auth()->user()->email)->find(auth()->user()->id);
-        $totalInsentif=0;
-        foreach($withdrawals as $wd){
-            $totalInsentif+=$wd->detail_withdraw_sum_biaya_admin_su;
+        $withdrawalMitraMarketingBisnis = Withdrawal::select([
+                                                            'withdrawals.id',
+                                                        ])
+                                                        ->with([
+                                                            'detailWithdraw' => function($query){
+                                                                $query->select([
+                                                                    'detail_penarikans.id',
+                                                                    'detail_penarikans.id_penarikan',
+                                                                    'detail_penarikans.nominal',
+                                                                ])
+                                                                ->where(
+                                                                    function($query){
+                                                                        $query->where('id_insentif', 3)
+                                                                                ->orWhere('id_insentif', 5);
+                                                                    }
+                                                                );
+                                                            }
+                                                        ])
+                                                        ->where('email', '!=', auth()->user()->email)
+                                                        ->where(
+                                                            function($query){
+                                                                $query->where('jenis_penarikan', 'Penarikan Dana Mitra Aplikasi')
+                                                                        ->orWhere('jenis_penarikan', 'Penarikan Dana Mitra Bisnis');
+                                                            }
+                                                        )
+                                                        ->where('status', 1)
+                                                        ->latest()
+                                                        ->get();
+        $withdrawals = Withdrawal::select([
+                                        'withdrawals.id',
+                                        'withdrawals.invoice_pemarikan',
+                                        'withdrawals.email',
+                                        'withdrawals.jenis_penarikan',
+                                        'withdrawals.tanggal_penarikan',
+                                        'withdrawals.nominal',
+                                        'withdrawals.biaya_admin',
+                                        'withdrawals.status',
+                                        'withdrawals.created_at',
+                                        'withdrawals.updated_at',
+                                    ])
+                                    ->where('email', '!=', 'adminsu@visipos.id')
+                                    ->latest()
+                                    ->get();
+        $insentifFromTenant = 0;
+        foreach($withdrawalTenant as $wdTenant){
+            $insentifFromTenant = $wdTenant->detailWithdraw->sum('nominal');
         }
-        return view('admin.admin_menu_dashboard_saldo_qris', compact(['withdrawals', 'totalInsentif', 'adminQrisWallet']));
+        $insentifFromMitra = 0;
+        foreach($withdrawalMitraMarketingBisnis as $wdMitra){
+            foreach($wdMitra->detailWithdraw as $wddt){
+                $insentifFromMitra+=$wddt->nominal;
+            }
+        }
+        $totalPendapatanAdmin = $insentifFromTenant+$insentifFromMitra;
+        $adminQrisWallet = QrisWallet::select(['saldo'])->where('email', auth()->user()->email)->find(auth()->user()->id);
+        return view('admin.admin_menu_dashboard_saldo_qris', compact(['withdrawals', 'totalPendapatanAdmin', 'adminQrisWallet']));
     }
 
     public function adminDashboardSaldoAgregate(){
@@ -651,6 +707,7 @@ class AdminController extends Controller {
                                         'withdrawals.id',
                                         'withdrawals.invoice_pemarikan',
                                         'withdrawals.tanggal_penarikan',
+                                        'withdrawals.jenis_penarikan',
                                         'withdrawals.status',
                                         'withdrawals.created_at',
                                     ])
@@ -659,21 +716,84 @@ class AdminController extends Controller {
                                             $query->select([
                                                 'detail_penarikans.id',
                                                 'detail_penarikans.id_penarikan',
-                                                'detail_penarikans.biaya_agregate',
-                                            ]);
+                                                'detail_penarikans.nominal',
+                                            ])
+                                            ->where(
+                                                function($query){
+                                                    $query->where('id_insentif', 2)
+                                                            ->orWhere('id_insentif', 4);
+                                                }
+                                            );
                                         }
                                     ])
-                                    ->withSum('detailWithdraw', 'biaya_agregate')
                                     ->where('email', '!=', auth()->user()->email)
                                     ->where('status', 1)
                                     ->latest()
                                     ->get();
-            $totalInsentifAgregate=0;
-            $agregateWallet = AgregateWallet::select(['saldo'])->first();
-            foreach($withdrawals as $wd){
-                $totalInsentifAgregate+=$wd->detail_withdraw_sum_biaya_agregate;
+            $agregate = 0;
+            foreach($withdrawals as $wdagg){
+                foreach($wdagg->detailWithdraw as $wd){
+                    $agregate+=$wd->nominal;
+                }
             }
-            return view('admin.admin_menu_dashboard_saldo_agregate', compact(['withdrawals', 'totalInsentifAgregate', 'agregateWallet']));
+            $agregateSaldo = AgregateWallet::sum('saldo');
+            return view('admin.admin_menu_dashboard_saldo_agregate', compact(['withdrawals', 'agregate', 'agregateSaldo']));
+    }
+
+    public function adminDashboardSaldoAgregateAplikasi(){
+        $withdrawals = Withdrawal::select([
+                                            'withdrawals.id',
+                                            'withdrawals.invoice_pemarikan',
+                                            'withdrawals.tanggal_penarikan',
+                                            'withdrawals.jenis_penarikan',
+                                            'withdrawals.status',
+                                            'withdrawals.created_at',
+                                        ])
+                                        ->with([
+                                            'detailWithdraw' => function($query){
+                                                $query->select([
+                                                    'detail_penarikans.id',
+                                                    'detail_penarikans.id_penarikan',
+                                                    'detail_penarikans.nominal',
+                                                ])
+                                                ->where('id_insentif', 4);
+                                            }
+                                        ])
+                                        ->where('email', '!=', auth()->user()->email)
+                                        ->where('status', 1)
+                                        ->latest()
+                                        ->get();
+        $agregateSaldoAplikasi = AgregateWallet::select('saldo')->find(1);
+
+        return view('admin.admin_menu_dashboard_saldo_agregate_aplikasi', compact(['withdrawals', 'agregateSaldoAplikasi']));
+    }
+
+    public function adminDashboardSaldoAgregateTransfer(){
+        $withdrawals = Withdrawal::select([
+                                            'withdrawals.id',
+                                            'withdrawals.invoice_pemarikan',
+                                            'withdrawals.tanggal_penarikan',
+                                            'withdrawals.jenis_penarikan',
+                                            'withdrawals.status',
+                                            'withdrawals.created_at',
+                                        ])
+                                        ->with([
+                                            'detailWithdraw' => function($query){
+                                                $query->select([
+                                                    'detail_penarikans.id',
+                                                    'detail_penarikans.id_penarikan',
+                                                    'detail_penarikans.nominal',
+                                                ])
+                                                ->where('id_insentif', 2);
+                                            }
+                                        ])
+                                        ->where('email', '!=', auth()->user()->email)
+                                        ->where('status', 1)
+                                        ->latest()
+                                        ->get();
+        $agregateSaldoAplikasi = AgregateWallet::select('saldo')->find(2);
+
+        return view('admin.admin_menu_dashboard_saldo_agregate_transfer', compact(['withdrawals', 'agregateSaldoAplikasi']));
     }
 
     public function adminDashboardSaldoCashback(){
@@ -715,6 +835,7 @@ class AdminController extends Controller {
                                                     $query->select([
                                                         'withdrawals.id',
                                                         'withdrawals.invoice_pemarikan',
+                                                        'withdrawals.jenis_penarikan',
                                                         'withdrawals.tanggal_penarikan',
                                                         'withdrawals.nominal',
                                                         'withdrawals.biaya_admin',
@@ -723,6 +844,7 @@ class AdminController extends Controller {
                                             ])
                                             ->latest()
                                             ->get();
+
         return view('admin.admin_menu_dashboard_saldo_history_nobu_fee_transfer', compact(['nobuFeeHistory']));
     }
 
@@ -1104,27 +1226,15 @@ class AdminController extends Controller {
                                 $query->select([
                                     'withdrawals.id',
                                     'withdrawals.invoice_pemarikan',
-                                    'withdrawals.id_user',
                                     'withdrawals.email',
+                                    'withdrawals.jenis_penarikan',
                                     'withdrawals.tanggal_penarikan',
                                     'withdrawals.nominal',
                                     'withdrawals.biaya_admin',
                                     'withdrawals.status',
                                     'withdrawals.created_at',
+                                    'withdrawals.updated_at',
                                 ])
-                                ->with(['detailWithdraw' => function($query){
-                                    $query->select([
-                                        'detail_penarikans.id',
-                                        'detail_penarikans.id_penarikan',
-                                        'detail_penarikans.nominal_penarikan',
-                                        'detail_penarikans.nominal_bersih_penarikan',
-                                        'detail_penarikans.biaya_nobu',
-                                        'detail_penarikans.biaya_mitra',
-                                        'detail_penarikans.biaya_tenant',
-                                        'detail_penarikans.biaya_admin_su',
-                                        'detail_penarikans.biaya_agregate',
-                                    ]);
-                                }])
                                 ->latest()
                                 ->get();
                             }])
@@ -1558,42 +1668,25 @@ class AdminController extends Controller {
 
     public function adminDashboardMitraBisnisWithdrawalList(){
         $tenantWithdraw = Tenant::select(['tenants.id', 'tenants.name', 'tenants.email'])
-                        ->with([
-                            'withdrawal' => function($query){
-                                $query->select([
-                                    'withdrawals.id',
-                                    'withdrawals.invoice_pemarikan',
-                                    'withdrawals.id_user',
-                                    'withdrawals.email',
-                                    'withdrawals.tanggal_penarikan',
-                                    'withdrawals.nominal',
-                                    'withdrawals.biaya_admin',
-                                    'withdrawals.status',
-                                    'withdrawals.created_at'
-
-                                ])
-                                ->with([
-                                    'detailWithdraw' => function($query){
-                                        $query->select([
-                                            'detail_penarikans.id',
-                                            'detail_penarikans.id_penarikan',
-                                            'detail_penarikans.nominal_penarikan',
-                                            'detail_penarikans.nominal_bersih_penarikan',
-                                            'detail_penarikans.total_biaya_admin',
-                                            'detail_penarikans.biaya_nobu',
-                                            'detail_penarikans.biaya_mitra',
-                                            'detail_penarikans.biaya_tenant',
-                                            'detail_penarikans.biaya_admin_su',
-                                            'detail_penarikans.biaya_agregate',
-                                        ]);
-                                    }
-                                ])
-                                ->latest()
+                                ->with(['withdrawal' => function($query){
+                                    $query->select([
+                                        'withdrawals.id',
+                                        'withdrawals.invoice_pemarikan',
+                                        'withdrawals.email',
+                                        'withdrawals.jenis_penarikan',
+                                        'withdrawals.tanggal_penarikan',
+                                        'withdrawals.nominal',
+                                        'withdrawals.biaya_admin',
+                                        'withdrawals.status',
+                                        'withdrawals.created_at',
+                                        'withdrawals.updated_at',
+                                    ])
+                                    ->latest()
+                                    ->get();
+                                }])
+                                ->where('id_inv_code', 0)
                                 ->get();
-                            }
-                        ])
-                        ->where('id_inv_code', 0)
-                        ->get();
+    
         return view('admin.admin_mitra_bisnis_withdrawal_list', compact('tenantWithdraw'));
     }
 
@@ -2163,40 +2256,22 @@ class AdminController extends Controller {
 
     public function adminDashboardMitraTenantWithdrawalList(){
         $tenantWithdraw = Tenant::select(['tenants.id', 'tenants.name', 'tenants.email'])
-                                ->with([
-                                    'withdrawal' => function($query){
-                                        $query->select([
-                                            'withdrawals.id',
-                                            'withdrawals.invoice_pemarikan',
-                                            'withdrawals.id_user',
-                                            'withdrawals.email',
-                                            'withdrawals.tanggal_penarikan',
-                                            'withdrawals.nominal',
-                                            'withdrawals.biaya_admin',
-                                            'withdrawals.status',
-                                            'withdrawals.created_at',
-
-                                        ])
-                                        ->with([
-                                            'detailWithdraw' => function($query){
-                                                $query->select([
-                                                    'detail_penarikans.id',
-                                                    'detail_penarikans.id_penarikan',
-                                                    'detail_penarikans.nominal_penarikan',
-                                                    'detail_penarikans.nominal_bersih_penarikan',
-                                                    'detail_penarikans.total_biaya_admin',
-                                                    'detail_penarikans.biaya_nobu',
-                                                    'detail_penarikans.biaya_mitra',
-                                                    'detail_penarikans.biaya_tenant',
-                                                    'detail_penarikans.biaya_admin_su',
-                                                    'detail_penarikans.biaya_agregate',
-                                                ]);
-                                            }
-                                        ])
-                                        ->latest()
-                                        ->get();
-                                    }
-                                ])
+                                ->with(['withdrawal' => function($query){
+                                    $query->select([
+                                        'withdrawals.id',
+                                        'withdrawals.invoice_pemarikan',
+                                        'withdrawals.email',
+                                        'withdrawals.jenis_penarikan',
+                                        'withdrawals.tanggal_penarikan',
+                                        'withdrawals.nominal',
+                                        'withdrawals.biaya_admin',
+                                        'withdrawals.status',
+                                        'withdrawals.created_at',
+                                        'withdrawals.updated_at',
+                                    ])
+                                    ->latest()
+                                    ->get();
+                                }])
                                 ->where('id_inv_code', '!=', 0)
                                 ->latest()
                                 ->get();
@@ -2215,14 +2290,44 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardFinanceInvoice($id){
-        $withdrawData = Withdrawal::select([ 'withdrawals.id',
-                                             'withdrawals.email',
-                                             'withdrawals.tanggal_penarikan',
-                                             'withdrawals.nominal',
-                                             'withdrawals.biaya_admin',
-                                             'withdrawals.tanggal_masuk',
-                                             'withdrawals.status'
-                                            ])
+        $withdrawData = Withdrawal::select([ 
+                                    'withdrawals.id',
+                                    'withdrawals.id_rekening',
+                                    'withdrawals.invoice_pemarikan',
+                                    'withdrawals.jenis_penarikan',
+                                    'withdrawals.email',
+                                    'withdrawals.tanggal_penarikan',
+                                    'withdrawals.nominal',
+                                    'withdrawals.biaya_admin',
+                                    'withdrawals.status',
+                                    'withdrawals.created_at',
+                                ])
+                                ->with([
+                                    'detailWithdraw' => function($query){
+                                        $query->select([
+                                            'detail_penarikans.id',
+                                            'detail_penarikans.id_insentif',
+                                            'detail_penarikans.id_penarikan',
+                                            'detail_penarikans.nominal'
+                                        ])
+                                        ->with([
+                                            'insentif' => function($query){
+                                                $query->select([
+                                                    'biaya_admin_transfer_danas.id',
+                                                    'biaya_admin_transfer_danas.jenis_insentif',  
+                                                ]);
+                                            }
+                                        ]);
+                                    },
+                                    'rekAdmin' => function($query){
+                                        $query->select([
+                                            'rekening_admins.id',
+                                            'rekening_admins.nama_rekening',
+                                            'rekening_admins.nama_bank',
+                                            'rekening_admins.no_rekening',
+                                        ]);
+                                    }
+                                ])
                                 ->where('email', auth()->user()->email)
                                 ->find($id);
         if(is_null($withdrawData) || empty($withdrawData)){
@@ -2233,10 +2338,85 @@ class AdminController extends Controller {
 
             return redirect()->route('admin.dashboard.finance')->with($notification);
         }
-        $rekening = Rekening::select(['swift_code', 'no_rekening'])
-                            ->where('id_user', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
-        return view('admin.admin_finance_history_invoice', compact(['withdrawData', 'withdrawData', 'rekening']));
+        return view('admin.admin_finance_history_invoice', compact(['withdrawData']));
+    }
+
+    public function adminDashboardInsentifSettingList(){
+        $insentifTransfer = BiayaAdminTransferDana::get();
+        $totalInsentif = $insentifTransfer->sum('nominal');
+
+        return view('admin.admin_finance_insentif_setting_list', compact(['totalInsentif', 'insentifTransfer']));
+    }
+
+    public function adminDashboardInsentifSettingInsert(Request $request){
+        $action = "";
+        DB::connection()->enableQueryLog();
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Add New Insentif Setting";
+        }
+        BiayaAdminTransferDana::create([
+            'jenis_insentif' => $request->name,
+            'nominal' => $request->nominal_insentif
+        ]);
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+        $notification = array(
+            'message' => 'Data berhasil ditambahkan!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('admin.dashboard.finance.insentif.list')->with($notification);
+    }
+
+    public function adminDashboardInsentifSettingUpdate(Request $request){
+        $action = "";
+        DB::connection()->enableQueryLog();
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Update Data Insentif";
+        }
+        $insentifTransfer = BiayaAdminTransferDana::find($request->id);
+        if(is_null($insentifTransfer) || empty($insentifTransfer)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.finance.insentif.list')->with($notification);
+        }
+
+        $insentifTransfer->update([
+            'jenis_insentif' => $request->name,
+            'nominal' => $request->nominal_insentif
+        ]);
+
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+
+        return redirect()->route('admin.dashboard.finance.insentif.list')->with($notification);
+    }
+
+    public function adminDashboardInsentifSettingDelete($id){
+        $action = "";
+        DB::connection()->enableQueryLog();
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Hapus Data Insentif";
+        }
+        $insentifTransfer = BiayaAdminTransferDana::find($id);
+        if(is_null($insentifTransfer) || empty($insentifTransfer)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.dashboard.finance.insentif.list')->with($notification);
+        }
+        $insentifTransfer->delete();
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+        $notification = array(
+            'message' => 'Data berhasil dihapus!',
+            'alert-type' => 'info',
+        );
+
+        return redirect()->route('admin.dashboard.finance.insentif.list')->with($notification);
     }
 }

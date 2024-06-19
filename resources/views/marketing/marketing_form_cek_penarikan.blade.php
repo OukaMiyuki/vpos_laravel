@@ -42,7 +42,7 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="biaya_admin" class="form-label">Biaya Transfer <label for="" style="font-style: italic;">BI-Fast</label> (Rp.)</label>
-                                                <input readonly type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" name="biaya_admin" id="biaya_admin" required value="1500" placeholder="Masukkan biaya admin">
+                                                <input readonly type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" name="biaya_admin" id="biaya_admin" required value="{{ $biayaAdmin }}" placeholder="Masukkan biaya admin">
                                             </div>
                                         </div>
                                     </div>

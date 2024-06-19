@@ -223,13 +223,13 @@
                                 <table class="table table-borderless table-nowrap table-hover table-centered m-0">
                                     <thead class="table-light">
                                         <tr>
+                                            <th class="text-center">Action</th>
                                             <th>No.</th>
                                             <th>Invoice</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Nominal (Rp.)</th>
-                                            <th>Insentif Admin (Rp.)</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th class="text-center">Nominal (Rp.)</th>
+                                            <th class="text-center">Insentif Admin (Rp.)</th>
                                             <th>Status</th>
-                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     @php
@@ -237,29 +237,31 @@
                                     @endphp
                                     <tbody>
                                         @foreach ($withdrawNew as $wd)
-                                            <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $wd->invoice_pemarikan }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }}</td>
-                                                <td>{{ $wd->nominal }}</td>
-                                                <td>
-                                                    @if ($wd->status == 0)
-                                                        0
-                                                    @else
-                                                        {{ $wd->detailWithdraw->biaya_admin_su }}
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if ($wd->status == 0)
-                                                        <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
-                                                    @else
-                                                        <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
-                                                </td>
-                                            </tr>
+                                            @foreach ($wd->detailWithdraw as $insentif)
+                                                <tr>
+                                                    <td class="text-center">
+                                                        <a href="{{ route('admin.dashboard.menu.userWithdrawals.detail', ['id' => $wd->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                    </td>
+                                                    <td>{{ $no+=1 }}</td>
+                                                    <td>{{ $wd->invoice_pemarikan }}</td>
+                                                    <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s') }}</td>
+                                                    <td class="text-center">{{ $wd->nominal }}</td>
+                                                    <td class="text-center">
+                                                        @if ($wd->status == 0)
+                                                            0
+                                                        @else
+                                                            {{$insentif->nominal}}
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if ($wd->status == 0)
+                                                            <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
+                                                        @else
+                                                            <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @endforeach
                                     </tbody>
                                 </table>

@@ -1790,6 +1790,7 @@ class TenantController extends Controller {
     public function invoiceTarikDana($id){
         $withdrawData = Withdrawal::select([ 'withdrawals.id',
                                              'withdrawals.email',
+                                             'withdrawals.invoice_pemarikan',
                                              'withdrawals.tanggal_penarikan',
                                              'withdrawals.nominal',
                                              'withdrawals.biaya_admin',

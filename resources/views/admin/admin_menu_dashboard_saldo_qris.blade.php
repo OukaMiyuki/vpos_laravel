@@ -27,8 +27,8 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalInsentif }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Total Insentif</p>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPendapatanAdmin }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Insentif Withdraw User</p>
                                     </div>
                                 </div>
                             </div>
@@ -72,35 +72,47 @@
                             <h4 class="header-title mb-3">History Insentif Transfer</h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-datatable" class="table nowrap w-100">
-                                    <thead>
-                                        <tr>
-                                            <th>No.</th>
-                                            <th>No. Invoice</th>
-                                            <th class="text-center">Tanggal Penarikan</th>
-                                            <th class="text-center">Insentif Transfer</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php
-                                            $no=0;
-                                        @endphp
-                                        @foreach ($withdrawals as $wd)
+                                    <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $wd->invoice_pemarikan }}</td>
-                                                <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s')}}</td>
-                                                <td class="text-center">{{ $wd->detailWithdraw->biaya_admin_su }}</td>
-                                                <td>
-                                                    @if ($wd->status == 0)
-                                                        <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
-                                                    @else
-                                                        <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
-                                                    @endif
-                                                </td>
+                                                <th>No.</th>
+                                                <th>Action</th>
+                                                <th>No. Invoice</th>
+                                                <th>User Email</th>
+                                                <th>Jenis Penarikan</th>
+                                                <th class="text-center">Tanggal Penarikan</th>
+                                                <th>Nominal (Rp.)</th>
+                                                <th class="text-center">Total Biaya Transfer (Rp.)</th>
+                                                <th class="text-center">Status</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
+                                        </thead>
+                                        <tbody>
+                                            @php $no=0; @endphp
+                                            @foreach($withdrawals as $key => $wd)
+                                                <tr>
+                                                    <td>{{$no+=1}}</td>
+                                                    <td>
+                                                        <a href="{{ route('admin.dashboard.menu.userWithdrawals.detail', ['id' => $wd->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                    </td>
+                                                    <td>{{$wd->invoice_pemarikan}}</td>
+                                                    <td>{{$wd->email}}</td>
+                                                    <td>{{$wd->jenis_penarikan}}</td>
+                                                    <td class="text-center">
+                                                        {{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s')}}
+                                                    </td>
+                                                    <td>{{$wd->nominal}}</td>
+                                                    <td class="text-center">{{$wd->biaya_admin}}</td>
+                                                    <td class="text-center">
+                                                        @if ($wd->status == 0)
+                                                            <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
+                                                        @else
+                                                            <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </table>
                             </div>
                         </div>

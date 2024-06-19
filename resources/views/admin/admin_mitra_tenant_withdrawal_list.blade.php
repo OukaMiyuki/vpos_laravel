@@ -37,48 +37,36 @@
                                             <th>No.</th>
                                             <th>Action</th>
                                             <th>No. Invoice</th>
-                                            <th>Tenant</th>
-                                            <th>Email</th>
+                                            <th>Nama</th>
+                                            <th>User Email</th>
                                             <th class="text-center">Tanggal Penarikan</th>
-                                            <th class="text-center">Nominal (Rp.)</th>
-                                            <th class="text-center">Nominal Bersih Penarikan (Rp.)</th>
-                                            <th>Status</th>
+                                            <th>Nominal (Rp.)</th>
                                             <th>Total Biaya Transfer (Rp.)</th>
-                                            <th>Transfer Bank (Rp.)</th>
-                                            <th>Tenant (Rp.)</th>
-                                            <th>Insentif Mitra Aplikasi (Rp.)</th>
-                                            <th>Insentif Admin (Rp.)</th>
-                                            <th>Insentif Agregate (Rp.)</th>
+                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
-                                        @foreach($tenantWithdraw as $key => $tenant)
-                                            @foreach ($tenant->withdrawal as $withdrawal)
+                                        @foreach($tenantWithdraw as $key => $wd)
+                                            @foreach ($wd->withdrawal as $withdraw)
                                                 <tr>
-                                                    <td>{{ $no+=1 }}</td>
+                                                    <td>{{$no+=1}}</td>
                                                     <td>
-                                                        <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                        <a href="{{ route('admin.dashboard.menu.userWithdrawals.detail', ['id' => $withdraw->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                     </td>
-                                                    <td>{{ $withdrawal->invoice_pemarikan }}</td>
-                                                    <td>{{ $tenant->name }}</td>
-                                                    <td>{{ $tenant->email }}</td>
-                                                    <td class="text-center">{{\Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($withdrawal->created_at)->format('H:i:s')}}</td>
-                                                    <td>{{ $withdrawal->nominal }}</td>
-                                                    <td>{{ $withdrawal->detailWithdraw->nominal_bersih_penarikan }}</td>
+                                                    <td>{{$withdraw->invoice_pemarikan}}</td>
+                                                    <td>{{$wd->name}}</td>
+                                                    <td>{{$wd->email}}</td>
+                                                    <td class="text-center">{{\Carbon\Carbon::parse($withdraw->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($withdraw->created_at)->format('H:i:s')}}</td>
+                                                    <td>{{$withdraw->nominal}}</td>
+                                                    <td>{{$withdraw->biaya_admin}}</td>
                                                     <td>
-                                                        @if ($withdrawal->status == 0)
+                                                        @if ($withdraw->status == 0)
                                                             <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
                                                         @else
                                                             <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
                                                         @endif
                                                     </td>
-                                                    <td>{{ $withdrawal->biaya_admin }}</td>
-                                                    <td>{{ $withdrawal->detailWithdraw->biaya_nobu }}</td>
-                                                    <td>{{ $withdrawal->detailWithdraw->biaya_tenant }}</td>
-                                                    <td>{{ $withdrawal->detailWithdraw->biaya_mitra }}</td>
-                                                    <td>{{ $withdrawal->detailWithdraw->biaya_admin_su }}</td>
-                                                    <td>{{ $withdrawal->detailWithdraw->biaya_agregate }}</td>
                                                 </tr>
                                             @endforeach
                                         @endforeach

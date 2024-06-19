@@ -27,8 +27,8 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalInsentifAgregate }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Total Insentif</p>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $agregate }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Insentif Agregate</p>
                                     </div>
                                 </div>
                             </div>
@@ -46,8 +46,8 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $agregateWallet->saldo }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Saldo Agregate</p>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $agregateSaldo }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Saldo Agregate</p>
                                     </div>
                                 </div>
                             </div>
@@ -76,8 +76,9 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>No. Invoice</th>
+                                            <th>Jenis Penarikan</th>
                                             <th class="text-center">Tanggal Penarikan</th>
-                                            <th class="text-center">Insentif Transfer</th>
+                                            <th class="text-center">Insentif Transfer (Rp.)</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
@@ -89,8 +90,11 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $wd->invoice_pemarikan }}</td>
+                                                <td>{{ $wd->jenis_penarikan }}</td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s')}}</td>
-                                                <td class="text-center">{{ $wd->detailWithdraw->biaya_agregate }}</td>
+                                                <td class="text-center">
+                                                    {{$wd->detailWithdraw->sum('nominal')}}
+                                                </td>
                                                 <td>
                                                     @if ($wd->status == 0)
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>

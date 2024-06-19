@@ -21,6 +21,7 @@ use App\Models\QrisWallet;
 use App\Models\AgregateWallet;
 use App\Models\DetailPenarikan;
 use App\Models\NobuWithdrawFeeHistory;
+use App\Models\BiayaAdminTransferDana;
 use App\Models\Withdrawal;
 use Exception;
 
@@ -449,7 +450,7 @@ class ProfileController extends Controller {
         $getLoc = Location::get($ip);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
-
+        $biayaAdmin = BiayaAdminTransferDana::sum('nominal');
         $nominal_tarik = $request->nominal_tarik;
         $otp = $request->wa_otp;
 
@@ -483,7 +484,7 @@ class ProfileController extends Controller {
                     $rekening = Rekening::where('id_user', auth()->user()->id)
                                         ->where('email', auth()->user()->email)
                                         ->first();
-                    $totalPenarikan = $nominal_tarik+1500;
+                    $totalPenarikan = $nominal_tarik+$biayaAdmin;
                     $rekClient = new GuzzleHttpClient();
                     $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
                     try {
@@ -498,7 +499,7 @@ class ProfileController extends Controller {
                         ]);
                         $responseCode = $getRek->getStatusCode();
                         $dataRekening = json_decode($getRek->getBody());
-                        return view('marketing.marketing_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan']));
+                        return view('marketing.marketing_form_cek_penarikan', compact(['dataRekening', 'biayaAdmin', 'rekening', 'nominal_tarik', 'totalPenarikan']));
                     } catch (Exception $e) {
                         $action = "Mitra Aplikasi : Cek Rekening Error";
                         $this->createHistoryUser($action, $e, 0);
@@ -529,29 +530,35 @@ class ProfileController extends Controller {
         $getLoc = Location::get($ip);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
-        $agregate = 350;
-        $aplikator = 850;
+        $transferFee = BiayaAdminTransferDana::get();
+        $biayaAdmin = $transferFee->sum('nominal');
+        $aplikator = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Admin')->first();
+        $mitra = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Mitra Aplikasi')->first();
+        $agregateMaintenance = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Agregate Maintenance')->first();
+        $agregateTransfer = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Transfer')->first();
         DB::connection()->enableQueryLog();
+
         $nominal_tarik = $request->nominal_penarikan;
         $total_tarik = $request->total_tarik;
-        $biaya_admin = $request->biaya_admin;
-        $rekening = Rekening::select(['swift_code', 'no_rekening'])
-                            ->where('id_user', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
-        $qrisWallet = QrisWallet::where('id_user', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
-        $agregateWallet = AgregateWallet::find(1);
-        $qrisAdmin = QrisWallet::where('id_user', 1)
-                                ->where('email', 'adminsu@visipos.id')
-                                ->find(1);
-        $agregateSaldo = $agregateWallet->saldo;
+
+        $rekeningMarketing = Rekening::select(['swift_code', 'no_rekening', 'id'])
+                                    ->where('id_user', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
+        $qrisWalletMarketing = QrisWallet::where('id_user', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
+        $agregateWalletforMaintenance = AgregateWallet::find(1);
+        $agregateWalletforTransfer = AgregateWallet::find(2);
+        $qrisAdmin = QrisWallet::where('email', 'adminsu@visipos.id')->find(1);
+        $agregateSaldoforMaintenance = $agregateWalletforMaintenance->saldo;
+        $agregateSaldoforTransfer = $agregateWalletforTransfer->saldo;
+
         try{
             $nominal_penarikan = filter_var($nominal_tarik, FILTER_SANITIZE_NUMBER_INT);
-            $total_penarikan = $total_tarik;
-            $saldo = $qrisWallet->saldo;
-            if($saldo < $total_penarikan){
+            $total_penarikan = filter_var($total_tarik, FILTER_SANITIZE_NUMBER_INT);
+            $saldoMarketing = $qrisWalletMarketing->saldo;
+            if($saldoMarketing < $total_penarikan){
                 $notification = array(
                     'message' => 'Saldo anda tidak mencukupi!',
                     'alert-type' => 'warning',
@@ -563,8 +570,8 @@ class ProfileController extends Controller {
                         'form_params' => [
                             'latitude' => $lat,
                             'longitude' => $long,
-                            'bankCode' => $rekening->swift_code,
-                            'accountNo' => $rekening->no_rekening,
+                            'bankCode' => $rekeningMarketing->swift_code,
+                            'accountNo' => $rekeningMarketing->no_rekening,
                             'amount' => $nominal_penarikan,
                             'secret_key' => "Vpos71237577Transfer"
                         ]
@@ -574,12 +581,15 @@ class ProfileController extends Controller {
                     $responseCode = $data->responseCode;
                     $responseMessage = $data->responseMessage;
                     if($responseCode == 2001800 && $responseMessage == "Request has been processed successfully") {
+                        $jenis_penarikan = "Penarikan Dana Mitra Aplikasi";
                         $withDraw = Withdrawal::create([
                             'id_user' => auth()->user()->id,
+                            'id_rekening' => $rekeningMarketing->id,
                             'email' => auth()->user()->email,
+                            'jenis_penarikan' => $jenis_penarikan,
                             'tanggal_penarikan' => Carbon::now(),
                             'nominal' => $nominal_penarikan,
-                            'biaya_admin' => $biaya_admin,
+                            'biaya_admin' => $biayaAdmin,
                             'tanggal_masuk' => Carbon::now(),
                             'deteksi_ip_address' => $ip,
                             'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
@@ -587,28 +597,29 @@ class ProfileController extends Controller {
                         ]);
 
                         if(!is_null($withDraw) || !empty($withDraw)){
-                            $qrisWallet->update([
-                                'saldo' => $saldo-$total_penarikan
+                            $qrisWalletMarketing->update([
+                                'saldo' => $saldoMarketing-$total_penarikan
                             ]);
                             $adminSaldo = $qrisAdmin->saldo;
                             $qrisAdmin->update([
-                                'saldo' => $adminSaldo+$aplikator
+                                'saldo' => $adminSaldo+$aplikator->nominal+$mitra->nominal
                             ]);
-                            $agregateWallet->update([
-                                'saldo' =>$agregateSaldo+$agregate
+                            
+                            $agregateWalletforMaintenance->update([
+                                'saldo' =>$agregateSaldoforMaintenance+$agregateMaintenance->nominal
                             ]);
 
-                            DetailPenarikan::create([
-                                'id_penarikan' => $withDraw->id,
-                                'nominal_penarikan' => $total_penarikan,
-                                'nominal_bersih_penarikan' => $nominal_penarikan,
-                                'total_biaya_admin' => $biaya_admin,
-                                'biaya_nobu' => 300,
-                                'biaya_mitra' => $nominal_penarikan,
-                                'biaya_tenant' => NULL,
-                                'biaya_admin_su' => $aplikator,
-                                'biaya_agregate' => $agregate
+                            $agregateWalletforTransfer->update([
+                                'saldo' =>$agregateSaldoforTransfer+$agregateTransfer->nominal
                             ]);
+
+                            foreach($transferFee as $fee){
+                                DetailPenarikan::create([
+                                    'id_penarikan' => $withDraw->id,
+                                    'id_insentif' => $fee->id,
+                                    'nominal' => $fee->nominal,
+                                ]);
+                            }
 
                             NobuWithdrawFeeHistory::create([
                                 'id_penarikan' => $withDraw->id,
@@ -637,22 +648,11 @@ class ProfileController extends Controller {
                             'email' => auth()->user()->email,
                             'tanggal_penarikan' => Carbon::now(),
                             'nominal' => $nominal_penarikan,
-                            'biaya_admin' => $biaya_admin,
+                            'biaya_admin' => $biayaAdmin,
                             'tanggal_masuk' => Carbon::now(),
                             'deteksi_ip_address' => $ip,
                             'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                             'status' => 0
-                        ]);
-                        DetailPenarikan::create([
-                            'id_penarikan' => $withDraw->id,
-                            'nominal_penarikan' => NULL,
-                            'nominal_bersih_penarikan' => NULL,
-                            'total_biaya_admin' => NULL,
-                            'biaya_nobu' => NULL,
-                            'biaya_mitra' => NULL,
-                            'biaya_tenant' => NULL,
-                            'biaya_admin_su' => NULL,
-                            'biaya_agregate' => NULL
                         ]);
                         $action = "Mitra Aplikasi : Withdrawal Transaction fail invalid";
                         $this->createHistoryUser($action, $responseMessage, 0);

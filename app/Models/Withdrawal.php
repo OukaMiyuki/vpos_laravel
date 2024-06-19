@@ -9,6 +9,8 @@ use App\Models\DetailPenarikan;
 use App\Models\Tenant;
 use App\Models\Marketing;
 use App\Models\Admin;
+use App\Models\Rekening;
+use App\Models\RekeningAdmin;
 
 class Withdrawal extends Model {
     use HasFactory;
@@ -20,7 +22,7 @@ class Withdrawal extends Model {
     }
 
     public function detailWithdraw(){
-        return $this->hasOne(DetailPenarikan::class, 'id_penarikan', 'id');
+        return $this->hasMany(DetailPenarikan::class, 'id_penarikan', 'id');
     }
 
     public function tenant(){
@@ -33,6 +35,14 @@ class Withdrawal extends Model {
 
     public function admin(){
         return $this->belongsTo(Admin::class, 'email', 'email');
+    }
+
+    public function rekUser(){
+        return $this->belongsTo(Rekening::class, 'id_rekening', 'email');
+    }
+
+    public function rekAdmin(){
+        return $this->belongsTo(RekeningAdmin::class, 'id_rekening', 'id');
     }
 
     public static function boot(){

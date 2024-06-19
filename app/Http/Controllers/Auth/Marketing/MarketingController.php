@@ -598,13 +598,16 @@ class MarketingController extends Controller {
     }
 
     public function invoiceTarikDana($id){
-        $withdrawData = Withdrawal::select([ 'withdrawals.id',
-                                             'withdrawals.email',
-                                             'withdrawals.tanggal_penarikan',
-                                             'withdrawals.nominal',
-                                             'withdrawals.biaya_admin',
-                                             'withdrawals.tanggal_masuk',
-                                             'withdrawals.status'
+        $withdrawData = Withdrawal::select([ 
+                                                'withdrawals.id',
+                                                'withdrawals.email',
+                                                'withdrawals.invoice_pemarikan',
+                                                'withdrawals.tanggal_penarikan',
+                                                'withdrawals.nominal',
+                                                'withdrawals.biaya_admin',
+                                                'withdrawals.tanggal_masuk',
+                                                'withdrawals.status',
+                                                'withdrawals.created_at'
                                             ])
                                 ->where('email', auth()->user()->email)
                                 ->find($id);

@@ -75,6 +75,7 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
+                                            <th>Nomor Invoice</th>
                                             <th>Email</th>
                                             <th class="text-center">Tanggal Penarikan</th>
                                             <th class="text-center">Nominal (Rp.)</th>
@@ -90,6 +91,7 @@
                                         @foreach ($allData as $data)
                                             <tr>
                                                 <td>{{$no+=1}}</td>
+                                                <td>{{$data->invoice_pemarikan}}</td>
                                                 <td>{{$data->email}}</td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($data->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($data->created_at)->format('H:i:s')}}</td>
                                                 <td class="text-center">{{$data->nominal}}</td>

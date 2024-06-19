@@ -9,11 +9,11 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.saldo') }}">Saldo</a></li>
-                                <li class="breadcrumb-item active">Bank Fee Transfer</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.setting') }}">Settings</a></li>
+                                <li class="breadcrumb-item active">Rekening</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data History Bank Fee Transfer</h4>
+                        <h4 class="page-title">Data Rekening Admin&nbsp;&nbsp;&nbsp;<a href="{{ route('admin.rekening.setting.add') }}"><button data-bs-toggle="modal" data-bs-target="#staticBackdrop" title="Tambah kode baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Rekening Baru</button></a></h4></h4>
                     </div>
                 </div>
             </div>
@@ -29,33 +29,33 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">History Cashback Bank Fee Transfer</h4>
+                            <h4 class="header-title mb-3">Tabel Daftar Rekening Admin</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>No. Invoice</th>
-                                            <th>Jenis Penarikan</th>
-                                            <th class="text-center">Tanggal Penarikan</th>
-                                            <th class="text-center">Nominal Penarikan (Rp.)</th>
-                                            <th class="text-center">Total Biaya Transfer (Rp.)</th>
-                                            <th class="text-center">Bank Transfer Fee (Rp.)</th>
+                                            <th>Nama Rekening</th>
+                                            <th>Nama Bank</th>
+                                            <th>Swift Code</th>
+                                            <th>Nomor Rekening</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php
-                                            $no=0;
-                                        @endphp
-                                        @foreach ($nobuFeeHistory as $fee)
+                                        @php $no=0; @endphp
+                                        @foreach ($rekeningList as $rekening)
                                             <tr>
                                                 <td>{{$no+=1}}</td>
-                                                <td>{{$fee->withdraw->invoice_pemarikan}}</td>
-                                                <td>{{$fee->withdraw->jenis_penarikan}}</td>
-                                                <td class="text-center">{{\Carbon\Carbon::parse($fee->withdraw->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($fee->withdraw->created_at)->format('H:i:s')}}</td>
-                                                <td class="text-center">{{$fee->withdraw->nominal}}</td>
-                                                <td class="text-center">{{$fee->withdraw->biaya_admin}}</td>
-                                                <td class="text-center">{{$fee->nominal}}</td>
+                                                <td>{{$rekening->nama_rekening}}</td>
+                                                <td>{{$rekening->nama_bank}}</td>
+                                                <td>{{$rekening->swift_code}}</td>
+                                                <td>{{$rekening->no_rekening}}</td>
+                                                <td class="text-center">
+                                                    <a href="{{ route('admin.rekening.setting.edit', ['id' => $rekening->id]) }}">
+                                                        <button title="Edit data rekening" type="button" class="btn btn-xs btn-success waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
+                                                    </a>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -65,6 +65,7 @@
                     </div>
                 </div>
             </div>
+            <!-- end row -->
         </div>
         <!-- container -->
     </div>

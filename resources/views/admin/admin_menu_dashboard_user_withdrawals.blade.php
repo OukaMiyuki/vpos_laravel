@@ -38,46 +38,36 @@
                                             <th>Action</th>
                                             <th>No. Invoice</th>
                                             <th>User Email</th>
+                                            <th>Jenis Penarikan</th>
                                             <th class="text-center">Tanggal Penarikan</th>
-                                            <th class="text-center">Nominal (Rp.)</th>
-                                            <th class="text-center">Nominal Bersih Penarikan (Rp.)</th>
-                                            <th>Status</th>
-                                            <th>Total Biaya Transfer (Rp.)</th>
-                                            <th>Transfer Bank (Rp.)</th>
-                                            <th>Mitra Aplikasi (Rp.)</th>
-                                            <th>Tenant (Rp.)</th>
-                                            <th>Insentif Admin (Rp.)</th>
-                                            <th>Insentif Agregate (Rp.)</th>
+                                            <th>Nominal (Rp.)</th>
+                                            <th class="text-center">Total Biaya Transfer (Rp.)</th>
+                                            <th class="text-center">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
                                         @foreach($withdrawals as $key => $wd)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
+                                                <td>{{$no+=1}}</td>
                                                 <td>
                                                     <a href="{{ route('admin.dashboard.menu.userWithdrawals.detail', ['id' => $wd->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                 </td>
-                                                <td>{{ $wd->invoice_pemarikan }}</td>
-                                                <td>{{ $wd->email }}</td>
+                                                <td>{{$wd->invoice_pemarikan}}</td>
+                                                <td>{{$wd->email}}</td>
+                                                <td>{{$wd->jenis_penarikan}}</td>
                                                 <td class="text-center">
                                                     {{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s')}}
                                                 </td>
-                                                <td class="text-center">{{ $wd->nominal }}</td>
-                                                <td class="text-center">{{ $wd->detailWithdraw->nominal_bersih_penarikan }}</td>
-                                                <td>
+                                                <td>{{$wd->nominal}}</td>
+                                                <td class="text-center">{{$wd->biaya_admin}}</td>
+                                                <td class="text-center">
                                                     @if ($wd->status == 0)
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
                                                     @else
                                                         <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $wd->biaya_admin }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_nobu }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_mitra }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_tenant }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_admin_su }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_agregate }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

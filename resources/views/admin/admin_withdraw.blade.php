@@ -57,7 +57,8 @@
                                             <select class="form-select" id="dana" name="dana" required>
                                                 <option value="">- Pilih Jenis Dana -</option>
                                                 <option value="Qris">Insentif Qris</option>
-                                                <option value="Agregate">Agregate</option>
+                                                <option value="Aplikasi">Agregate Aplikasi</option>
+                                                <option value="Transfer">Agregate Transfer</option>
                                             </select>
                                         </div>
                                     </div>
@@ -67,14 +68,31 @@
                                             <input readonly type="text" class="form-control" name="saldo-qris" id="saldo-qris" required value="{{ $adminQrisWallet->saldo }}" placeholder="Masukkan jumlah saldo">
                                         </div>
                                     </div>
-                                    <div class="col-md-12" id="saldo-agregate-txt">
+                                    <div class="col-md-12" id="saldo-agregate-aplikasi-txt">
                                         <div class="mb-3">
-                                            <label for="saldo-agregate" class="form-label">Saldo Insentif Agregate (Rp.)</label>
-                                            <input readonly type="text" class="form-control" name="saldo-agregate" id="saldo-agregate" required value="{{ $agregateWallet->saldo }}" placeholder="Masukkan jumlah saldo">
+                                            <label for="saldo-agregate" class="form-label">Saldo Insentif Agregate Aplikasi (Rp.)</label>
+                                            <input readonly type="text" class="form-control" name="saldo-agregate-aplikasi" id="saldo-agregate-aplikasi" required value="{{ $agregateWalletAplikasi->saldo }}" placeholder="Masukkan jumlah saldo">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12" id="saldo-agregate-transfer-txt">
+                                        <div class="mb-3">
+                                            <label for="saldo-agregate" class="form-label">Saldo Insentif Agregate Transfer (Rp.)</label>
+                                            <input readonly type="text" class="form-control" name="saldo-agregate-transfer" id="saldo-agregate-transfer" required value="{{ $agregateWalletTransfer->saldo }}" placeholder="Masukkan jumlah saldo">
                                         </div>
                                     </div>
                                     <form method="post" action="{{ route('admin.withdraw.tarik') }}">
                                         @csrf
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="rekening" class="form-label">Pilih Rekening</label>
+                                                <select class="form-select" id="rekening" name="rekening" required>
+                                                    <option value="">- Pilih Rekening Penarikan -</option>
+                                                    @foreach ($rekening as $rek)
+                                                        <option value="{{$rek->id}}">{{$rek->nama_rekening}} - {{$rek->no_rekening}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">

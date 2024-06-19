@@ -27,6 +27,15 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="mb-3">
+                                            <label for="nama_rekening" class="form-label">Nama Rekening</label>
+                                            <input readonly type="hidden" readonly class="form-control" name="id_rekening" id="id_rekening" required value="{{ $rekening->id }}">
+                                            <input readonly type="text" readonly class="form-control" name="nama_rekening" id="nama_rekening" required value="{{ $rekening->nama_rekening }}" placeholder="Masukkan jenis penarikan">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
                                             <label for="jenis_penarikan" class="form-label">Jenis Penarikan</label>
                                             <input readonly type="text" readonly class="form-control" name="jenis_penarikan" id="jenis_penarikan" required value="{{ $jenis_tarik }}" placeholder="Masukkan jenis penarikan">
                                         </div>
@@ -44,7 +53,7 @@
                                     <div class="col-md-12">
                                         <div class="mb-3">
                                             <label for="biaya_admin" class="form-label">Biaya Transfer <label for="" style="font-style: italic;">BI-Fast</label> (Rp.)</label>
-                                            <input readonly type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" name="biaya_admin" id="biaya_admin" required value="300" placeholder="Masukkan biaya admin">
+                                            <input readonly type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" name="biaya_admin" id="biaya_admin" required value="{{ $biayaTransfer }}" placeholder="Masukkan biaya admin">
                                         </div>
                                     </div>
                                 </div>
@@ -79,6 +88,7 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Atas Nama</th>
+                                                    <th>Nama Bank</th>
                                                     <th>Nomor Rekening</th>
                                                 </tr>
                                             </thead>
@@ -86,6 +96,7 @@
                                                 <tr>
                                                     <th scope="row">1</th>
                                                     <td>{{ $dataRekening->beneficiaryAccountName }}</td>
+                                                    <td>{{ $rekening->nama_bank }}</td>
                                                     <td>{{ $dataRekening->beneficiaryAccountNo }}</td>
                                                 </tr>
                                             </tbody>

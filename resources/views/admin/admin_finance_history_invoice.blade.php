@@ -55,14 +55,9 @@
                                     <div class="mt-3 float-end">
                                         <table>
                                             <tr>
-                                                <td><p><strong>Tanggal Transaksi</strong></p></td>
+                                                <td><p><strong>Tanggal Penarikan</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $withdrawData->tanggal_penarikan }}</span></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td><p><strong>Tanggal Masuk</strong></p></td>
-                                                <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $withdrawData->tanggal_masuk }}</span></p></td>
+                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp; {{\Carbon\Carbon::parse($withdrawData->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($withdrawData->created_at)->format('H:i:s')}}</span></p></td>
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Status Transfer</strong></p></td>
@@ -89,10 +84,43 @@
                                 <div class="col-sm-6">
                                     <h6>Info Penarikan</h6>
                                     <address>
-                                        Nama : {{ auth()->user()->name }}<br>
-                                        Email : {{ auth()->user()->email }}<br>
-                                        Level Akun : <strong>Admin Super User</strong><br>
-                                        Nomor Rekening : {{ $rekening->no_rekening }}<br>
+                                        <table>
+                                            <tr>
+                                                <td><strong>Nama</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ auth()->user()->name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Email</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ auth()->user()->email }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Level Akun</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td><strong>Admin Super User</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Jenis Penarikan</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $withdrawData->jenis_penarikan }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Nama Rekening</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $withdrawData->rekAdmin->nama_rekening }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Nama Bank</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $withdrawData->rekAdmin->nama_bank }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>No. Rekening</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $withdrawData->rekAdmin->no_rekening }}</td>
+                                            </tr>
+                                        </table>
                                     </address>
                                 </div> <!-- end col -->
                             </div>
@@ -145,6 +173,9 @@
                                 </div> <!-- end col -->
                                 <div class="col-sm-6">
                                     <div class="float-end">
+                                        @foreach ($withdrawData->detailWithdraw as $wddt)
+                                            <p><b>{{$wddt->insentif->jenis_insentif}} (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{ $wddt->nominal }}</span></p>
+                                        @endforeach
                                         <h3><b>Total (Rp.): </b> <span class="float-end">{{ $withdrawData->nominal+$withdrawData->biaya_admin }}</span></h3>
                                     </div>
                                     <div class="clearfix"></div>

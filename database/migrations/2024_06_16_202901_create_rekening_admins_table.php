@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('rekening_admins', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('id_user')->nullable();
+            $table->string('email')->nullable();
+            $table->string('nama_rekening')->nullable();
+            $table->string('nama_bank')->nullable();
+            $table->string('swift_code')->nullable();
+            $table->string('no_rekening')->nullable();
             $table->timestamps();
         });
     }

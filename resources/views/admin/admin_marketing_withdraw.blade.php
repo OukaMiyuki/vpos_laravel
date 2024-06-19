@@ -41,13 +41,8 @@
                                             <th>Nama</th>
                                             <th>User Email</th>
                                             <th class="text-center">Tanggal Penarikan</th>
-                                            <th class="text-center">Nominal (Rp.)</th>
-                                            <th class="text-center">Nominal Bersih Penarikan (Rp.)</th>
+                                            <th>Nominal (Rp.)</th>
                                             <th>Total Biaya Transfer (Rp.)</th>
-                                            <th>Transfer Bank (Rp.)</th>
-                                            <th>Mitra Aplikasi (Rp.)</th>
-                                            <th>Insentif Admin (Rp.)</th>
-                                            <th>Insentif Agregate (Rp.)</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
@@ -64,13 +59,8 @@
                                                     <td>{{$wd->name}}</td>
                                                     <td>{{$wd->email}}</td>
                                                     <td class="text-center">{{\Carbon\Carbon::parse($withdraw->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($withdraw->created_at)->format('H:i:s')}}</td>
-                                                    <td class="text-center">{{$withdraw->nominal+$withdraw->biaya_admin }}</td>
-                                                    <td class="text-center">{{$withdraw->detailWithdraw->nominal_bersih_penarikan }}</td>
+                                                    <td>{{$withdraw->nominal}}</td>
                                                     <td>{{$withdraw->biaya_admin}}</td>
-                                                    <td>{{$withdraw->detailWithdraw->biaya_nobu}}</td>
-                                                    <td>{{$withdraw->detailWithdraw->biaya_mitra}}</td>
-                                                    <td>{{$withdraw->detailWithdraw->biaya_admin_su}}</td>
-                                                    <td>{{$withdraw->detailWithdraw->biaya_agregate}}</td>
                                                     <td>
                                                         @if ($withdraw->status == 0)
                                                             <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>

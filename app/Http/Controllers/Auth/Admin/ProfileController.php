@@ -21,6 +21,8 @@ use App\Models\Withdrawal;
 use App\Models\DetailPenarikan;
 use App\Models\NobuWithdrawFeeHistory;
 use App\Models\History;
+use App\Models\RekeningAdmin;
+use App\Models\BiayaAdminTransferDana;
 use Exception;
 
 class ProfileController extends Controller {
@@ -288,56 +290,123 @@ class ProfileController extends Controller {
 
     }
 
-    public function rekeningSetting(){
-        $rekening = Rekening::where('id_user', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
-        $dataRekening = "";
-        $action = "";
-        if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
-            $ip = "36.84.106.3";
-            $PublicIP = $this->get_client_ip();
-            $getLoc = Location::get($ip);
-            $lat = $getLoc->latitude;
-            $long = $getLoc->longitude;
-            $rekClient = new GuzzleHttpClient();
-            $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
-            try {
-                $getRek = $rekClient->request('POST',  $urlRek, [
-                    'form_params' => [
-                        'latitude' => $lat,
-                        'longitude' => $long,
-                        'bankCode' => $rekening->swift_code,
-                        'accountNo' => $rekening->no_rekening,
-                        'secret_key' => "Vpos71237577Inquiry"
-                    ]
-                ]);
-                $responseCode = $getRek->getStatusCode();
-                $dataRekening = json_decode($getRek->getBody());
-            } catch (Exception $e) {
-                if(auth()->user()->access_level == 0){
-                    $action = "Admin Super User : Rekening Cek Error HTTP API";
-                } else {
-                    $action = "Administrator : Rekening Cek Error HTTP API";
-                }
-                $this->createHistoryUser($action, $e, 0);
-            }
-        }
+    public function rekeningList(){
+        $rekeningList = RekeningAdmin::latest()->get();
+        return view('admin.admin_rekening_list', compact('rekeningList'));
+    }
 
+    public function rekeningListAdd(){
         $client = new GuzzleHttpClient();
         $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
         $postResponse = $client->request('POST',  $url);
         $responseCode = $postResponse->getStatusCode();
         $data = json_decode($postResponse->getBody());
         $dataBankList = $data->bankSwiftList;
+
+        return view('admin.admin_rekening_add', compact(['dataBankList']));
+    }
+
+    public function rekeningListInsert(Request $request){
+        $kode = (int) $request->otp;
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Tambah Rekening";
+        } else {
+            $action = "Administrator : Tambah Rekening";
+        }
+        DB::connection()->enableQueryLog();
+
+        try{
+            $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+            if(!$otp->status){
+                $notification = array(
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                RekeningAdmin::create([
+                    'id_user' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'nama_rekening' => $request->nama_rekening,
+                    'nama_bank' => $request->nama_bank,
+                    'swift_code' => $request->swift_code,
+                    'no_rekening' => $request->no_rekening
+                ]);
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                $notification = array(
+                    'message' => 'Rekening berhasil ditambahkan!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->route('admin.rekening.setting')->with($notification);
+            }
+        } catch(Exception $e){
+            $this->createHistoryUser($action, $e, 0);
+            $notification = array(
+                'message' => 'Update Rekening Error!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
+    public function rekeningListEdit($id){
+        $rekening = RekeningAdmin::find($id);
+
+        if(is_null($rekening) || empty($rekening)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('admin.rekening.setting')->with($notification);
+        }
+
+        $ip = "36.84.106.3";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $dataBankList = "";
+        
+        $rekClient = new GuzzleHttpClient();
+        $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
+        try {
+            $client = new GuzzleHttpClient();
+            $url = 'https://erp.pt-best.com/api/testing-get-swift-code';
+            $postResponse = $client->request('POST',  $url);
+            $responseCode = $postResponse->getStatusCode();
+            $data = json_decode($postResponse->getBody());
+            $dataBankList = $data->bankSwiftList;
+
+            $getRek = $rekClient->request('POST',  $urlRek, [
+                'form_params' => [
+                    'latitude' => $lat,
+                    'longitude' => $long,
+                    'bankCode' => $rekening->swift_code,
+                    'accountNo' => $rekening->no_rekening,
+                    'secret_key' => "Vpos71237577Inquiry"
+                ]
+            ]);
+            $responseCode = $getRek->getStatusCode();
+            $dataRekening = json_decode($getRek->getBody());
+        } catch (Exception $e) {
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Rekening Cek Error HTTP API";
+            } else {
+                $action = "Administrator : Rekening Cek Error HTTP API";
+            }
+            $this->createHistoryUser($action, $e, 0);
+        }
+
         return view('admin.admin_rekening_setting', compact('rekening', 'dataBankList', 'dataRekening'));
+
     }
 
     public function rekeningSettingUpdate(Request $request){
         $kode = (int) $request->otp;
         $swift_code = $request->swift_code;
         $nama_bank = $request->nama_bank;
-        $rekening = $request->no_rekening;
+        $nomor_rekening = $request->no_rekening;
+        $nama_rekening = $request->nama_rekening;
         $action = "";
         if(auth()->user()->access_level == 0){
             $action = "Admin Super User : Rekening Update";
@@ -354,11 +423,17 @@ class ProfileController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             } else {
-                $rekeningAkun = Rekening::where('id_user', auth()->user()->id)
-                                        ->where('email', auth()->user()->email)
-                                        ->first();
-                $rekeningAkun->update([
-                    'no_rekening' => $rekening,
+                $rekening = RekeningAdmin::find($request->id);
+                if(is_null($rekening) || empty($rekening)){
+                    $notification = array(
+                        'message' => 'Data tidak ditemukan!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->route('admin.rekening.setting')->with($notification);
+                }
+                $rekening->update([
+                    'nama_rekening' => $nama_rekening,
+                    'no_rekening' => $nomor_rekening,
                     'nama_bank' => $nama_bank,
                     'swift_code' => $swift_code,
                 ]);
@@ -367,7 +442,7 @@ class ProfileController extends Controller {
                     'message' => 'Update nomor rekening berhasil!',
                     'alert-type' => 'success',
                 );
-                return redirect()->back()->with($notification);
+                return redirect()->route('admin.rekening.setting')->with($notification);
             }
         } catch(Exception $e){
             $this->createHistoryUser($action, $e, 0);
@@ -381,8 +456,10 @@ class ProfileController extends Controller {
 
     public function adminWithdraw(){
         $adminQrisWallet = QrisWallet::select(['saldo'])->where('email', auth()->user()->email)->find(auth()->user()->id);
-        $agregateWallet = AgregateWallet::select(['saldo'])->first();
-        return view('admin.admin_withdraw', compact('adminQrisWallet', 'agregateWallet'));
+        $agregateWalletAplikasi = AgregateWallet::select(['saldo'])->find(1);
+        $agregateWalletTransfer = AgregateWallet::select(['saldo'])->find(2);
+        $rekening = RekeningAdmin::latest()->get();
+        return view('admin.admin_withdraw', compact('adminQrisWallet', 'agregateWalletAplikasi', 'agregateWalletTransfer', 'rekening'));
     }
 
     public function adminWithdrawTarik(Request $request){
@@ -394,10 +471,12 @@ class ProfileController extends Controller {
         $long = $getLoc->longitude;
         $wallet = "";
         $action = "";
+        $biayaTransfer = 0;
 
         $nominal_tarik = $request->nominal_tarik;
         $otp = $request->wa_otp;
         $jenis_tarik = $request->jenis_tarik;
+        $rekening = $request->rekening;
 
         try{
             $otp = (new Otp)->validate(auth()->user()->phone, $otp);
@@ -408,12 +487,23 @@ class ProfileController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             } else {
-                if($jenis_tarik == "Qris"){
-                    $wallet = QrisWallet::select(['saldo'])
+                $rekening = RekeningAdmin::where('id_user', auth()->user()->id)
                                             ->where('email', auth()->user()->email)
-                                            ->find(auth()->user()->id);
-                } else if($jenis_tarik == "Agregate"){
-                    $wallet = AgregateWallet::select(['saldo'])->first();
+                                            ->find($rekening);
+                if($jenis_tarik == "Qris"){
+                    $wallet = QrisWallet::select(['saldo'])->where('email', auth()->user()->email)->find(auth()->user()->id);
+                    $biayaTransferBank = BiayaAdminTransferDana::find(1);
+                    $biayaTransferAgregate = BiayaAdminTransferDana::find(2);
+                    $biayaTransfer = $biayaTransferBank->nominal+$biayaTransferAgregate->nominal;
+                } else if($jenis_tarik == "Aplikasi"){
+                    $wallet = AgregateWallet::select(['saldo'])->find(1);
+                    $biayaTransferBank = BiayaAdminTransferDana::find(1);
+                    $biayaTransferAgregate = BiayaAdminTransferDana::find(2);
+                    $biayaTransfer = $biayaTransferBank->nominal+$biayaTransferAgregate->nominal;
+                } else if($jenis_tarik == "Transfer"){
+                    $wallet = AgregateWallet::select(['saldo'])->find(2);
+                    $biayaTransferBank = BiayaAdminTransferDana::find(1);
+                    $biayaTransfer = $biayaTransferBank->nominal;
                 } else {
                     $notification = array(
                         'message' => 'Jenis saldo kosong!',
@@ -436,11 +526,8 @@ class ProfileController extends Controller {
                         );
                         return redirect()->back()->with($notification);
                     }
-
-                    $rekening = Rekening::where('id_user', auth()->user()->id)
-                                        ->where('email', auth()->user()->email)
-                                        ->first();
-                    $totalPenarikan = $nominal_tarik+300;
+                    
+                    $totalPenarikan = $nominal_tarik+$biayaTransfer;
                     $rekClient = new GuzzleHttpClient();
                     $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
                     try {
@@ -455,7 +542,14 @@ class ProfileController extends Controller {
                         ]);
                         $responseCode = $getRek->getStatusCode();
                         $dataRekening = json_decode($getRek->getBody());
-                        return view('admin.admin_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan', 'jenis_tarik']));
+                        if(is_null($dataRekening) || empty($dataRekening)){
+                            $notification = array(
+                                'message' => 'Rekening inquiry error!',
+                                'alert-type' => 'error',
+                            );
+                            return redirect()->back()->with($notification);
+                        }
+                        return view('admin.admin_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan', 'jenis_tarik', 'biayaTransfer']));
                     } catch (Exception $e) {
                         if(auth()->user()->access_level == 0){
                             $action = "Admin Super User :Cek Rekening Error";
@@ -498,19 +592,32 @@ class ProfileController extends Controller {
         $action = "";
         DB::connection()->enableQueryLog();
         $nominal_tarik = $request->nominal_penarikan;
-        $total_tarik = $request->total_tarik;
-        $biaya_admin = $request->biaya_admin;
+        // $total_tarik = $request->total_tarik;
+        // $biaya_admin = $request->biaya_admin;
         $jenis_tarik = $request->jenis_penarikan;
-        $rekening = Rekening::select(['swift_code', 'no_rekening'])
+        $biayaTransferBank = "";
+        $biayaTransferAgregate = "";
+        $biayaTransfer = "";
+        $wallet = "";
+        $rekening_id = $request->id_rekening;
+        $rekening = RekeningAdmin::select(['swift_code', 'no_rekening', 'id'])
                             ->where('id_user', auth()->user()->id)
                             ->where('email', auth()->user()->email)
-                            ->first();
+                            ->find($rekening_id);
         if($jenis_tarik == "Qris"){
-            $wallet = QrisWallet::where('id_user', auth()->user()->id)
-                                    ->where('email', auth()->user()->email)
-                                    ->first();
-        } else if($jenis_tarik == "Agregate"){
-            $wallet = AgregateWallet::first();
+            $wallet = QrisWallet::where('email', auth()->user()->email)->find(auth()->user()->id);
+            $biayaTransferBank = BiayaAdminTransferDana::find(1);
+            $biayaTransferAgregate = BiayaAdminTransferDana::find(2);
+            $biayaTransfer = $biayaTransferBank->nominal+$biayaTransferAgregate->nominal;
+        } else if($jenis_tarik == "Aplikasi"){
+            $wallet = AgregateWallet::find(1);
+            $biayaTransferBank = BiayaAdminTransferDana::find(1);
+            $biayaTransferAgregate = BiayaAdminTransferDana::find(2);
+            $biayaTransfer = $biayaTransferBank->nominal+$biayaTransferAgregate->nominal;
+        } else if($jenis_tarik == "Transfer"){
+            $wallet = AgregateWallet::find(2);
+            $biayaTransferBank = BiayaAdminTransferDana::find(1);
+            $biayaTransfer = $biayaTransferBank->nominal;
         } else {
             $notification = array(
                 'message' => 'Jenis saldo kosong!',
@@ -521,7 +628,7 @@ class ProfileController extends Controller {
 
         try{
             $nominal_penarikan = filter_var($nominal_tarik, FILTER_SANITIZE_NUMBER_INT);
-            $total_penarikan = $total_tarik;
+            $total_penarikan = filter_var($nominal_tarik+$biayaTransfer, FILTER_SANITIZE_NUMBER_INT);
             $saldo = $wallet->saldo;
             if($saldo < $total_penarikan){
                 $notification = array(
@@ -546,46 +653,64 @@ class ProfileController extends Controller {
                     $responseCode = $data->responseCode;
                     $responseMessage = $data->responseMessage;
                     if($responseCode == 2001800 && $responseMessage == "Request has been processed successfully") {
+                        $jenis_penarikan = "Penarikan Dana ".$jenis_tarik." Admin Super User";
                         $withDraw = Withdrawal::create([
                             'id_user' => auth()->user()->id,
+                            'id_rekening' => $rekening->id,
                             'email' => auth()->user()->email,
-                            'jenis_penarikan' => $jenis_tarik,
+                            'jenis_penarikan' => $jenis_penarikan,
                             'tanggal_penarikan' => Carbon::now(),
                             'nominal' => $nominal_penarikan,
-                            'biaya_admin' => $biaya_admin,
+                            'biaya_admin' => $biayaTransfer,
                             'tanggal_masuk' => Carbon::now(),
                             'deteksi_ip_address' => $ip,
                             'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                             'status' => 1
                         ]);
-
+ 
                         if(!is_null($withDraw) || !empty($withDraw)){
                             $wallet->update([
                                 'saldo' => (int) $saldo-$total_penarikan
                             ]);
+                            $transferFee = BiayaAdminTransferDana::get();
+                            if($jenis_tarik == "Qris" || $jenis_tarik == "Aplikasi"){
+                                $transferAgregate = $biayaTransferAgregate->nominal;
+                                $walletTransfer = AgregateWallet::find(2);
+                                $walletSaldoTransfer = $walletTransfer->saldo;
+                                $walletTransfer->update([
+                                    'saldo' => $transferAgregate+$walletSaldoTransfer
+                                ]);
+                                foreach($transferFee as $fee){
+                                    if($fee->id == 1){
+                                        DetailPenarikan::create([
+                                            'id_penarikan' => $withDraw->id,
+                                            'id_insentif' => $fee->id,
+                                            'nominal' => $fee->nominal,
+                                        ]);
+                                    }
 
-                            DetailPenarikan::create([
-                                'id_penarikan' => $withDraw->id,
-                                'nominal_penarikan' => $total_penarikan,
-                                'nominal_bersih_penarikan' => $nominal_penarikan,
-                                'total_biaya_admin' => $biaya_admin,
-                                'biaya_nobu' => 300,
-                                'biaya_mitra' => NULL,
-                                'biaya_tenant' => NULL,
-                                'biaya_admin_su' => NULL,
-                                'biaya_agregate' => NULL
-                            ]);
+                                    if($fee->id == 2){
+                                        DetailPenarikan::create([
+                                            'id_penarikan' => $withDraw->id,
+                                            'id_insentif' => $fee->id,
+                                            'nominal' => $fee->nominal,
+                                        ]);
+                                    }
+                                }
+                            } else if($jenis_tarik == "Transfer"){
+                                DetailPenarikan::create([
+                                    'id_penarikan' => $withDraw->id,
+                                    'id_insentif' => $biayaTransferBank->id,
+                                    'nominal' => $biayaTransferBank->nominal,
+                                ]);
+                            }
 
                             NobuWithdrawFeeHistory::create([
                                 'id_penarikan' => $withDraw->id,
                                 'nominal' => 300
                             ]);
 
-                            if(auth()->user()->access_level == 0){
-                                $action = "Admin Super User : Update Profile";
-                            } else {
-                                $action = "Administrator : Update Profile";
-                            }
+                            $action = "Admin Super User : Withdraw Success";
 
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
@@ -613,23 +738,13 @@ class ProfileController extends Controller {
                             'email' => auth()->user()->email,
                             'tanggal_penarikan' => Carbon::now(),
                             'nominal' => $nominal_penarikan,
-                            'biaya_admin' => $biaya_admin,
+                            'biaya_admin' => $biayaTransfer,
                             'tanggal_masuk' => Carbon::now(),
                             'deteksi_ip_address' => $ip,
                             'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                             'status' => 0
                         ]);
-                        DetailPenarikan::create([
-                            'id_penarikan' => $withDraw->id,
-                            'nominal_penarikan' => NULL,
-                            'nominal_bersih_penarikan' => NULL,
-                            'total_biaya_admin' => NULL,
-                            'biaya_nobu' => NULL,
-                            'biaya_mitra' => NULL,
-                            'biaya_tenant' => NULL,
-                            'biaya_admin_su' => NULL,
-                            'biaya_agregate' => NULL
-                        ]);
+                       
                         if(auth()->user()->access_level == 0){
                             $action = "Admin Super User : Withdrawal Transaction fail invalid";
                         } else {

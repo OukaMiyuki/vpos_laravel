@@ -56,9 +56,9 @@
                                     <div class="mt-3 float-end">
                                         <table>
                                             <tr>
-                                                <td><p><strong>Tanggal Transaksi</strong></p></td>
+                                                <td><p><strong>Tanggal Penarikan</strong></p></td>
                                                 <td><p><strong>&nbsp;&nbsp;&nbsp;&nbsp;:</strong></p></td>
-                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ $withdraw->tanggal_penarikan }}</span></p></td>
+                                                <td><p><span>&nbsp;&nbsp;&nbsp;&nbsp; {{\Carbon\Carbon::parse($withdraw->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($withdraw->created_at)->format('H:i:s')}}</span></p></td>
                                             </tr>
                                             <tr>
                                                 <td><p><strong>Status Transfer</strong></p></td>
@@ -85,10 +85,28 @@
                                 <div class="col-sm-6">
                                     <h6>Info Penarikan</h6>
                                     <address>
-                                        Nama : {{ $user->name }}<br>
-                                        Email : {{ $user->email }}<br>
-                                        Level Akun : <strong>{{ $userType }}</strong><br>
-                                        Nomor Rekening : {{ $rekening->no_rekening }}<br>
+                                        <table>
+                                            <tr>
+                                                <td><strong>Nama</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $user->name }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Email</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $user->email }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Level Akun</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td><strong>{{ $userType }}</strong></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>No. Rekening</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $rekening->no_rekening }}</td>
+                                            </tr>
+                                        </table>
                                     </address>
                                 </div> <!-- end col -->
                             </div>
@@ -103,9 +121,8 @@
                                                     <th width="width:5%">#</th>
                                                     <th width="width:25%">Invoice</th>
                                                     <th width="width:25%">Email</th>
-                                                    <th width="width:10%">Nominal</th>
-                                                    <th width="width:25%">Total Biaya Transfer</th>
-                                                    <th width="width:25%">Tanggal</th>
+                                                    <th width="width:10%">Nominal (Rp.)</th>
+                                                    <th width="width:25%">Total Biaya Transfer (Rp.)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -118,7 +135,6 @@
                                                     <td>{{ $user->email }}</td>
                                                     <td>{{ $withdraw->nominal }}</td></td>
                                                     <td>{{ $withdraw->biaya_admin }}</td>
-                                                    <td>{{ $withdraw->tanggal_penarikan }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -143,11 +159,26 @@
                                 </div> <!-- end col -->
                                 <div class="col-sm-6">
                                     <div class="float-end">
-                                        <p><b>Transfer Bank (Rp.) :</b> <span class="float-end">{{ $withdraw->detailWithdraw->biaya_nobu }}</span></p>
-                                        <p><b>Mitra Aplikasi (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{ $withdraw->detailWithdraw->biaya_mitra }}</span></p>
-                                        <p><b>Tenant (Rp.) :</b> <span class="float-end">{{ $withdraw->detailWithdraw->biaya_tenant }}</span></p>
-                                        <p><b>Admin SU (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{ $withdraw->detailWithdraw->biaya_admin_su }}</span></p>
-                                        <p><b>Agregate (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{ $withdraw->detailWithdraw->biaya_agregate }}</span></p>
+                                        @if ($userType == "Mitra Tenant")
+                                            @foreach ($withdraw->detailWithdraw as $dtwd)
+                                                <p><b>{{$dtwd->insentif->jenis_insentif}} (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{ $dtwd->nominal }}</span></p>
+                                            @endforeach
+                                        @elseif($userType == "Mitra Bisnis" || $userType == "Mitra Aplikasi")
+                                            @php
+                                                $nominalAdmin = 0;
+                                            @endphp
+                                            @foreach ($withdraw->detailWithdraw as $dtwd)
+                                                @if($dtwd->id_insentif != 5 && $dtwd->id_insentif != 3)
+                                                    <p><b>{{$dtwd->insentif->jenis_insentif}} (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{ $dtwd->nominal }}</span></p>
+                                                @endif
+                                                @if ($dtwd->id_insentif == 5 || $dtwd->id_insentif == 3)
+                                                    @php
+                                                        $nominalAdmin+=$dtwd->nominal;
+                                                    @endphp
+                                                @endif
+                                            @endforeach
+                                            <p><b>Insentif Admin (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{$nominalAdmin }}</span></p>
+                                        @endif
                                         <h3><b>Total (Rp.): </b> <span class="float-end">{{ $withdraw->nominal+$withdraw->biaya_admin }}</span></h3>
                                     </div>
                                     <div class="clearfix"></div>
