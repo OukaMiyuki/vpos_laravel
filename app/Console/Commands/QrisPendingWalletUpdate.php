@@ -77,30 +77,31 @@ class QrisPendingWalletUpdate extends Command {
             foreach($invoiceSettlementPending as $invoice){
                 $qris = QrisWallet::where('id_user', $invoice->id_tenant)->where('email', $invoice->email)->first();
                 $qrisSaldo = $qris->saldo;
-                $saldoTransfer = $invoice->nominal_terima_bersih;
-                $qris->update([
-                    'saldo' => $qrisSaldo+$saldoTransfer
-                ]);
-                $qrisAdminWallet = QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
-                $saldoAdmin = $qrisAdminWallet->saldo;
-                // $nominal_mdr = $invoice->nominal_terima_bersih;
-                $insentif_cashback = $saldoTransfer*0.25;
+                dd($qrisSaldo);
+                // $saldoTransfer = $invoice->nominal_terima_bersih;
+                // $qris->update([
+                //     'saldo' => $qrisSaldo+$saldoTransfer
+                // ]);
+                // $qrisAdminWallet = QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
+                // $saldoAdmin = $qrisAdminWallet->saldo;
+                // // $nominal_mdr = $invoice->nominal_terima_bersih;
+                // $insentif_cashback = $saldoTransfer*0.25;
     
-                $qrisAdminWallet->update([
-                    'saldo' => $saldoAdmin+$insentif_cashback
-                ]);
+                // $qrisAdminWallet->update([
+                //     'saldo' => $saldoAdmin+$insentif_cashback
+                // ]);
     
-                HistoryCashbackAdmin::create([
-                    'id_invoice' => $invoice->id,
-                    'nominal_terima_mdr' => $insentif_cashback
-                ]);
+                // HistoryCashbackAdmin::create([
+                //     'id_invoice' => $invoice->id,
+                //     'nominal_terima_mdr' => $insentif_cashback
+                // ]);
 
-                // Invoice::find($invoice->id)->update([
+                // // Invoice::find($invoice->id)->update([
+                // //     'settlement_status' => 1
+                // // ]);
+                // $invoice->update([
                 //     'settlement_status' => 1
                 // ]);
-                $invoice->update([
-                    'settlement_status' => 1
-                ]);
             }
         }
     }
