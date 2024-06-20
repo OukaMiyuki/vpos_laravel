@@ -6,7 +6,9 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use App\Exceptions\InvalidOrderException;
 // use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Session\TokenMismatchException;
 use Throwable;
+use Exception;
 
 class Handler extends ExceptionHandler {
     /**
@@ -29,6 +31,20 @@ class Handler extends ExceptionHandler {
     //         //
     //     });
     // }
+
+    public function render($request, Throwable $e) {
+        if ($e instanceof TokenMismatchException && $request->getRequestUri() === '/kasir/logout'
+            || $e instanceof TokenMismatchException && $request->getRequestUri() === '/admin/logout'  
+            || $e instanceof TokenMismatchException && $request->getRequestUri() === '/marketing/logout' 
+            || $e instanceof TokenMismatchException && $request->getRequestUri() === '/tenant/logout'    
+        ) {
+            return redirect('/');
+        }
+
+        return parent::render($request, $e);
+    }
+
+
     public function register(): void {
         $this->renderable(function (Throwable $e, Request $request) {
             if ($request->is('api/*')) {

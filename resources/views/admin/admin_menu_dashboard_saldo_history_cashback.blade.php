@@ -59,11 +59,11 @@
                                             <th>No. Invoice</th>
                                             <th class="text-center">Tanggal Transaksi</th>
                                             <th class="text-center">Jenis Pembayaran</th>
-                                            <th class="text-center">MDR</th>
+                                            <th class="text-center">MDR (%)</th>
                                             <th class="text-center">Nominal MDR (Rp.)</th>
                                             <th class="text-center">Nominal Bayar (Rp.)</th>
                                             <th class="text-center">Nominal Terima Bersih Qris User (Rp.)</th>
-                                            <th class="text-center">Nominal Terima MDR (0.25%)</th>
+                                            <th class="text-center">Nominal Terima MDR (25%)</th>
                                             <th class="text-center">Tanggal Cashback</th>
                                         </tr>
                                     </thead>
