@@ -798,9 +798,10 @@ class TenantMitraController extends Controller {
         $qris = QrisWallet::where('id_user', auth()->user()->id)
                             ->where('email', auth()->user()->email)
                             ->first();
-        $qrisPending = Invoice::whereDate('tanggal_transaksi', Carbon::yesterday())
+        $qrisPending = Invoice::whereDate('tanggal_transaksi', '!=', Carbon::now())
                                 ->where('id_tenant', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
+                                ->where('settlement_status', 0)
                                 ->where('jenis_pembayaran', 'Qris')
                                 ->where('status_pembayaran', 1)
                                 ->sum('nominal_terima_bersih');

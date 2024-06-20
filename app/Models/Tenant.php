@@ -26,7 +26,6 @@ use App\Models\QrisWalletPending;
 use App\Models\UmiRequest;
 use App\Models\Withdrawal;
 use App\Models\DetailPenarikan;
-use App\Models\Kasir;
 use App\Models\StoreList;
 use App\Models\TenantQrisAccount;
 
@@ -159,6 +158,10 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
             'id',
             'id'
         );
+    }
+
+    public function qrisWalletPrnding(){
+        return $this->hasOne(QrisWalletPending::class, 'id_user', 'id');
     }
 
     public function saldoTunai(){

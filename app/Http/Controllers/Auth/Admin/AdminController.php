@@ -34,6 +34,7 @@ use App\Models\NobuWithdrawFeeHistory;
 use App\Models\BiayaAdminTransferDana;
 use App\Models\Rekening;
 use App\Models\History;
+use App\Models\SettlementDateSetting;
 
 class AdminController extends Controller {
 
@@ -2418,5 +2419,88 @@ class AdminController extends Controller {
         );
 
         return redirect()->route('admin.dashboard.finance.insentif.list')->with($notification);
+    }
+
+    public function adminDashboardSettlementSettingList(){
+        $settlementList = SettlementDateSetting::latest()->get();
+        return view('admin.admin_finance_settlement_setting_list', compact(['settlementList']));
+    }
+
+    public function adminDashboardSettlementSettingListInsert(Request $request){
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $note = $request->note;
+        $dateCheck = Carbon::parse($start_date);
+
+        if($end_date<$start_date || $dateCheck->isYesterday()){
+            $notification = array(
+                'message' => 'Inputan tanggal salah atau tidak sesuai!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            SettlementDateSetting::create([
+                'stat_date' => $start_date,
+                'end_date' => $end_date,
+                'note' => $note
+            ]);
+            $action = "";
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Add Settlement Holiday Date";
+            } else {
+                $action = "Administrator : Add Settlement Holiday Date";
+            }
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+            $notification = array(
+                'message' => 'Data berhasil ditambahkan!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
+    public function adminDashboardSettlementSettingListUpdate(Request $request){
+        $id = $request->id;
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $note = $request->note;
+        $dateCheck = Carbon::parse($start_date);
+
+        if($end_date<$start_date || $dateCheck->isYesterday()){
+            $notification = array(
+                'message' => 'Inputan tanggal salah atau tidak sesuai!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            $settlement = SettlementDateSetting::find($id);
+
+            if(is_null($settlement) || empty($settlement)){
+                $notification = array(
+                    'message' => 'Data tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+            
+            $settlement->update([
+                'stat_date' => $start_date,
+                'end_date' => $end_date,
+                'note' => $note
+            ]);
+
+            $action = "";
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Update Settlement Holiday Date";
+            } else {
+                $action = "Administrator : Update Settlement Holiday Date";
+            }
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+            $notification = array(
+                'message' => 'Data berhasil diupdate!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        }
     }
 }

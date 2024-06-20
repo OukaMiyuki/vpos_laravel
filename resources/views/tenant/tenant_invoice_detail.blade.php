@@ -1,4 +1,4 @@
-<x-kasir-layout>
+<x-tenant-layout>
     <div class="content">
         <div class="container-fluid">
             <div class="row">
@@ -311,4 +311,4 @@
 
         </div>
     </div>
-</x-kasir-layout>
+</x-tenant-layout>

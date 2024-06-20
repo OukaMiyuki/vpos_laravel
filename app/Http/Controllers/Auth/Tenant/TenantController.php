@@ -1742,7 +1742,8 @@ class TenantController extends Controller {
                             ->where('email', auth()->user()->email)
                             ->first();
         $qrisPending = Invoice::where('store_identifier', $identifier)
-                                ->whereDate('tanggal_transaksi', Carbon::yesterday())
+                                ->where('tanggal_transaksi', '!=', Carbon::now()->format('Y-m-d'))
+                                ->where('settlement_status', 0)
                                 ->where('jenis_pembayaran', 'Qris')
                                 ->where('status_pembayaran', 1)
                                 ->sum('nominal_terima_bersih');

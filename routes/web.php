@@ -120,6 +120,9 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::post('dashboard/finance/insentif', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingInsert'])->name('admin.dashboard.finance.insentif.insert');
     Route::post('dashboard/finance/insentif/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingUpdate'])->name('admin.dashboard.finance.insentif.update');
     Route::get('dashboard/finance/insentif/delete/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingDelete'])->name('admin.dashboard.finance.insentif.delete');
+    Route::get('dashboard/finance/settlement', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingList'])->name('admin.dashboard.finance.settlement.list');
+    Route::post('dashboard/finance/settlement', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingListInsert'])->name('admin.dashboard.finance.settlement.insert');
+    Route::post('dashboard/finance/settlement/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingListUpdate'])->name('admin.dashboard.finance.settlement.update');
 
     Route::get('dashboard/history', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistory'])->name('admin.dashboard.history');
     Route::get('dashboard/history/user-login', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserLogin'])->name('admin.dashboard.history.user.login');

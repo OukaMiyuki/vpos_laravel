@@ -54,6 +54,17 @@ $(document).ready(function(){
         $("#show #name").val(jenis_insentif);
         $("#show #nominal_insentif").val(nominal);
     });
+    $(document).on("click", "#edit-settlement", function() {
+        var id = $(this).data('id');
+        var start_date = $(this).data('start_date');
+        var end_date = $(this).data('end_date');
+        var note = $(this).data('note');
+        console.log(start_date);
+        $("#show #id").val(id);
+        $("#show #start_date").val(start_date);
+        $("#show #end_date").val(end_date);
+        $("#show #note").val(note);
+    });
 });
 $("#saldo-qris-txt").hide();
 $("#saldo-agregate-aplikasi-txt").hide();

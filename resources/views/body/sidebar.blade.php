@@ -371,7 +371,10 @@
                                     <a href="{{ route('admin.dashboard.finance') }}">History Saldo</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('admin.dashboard.finance.insentif.list') }}">Pengaturan Insentif</a>
+                                    <a href="{{ route('admin.dashboard.finance.insentif.list') }}">Insentive Setting</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.dashboard.finance.settlement.list') }}">Settlement Setting</a>
                                 </li>
                             </ul>
                         </div>

@@ -219,6 +219,7 @@ class ProfileController extends Controller {
         $action = "";
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        // dd($sender);
         $client = new GuzzleHttpClient();
         $nohp = auth()->user()->phone;
         $hp = "";
