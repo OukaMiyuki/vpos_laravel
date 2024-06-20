@@ -77,14 +77,14 @@ class QrisPendingWalletUpdate extends Command {
             foreach($invoiceSettlementPending as $invoice){
                 $qris = QrisWallet::where('id_user', $invoice->id_tenant)->where('email', $invoice->email)->first();
                 $qrisSaldo = $qris->saldo;
-                $saldoTransfer = $invoice->total_penghasilan;
+                $saldoTransfer = $invoice->nominal_terima_bersih;
                 $qris->update([
                     'saldo' => $qrisSaldo+$saldoTransfer
                 ]);
                 $qrisAdminWallet = QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
                 $saldoAdmin = $qrisAdminWallet->saldo;
-                $nominal_mdr = $invoice->total_nominal_mdr;
-                $insentif_cashback = $nominal_mdr*0.25;
+                // $nominal_mdr = $invoice->nominal_terima_bersih;
+                $insentif_cashback = $saldoTransfer*0.25;
     
                 $qrisAdminWallet->update([
                     'saldo' => $saldoAdmin+$insentif_cashback
