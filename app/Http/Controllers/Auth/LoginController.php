@@ -18,10 +18,12 @@ use Illuminate\Support\Facades\Validator;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 use App\Models\History;
 use App\Models\Marketing;
 use App\Models\Tenant;
 use App\Models\Kasir;
+use App\Models\Admin;
 use Illuminate\Validation\Rule;
 use Exception;
 
@@ -48,8 +50,7 @@ class LoginController extends Controller {
         return $ipaddress;
     }
 
-    private function createHistoryUser($user_id,  $user_email, $log, $status){
-        $action = "User Login";
+    private function createHistoryUser($user_id,  $user_email, $action, $log, $status){
         $ip = "125.164.244.223";
         $PublicIP = $this->get_client_ip();
         $getLoc = Location::get($ip);
@@ -89,7 +90,8 @@ class LoginController extends Controller {
                     if(! Auth::guard('kasir')->attempt($request->only('email', 'password'), $request->boolean('remember'))){
                         $login_id = NULL;
                         $login_email = $request->email;
-                        $this->createHistoryUser($login_id, $login_email, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+                        $action = "User Login Fail";
+                        $this->createHistoryUser($login_id, $login_email, $action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
                         RateLimiter::hit($this->throttleKey());
                         throw ValidationException::withMessages([
                             'email' => trans('auth.failed'),
@@ -106,18 +108,119 @@ class LoginController extends Controller {
         RateLimiter::clear($this->throttleKey());
         $login_id = NULL;
         $login_email = $request->email;
-        $this->createHistoryUser($login_id, $login_email, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+        $action = "User Login Success";
+        $this->createHistoryUser($login_id, $login_email, $action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+        $noHp = "";
+        $date = Carbon::now()->format('d-m-Y H:i:s');
+        $body = "Anda berhasil melakukan login pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
         if(Auth::guard('admin')->check()){
+            $action = "Login User Admin";
+            $user = Admin::select([
+                                'admins.id',
+                                'admins.email',
+                                'admins.phone'
+                            ])
+                            ->where('email', $login_email)
+                            ->first();
+            $noHp = $user->phone;
+            $id = $user->id;
+            $email = $user->email;
+            $this->sendWhatsappLoginNotification($id, $email, $noHp, $action, $body);
             return redirect()->intended(RouteServiceProvider::ADMIN_DASHBOARD)->with($notification);
         } else if(Auth::guard('marketing')->check()){
+            $action = "Login User Mitra Aplikasi";
+            $user = Marketing::select([
+                                    'marketings.id',
+                                    'marketings.email',
+                                    'marketings.phone'
+                                ])
+                                ->where('email', $login_email)
+                                ->first();
+            $noHp = $user->phone;
+            $id = $user->id;
+            $email = $user->email;
+            $this->sendWhatsappLoginNotification($id, $email, $noHp, $action,$body);
             return redirect()->intended(RouteServiceProvider::MARKETING_DASHBOARD)->with($notification);
         } else if(Auth::guard('tenant')->check()){
+            $action = "Login User Tenant";
+            $user = Tenant::select([
+                                    'tenants.id',
+                                    'tenants.email',
+                                    'tenants.phone'
+                                ])
+                                ->where('email', $login_email)
+                                ->first();
+            $noHp = $user->phone;
+            $id = $user->id;
+            $email = $user->email;
+            $this->sendWhatsappLoginNotification($id, $email, $noHp, $action, $body);
             if(Auth::guard('tenant')->user()->id_inv_code == 0){
                 return redirect()->intended(RouteServiceProvider::TENANT_MITRA_DASHBOARD)->with($notification);
             }
             return redirect()->intended(RouteServiceProvider::TENANT_DASHBOARD)->with($notification);
         } else if(Auth::guard('kasir')->check()){
+            $action = "Login User Kasir";
+            $user = Kasir::select([
+                            'kasirs.id',
+                            'kasirs.email',
+                            'kasirs.phone'
+                        ])
+                        ->where('email', $login_email)
+                        ->first();
+            $noHp = $user->phone;
+            $id = $user->id;
+            $email = $user->email;
+            $this->sendWhatsappLoginNotification($id, $email, $noHp, $action, $body);
             return redirect()->intended(RouteServiceProvider::KASIR_DASHBOARD)->with($notification);
+        }
+    }
+
+    public function sendWhatsappLoginNotification($user_id, $user_email, $noHP, $action, $body){
+        DB::connection()->enableQueryLog();
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $postResponse = "";
+        $action = "";
+        if(!preg_match("/[^+0-9]/",trim($noHP))){
+            if(substr(trim($noHP), 0, 2)=="62"){
+                $hp    =trim($noHP);
+            }
+            else if(substr(trim($noHP), 0, 1)=="0"){
+                $hp    ="62".substr(trim($noHP), 1);
+            }
+        }
+
+        $url = 'https://waq.my.id/send-message';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            'api_key' => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            'message' => $body
+        ];
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            $action = "Send User Login Notification Fail";
+            $this->createHistoryUser($user_id, $user_email, $action, $ex, 0);
+        }
+        if(is_null($postResponse) || empty($postResponse) || $postResponse == NULL || $postResponse == ""){
+            $this->createHistoryUser($user_id, $user_email, $action, "OTP Response NULL", 0);
+        } else {
+            $responseCode = $postResponse->getStatusCode();
+            if($responseCode == 200){
+                $action = "Send User Login Notification Success";
+                $this->createHistoryUser($user_id, $user_email, $action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+            } else {
+                $action = "Send User Login Notification Fail";
+                $this->createHistoryUser($user_id, $user_email, $action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+            }
         }
     }
 
@@ -241,21 +344,31 @@ class LoginController extends Controller {
             );
             return redirect()->back()->with($notification)->withInput();
         }
-        $responseCode = $postResponse->getStatusCode();
-
-        if($responseCode == 200){
-            $notification = array(
-                'message' => 'OTP Sukses dikirim!',
-                'alert-type' => 'success',
-            );
-            return view('auth.otp_verification', compact('nohp'))->with($notification);
-        } else {
+        if(is_null($postResponse) || empty($postResponse) || $postResponse == NULL || $postResponse == ""){
+            $action = "User Password Reset Send OTP Fail";
+            $this->createHistoryUser(NULL, NULL, $action, "OTP Response NULL", 0);
             $notification = array(
                 'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
                 'alert-type' => 'error',
             );
             return redirect()->back()->with($notification)->withInput();
+        } else {
+            $responseCode = $postResponse->getStatusCode();
+            if($responseCode == 200){
+                $notification = array(
+                    'message' => 'OTP Sukses dikirim!',
+                    'alert-type' => 'success',
+                );
+                return view('auth.otp_verification', compact('nohp'))->with($notification);
+            } else {
+                $notification = array(
+                    'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification)->withInput();
+            }
         }
+
     }
 
     public function resetPasswordOTPVerification(Request $request){
@@ -293,10 +406,19 @@ class LoginController extends Controller {
         $checkMitraApp = Marketing::where('phone', $phone)->first();
         $checkKasir = Kasir::where('phone', $phone)->first();
 
+        $action ="";
+        $date = Carbon::now()->format('d-m-Y H:i:s');
+        $body = "Password anda telah direset pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+
         if($checkTenant){
             $checkTenant->update([
                 'password' => Hash::make($request->password)
             ]);
+            $action = "User Tenant Reset Password Success";
+            $noHp = $checkTenant->phone;
+            $id = $checkTenant->id;
+            $email = $checkTenant->email;
+            $this->sendWhatsappLoginNotification($id, $email, $noHp, $action, $body);
             $notification = array(
                 'message' => 'Password berhasil diperbarui, silahkan login dengan password yang baru!',
                 'alert-type' => 'success',
@@ -306,6 +428,11 @@ class LoginController extends Controller {
             $$checkMitraApp->update([
                 'password' => Hash::make($request->password)
             ]);
+            $action = "User Mitra Aplikasi Reset Password Success";
+            $noHp = $checkMitraApp->phone;
+            $id = $checkMitraApp->id;
+            $email = $checkMitraApp->email;
+            $this->sendWhatsappLoginNotification($id, $email, $noHp, $action, $body);
             $notification = array(
                 'message' => 'Password berhasil diperbarui, silahkan login dengan password yang baru!',
                 'alert-type' => 'success',
@@ -315,6 +442,11 @@ class LoginController extends Controller {
             $checkKasir->update([
                 'password' => Hash::make($request->password)
             ]);
+            $action = "User Kasir Reset Password Success";
+            $noHp = $checkKasir->phone;
+            $id = $checkKasir->id;
+            $email = $checkKasir->email;
+            $this->sendWhatsappLoginNotification($id, $email, $noHp, $action, $body);
             $notification = array(
                 'message' => 'Password berhasil diperbarui, silahkan login dengan password yang baru!',
                 'alert-type' => 'success',

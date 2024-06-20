@@ -53,20 +53,26 @@ class QrisPendingWalletUpdate extends Command {
                 'status' => 1
             ]);
         } else {
-            $invoiceSettlementPending = Invoice::select([
-                                                        'id',
-                                                        'id_tenant',
-                                                        'email',
-                                                        "store_identifier",
-                                                        DB::raw("(sum(nominal_mdr)) as total_nominal_mdr"),
-                                                        DB::raw("(sum(nominal_terima_bersih)) as total_penghasilan"),
-                                                    ])
-                                                    ->where('settlement_status', 0)
-                                                    ->where('jenis_pembayaran', 'Qris')
-                                                    ->where('status_pembayaran', 1)
-                                                    ->whereDate('tanggal_transaksi', '!=', Carbon::now())
-                                                    ->groupBy(['id','store_identifier', 'email', 'id_tenant'])
-                                                    ->get();
+            // $invoiceSettlementPending = Invoice::select([
+            //                                             'id',
+            //                                             'id_tenant',
+            //                                             'email',
+            //                                             "store_identifier",
+            //                                             DB::raw("(sum(nominal_mdr)) as total_nominal_mdr"),
+            //                                             DB::raw("(sum(nominal_terima_bersih)) as total_penghasilan"),
+            //                                         ])
+            //                                         ->where('settlement_status', 0)
+            //                                         ->where('jenis_pembayaran', 'Qris')
+            //                                         ->where('status_pembayaran', 1)
+            //                                         ->whereDate('tanggal_transaksi', '!=', Carbon::now())
+            //                                         ->groupBy(['id','store_identifier', 'email', 'id_tenant'])
+            //                                         ->get();
+
+            $invoiceSettlementPending = Invoice::where('settlement_status', 0)
+                                                ->where('jenis_pembayaran', 'Qris')
+                                                ->where('status_pembayaran', 1)
+                                                ->whereDate('tanggal_transaksi', '!=', Carbon::now())
+                                                ->get();
 
             foreach($invoiceSettlementPending as $invoice){
                 $qris = QrisWallet::where('id_user', $invoice->id_tenant)->where('email', $invoice->email)->first();
@@ -88,7 +94,11 @@ class QrisPendingWalletUpdate extends Command {
                     'id_invoice' => $invoice->id,
                     'nominal_terima_mdr' => $insentif_cashback
                 ]);
-                Invoice::find($invoice->id)->update([
+
+                // Invoice::find($invoice->id)->update([
+                //     'settlement_status' => 1
+                // ]);
+                $invoice->update([
                     'settlement_status' => 1
                 ]);
             }

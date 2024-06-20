@@ -79,6 +79,47 @@ class ProfileController extends Controller{
         }
     }
 
+    private function sendNotificationToUser($body){
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $postResponse = "";
+        $noHP = auth()->user()->phone;
+        if(!preg_match("/[^+0-9]/",trim($noHP))){
+            if(substr(trim($noHP), 0, 2)=="62"){
+                $hp    =trim($noHP);
+            }
+            else if(substr(trim($noHP), 0, 1)=="0"){
+                $hp    ="62".substr(trim($noHP), 1);
+            }
+        }
+
+        $url = 'https://waq.my.id/send-message';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            'api_key' => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            'message' => $body
+        ];
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            $action = "Send Whatsapp Notification Fail";
+            $this->createHistoryUser($action, $ex, 0);
+        }
+        $responseCode = $postResponse->getStatusCode();
+        if($responseCode != 200){
+            $action = "Send Whatsapp Notification Fail";
+            $this->createHistoryUser($action, $ex, 0);
+        } 
+    }
+
     public function tenantSettings(){
         return view('tenant.tenant_settings');
     }
@@ -241,6 +282,9 @@ class ProfileController extends Controller{
                     'password' => Hash::make($request->new_password),
                 ]);
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                $date = Carbon::now()->format('d-m-Y H:i:s');
+                $body = "Password anda telah diubah pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                $this->sendNotificationToUser($body);
                 $notification = array(
                     'message' => 'Password berhasil diperbarui!',
                     'alert-type' => 'success',
@@ -413,6 +457,9 @@ class ProfileController extends Controller{
                     'swift_code' => $swift_code,
                 ]);
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                $date = Carbon::now()->format('d-m-Y H:i:s');
+                $body = "Rekening anda berhasil diupdate pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                $this->sendNotificationToUser($body);
                 $notification = array(
                     'message' => 'Update nomor rekening berhasil!',
                     'alert-type' => 'success',
@@ -548,7 +595,6 @@ class ProfileController extends Controller{
 
     public function whatsappNotification(){
         DB::connection()->enableQueryLog();
-
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
         $client = new GuzzleHttpClient();
@@ -724,6 +770,7 @@ class ProfileController extends Controller{
                         ]);
                         $responseCode = $getRek->getStatusCode();
                         $dataRekening = json_decode($getRek->getBody());
+
                         return view('tenant.tenant_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan', 'biayaAdmin']));
                     } catch (Exception $e) {
                         $action = "";
@@ -902,6 +949,9 @@ class ProfileController extends Controller{
                             }
 
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                            $date = Carbon::now()->format('d-m-Y H:i:s');
+                            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan."  pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $this->sendNotificationToUser($body);
 
                             $notification = array(
                                 'message' => 'Penarikan dana sukses!',

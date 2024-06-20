@@ -68,6 +68,57 @@ class ProfileController extends Controller {
         }
     }
 
+    private function sendNotificationToUser($body){
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $postResponse = "";
+        $noHP = auth()->user()->phone;
+        if(!preg_match("/[^+0-9]/",trim($noHP))){
+            if(substr(trim($noHP), 0, 2)=="62"){
+                $hp    =trim($noHP);
+            }
+            else if(substr(trim($noHP), 0, 1)=="0"){
+                $hp    ="62".substr(trim($noHP), 1);
+            }
+        }
+
+        $url = 'https://waq.my.id/send-message';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            'api_key' => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            'message' => $body
+        ];
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            $action = "Admin Send User Notification Fail";
+            $this->createHistoryUser($action, $ex, 0);
+        }
+        if(is_null($postResponse) || empty($postResponse) || $postResponse == NULL || $postResponse == ""){
+            $action = "Admin Send User Notification Fail";
+            $this->createHistoryUser(NULL, NULL, $action, "OTP Response NULL", 0);
+            $notification = array(
+                'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification)->withInput();
+        } else {
+            $responseCode = $postResponse->getStatusCode();
+            if($responseCode != 200){
+                $action = "Send Whatsapp Notification Fail";
+                $this->createHistoryUser($action, $ex, 0);
+            } 
+        }
+    }
+
     public function adminSettings(){
         return view('admin.admin_setting');
     }
@@ -198,6 +249,9 @@ class ProfileController extends Controller {
                     'password' => Hash::make($request->new_password),
                 ]);
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                $date = Carbon::now()->format('d-m-Y H:i:s');
+                $body = "Password anda telah diubah pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                $this->sendNotificationToUser($body);
                 $notification = array(
                     'message' => 'Password berhasil diperbarui!',
                     'alert-type' => 'success',
@@ -262,31 +316,42 @@ class ProfileController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-        $responseCode = $postResponse->getStatusCode();
-        if($responseCode == 200){
-            if(auth()->user()->access_level == 0){
-                $action = "Admin Super User : Send Whatsapp OTP Success";
-            } else {
-                $action = "Administrator : Send Whatsapp OTP Success";
-            }
-            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
-            $notification = array(
-                'message' => 'OTP Sukses dikirim!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
-        } else {
-            if(auth()->user()->access_level == 0){
-                $action = "Admin Super User : Send Whatsapp OTP Fail | Status : ".$responseCode;
-            } else {
-                $action = "Administrator : Send Whatsapp OTP Fail | Status : ".$responseCode;
-            }
-            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+
+        if(is_null($postResponse) || empty($postResponse) || $postResponse == NULL || $postResponse == ""){
+            $action = "Admin User Send Whatsapp OTP Fail";
+            $this->createHistoryUser(NULL, NULL, $action, "OTP Response NULL", 0);
             $notification = array(
                 'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
                 'alert-type' => 'error',
             );
-            return redirect()->back()->with($notification);
+            return redirect()->back()->with($notification)->withInput();
+        } else {
+            $responseCode = $postResponse->getStatusCode();
+            if($responseCode == 200){
+                if(auth()->user()->access_level == 0){
+                    $action = "Admin Super User : Send Whatsapp OTP Success";
+                } else {
+                    $action = "Administrator : Send Whatsapp OTP Success";
+                }
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                $notification = array(
+                    'message' => 'OTP Sukses dikirim!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                if(auth()->user()->access_level == 0){
+                    $action = "Admin Super User : Send Whatsapp OTP Fail | Status : ".$responseCode;
+                } else {
+                    $action = "Administrator : Send Whatsapp OTP Fail | Status : ".$responseCode;
+                }
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+                $notification = array(
+                    'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            }
         }
 
     }
@@ -303,7 +368,6 @@ class ProfileController extends Controller {
         $responseCode = $postResponse->getStatusCode();
         $data = json_decode($postResponse->getBody());
         $dataBankList = $data->bankSwiftList;
-
         return view('admin.admin_rekening_add', compact(['dataBankList']));
     }
 
@@ -334,6 +398,9 @@ class ProfileController extends Controller {
                     'no_rekening' => $request->no_rekening
                 ]);
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                $date = Carbon::now()->format('d-m-Y H:i:s');
+                $body = "Anda telah menambahkan rekening ". $request->nama_rekening." pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                $this->sendNotificationToUser($body);
                 $notification = array(
                     'message' => 'Rekening berhasil ditambahkan!',
                     'alert-type' => 'success',
@@ -439,6 +506,9 @@ class ProfileController extends Controller {
                     'swift_code' => $swift_code,
                 ]);
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                $date = Carbon::now()->format('d-m-Y H:i:s');
+                $body = "Rekening untuk ".$nama_rekening." telah diupdate pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                $this->sendNotificationToUser($body);
                 $notification = array(
                     'message' => 'Update nomor rekening berhasil!',
                     'alert-type' => 'success',
@@ -593,8 +663,6 @@ class ProfileController extends Controller {
         $action = "";
         DB::connection()->enableQueryLog();
         $nominal_tarik = $request->nominal_penarikan;
-        // $total_tarik = $request->total_tarik;
-        // $biaya_admin = $request->biaya_admin;
         $jenis_tarik = $request->jenis_penarikan;
         $biayaTransferBank = "";
         $biayaTransferAgregate = "";
@@ -714,7 +782,11 @@ class ProfileController extends Controller {
                             $action = "Admin Super User : Withdraw Success";
 
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
-
+                            
+                            $date = Carbon::now()->format('d-m-Y H:i:s');
+                            $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan."  pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $this->sendNotificationToUser($body);
+                            
                             $notification = array(
                                 'message' => 'Penarikan dana sukses!',
                                 'alert-type' => 'success',
