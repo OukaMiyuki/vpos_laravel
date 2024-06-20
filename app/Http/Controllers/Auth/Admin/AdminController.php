@@ -220,7 +220,7 @@ class AdminController extends Controller {
     }
 
     public function adminMenuUserTransactionSettlementReady(){
-        $invoiceSettlementPending = Invoice::where('settlement_status', 0)
+        $invoice = Invoice::where('settlement_status', 0)
                                     ->where('jenis_pembayaran', 'Qris')
                                     ->where('status_pembayaran', 1)
                                     ->whereDate('tanggal_transaksi', '!=', Carbon::now())
