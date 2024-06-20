@@ -219,7 +219,7 @@ class Invoice extends Model {
                 } else {
                     $date = date('YmdHis');
                     $invoice_generated = $date;
-                    $model->nomor_invoice = $invoice_generated;
+                    $model->nomor_invoice = $model->qris_data.$invoice_generated;
                 }
             }
             $tenant = Tenant::select(['id_inv_code'])->find($model->id_tenant);
