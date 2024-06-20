@@ -148,6 +148,9 @@
                                     <a href="{{ route('admin.dashboard.menu.userTransaction') }}">User Transaction List</a>
                                 </li>
                                 <li>
+                                    <a href="{{ route('admin.dashboard.menu.userTransaction.settlementReady') }}">Transaction Settlement Ready</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('admin.dashboard.menu.userWithdrawals') }}">User Withdrawals</a>
                                 </li>
                                 <li>

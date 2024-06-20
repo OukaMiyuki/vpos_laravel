@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use Stevebauman\Location\Facades\Location;
+use GuzzleHttp\Client as GuzzleHttpClient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -35,6 +36,7 @@ use App\Models\BiayaAdminTransferDana;
 use App\Models\Rekening;
 use App\Models\History;
 use App\Models\SettlementDateSetting;
+use Exception;
 
 class AdminController extends Controller {
 
@@ -78,6 +80,58 @@ class AdminController extends Controller {
             $history->createHistory($history, $action, $user_location, $ip, $log, $status);
         }
     }
+
+    private function sendNotificationToUser($body){
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $postResponse = "";
+        $noHP = auth()->user()->phone;
+        if(!preg_match("/[^+0-9]/",trim($noHP))){
+            if(substr(trim($noHP), 0, 2)=="62"){
+                $hp    =trim($noHP);
+            }
+            else if(substr(trim($noHP), 0, 1)=="0"){
+                $hp    ="62".substr(trim($noHP), 1);
+            }
+        }
+
+        $url = 'https://waq.my.id/send-message';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            'api_key' => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            'message' => $body
+        ];
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            $action = "Admin Send User Notification Fail";
+            $this->createHistoryUser($action, $ex, 0);
+        }
+        if(is_null($postResponse) || empty($postResponse) || $postResponse == NULL || $postResponse == ""){
+            $action = "Admin Send User Notification Fail";
+            $this->createHistoryUser(NULL, NULL, $action, "OTP Response NULL", 0);
+            $notification = array(
+                'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification)->withInput();
+        } else {
+            $responseCode = $postResponse->getStatusCode();
+            if($responseCode != 200){
+                $action = "Send Whatsapp Notification Fail";
+                $this->createHistoryUser($action, $ex, 0);
+            } 
+        }
+    }
+
 
     public function index(){
         $marketingCount = Marketing::count();
@@ -163,6 +217,16 @@ class AdminController extends Controller {
     public function adminMenuUserTransaction(){
         $invoice = Invoice::latest()->get();
         return view('admin.admin_menu_dashboard_user_transaction', compact('invoice'));
+    }
+
+    public function adminMenuUserTransactionSettlementReady(){
+        $invoiceSettlementPending = Invoice::where('settlement_status', 0)
+                                    ->where('jenis_pembayaran', 'Qris')
+                                    ->where('status_pembayaran', 1)
+                                    ->whereDate('tanggal_transaksi', '!=', Carbon::now())
+                                    ->latest()
+                                    ->get();
+        return view('admin.admin_menu_dashboard_user_transaction_settlement', compact('invoice'));
     }
 
     public function adminMenuUserWithdrawals(){
@@ -892,6 +956,9 @@ class AdminController extends Controller {
             } else {
                 $action = "Administrator : Activating Mitra Aplikasi | ".$marketing->name;
             }
+            // $date = Carbon::now()->format('d-m-Y H:i:s');
+            $body = "Terima kasih telah mendaftar di aplikasi Visioner, akun anda telah sukses diaktifkan oleh admin";
+            $this->sendNotificationToUser($body);
             $marketing->is_active = 1;
         } else if($marketing->is_active == 1){
             if(auth()->user()->access_level == 0){

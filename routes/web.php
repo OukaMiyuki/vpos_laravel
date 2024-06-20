@@ -51,6 +51,7 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
 
     Route::get('/dashboard/admin', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuDashboard'])->name('admin.dashboard.menu');
     Route::get('/dashboard/user/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTransaction'])->name('admin.dashboard.menu.userTransaction');
+    Route::get('/dashboard/user/transaction/settlement-ready', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTransactionSettlementReady'])->name('admin.dashboard.menu.userTransaction.settlementReady');
     Route::get('/dashboard/user/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserWithdrawals'])->name('admin.dashboard.menu.userWithdrawals');
     Route::get('/dashboard/user/withdrawals/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserWithdrawalDetail'])->name('admin.dashboard.menu.userWithdrawals.detail');
     Route::get('/dashboard/user/request-umi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequest'])->name('admin.dashboard.menu.userUmiRequest');
