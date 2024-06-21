@@ -42,7 +42,7 @@ class QrisPendingWalletUpdate extends Command {
                 $dateCollection+=1;
             }
         }
-        echo $dateCollection;
+        //echo $dateCollection;
         if($dateCollection != 0){
             History::create([
                 'action' => 'Settlement Update : Pending due to holiday!',
@@ -65,11 +65,11 @@ class QrisPendingWalletUpdate extends Command {
                                     ->get();
 
             foreach($tenantinvoice as $sumInvoice){
-                foreach($sumInvoice->invoice as $invoice){
-                    echo $invoice->nomor_invoice." | ".$invoice->nominal_terima_bersih."\n";
-                }
-                // $total = $sumInvoice->invoice->sum('nominal_terima_bersih');
-                // echo $total."\n";
+                // foreach($sumInvoice->invoice as $invoice){
+                //     echo $invoice->nomor_invoice." | ".$invoice->nominal_terima_bersih."\n";
+                // }
+                $total = $sumInvoice->invoice->sum('nominal_terima_bersih');
+                echo $tenantinvoice->name." Total For : ".$total."\n";
             }
             // $invoiceSettlementPending = Invoice::select([
             //                                             'id',
