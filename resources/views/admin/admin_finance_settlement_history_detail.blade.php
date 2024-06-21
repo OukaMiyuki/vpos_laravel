@@ -11,10 +11,11 @@
                             <div class="page-title-right">
                                 <ol class="breadcrumb m-0">
                                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                    <li class="breadcrumb-item active">Settlement History</li>
+                                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.finance.settlement.history') }}">Settlement History</a></li>
+                                    <li class="breadcrumb-item active">Settlement Detail</li>
                                 </ol>
                             </div>
-                            <h4 class="page-title">Daftar History Settlement</h4>
+                            <h4 class="page-title">Data Settlement Detail {{$settlementDetailHistory->nomor_settlement}}</h4>
                         </div>
                     </div>
                 </div>
@@ -31,42 +32,48 @@
                                     <a href="" class="dropdown-item">Lihat Semua Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar History Settlement</h4>
+                            <h4 class="header-title mb-3">Settlement Info on {{\Carbon\Carbon::parse($settlementDetailHistory->tanggal_settlement)->format('d-m-Y')}}</h4>
+                            <div class="row">
+                                <div class="col-6">
+                                    <h3 class="mb-3"><span>Total Settlement : </span>{{ $settlementDetailHistory->settlement_history_sum_nominal_settle }}</h3>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <h3 class="mb-3"><span>Total Insentif Cashback : </span>{{ $settlementDetailHistory->settlement_history_sum_nominal_insentif_cashback }} </h3>
+                                </div>
+                            </div>
                             <div class="responsive-table-plugin">
                                 <div class="table-rep-plugin">
                                     <div class="table-responsive" data-pattern="priority-columns">
-                                        <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                        <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                             <thead>
                                                 <tr>
-                                                    <th width="2%">No.</th>
-                                                    <th class="text-center">Nomor Settlement</th>
-                                                    <th class="text-center">Tanggal</th>
-                                                    <th>Nominal Settlement (Rp.)</th>
-                                                    <th>Total Cashback (Rp.)</th>
+                                                    <th>No.</th>
+                                                    <th>Nama Tenant</th>
+                                                    <th>Email</th>
+                                                    <th class="text-center">Tanggal Settlement</th>
+                                                    <th class="text-center">Nominal Settlement (Rp.)</th>
+                                                    <th class="text-center">Nominal Insentif Cashback (Rp.)</th>
                                                     <th class="text-center">Status</th>
-                                                    <th class="text-center">Action</th>
                                                 </tr>
                                             </thead>
                                             @php
                                                 $no=0;
                                             @endphp
                                             <tbody>
-                                                @foreach($settlement as $stl)
+                                                @foreach ($settlementDetailHistory->settlementHistory as $stl)
                                                     <tr>
                                                         <td>{{$no+=1}}</td>
-                                                        <td>{{$stl->nomor_settlement}}</td>
-                                                        <td class="text-center">{{\Carbon\Carbon::parse($stl->tanggal_settlement)->format('d-m-Y')}}</td>
-                                                        <td>{{$stl->settlement_history_sum_nominal_settle}}</td>
-                                                        <td>{{$stl->settlement_history_sum_nominal_insentif_cashback}}</td>
+                                                        <td>{{ $stl->tenant->name }}</td>
+                                                        <td>{{ $stl->tenant->email }}</td>
+                                                        <td class="text-center">{{\Carbon\Carbon::parse($stl->settlement_time_stamp)->format('d-m-Y H:i:s')}}</td>
+                                                        <td>{{ $stl->nominal_settle }}</td>
+                                                        <td>{{ $stl->nominal_insentif_cashback }}</td>
                                                         <td>
                                                             @if ($stl->status == 0)
                                                                 <span class="badge bg-soft-warning text-danger">Settlement Gagal</span>
                                                             @elseif($stl->status == 1)
                                                                 <span class="badge bg-soft-success text-success">Settlement Sukses</span>
                                                             @endif
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <a href="{{ route('admin.dashboard.finance.settlement.history.detail', ['id' => $stl->id, 'code' => $stl->nomor_settlement]) }}" title="Lihat detail settlement" class="btn btn-xs btn-primary"><i class="mdi mdi-eye"></i></a>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -83,4 +90,5 @@
         </div>
         <!-- container -->
     </div>
+
 </x-admin-layout>

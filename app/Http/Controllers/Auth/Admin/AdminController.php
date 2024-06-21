@@ -2611,6 +2611,7 @@ class AdminController extends Controller {
         $settlementDetailHistory = Settlement::select([
                                                     'settlements.id',
                                                     'settlements.nomor_settlement',
+                                                    'settlements.tanggal_settlement',
                                                 ])
                                                 ->withSum('settlementHistory', 'nominal_settle')
                                                 ->withSum('settlementHistory', 'nominal_insentif_cashback')
@@ -2640,6 +2641,7 @@ class AdminController extends Controller {
                                                 ])
                                                 ->where('nomor_settlement', $code)
                                                 ->find($id);
-        dd($settlementDetailHistory);
+
+        return view('admin.admin_finance_settlement_history_detail', compact('settlementDetailHistory'));
     }
 }
