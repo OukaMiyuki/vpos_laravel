@@ -10,6 +10,7 @@ use App\Models\SettlementDateSetting;
 use App\Models\QrisWallet;
 use App\Models\HistoryCashbackAdmin;
 use App\Models\History;
+use App\models\Tenant;
 
 class QrisPendingWalletUpdate extends Command {
     /**
@@ -53,47 +54,61 @@ class QrisPendingWalletUpdate extends Command {
                 'status' => 1
             ]);
         } else {
-            $invoiceSettlementPending = Invoice::select([
-                                                        'id',
-                                                        'id_tenant',
-                                                        'email',
-                                                        "store_identifier",
-                                                        DB::raw("(sum(nominal_mdr)) as total_nominal_mdr"),
-                                                        DB::raw("(sum(nominal_terima_bersih)) as total_penghasilan"),
-                                                    ])
-                                                    ->where('settlement_status', 0)
-                                                    ->where('jenis_pembayaran', 'Qris')
-                                                    ->where('status_pembayaran', 1)
-                                                    ->whereDate('tanggal_transaksi', '!=', Carbon::now())
-                                                    ->groupBy(['id','store_identifier', 'email', 'id_tenant'])
-                                                    ->get();
-            $saldoTotal = 0;
-            foreach($invoiceSettlementPending as $invoice){
-                $qris = QrisWallet::where('id_user', $invoice->id_tenant)->where('email', $invoice->email)->first();
-                $qrisSaldo = $qris->saldo;
-                $saldoTransfer = floor($invoice->total_penghasilan);
-                $saldoTotal+=$saldoTransfer;
-                // $qris->update([
-                //     'saldo' => $qrisSaldo+$saldoTransfer
-                // ]);
-                // $qrisAdminWallet = QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
-                // $saldoAdmin = $qrisAdminWallet->saldo;
-                // $nominal_mdr = $invoice->total_nominal_mdr;
-                // $insentif_cashback = $nominal_mdr*0.25;
-    
-                // $qrisAdminWallet->update([
-                //     'saldo' => $saldoAdmin+$insentif_cashback
-                // ]);
-    
-                // HistoryCashbackAdmin::create([
-                //     'id_invoice' => $invoice->id,
-                //     'nominal_terima_mdr' => $insentif_cashback
-                // ]);
-                // Invoice::find($invoice->id)->update([
-                //     'settlement_status' => 1
-                // ]);
+            $tenantinvoice = Tenant::with([
+                                        'invoice' => function($query){
+                                            $query->where('settlement_status', 0)
+                                                  ->where('jenis_pembayaran', 'Qris')
+                                                  ->where('status_pembayaran', 1)
+                                                  ->whereDate('tanggal_transaksi', '!=', Carbon::now());
+                                        }
+                                    ])
+                                    ->get();
+
+            foreach($tenantinvoice as $sumInvoice){
+                $total = $sumInvoice->ininvoice->sum('nominal_terima_bersih');
+                echo $total."\n";
             }
-            echo "total segini : ".$saldoTotal."\n";
+            // $invoiceSettlementPending = Invoice::select([
+            //                                             'id',
+            //                                             'id_tenant',
+            //                                             'email',
+            //                                             "store_identifier",
+            //                                             DB::raw("(sum(nominal_mdr)) as total_nominal_mdr"),
+            //                                             DB::raw("(sum(nominal_terima_bersih)) as total_penghasilan"),
+            //                                         ])
+            //                                         ->where('settlement_status', 0)
+            //                                         ->where('jenis_pembayaran', 'Qris')
+            //                                         ->where('status_pembayaran', 1)
+            //                                         ->whereDate('tanggal_transaksi', '!=', Carbon::now())
+            //                                         ->groupBy(['id','store_identifier', 'email', 'id_tenant'])
+            //                                         ->get();
+            // $saldoTotal = 0;
+            // foreach($invoiceSettlementPending as $invoice){
+            //     $qris = QrisWallet::where('id_user', $invoice->id_tenant)->where('email', $invoice->email)->first();
+            //     $qrisSaldo = $qris->saldo;
+            //     $saldoTransfer = floor($invoice->total_penghasilan);
+            //     $saldoTotal+=$saldoTransfer;
+            //     // $qris->update([
+            //     //     'saldo' => $qrisSaldo+$saldoTransfer
+            //     // ]);
+            //     // $qrisAdminWallet = QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
+            //     // $saldoAdmin = $qrisAdminWallet->saldo;
+            //     // $nominal_mdr = $invoice->total_nominal_mdr;
+            //     // $insentif_cashback = $nominal_mdr*0.25;
+    
+            //     // $qrisAdminWallet->update([
+            //     //     'saldo' => $saldoAdmin+$insentif_cashback
+            //     // ]);
+    
+            //     // HistoryCashbackAdmin::create([
+            //     //     'id_invoice' => $invoice->id,
+            //     //     'nominal_terima_mdr' => $insentif_cashback
+            //     // ]);
+            //     // Invoice::find($invoice->id)->update([
+            //     //     'settlement_status' => 1
+            //     // ]);
+            // }
+            // echo "total segini : ".$saldoTotal."\n";
         }
     }
 }
