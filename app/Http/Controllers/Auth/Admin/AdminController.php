@@ -2599,6 +2599,7 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardSettlementHistory(){
+        config()->set('database.connections.mysql.strict', false);
         $settlement = SettlementHstory::select([
                                             DB::raw("(sum(nominal_settle)) as total_settle"),
                                             DB::raw("(sum(nominal_insentif_cashback)) as total_cashback"),
