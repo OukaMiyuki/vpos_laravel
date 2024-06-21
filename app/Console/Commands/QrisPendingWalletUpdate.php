@@ -72,25 +72,26 @@ class QrisPendingWalletUpdate extends Command {
                 $qris = QrisWallet::where('id_user', $invoice->id_tenant)->where('email', $invoice->email)->first();
                 $qrisSaldo = $qris->saldo;
                 $saldoTransfer = $invoice->total_penghasilan;
-                $qris->update([
-                    'saldo' => $qrisSaldo+$saldoTransfer
-                ]);
-                $qrisAdminWallet = QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
-                $saldoAdmin = $qrisAdminWallet->saldo;
-                $nominal_mdr = $invoice->total_nominal_mdr;
-                $insentif_cashback = $nominal_mdr*0.25;
+                echo floor($saldoTransfer);
+                // $qris->update([
+                //     'saldo' => $qrisSaldo+$saldoTransfer
+                // ]);
+                // $qrisAdminWallet = QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
+                // $saldoAdmin = $qrisAdminWallet->saldo;
+                // $nominal_mdr = $invoice->total_nominal_mdr;
+                // $insentif_cashback = $nominal_mdr*0.25;
     
-                $qrisAdminWallet->update([
-                    'saldo' => $saldoAdmin+$insentif_cashback
-                ]);
+                // $qrisAdminWallet->update([
+                //     'saldo' => $saldoAdmin+$insentif_cashback
+                // ]);
     
-                HistoryCashbackAdmin::create([
-                    'id_invoice' => $invoice->id,
-                    'nominal_terima_mdr' => $insentif_cashback
-                ]);
-                Invoice::find($invoice->id)->update([
-                    'settlement_status' => 1
-                ]);
+                // HistoryCashbackAdmin::create([
+                //     'id_invoice' => $invoice->id,
+                //     'nominal_terima_mdr' => $insentif_cashback
+                // ]);
+                // Invoice::find($invoice->id)->update([
+                //     'settlement_status' => 1
+                // ]);
             }
         }
     }
