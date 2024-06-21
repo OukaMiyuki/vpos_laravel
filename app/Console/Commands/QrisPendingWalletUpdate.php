@@ -93,6 +93,7 @@ class QrisPendingWalletUpdate extends Command {
                 //     'settlement_status' => 1
                 // ]);
             }
+            echo "total segini : ".$saldoTotal."\n";
         }
     }
 }
