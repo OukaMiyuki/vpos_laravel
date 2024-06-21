@@ -10,7 +10,7 @@ use App\Models\SettlementDateSetting;
 use App\Models\QrisWallet;
 use App\Models\HistoryCashbackAdmin;
 use App\Models\History;
-use App\models\Tenant;
+use App\Models\Tenant;
 
 class QrisPendingWalletUpdate extends Command {
     /**
