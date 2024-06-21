@@ -71,7 +71,7 @@ class QrisPendingWalletUpdate extends Command {
             foreach($invoiceSettlementPending as $invoice){
                 $qris = QrisWallet::where('id_user', $invoice->id_tenant)->where('email', $invoice->email)->first();
                 $qrisSaldo = $qris->saldo;
-                $saldoTransfer = $invoice->total_penghasilan;
+                $saldoTransfer = floor($invoice->total_penghasilan);
                 $saldoTotal+=$saldoTransfer;
                 // $qris->update([
                 //     'saldo' => $qrisSaldo+$saldoTransfer
