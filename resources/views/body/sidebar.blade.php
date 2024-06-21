@@ -379,6 +379,9 @@
                                 <li>
                                     <a href="{{ route('admin.dashboard.finance.settlement.list') }}">Settlement Setting</a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('admin.dashboard.finance.settlement.list') }}">Settlement History</a>
+                                </li>
                             </ul>
                         </div>
                     </li>

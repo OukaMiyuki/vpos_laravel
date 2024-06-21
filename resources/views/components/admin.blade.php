@@ -98,8 +98,8 @@
         <script src="{{ asset('assets/libs/jquery-mockjax/jquery.mockjax.min.js') }}"></script>
         <script src="{{ asset('assets/libs/devbridge-autocomplete/jquery.autocomplete.min.js') }}"></script>
         <script src="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js') }}"></script>
-        <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
-        <script src="{{ asset('assets/js/pages/form-advanced.init.js') }}"></script>
+        {{-- <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
+        <script src="{{ asset('assets/js/pages/form-advanced.init.js') }}"></script> --}}
 
         {{-- <script src="{{ asset('assets/js/pages/calendar.init.js') }}"></script> --}}
         <script src="{{ asset('assets/js/app.min.js') }}"></script>

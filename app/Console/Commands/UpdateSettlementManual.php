@@ -51,7 +51,7 @@ class UpdateSettlementManual extends Command {
                 $qrisWalletTenant->update([
                     'saldo' => $saldoQrisTenant+$totalSumFloor
                 ]);
-                echo "Nama : ".$sumInvoice->name." | ".$totalSumFloor;
+                echo "Nama : ".$sumInvoice->name." | ".$totalSumFloor." | Periode : ".Carbon::now();
                 $totalCashback = 0;
                 foreach($sumInvoice->invoice as $invoice){
                     $nominal_mdr = $invoice->nominal_mdr;

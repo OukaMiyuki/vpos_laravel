@@ -37,6 +37,7 @@ use App\Models\BiayaAdminTransferDana;
 use App\Models\Rekening;
 use App\Models\History;
 use App\Models\SettlementDateSetting;
+use App\Models\SettlementHstory;
 use Exception;
 
 class AdminController extends Controller {
@@ -2595,5 +2596,13 @@ class AdminController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
+    }
+
+    public function adminDashboardSettlementHistory(){
+        $settlement = SettlementHstory::groupBy(function($query){
+                                            return Carbon::parse($query->settlement_time_stamp)->format('d-m-Y');
+                                        })
+                                        ->get();
+        dd($settlement);
     }
 }
