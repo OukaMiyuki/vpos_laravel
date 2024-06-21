@@ -11,6 +11,7 @@ use App\Models\QrisWallet;
 use App\Models\HistoryCashbackAdmin;
 use App\Models\History;
 use App\Models\Tenant;
+use App\Models\SettlementHstory;
 
 class QrisPendingWalletUpdate extends Command {
     /**
@@ -63,14 +64,56 @@ class QrisPendingWalletUpdate extends Command {
                                         }
                                     ])
                                     ->get();
-
+            $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
+            $qrisWalletAdminSaldo = $qrisWalletAdmin->saldo;
             foreach($tenantinvoice as $sumInvoice){
+                $qrisWalletTenant = QrisWallet::where('id_user', $sumInvoice->id)->where('email', $sumInvoice->email)->first();
+                if(!is_null($qrisWalletTenant) || empty($qrisWalletTenant)){
+                    $totalSum = $sumInvoice->invoice->sum('nominal_terima_bersih');
+                    $totalSumFloor = floor($totalSum);
+                    $saldoQrisTenant = $qrisWalletTenant->saldo;
+                    $qrisWalletTenant->update([
+                        'saldo' => $saldoQrisTenant+$totalSumFloor
+                    ]);
+                    $totalCashback = 0;
+                    foreach($sumInvoice->invoice as $invoice){
+                        $nominal_mdr = $invoice->nominal_mdr;
+                        $insentif_cashback = $nominal_mdr*0.25;
+                        $insentif_cashbackFloor = floor($insentif_cashback);
+                        $qrisWalletAdmin->update([
+                            'saldo' => $qrisWalletAdminSaldo+$insentif_cashbackFloor
+                        ]);
+                        $totalCashback+=$insentif_cashbackFloor;
+                        HistoryCashbackAdmin::create([
+                            'id_invoice' => $invoice->id,
+                            'nominal_terima_mdr' => $insentif_cashback
+                        ]);
+                        Invoice::find($invoice->id)->update([
+                            'settlement_status' => 1
+                        ]);
+                    }
+                    SettlementHstory::create([
+                        'id_user' => $sumInvoice->id,
+                        'email' => $sumInvoice->email,
+                        'settlement_time_stamp' => Carbon::now(),
+                        'nominal_settle' => $totalSumFloor,
+                        'nominal_insentif_cashback' => $totalCashback
+                    ]);
+                } else {
+                    echo "Wallet not found".$sumInvoice->email;
+                }
                 // foreach($sumInvoice->invoice as $invoice){
                 //     echo $invoice->nomor_invoice." | ".$invoice->nominal_terima_bersih."\n";
                 // }
-                $total = $sumInvoice->invoice->sum('nominal_terima_bersih');
-                echo $sumInvoice->name." Total For : ".$total."\n";
             }
+
+            // foreach($tenantinvoice as $sumInvoice){
+            //     // foreach($sumInvoice->invoice as $invoice){
+            //     //     echo $invoice->nomor_invoice." | ".$invoice->nominal_terima_bersih."\n";
+            //     // }
+            //     $total = $sumInvoice->invoice->sum('nominal_terima_bersih');
+            //     echo $sumInvoice->name." Total For : ".$total."\n";
+            // }
             // $invoiceSettlementPending = Invoice::select([
             //                                             'id',
             //                                             'id_tenant',
