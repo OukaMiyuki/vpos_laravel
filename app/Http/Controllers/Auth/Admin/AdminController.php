@@ -2599,9 +2599,14 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardSettlementHistory(){
-        $settlement = SettlementHstory::groupBy(function($query){
-                                            return Carbon::parse($query->settlement_time_stamp)->format('d-m-Y');
-                                        })
+        $settlement = SettlementHstory::select([
+                                            'id',
+                                            DB::raw("(sum(nominal_settle)) as total_settle"),
+                                            DB::raw("(sum(nominal_insentif_cashback)) as total_cashback"),
+                                            DB::raw("(DATE_FORMAT(settlement_time_stamp, '%d-%m-%Y')) as settlement_date")
+                                        ])
+                                        ->orderBy('settlement_time_stamp', 'DESC')
+                                        ->groupBy(DB::raw("DATE_FORMAT(settlement_time_stamp, '%d-%m-%Y')"))
                                         ->get();
         dd($settlement);
     }
