@@ -2599,18 +2599,19 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardSettlementHistory(){
-        $settlement = SettlementHstory::select([
-                                            DB::raw("(sum(nominal_settle)) as total_settle"),
-                                            DB::raw("(sum(nominal_insentif_cashback)) as total_cashback"),
-                                            DB::raw("(DATE_FORMAT(settlement_time_stamp, '%d-%m-%Y')) as settlement_date")
-                                        ])
-                                        // ->orderBy('settlement_time_stamp', 'DESC')
-                                        ->groupBy([
-                                            DB::raw("DATE_FORMAT(settlement_time_stamp, '%d-%m-%Y')"),
-                                            'nominal_insentif_cashback',
-                                            'nominal_insentif_cashback'
-                                        ])
-                                        ->get();
-        dd($settlement);
+        return Carbon::now()->format('dmY');
+        // $settlement = SettlementHstory::select([
+        //                                     DB::raw("(sum(nominal_settle)) as total_settle"),
+        //                                     DB::raw("(sum(nominal_insentif_cashback)) as total_cashback"),
+        //                                     DB::raw("(DATE_FORMAT(settlement_time_stamp, '%d-%m-%Y')) as settlement_date")
+        //                                 ])
+        //                                 // ->orderBy('settlement_time_stamp', 'DESC')
+        //                                 ->groupBy([
+        //                                     DB::raw("DATE_FORMAT(settlement_time_stamp, '%d-%m-%Y')"),
+        //                                     'nominal_insentif_cashback',
+        //                                     'nominal_insentif_cashback'
+        //                                 ])
+        //                                 ->get();
+        // dd($settlement);
     }
 }

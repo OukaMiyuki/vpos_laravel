@@ -12,6 +12,7 @@ use App\Models\HistoryCashbackAdmin;
 use App\Models\History;
 use App\Models\Tenant;
 use App\Models\SettlementHstory;
+use App\Models\Settlement;
 use Exception;
 
 class QrisPendingWalletUpdate extends Command {
@@ -57,6 +58,8 @@ class QrisPendingWalletUpdate extends Command {
             ]);
         } else {
             try{
+                $code = "STL";
+                $dateCode = Carbon::now()->format('dmY');
                 $tenantinvoice = Tenant::with([
                                                 'invoice' => function($query){
                                                     $query->where('settlement_status', 0)
@@ -66,6 +69,10 @@ class QrisPendingWalletUpdate extends Command {
                                                 }
                                             ])
                                             ->get();
+                $settlement = Settlement::create([
+                    'nomor_settlement' => $code.$dateCode,
+                    'tanggal_settlement' => Carbon::now(),
+                ]);
                 foreach($tenantinvoice as $sumInvoice){
                     $qrisWalletTenant = QrisWallet::where('id_user', $sumInvoice->id)->where('email', $sumInvoice->email)->first();
                     if(!is_null($qrisWalletTenant) || empty($qrisWalletTenant)){
@@ -97,6 +104,7 @@ class QrisPendingWalletUpdate extends Command {
                         }
                         SettlementHstory::create([
                             'id_user' => $sumInvoice->id,
+                            'id_settlement' => $settlement->id,
                             'email' => $sumInvoice->email,
                             'settlement_time_stamp' => Carbon::now(),
                             'nominal_settle' => $totalSumFloor,
@@ -115,6 +123,8 @@ class QrisPendingWalletUpdate extends Command {
                     'log' => Carbon::now(),
                     'status' => 1
                 ]);
+                $settlement->status = 1;
+                $settlement->save();
             } catch(Exception $e){
                 History::create([
                     'action' => 'Settlement Update Failed! '.Carbon::now(),
@@ -125,6 +135,8 @@ class QrisPendingWalletUpdate extends Command {
                     'log' => $e,
                     'status' => 0
                 ]);
+                $settlement->status = 0;
+                $settlement->save();
             }
         }
     }
