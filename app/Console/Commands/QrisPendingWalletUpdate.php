@@ -65,7 +65,7 @@ class QrisPendingWalletUpdate extends Command {
                                     ->get();
 
             foreach($tenantinvoice as $sumInvoice){
-                $total = $sumInvoice->ininvoice->sum('nominal_terima_bersih');
+                $total = $sumInvoice->invoice->sum('nominal_terima_bersih');
                 echo $total."\n";
             }
             // $invoiceSettlementPending = Invoice::select([
