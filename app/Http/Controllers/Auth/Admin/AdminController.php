@@ -2604,7 +2604,7 @@ class AdminController extends Controller {
                                             DB::raw("(sum(nominal_insentif_cashback)) as total_cashback"),
                                             DB::raw("(DATE_FORMAT(settlement_time_stamp, '%d-%m-%Y')) as settlement_date")
                                         ])
-                                        ->orderBy('settlement_time_stamp', 'DESC')
+                                        // ->orderBy('settlement_time_stamp', 'DESC')
                                         ->groupBy([
                                             DB::raw("DATE_FORMAT(settlement_time_stamp, '%d-%m-%Y')"),
                                             'nominal_insentif_cashback',
