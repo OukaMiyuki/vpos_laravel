@@ -64,8 +64,6 @@ class QrisPendingWalletUpdate extends Command {
                                         }
                                     ])
                                     ->get();
-            $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
-            $qrisWalletAdminSaldo = $qrisWalletAdmin->saldo;
             foreach($tenantinvoice as $sumInvoice){
                 $qrisWalletTenant = QrisWallet::where('id_user', $sumInvoice->id)->where('email', $sumInvoice->email)->first();
                 if(!is_null($qrisWalletTenant) || empty($qrisWalletTenant)){
@@ -80,13 +78,15 @@ class QrisPendingWalletUpdate extends Command {
                         $nominal_mdr = $invoice->nominal_mdr;
                         $insentif_cashback = $nominal_mdr*0.25;
                         $insentif_cashbackFloor = floor($insentif_cashback);
+                        $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
+                        $qrisWalletAdminSaldo = $qrisWalletAdmin->saldo;
                         $qrisWalletAdmin->update([
                             'saldo' => $qrisWalletAdminSaldo+$insentif_cashbackFloor
                         ]);
                         $totalCashback+=$insentif_cashbackFloor;
                         HistoryCashbackAdmin::create([
                             'id_invoice' => $invoice->id,
-                            'nominal_terima_mdr' => $insentif_cashback
+                            'nominal_terima_mdr' => $insentif_cashbackFloor
                         ]);
                         Invoice::find($invoice->id)->update([
                             'settlement_status' => 1
