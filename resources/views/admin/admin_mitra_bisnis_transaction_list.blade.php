@@ -67,12 +67,11 @@
                                                                 <span class="badge bg-soft-success text-success">Selesai</span>
                                                             @endif
                                                         </td>
-                                                        <td>{{\Carbon\Carbon::parse($invoiceList->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                        <td>{{\Carbon\Carbon::parse($invoiceList->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoiceList->created_at)->format('H:i:s')}}</td>
                                                         <td>
-                                                            {{$invoice->tanggal_pelunasan}}
-                                                            {{-- @if (!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan))
-                                                                {{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}
-                                                            @endif --}}
+                                                            @if (!is_null($invoiceList->tanggal_pelunasan) || !empty($invoiceList->tanggal_pelunasan))
+                                                                {{\Carbon\Carbon::parse($invoiceList->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoiceList->updated_at)->format('H:i:s')}}
+                                                            @endif
                                                         </td>
                                                         <td>{{ $invoiceList->jenis_pembayaran }}</td>
                                                         <td>{{ $invoiceList->nominal_bayar }}</td>
