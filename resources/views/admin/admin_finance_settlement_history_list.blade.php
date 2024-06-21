@@ -61,7 +61,7 @@
                                                         <td>
                                                             @if ($stl->status == 0)
                                                                 <span class="badge bg-soft-warning text-danger">Settlement Gagal</span>
-                                                            @elseif($stl->status == 0)
+                                                            @elseif($stl->status == 1)
                                                                 <span class="badge bg-soft-warning text-danger">Settlement Sukses</span>
                                                             @endif
                                                         </td>
