@@ -81,12 +81,12 @@ class AdminController extends Controller {
         }
     }
 
-    private function sendNotificationToUser($body){
+    private function sendNotificationToUser($body, $phone){
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
         $client = new GuzzleHttpClient();
         $postResponse = "";
-        $noHP = auth()->user()->phone;
+        $noHP = $phone;
         if(!preg_match("/[^+0-9]/",trim($noHP))){
             if(substr(trim($noHP), 0, 2)=="62"){
                 $hp    =trim($noHP);
@@ -116,17 +116,12 @@ class AdminController extends Controller {
             $this->createHistoryUser($action, $ex, 0);
         }
         if(is_null($postResponse) || empty($postResponse) || $postResponse == NULL || $postResponse == ""){
-            $action = "Admin Send User Notification Fail";
-            $this->createHistoryUser(NULL, NULL, $action, "OTP Response NULL", 0);
-            $notification = array(
-                'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
-                'alert-type' => 'error',
-            );
-            return redirect()->back()->with($notification)->withInput();
+            $action = "Admin Send User Notification Fail to ".$phone;
+            $this->createHistoryUser($action, "Whatsapp Response NULL to destination ".$phone, 0);
         } else {
             $responseCode = $postResponse->getStatusCode();
             if($responseCode != 200){
-                $action = "Send Whatsapp Notification Fail";
+                $action = "Send Whatsapp Notification Fail to destination ".$phone;
                 $this->createHistoryUser($action, $ex, 0);
             } 
         }
@@ -949,16 +944,22 @@ class AdminController extends Controller {
             );
             return redirect()->route('admin.dashboard.marketing.list')->with($notification);
         }
-
+        $phone = $marketing->phone;
         if($marketing->is_active == 0){
+            if(is_null($marketing->phone_number_verified_at) || empty($marketing->phone_number_verified_at) || $marketing->phone_number_verified_at == NULL || $marketing->phone_number_verified_at == ""){
+                $notification = array(
+                    'message' => 'Akun gagal diaktifkan, user bersangkutan belum melakukan verifikasi nomor Whatsapp!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->route('admin.dashboard.marketing.list')->with($notification);
+            }
             if(auth()->user()->access_level == 0){
                 $action = "Admin Super User : Activating Mitra Aplikasi | ".$marketing->name;
             } else {
                 $action = "Administrator : Activating Mitra Aplikasi | ".$marketing->name;
             }
-            // $date = Carbon::now()->format('d-m-Y H:i:s');
-            $body = "Terima kasih telah mendaftar di aplikasi Visioner, akun anda telah sukses diaktifkan oleh admin";
-            $this->sendNotificationToUser($body);
+            $body = "Terima kasih telah mendaftar sebagai Mitra Aplikasi pada aplikasi Visioner, akun anda telah sukses diaktifkan oleh admin";
+            $this->sendNotificationToUser($body, $phone);
             $marketing->is_active = 1;
         } else if($marketing->is_active == 1){
             if(auth()->user()->access_level == 0){
@@ -967,6 +968,8 @@ class AdminController extends Controller {
                 $action = "Administrator : Deactivating Mitra Aplikasi | ".$marketing->name;
             }
             $marketing->is_active = 2;
+            $body = "Karena aktivitas yang mencurigakan, admin memutuskan untuk menonaktifkan akun mitra aplikasi anda, Jika anda merasa tidak melakukan aktivitas yang ilegal, segera hubungi Admin untuk proses lebih lanjut!";
+            $this->sendNotificationToUser($body, $phone);
         } else if($marketing->is_active == 2){
             if(auth()->user()->access_level == 0){
                 $action = "Admin Super User : Reactivating Mitra Aplikasi | ".$marketing->name;
@@ -974,6 +977,8 @@ class AdminController extends Controller {
                 $action = "Administrator : Reactivating Mitra Aplikasi | ".$marketing->name;
             }
             $marketing->is_active = 1;
+            $body = "Akun anda telah sukses di re-aktivasi oleh admin, anda dapat melakukan aktivitas login kembali melalui login form pada website Visipos.";
+            $this->sendNotificationToUser($body, $phone);
         }
 
         if($marketing->is_active == 2) {
@@ -1416,8 +1421,15 @@ class AdminController extends Controller {
             );
             return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
         }
-
+        $phone = $tenant->phone;
         if($tenant->is_active == 0){
+            if(empty($tenant->phone_number_verified_at) || is_null($tenant->phone_number_verified_at) || $tenant->phone_number_verified_at == NULL || $tenant->phone_number_verified_at == ""){
+                $notification = array(
+                    'message' => 'Akun gagal diaktifkan, user bersangkutan belum melakukan verifikasi nomor Whatsapp!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
+            }
             if(auth()->user()->access_level == 0){
                 $action = "Admin Super User : Activating Mitra Bisnis | ".$tenant->name;
             } else {
@@ -1426,6 +1438,9 @@ class AdminController extends Controller {
             $tenant->update([
                 'is_active' => 1
             ]);
+            $phone = $tenant->phone;
+            $body = "Terima kasih telah mendaftar sebagai Mitra Bisnis pada aplikasi Visioner, akun anda telah sukses diaktifkan oleh admin";
+            $this->sendNotificationToUser($body, $phone);
         } else if($tenant->is_active == 1){
             if(auth()->user()->access_level == 0){
                 $action = "Admin Super User : Deactivating Mitra Bisnis | ".$tenant->name;
@@ -1435,6 +1450,8 @@ class AdminController extends Controller {
             $tenant->update([
                 'is_active' => 2
             ]);
+            $body = "Karena aktivitas yang mencurigakan, admin memutuskan untuk menonaktifkan akun mitra aplikasi anda, Jika anda merasa tidak melakukan aktivitas yang ilegal, segera hubungi Admin untuk proses lebih lanjut!";
+            $this->sendNotificationToUser($body, $phone);
         } else if($tenant->is_active == 2){
             if(auth()->user()->access_level == 0){
                 $action = "Admin Super User : Reactivating Mitra Bisnis | ".$tenant->name;
@@ -1444,6 +1461,8 @@ class AdminController extends Controller {
             $tenant->update([
                 'is_active' => 1
             ]);
+            $body = "Akun anda telah sukses di re-aktivasi oleh admin, anda dapat melakukan aktivitas login kembali melalui login form pada website Visipos.";
+            $this->sendNotificationToUser($body, $phone);
         }
         $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
@@ -1502,7 +1521,8 @@ class AdminController extends Controller {
                                             'invoices.mdr',
                                             'invoices.nominal_mdr',
                                             'invoices.nominal_terima_bersih',
-                                            'invoices.created_at'
+                                            'invoices.created_at',
+                                            'invoices.updated_at'
                                         ])
                                         ->latest()
                                         ->get();
@@ -1931,6 +1951,7 @@ class AdminController extends Controller {
             );
             return redirect()->route('admin.dashboard.mitraTenant.list')->with($notification);
         }
+        $phone = $tenant->phone;
         if($tenant->is_active == 0){
             if(auth()->user()->access_level == 0){
                 $action = "Admin Super User : Activating Tenant | ".$tenant->name;
@@ -1940,6 +1961,8 @@ class AdminController extends Controller {
             $tenant->update([
                 'is_active' => 1
             ]);
+            $body = "Terima kasih telah mendaftar sebagai Mitra Tenant pada aplikasi Visioner, akun anda telah sukses diaktifkan oleh admin";
+            $this->sendNotificationToUser($body, $phone);
         } else if($tenant->is_active == 1){
             if(auth()->user()->access_level == 0){
                 $action = "Admin Super User : Deactivating Tenant | ".$tenant->name;
@@ -1949,6 +1972,8 @@ class AdminController extends Controller {
             $tenant->update([
                 'is_active' => 2
             ]);
+            $body = "Karena aktivitas yang mencurigakan, admin memutuskan untuk menonaktifkan akun mitra aplikasi anda, Jika anda merasa tidak melakukan aktivitas yang ilegal, segera hubungi Admin untuk proses lebih lanjut!";
+            $this->sendNotificationToUser($body, $phone);
         } else if($tenant->is_active == 2){
             if(auth()->user()->access_level == 0){
                 $action = "Admin Super User : Reactivating Tenant | ".$tenant->name;
@@ -1958,6 +1983,8 @@ class AdminController extends Controller {
             $tenant->update([
                 'is_active' => 1
             ]);
+            $body = "Akun anda telah sukses di re-aktivasi oleh admin, anda dapat melakukan aktivitas login kembali melalui login form pada website Visipos.";
+            $this->sendNotificationToUser($body, $phone);
         }
         $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(

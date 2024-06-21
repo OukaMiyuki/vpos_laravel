@@ -10,8 +10,9 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="">Settings</a></li>
-                                <li class="breadcrumb-item active">Rekening</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.setting') }}">Settings</a></li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.rekening.setting') }}">Rekening</a></li>
+                                <li class="breadcrumb-item active">Edit</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Pengaturan Rekening Anda</h4>

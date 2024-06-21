@@ -74,37 +74,39 @@
                     <!-- end card-->
                 </div>
                     @if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != "")
-                        <div class="col-lg-5 col-xl-5">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="header-title">Informasi Rekening</h4>
-                                    {{-- <p class="sub-header">
-                                        Add <code>.table-bordered</code> for borders on all sides of the table and cells.
-                                    </p> --}}
+                        @if (!empty($dataRekening) || !is_null($dataRekening) || $dataRekening != NULL || $dataRekening != "")
+                            <div class="col-lg-5 col-xl-5">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="header-title">Informasi Rekening</h4>
+                                        {{-- <p class="sub-header">
+                                            Add <code>.table-bordered</code> for borders on all sides of the table and cells.
+                                        </p> --}}
 
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered border-primary mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Atas Nama</th>
-                                                    <th>Nama Bank</th>
-                                                    <th>Nomor Rekening</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <th scope="row">1</th>
-                                                    <td>{{ $dataRekening->beneficiaryAccountName }}</td>
-                                                    <td>{{ $rekening->nama_bank }}</td>
-                                                    <td>{{ $dataRekening->beneficiaryAccountNo }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div> <!-- end .table-responsive-->
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered border-primary mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Atas Nama</th>
+                                                        <th>Nama Bank</th>
+                                                        <th>Nomor Rekening</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <th scope="row">1</th>
+                                                        <td>{{ $dataRekening->beneficiaryAccountName }}</td>
+                                                        <td>{{ $rekening->nama_bank }}</td>
+                                                        <td>{{ $dataRekening->beneficiaryAccountNo }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div> <!-- end .table-responsive-->
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
                     @endif
                 <!-- end col -->
             </div>

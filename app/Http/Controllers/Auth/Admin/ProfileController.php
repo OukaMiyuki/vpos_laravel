@@ -543,6 +543,7 @@ class ProfileController extends Controller {
         $wallet = "";
         $action = "";
         $biayaTransfer = 0;
+        $dataRekening = "";
 
         $nominal_tarik = $request->nominal_tarik;
         $otp = $request->wa_otp;
@@ -613,12 +614,12 @@ class ProfileController extends Controller {
                         ]);
                         $responseCode = $getRek->getStatusCode();
                         $dataRekening = json_decode($getRek->getBody());
-                        if(is_null($dataRekening) || empty($dataRekening)){
+                        if($dataRekening->responseMessage == "Inactive Account"){
                             $notification = array(
-                                'message' => 'Rekening inquiry error!',
+                                'message' => 'Rekening Error!, harap cek kembali apakah rekening sudah benar!',
                                 'alert-type' => 'error',
                             );
-                            return redirect()->back()->with($notification);
+                            return redirect()->route('admin.withdraw')->with($notification);
                         }
                         return view('admin.admin_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan', 'jenis_tarik', 'biayaTransfer']));
                     } catch (Exception $e) {
@@ -632,7 +633,7 @@ class ProfileController extends Controller {
                             'message' => 'Tarik dana error, harap hubungi admin!',
                             'alert-type' => 'error',
                         );
-                        return redirect()->back()->with($notification);
+                        return redirect()->route('admin.withdraw')->with($notification);
                     }
                 }
             }
@@ -784,7 +785,7 @@ class ProfileController extends Controller {
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                             
                             $date = Carbon::now()->format('d-m-Y H:i:s');
-                            $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan."  pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." berhasil pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
                             $this->sendNotificationToUser($body);
                             
                             $notification = array(
@@ -803,6 +804,9 @@ class ProfileController extends Controller {
                                 'message' => 'Penarikan dana gagal, harap hubungi admin!',
                                 'alert-type' => 'error',
                             );
+                            $date = Carbon::now()->format('d-m-Y H:i:s');
+                            $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $this->sendNotificationToUser($body);
                             return redirect()->route('admin.withdraw')->with($notification);
                         }
                     } else {
@@ -824,6 +828,9 @@ class ProfileController extends Controller {
                             $action = "Administrator : Withdrawal Transaction fail invalid";
                         }
                         $this->createHistoryUser($action, $responseMessage, 0);
+                        $date = Carbon::now()->format('d-m-Y H:i:s');
+                        $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                        $this->sendNotificationToUser($body);
                         $notification = array(
                             'message' => 'Penarikan dana gagal!',
                             'alert-type' => 'error',
@@ -837,6 +844,9 @@ class ProfileController extends Controller {
                         $action = "Administrator :  Withdraw Process | Error (HTTP API Error)";
                     }
                     $this->createHistoryUser($action, $e, 0);
+                    $date = Carbon::now()->format('d-m-Y H:i:s');
+                    $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                    $this->sendNotificationToUser($body);
                     $notification = array(
                         'message' => 'Penarikan dana gagal!',
                         'alert-type' => 'error',
@@ -851,6 +861,9 @@ class ProfileController extends Controller {
                 $action = "Administrator : Withdraw Process | Error";
             }
             $this->createHistoryUser($action, $e, 0);
+            $date = Carbon::now()->format('d-m-Y H:i:s');
+            $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+            $this->sendNotificationToUser($body);
             $notification = array(
                 'message' => 'Penarikan dana gagal!',
                 'alert-type' => 'error',
