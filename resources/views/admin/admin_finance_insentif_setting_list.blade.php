@@ -31,7 +31,7 @@
                                     <a href="" class="dropdown-item">Lihat Semua Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Insentif List&nbsp;&nbsp;&nbsp;<button data-bs-toggle="modal" data-bs-target="#add-insentif" title="Tambah insentif baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Insentif</button></h4></h4>
+                            <h4 class="header-title mb-3">Insentif List&nbsp;&nbsp;&nbsp;<button data-bs-toggle="modal" data-bs-target="#add-insentif" title="Tambah insentif baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Insentif</button></h4>
                             <div class="row">
                                 <div class="col-6">
                                     

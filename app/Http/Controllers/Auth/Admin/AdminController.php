@@ -2604,19 +2604,6 @@ class AdminController extends Controller {
                                 ->withSum('settlementHistory', 'nominal_insentif_cashback')
                                 ->latest()
                                 ->get();
-        dd($settlement);
-        // $settlement = SettlementHstory::select([
-        //                                     DB::raw("(sum(nominal_settle)) as total_settle"),
-        //                                     DB::raw("(sum(nominal_insentif_cashback)) as total_cashback"),
-        //                                     DB::raw("(DATE_FORMAT(settlement_time_stamp, '%d-%m-%Y')) as settlement_date")
-        //                                 ])
-        //                                 // ->orderBy('settlement_time_stamp', 'DESC')
-        //                                 ->groupBy([
-        //                                     DB::raw("DATE_FORMAT(settlement_time_stamp, '%d-%m-%Y')"),
-        //                                     'nominal_insentif_cashback',
-        //                                     'nominal_insentif_cashback'
-        //                                 ])
-        //                                 ->get();
-        // dd($settlement);
+        return view('admin.admin_finance_settlement_history_list', compact('settlement'));
     }
 }
