@@ -556,6 +556,13 @@ class ProfileController extends Controller {
                         ]);
                         $responseCode = $getRek->getStatusCode();
                         $dataRekening = json_decode($getRek->getBody());
+                        if($dataRekening->responseMessage == "Inactive Account"){
+                            $notification = array(
+                                'message' => 'Rekening Error!, harap cek kembali apakah rekening sudah benar!',
+                                'alert-type' => 'error',
+                            );
+                            return redirect()->route('marketing.profile')->with($notification);
+                        }
                         return view('marketing.marketing_form_cek_penarikan', compact(['dataRekening', 'biayaAdmin', 'rekening', 'nominal_tarik', 'totalPenarikan']));
                     } catch (Exception $e) {
                         $action = "Mitra Aplikasi : Cek Rekening Error";
@@ -687,7 +694,7 @@ class ProfileController extends Controller {
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                             
                             $date = Carbon::now()->format('d-m-Y H:i:s');
-                            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan."  pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $body = "Penarikan saldo sebesar Rp. ".$nominal_penarikan." sukses pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
                             $this->sendNotificationToUser($body);
                             
                             $notification = array(
@@ -698,6 +705,9 @@ class ProfileController extends Controller {
                         } else {
                             $action = "Mitra Aplikasi : Withdrawal Process Error";
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+                            $date = Carbon::now()->format('d-m-Y H:i:s');
+                            $body = "Penarikan saldo sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $this->sendNotificationToUser($body);
                             $notification = array(
                                 'message' => 'Penarikan dana gagal, harap hubungi admin!',
                                 'alert-type' => 'error',
@@ -718,6 +728,9 @@ class ProfileController extends Controller {
                         ]);
                         $action = "Mitra Aplikasi : Withdrawal Transaction fail invalid";
                         $this->createHistoryUser($action, $responseMessage, 0);
+                        $date = Carbon::now()->format('d-m-Y H:i:s');
+                        $body = "Penarikan saldo sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                        $this->sendNotificationToUser($body);
                         $notification = array(
                             'message' => 'Penarikan dana gagal, harap hubungi admin!',
                             'alert-type' => 'error',
@@ -727,6 +740,9 @@ class ProfileController extends Controller {
                 } catch (Exception $e) {
                     $action = "Mitra Aplikasi : Withdraw Process | Error (HTTP API Error)";
                     $this->createHistoryUser($action, $e, 0);
+                    $date = Carbon::now()->format('d-m-Y H:i:s');
+                    $body = "Penarikan saldo sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                    $this->sendNotificationToUser($body);
                     $notification = array(
                         'message' => 'Penarikan dana gagal, harap hubungi admin!',
                         'alert-type' => 'error',
@@ -737,6 +753,9 @@ class ProfileController extends Controller {
         } catch (Exception $e){
             $action = "Mitra Aplikasi : Withdraw Process | Error";
             $this->createHistoryUser($action, $e, 0);
+            $date = Carbon::now()->format('d-m-Y H:i:s');
+            $body = "Penarikan saldo sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+            $this->sendNotificationToUser($body);
             $notification = array(
                 'message' => 'Penarikan dana gagal, harap hubungi admin!',
                 'alert-type' => 'error',

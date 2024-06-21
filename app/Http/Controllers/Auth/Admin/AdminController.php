@@ -127,7 +127,6 @@ class AdminController extends Controller {
         }
     }
 
-
     public function index(){
         $marketingCount = Marketing::count();
         $mitraBisnis = Tenant::where('id_inv_code', '==', 0)->count();
