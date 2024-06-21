@@ -82,7 +82,7 @@ class QrisPendingWalletUpdate extends Command {
                         $qrisWalletTenant->update([
                             'saldo' => $saldoQrisTenant+$totalSumFloor
                         ]);
-                        echo "Nama : ".$sumInvoice->name." | ".$totalSumFloor." | Periode : ".Carbon::now();
+                        echo "Nama : ".$sumInvoice->name." | ".$totalSumFloor." | Periode : ".Carbon::now()."\n";
                         $totalCashback = 0;
                         foreach($sumInvoice->invoice as $invoice){
                             $nominal_mdr = $invoice->nominal_mdr;
@@ -108,7 +108,8 @@ class QrisPendingWalletUpdate extends Command {
                             'email' => $sumInvoice->email,
                             'settlement_time_stamp' => Carbon::now(),
                             'nominal_settle' => $totalSumFloor,
-                            'nominal_insentif_cashback' => $totalCashback
+                            'nominal_insentif_cashback' => $totalCashback,
+                            'status' => 1
                         ]);
                     } else {
                         echo "Wallet not found".$sumInvoice->email;
