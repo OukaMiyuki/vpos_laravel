@@ -41,7 +41,7 @@ class UpdateSettlementManual extends Command {
                                         }
                                     ])
                                     ->get();
-        
+        echo "walla";
         foreach($tenantinvoice as $sumInvoice){
             foreach($sumInvoice->invoice as $invoice){
                 echo $invoice->nomor_invoice."\n";
