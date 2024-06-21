@@ -38,6 +38,7 @@ use App\Models\Rekening;
 use App\Models\History;
 use App\Models\SettlementDateSetting;
 use App\Models\SettlementHstory;
+use App\Models\Settlement;
 use Exception;
 
 class AdminController extends Controller {
@@ -2599,7 +2600,8 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardSettlementHistory(){
-        return Carbon::now()->format('dmY');
+        $settlement = Settlement::withSum('settlementHistory', 'nominal_settle')->latest()->get();
+        dd($settlement);
         // $settlement = SettlementHstory::select([
         //                                     DB::raw("(sum(nominal_settle)) as total_settle"),
         //                                     DB::raw("(sum(nominal_insentif_cashback)) as total_cashback"),
