@@ -62,11 +62,11 @@
                                                             @if ($stl->status == 0)
                                                                 <span class="badge bg-soft-warning text-danger">Settlement Gagal</span>
                                                             @elseif($stl->status == 1)
-                                                                <span class="badge bg-soft-warning text-danger">Settlement Sukses</span>
+                                                                <span class="badge bg-soft-success text-success">Settlement Sukses</span>
                                                             @endif
                                                         </td>
                                                         <td class="text-center">
-                                                            <a href="" title="Lihat detail settlement" class="btn btn-xs btn-primary"><i class="mdi mdi-eye"></i></a>
+                                                            <a href="{{ route('admin.dashboard.finance.settlement.history.detail', ['id' => $stl->id, 'code' => $stl->nomor_settlement]) }}" title="Lihat detail settlement" class="btn btn-xs btn-primary"><i class="mdi mdi-eye"></i></a>
                                                         </td>
                                                     </tr>
                                                 @endforeach

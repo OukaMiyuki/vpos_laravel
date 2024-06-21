@@ -2606,4 +2606,40 @@ class AdminController extends Controller {
                                 ->get();
         return view('admin.admin_finance_settlement_history_list', compact('settlement'));
     }
+
+    public function adminDashboardSettlementHistoryDetail($id, $code){
+        $settlementDetailHistory = Settlement::select([
+                                                    'settlements.id',
+                                                    'settlements.nomor_settlement',
+                                                ])
+                                                ->withSum('settlementHistory', 'nominal_settle')
+                                                ->withSum('settlementHistory', 'nominal_insentif_cashback')
+                                                ->with([
+                                                    'settlementHistory' => function($query){
+                                                        $query->select([
+                                                            'settlement_hstories.id',
+                                                            'settlement_hstories.id_user',
+                                                            'settlement_hstories.id_settlement',
+                                                            'settlement_hstories.email',
+                                                            'settlement_hstories.settlement_time_stamp',
+                                                            'settlement_hstories.nominal_settle',
+                                                            'settlement_hstories.nominal_insentif_cashback',
+                                                            'settlement_hstories.status',
+                                                        ])
+                                                        ->with([
+                                                            'tenant' => function($query){
+                                                                $query->select([
+                                                                    'tenants.id',
+                                                                    'tenants.name'
+                                                                ]);
+                                                            }
+                                                        ])
+                                                        ->latest()
+                                                        ->get();
+                                                    }
+                                                ])
+                                                ->where('nomor_settlement', $code)
+                                                ->find($id);
+        dd($settlementDetailHistory);
+    }
 }

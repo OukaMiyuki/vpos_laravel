@@ -125,6 +125,7 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::post('dashboard/finance/settlement', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingListInsert'])->name('admin.dashboard.finance.settlement.insert');
     Route::post('dashboard/finance/settlement/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingListUpdate'])->name('admin.dashboard.finance.settlement.update');
     Route::get('dashboard/finance/settlement/history', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementHistory'])->name('admin.dashboard.finance.settlement.history');
+    Route::get('dashboard/finance/settlement/history/{id}/{code}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementHistoryDetail'])->name('admin.dashboard.finance.settlement.history.detail');
 
     Route::get('dashboard/history', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistory'])->name('admin.dashboard.history');
     Route::get('dashboard/history/user-login', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserLogin'])->name('admin.dashboard.history.user.login');
