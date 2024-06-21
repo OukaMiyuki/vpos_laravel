@@ -9,8 +9,8 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.menu') }}">Admin Menu</a></li>
-                                <li class="breadcrumb-item active">User Transaction List</li>
+                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.mitraBisnis') }}">Mitra Bisnis</a></li>
+                                <li class="breadcrumb-item active">Transaction List</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Data Transaksi Mitra Bisnis</h4>
@@ -69,9 +69,10 @@
                                                         </td>
                                                         <td>{{\Carbon\Carbon::parse($invoiceList->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
                                                         <td>
-                                                            @if (!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan))
+                                                            {{$invoice->tanggal_pelunasan}}
+                                                            {{-- @if (!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan))
                                                                 {{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}
-                                                            @endif
+                                                            @endif --}}
                                                         </td>
                                                         <td>{{ $invoiceList->jenis_pembayaran }}</td>
                                                         <td>{{ $invoiceList->nominal_bayar }}</td>
