@@ -2600,7 +2600,10 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardSettlementHistory(){
-        $settlement = Settlement::withSum('settlementHistory', 'nominal_settle')->latest()->get();
+        $settlement = Settlement::withSum('settlementHistory', 'nominal_settle')
+                                ->withSum('settlementHistory', 'nominal_insentif_cashback')
+                                ->latest()
+                                ->get();
         dd($settlement);
         // $settlement = SettlementHstory::select([
         //                                     DB::raw("(sum(nominal_settle)) as total_settle"),
