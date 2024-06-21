@@ -40,6 +40,25 @@
                 <div class="col-xl-3 col-md-3">
                     <div class="card">
                         <div class="card-body">
+                            <h4 class="header-title mb-0">Settlement Ready Transaction</h4>
+                            <div id="cardCollpase1" class="collapse show">
+                                <div class="text-center pt-3">
+                                    <div class="row text-center">
+                                        <div class="col-12">
+                                            <img src="{{ asset('assets/images/icons/activities.png') }}" class="img-fluid" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <a href="{{ route('admin.dashboard.menu') }}"><button title="Pengaturan akun" type="button" class="btn btn-info waves-effect waves-light">View Data</button></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-3">
+                    <div class="card">
+                        <div class="card-body">
                             <h4 class="header-title mb-0">User Withdrawals</h4>
                             <div id="cardCollpase1" class="collapse show">
                                 <div class="text-center pt-3">
