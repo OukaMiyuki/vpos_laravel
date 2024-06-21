@@ -37,7 +37,7 @@ class UpdateSettlementManual extends Command {
                                             $query->where('settlement_status', 0)
                                                 ->where('jenis_pembayaran', 'Qris')
                                                 ->where('status_pembayaran', 1)
-                                                ->whereDate('tanggal_transaksi', '2024-06-17');
+                                                ->whereDate('tanggal_transaksi', '2024-06-18');
                                         }
                                     ])
                                     ->get();
@@ -74,7 +74,7 @@ class UpdateSettlementManual extends Command {
                 SettlementHstory::create([
                     'id_user' => $sumInvoice->id,
                     'email' => $sumInvoice->email,
-                    'settlement_time_stamp' => '2024-06-18 15:01:40',
+                    'settlement_time_stamp' => '2024-06-19 15:01:40',
                     'nominal_settle' => $totalSumFloor,
                     'nominal_insentif_cashback' => $totalCashback
                 ]);
