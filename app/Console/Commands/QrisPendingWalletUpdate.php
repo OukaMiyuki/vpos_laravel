@@ -73,6 +73,7 @@ class QrisPendingWalletUpdate extends Command {
                     $qrisWalletTenant->update([
                         'saldo' => $saldoQrisTenant+$totalSumFloor
                     ]);
+                    echo "Nama : ".$sumInvoice->name." | ".$totalSumFloor;
                     $totalCashback = 0;
                     foreach($sumInvoice->invoice as $invoice){
                         $nominal_mdr = $invoice->nominal_mdr;
