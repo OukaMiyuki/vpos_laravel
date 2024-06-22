@@ -40,6 +40,7 @@ use App\Models\SettlementDateSetting;
 use App\Models\SettlementHstory;
 use App\Models\Settlement;
 use App\Models\HistoryCashbackPending;
+use App\Models\SettlementPending;
 use Exception;
 
 class AdminController extends Controller {
@@ -2646,6 +2647,11 @@ class AdminController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
+    }
+
+    public function adminDashboardSettlementPending(){
+        $settlemetHistory = SettlementPending::where('settlement_pending_status', 0)->latest()->get();
+        return view('admin.admin_finance_settlement_pending', compact('settlemetHistory'));
     }
 
     public function adminDashboardSettlementHistory(){

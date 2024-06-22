@@ -383,6 +383,9 @@
                                     <a href="{{ route('admin.dashboard.finance.settlement.list') }}">Settlement Setting</a>
                                 </li>
                                 <li>
+                                    <a href="{{ route('admin.dashboard.finance.settlement.list') }}">Settlement Pending</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('admin.dashboard.finance.settlement.history') }}">Settlement History</a>
                                 </li>
                             </ul>
