@@ -1054,15 +1054,39 @@ class TenantController extends Controller {
         $id_user = $request->id_user;
         $invoiceAliasSearch = "";
         try {
-           $invoiceAliasSearch = InvoiceField::with(['invoice'])
-                                            ->where('store_identifier', $identifier)
-                                            ->where('content1', 'LIKE', '%'.$alias1.'%')
-                                            ->orWhere('content2', 'LIKE', '%'.$alias2.'%')
-                                            ->orWhere('content3', 'LIKE', '%'.$alias3.'%')
-                                            ->orWhere('content4', 'LIKE', '%'.$alias4.'%')
-                                            ->orWhere('content5', 'LIKE', '%'.$alias5.'%')
-                                            ->latest()
-                                            ->get();
+            $invoiceAliasSearch = InvoiceField::distinct()
+                                                ->where('store_identifier', $identifier)
+                                                // ->when($alias1, function($query) use ($alias1){
+                                                //     $query->where('content1', 'LIKE', '%'.$alias1.'%');
+                                                // })
+                                                ->where(function($query) use($alias1, $alias2, $alias3, $alias4, $alias5){
+                                                    $query->when($alias1, function($query) use ($alias1){
+                                                        $query->where('content1', 'LIKE', '%'.$alias1.'%');
+                                                    })
+                                                    ->when($alias2, function($query) use ($alias2){
+                                                        $query->where('content2', 'LIKE', '%'.$alias2.'%');
+                                                    })
+                                                    ->when($alias3, function($query) use ($alias3){
+                                                        $query->where('content3', 'LIKE', '%'.$alias3.'%');
+                                                    })
+                                                    ->when($alias4, function($query) use ($alias4){
+                                                        $query->where('content4', 'LIKE', '%'.$alias4.'%');
+                                                    })
+                                                    ->when($alias5, function($query) use ($alias5){
+                                                        $query->where('content5', 'LIKE', '%'.$alias5.'%');
+                                                    });
+                                                })
+                                                ->latest()
+                                                ->get();
+        //    $invoiceAliasSearch = InvoiceField::distinct()
+        //                                     ->where('store_identifier', $identifier)
+        //                                     ->where('content1', 'LIKE', '%'.$alias1.'%')
+        //                                     ->orWhere('content2', 'LIKE', '%'.$alias2.'%')
+        //                                     ->orWhere('content3', 'LIKE', '%'.$alias3.'%')
+        //                                     ->orWhere('content4', 'LIKE', '%'.$alias4.'%')
+        //                                     ->orWhere('content5', 'LIKE', '%'.$alias5.'%')
+        //                                     ->latest()
+        //                                     ->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
@@ -1083,7 +1107,7 @@ class TenantController extends Controller {
             ]);
         } else {
             return response()->json([
-                'message' => 'Fetch Success',
+                'message' => 'Fetch Success Alias Found',
                 // 'date-type' => $showdate,
                 'transaction-number' => $invoiceAliasSearch->count(),
                 'transaction-data' => $invoiceAliasSearch,

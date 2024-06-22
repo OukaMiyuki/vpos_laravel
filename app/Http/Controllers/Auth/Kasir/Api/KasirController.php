@@ -726,7 +726,8 @@ class KasirController extends Controller {
         // $id_user = $request->id_user;
         $invoiceAliasSearch = "";
         try {
-           $invoiceAliasSearch = InvoiceField::with(['invoice'])
+           $invoiceAliasSearch = InvoiceField::distinct()
+                                            ->with(['invoice'])
                                             ->where('store_identifier', auth()->user()->id_store)
                                             ->where('id_kasir', auth()->user()->id)
                                             ->where('content1', 'LIKE', '%'.$alias1.'%')
