@@ -8,10 +8,28 @@ use App\Models\Tenant;
 use App\Models\Admin;
 use App\Models\Marketing;
 use App\Models\Kasir;
+use App\Models\AppVersion;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
 
 class AccessController extends Controller {
+    public function adminDashboardAppVersion(){
+        $appversion = AppVersion::find(1);
+        return view('admin.admin_dashboard_application_appversion', compact('appversion'));
+    }
+
+    public function adminDashboardAppVersionUpdate(Request $request){
+        $appversion = AppVersion::find(1);
+        $appversion->update([
+            'versi' => $request->versi
+        ]);
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('admin.dashboard.application.appversion')->with($notification);
+    }
+
     public function adminDashboardHistory(){
         return view('admin.admin_history_dashboard');
     }

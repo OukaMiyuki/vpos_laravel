@@ -22,6 +22,7 @@ use App\Models\AgregateWallet;
 use App\Models\Withdrawal;
 use App\Models\DetailPenarikan;
 use App\Models\NobuWithdrawFeeHistory;
+use App\Models\AppVersion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -35,7 +36,11 @@ use GuzzleHttp\Client as GuzzleHttpClient;
 use Exception;
 
 class AuthController extends Controller {
-    // tetsing github
+
+    private function getAppversion(){
+        $appVersion = AppVersion::find(1);
+        return $appVersion->versi;
+    }
 
     public function register(Request $request) {
         //EDIT DISINI
@@ -96,13 +101,14 @@ class AuthController extends Controller {
             'access_token' => $token,
             'token_type' => 'Bearer',
             'data' => array(
-                'sup_user_id'           => $tenant->id,
-                'sup_user_name'         => $tenant->name,
-                'sup_user_referal_code' => $invitationcodeid->id,
-                'sup_user_email'        => $request->email,
+                'sup_user_id'            => $tenant->id,
+                'sup_user_name'          => $tenant->name,
+                'sup_user_referal_code'  => $invitationcodeid->id,
+                'sup_user_email'         => $request->email,
                 'sup_email_verification' => $tenant->email_verified_at,
                 'sup_phone_verification' => $tenant->phone_number_verified_at,
-                'sup_user_token'        => $token,
+                'sup_user_token'         => $token,
+                'app-version'            => $this->getAppversion()
             ),
             'status' => 200
         ]);
@@ -127,15 +133,16 @@ class AuthController extends Controller {
             'access_token' => $token,
             'token_type' => 'Bearer',
             'data' => array(
-                'sup_user_id'           => $tenant->id,
-                'sup_user_name'         => $tenant->name,
-                'sup_user_referal_code' => $tenant->id_inv_code,
-                'sup_user_company'      => null,
-                'sup_user_email'        => $tenant->email,
+                'sup_user_id'            => $tenant->id,
+                'sup_user_name'          => $tenant->name,
+                'sup_user_referal_code'  => $tenant->id_inv_code,
+                'sup_user_company'       => null,
+                'sup_user_email'         => $tenant->email,
                 'sup_email_verification' => $tenant->email_verified_at,
                 'sup_phone_verification' => $tenant->phone_number_verified_at,
-                'sup_user_type'         => 'owner',
-                'sup_user_token'        => $token
+                'sup_user_type'          => 'owner',
+                'sup_user_token'         => $token,
+                'app-version'            => $this->getAppversion()
             ),
             'status' => 200
         ]);
@@ -157,7 +164,8 @@ class AuthController extends Controller {
 
         return response()->json([
             'message' => 'Email Sent!',
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -183,7 +191,8 @@ class AuthController extends Controller {
                     'data' => array(
                         'sup_email_verification' => auth()->user()->email_verified_at,
                     ),
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         }
@@ -230,12 +239,14 @@ class AuthController extends Controller {
             if($responseCode == 200){
                 return response()->json([
                     'message' => 'OTP Sent!',
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 return response()->json([
                     'message' => 'OTP Send Failed!',
-                    'status' => 200
+                    'status' => 500,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         } catch (Exception $e) {
@@ -243,6 +254,7 @@ class AuthController extends Controller {
                 'message' => 'Failed to send Whatsapp OTP!',
                 'error-message' => $e->getMessage(),
                 'status' => 500,
+                'app-version' => $this->getAppversion()
             ]);
             exit;
         }
@@ -252,7 +264,8 @@ class AuthController extends Controller {
         if(!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "") {
             return response()->json([
                 'message' => 'Your Whatsapp Number has been verified!',
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             $kode = (int) $request->kode_otp;
@@ -272,7 +285,8 @@ class AuthController extends Controller {
                     'data' => array(
                         'sup_phone_verification' => auth()->user()->phone_number_verified_at,
                     ),
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         }
@@ -337,7 +351,8 @@ class AuthController extends Controller {
             'data-detail-user' => $user,
             'sup_email_verification' => $user->email_verified_at,
             'sup_phone_verification' => $user->phone_number_verified_at,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -360,7 +375,7 @@ class AuthController extends Controller {
             ]);
             exit;
         }
-        return response()->json(['message' => 'Update Success', 'status' => 200]);
+        return response()->json(['message' => 'Update Success', 'status' => 200, 'app-version' => $this->getAppversion()]);
     }
 
     public function userUpdateStore(Request $request) : JsonResponse {
@@ -386,7 +401,7 @@ class AuthController extends Controller {
             ]);
             exit;
         }
-        return response()->json(['message' => 'Update Success', 'status' => 200]);
+        return response()->json(['message' => 'Update Success', 'status' => 200, 'app-version' => $this->getAppversion()]);
     }
 
     public function csInfo() : JsonResponse {
@@ -411,7 +426,8 @@ class AuthController extends Controller {
         return response()->json([
             'message' => 'Fetch Success',
             'data-cs' => $cs,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -455,7 +471,8 @@ class AuthController extends Controller {
             } else {
                 return response()->json([
                     'message' => 'Anda belum memasukkan nomor rekening!',
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         } catch (Exception $e) {
@@ -471,7 +488,8 @@ class AuthController extends Controller {
                 'message' => 'Fetch Success!',
                 'data-status' => 'No data found in this collection!',
                 'data-rekening' => $rek,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             if($dataRekening->responseCode == "2001600" || $dataRekening->responseCode == 2001600){
@@ -480,7 +498,8 @@ class AuthController extends Controller {
                     'rekening-status' => 'Akun Terdeteksi',
                     'data-bank' => $dataRekening,
                     'data-rekening' => $rek,
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 return response()->json([
@@ -488,7 +507,8 @@ class AuthController extends Controller {
                     'rekening-status' => 'Akun Bank Tidak Terdeteksi, Harap cek kembali nomor rekening dan nama bank yang anda inputkan',
                     'data-bank' => $dataRekening,
                     'data-rekening' => $rek,
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         }
@@ -514,7 +534,8 @@ class AuthController extends Controller {
             'message' => 'Fetch Success!',
             'data-status' => 'Bank',
             'data-bank-list' => $dataBankList,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
 
     }
@@ -543,7 +564,8 @@ class AuthController extends Controller {
         return response()->json([
             'message' => 'Rekening berhasil diupdate!',
             'data-rekening' => $rekeningAkun,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -555,7 +577,8 @@ class AuthController extends Controller {
         return response()->json([
             'message' => 'Fetch Success!',
             'saldo-qris-akun' => $qrisWallet,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -689,7 +712,8 @@ class AuthController extends Controller {
                                     'message' => 'Penarikan Berhasil!',
                                     'data-withdraw' => $withDraw,
                                     'saldo-qris' => $qrisWallet,
-                                    'status' => 200
+                                    'status' => 200,
+                                    'app-version' => $this->getAppversion()
                                 ]);
                             } else {
                                 return response()->json([

@@ -22,12 +22,19 @@ use App\Models\ShoppingCart;
 use App\Models\Tax;
 use App\Models\Discount;
 use App\Models\Withdrawal;
+use App\Models\AppVersion;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Exception;
 
 class TenantController extends Controller {
+
+    private function getAppversion(){
+        $appVersion = AppVersion::find(1);
+        return $appVersion->versi;
+    }
+
     public function getStoreIdentifier(){
         $store = StoreDetail::select(['store_identifier'])
                             ->where('id_tenant', auth()->user()->id)
@@ -57,13 +64,15 @@ class TenantController extends Controller {
                 'message' => 'Fetch Success!',
                 'data-status' => 'Data toko masih kosong!',
                 'storeData' => $store,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
                 'message' => 'Fetch Success!',
                 'storeData' => $store,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -93,7 +102,8 @@ class TenantController extends Controller {
             return response()->json([
                 'message' => 'Data has ben updated!',
                 'storeData' => $store,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } catch (Exception $e) {
             return response()->json([
@@ -125,13 +135,15 @@ class TenantController extends Controller {
                 'message' => 'Fetch Success!',
                 'data-status' => 'No data found in this collection!',
                 'alias-data' => $alias,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
                 'message' => 'Fetch Success!',
                 'alias-data' => $alias,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -203,7 +215,8 @@ class TenantController extends Controller {
             return response()->json([
                 'message' => 'Updated Success!',
                 'alias-data' => $alias,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } catch (Exception $e) {
             return response()->json([
@@ -237,13 +250,15 @@ class TenantController extends Controller {
                 'message' => 'Fetch Success!',
                 'data-status' => 'No data found in this collection!',
                 'dataStokProduk' => $kasir,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
                 'message' => 'Fetch Success!',
                 'kasir-list' => $kasir,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -268,7 +283,8 @@ class TenantController extends Controller {
         return response()->json([
             'message' => 'Fetch Success!',
             'kasir-detail' => $kasir,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -294,7 +310,8 @@ class TenantController extends Controller {
             return response()->json([
                 'message' => 'Data has been added!',
                 'kasir-data' => $kasir,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } catch (Exception $e) {
             return response()->json([
@@ -331,6 +348,7 @@ class TenantController extends Controller {
             return response()->json([
                 'message' => 'Update Success!',
                 'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
 
         } catch(Exception $e){
@@ -370,13 +388,15 @@ class TenantController extends Controller {
                 'message' => 'Fetch Success!',
                 'data-status' => 'No data found in this collection!',
                 'data-product' => $product,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
                 'message' => 'Fetch Success!',
                 'data-product-stock' => $product,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -405,7 +425,8 @@ class TenantController extends Controller {
         return response()->json([
             'message' => 'Fetch Success',
             'data-detail-stock' => $stock,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -427,13 +448,15 @@ class TenantController extends Controller {
                 'message' => 'Fetch Success',
                 'data-status' => 'No data found in this collection!',
                 'productCategory' => $productCategory,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
                 'message' => 'Fetch Success',
                 'productCategory' => $productCategory,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -465,13 +488,15 @@ class TenantController extends Controller {
                 'message' => 'Fetch Success',
                 'data-status' => 'No product found in this category!',
                 'data-product' => $product,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
                 'message' => "Fetch Success walaaa!",
                 'data-product-stock' => $product,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -505,13 +530,15 @@ class TenantController extends Controller {
                     'message' => 'Fetch Success',
                     'data-status' => 'No product found!',
                     'data-product-stock' => $product,
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 return response()->json([
                     'message' => "Fetch Success!",
                     'data-product-stock' => $product,
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         }
@@ -543,14 +570,16 @@ class TenantController extends Controller {
                 return response()->json([
                     'message' => "Product Not Found!",
                     'data-product-stock' => $stock,
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
 
             return response()->json([
                 'message' => "Fetch Success!",
                 'data-product-stock' => $stock,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -590,6 +619,7 @@ class TenantController extends Controller {
             return response()->json([
                 'message' => 'Stok barang tidak cukup!',
                 'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             if($cartCheckup->count() == 0 || $cartCheckup == "" || is_null($cartCheckup) || empty($cartCheckup)){
@@ -609,7 +639,8 @@ class TenantController extends Controller {
                         'message' => 'Added Success',
                         'cart' => $cart,
                         'data' => 'Add new cart',
-                        'status' => 200
+                        'status' => 200,
+                        'app-version' => $this->getAppversion()
                     ]);
                 } catch (Exception $e) {
                     return response()->json([
@@ -637,6 +668,7 @@ class TenantController extends Controller {
                             return response()->json([
                                 'message' => 'Stok barang tidak cukup!',
                                 'status' => 200,
+                                'app-version' => $this->getAppversion()
                             ]);
                         }
                         $cart->update([
@@ -659,7 +691,8 @@ class TenantController extends Controller {
                     'message' => 'Added Success',
                     'cart' => $cart,
                     'data' => 'Uodate cart',
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         }
@@ -694,7 +727,8 @@ class TenantController extends Controller {
 
         return response()->json([
             'message' => 'Success Deleted',
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -738,13 +772,15 @@ class TenantController extends Controller {
                 'message' => 'Fetch Success!',
                 'data-status' => 'Cart is empty!',
                 'dataStokProduk' => $cartContent,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
                 'message' => 'Fetch Success',
                 'cartData' => $cartContent,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -838,7 +874,8 @@ class TenantController extends Controller {
             'message' => 'Transaction has been processed successfully',
             'invoice' => $invoice,
             'cartData' => $cartContent,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
 
     }
@@ -884,13 +921,15 @@ class TenantController extends Controller {
                 'message' => 'Fetch Success!',
                 'data-status' => 'Cart is empty!',
                 'dataStokProduk' => $cartContent,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
                 'message' => 'Fetch Success',
                 'cartData' => $cartContent,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -914,13 +953,15 @@ class TenantController extends Controller {
                 'message' => 'Fetch Success!',
                 'data-status' => 'No data found in this collection!',
                 'alias-data' => $alias,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
                 'message' => 'Fetch Success!',
                 'alias-data' => $alias,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -953,7 +994,8 @@ class TenantController extends Controller {
                     'date-type' => 'Data transaksi tidak ditemukan',
                     'transaction-number' => $invoice->count(),
                     'transaction-data' => $invoice,
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 return response()->json([
@@ -961,7 +1003,8 @@ class TenantController extends Controller {
                     'date-type' => $showdate,
                     'transaction-number' => $invoice->count(),
                     'transaction-data' => $invoice,
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         } else {
@@ -985,7 +1028,8 @@ class TenantController extends Controller {
                     'date-type' => 'Data transaksi tidak ditemukan',
                     'transaction-number' => $invoice->count(),
                     'transaction-data' => $invoice,
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 return response()->json([
@@ -993,7 +1037,8 @@ class TenantController extends Controller {
                     'date-type' => $showdate,
                     'transaction-number' => $invoice->count(),
                     'transaction-data' => $invoice,
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         }
@@ -1033,7 +1078,8 @@ class TenantController extends Controller {
                 'date-type' => 'Data transaksi tidak ditemukan',
                 'transaction-number' => $invoiceAliasSearch->count(),
                 'transaction-data' => $invoiceAliasSearch,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
@@ -1041,7 +1087,8 @@ class TenantController extends Controller {
                 // 'date-type' => $showdate,
                 'transaction-number' => $invoiceAliasSearch->count(),
                 'transaction-data' => $invoiceAliasSearch,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -1067,7 +1114,8 @@ class TenantController extends Controller {
         return response()->json([
             'message' => 'Fetch Success',
             'transaction-data' => $invoice,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -1117,7 +1165,8 @@ class TenantController extends Controller {
         return response()->json([
             'message' => 'Added Success',
             'cart' => $cart,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -1148,7 +1197,8 @@ class TenantController extends Controller {
 
         return response()->json([
             'message' => 'Success Deleted',
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -1266,7 +1316,8 @@ class TenantController extends Controller {
             'message' => 'Transaction Updated',
             'invoice' => $invoice,
             'cartData' => $invoice->shoppingCart,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -1297,7 +1348,8 @@ class TenantController extends Controller {
         }
         return response()->json([
             'message' => 'Transaction deleted',
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -1334,7 +1386,8 @@ class TenantController extends Controller {
         return response()->json([
             'message' => 'Payment Success',
             'transaction-data' => $invoice,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -1367,7 +1420,8 @@ class TenantController extends Controller {
             'transaction-data' => $invoice,
             'data-alias' => $alias,
             'store-detail' => $storeDetail,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -1390,7 +1444,8 @@ class TenantController extends Controller {
         return response()->json([
             'message' => 'Fetch Success',
             'withdraw-data' => $withdrawData,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 }

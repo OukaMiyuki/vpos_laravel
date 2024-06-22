@@ -8,12 +8,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Kasir;
+use App\Models\AppVersion;
 use Illuminate\Http\JsonResponse;
 use Exception;
 // use App\Models\Admin;
 // use App\Models\Tenant;
 
 class AuthController extends Controller {
+
+    private function getAppversion(){
+        $appVersion = AppVersion::find(1);
+        return $appVersion->versi;
+    }
+
     public function login(Request $request) {
         if (! Auth::guard('kasir')->attempt($request->only('email', 'password'))) {
             return response()->json([
@@ -29,7 +36,8 @@ class AuthController extends Controller {
             'message' => 'Login success',
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -70,7 +78,8 @@ class AuthController extends Controller {
         return response()->json([
             'message' => 'Fetch Success',
             'data-detail-user' => $user,
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 
@@ -96,7 +105,8 @@ class AuthController extends Controller {
         }
         return response()->json([
             'message' => 'Update Success',
-            'status' => 200
+            'status' => 200,
+            'app-version' => $this->getAppversion()
         ]);
     }
 

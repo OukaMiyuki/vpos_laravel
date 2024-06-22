@@ -13,9 +13,16 @@ use Illuminate\Http\JsonResponse;
 use App\Models\Kasir;
 use App\Models\Tenant;
 use App\Models\StoreDetail;
+use App\Models\AppVersion;
 use Exception;
 
 class LoginController extends Controller {
+
+    private function getAppversion(){
+        $appVersion = AppVersion::find(1);
+        return $appVersion->versi;
+    }
+
     public function login(Request $request) {
         if (! Auth::guard('tenant')->attempt($request->only('email', 'password'))) {
             if (! Auth::guard('kasir')->attempt($request->only('email', 'password'))) {
@@ -70,7 +77,8 @@ class LoginController extends Controller {
                     'sup_user_company'      => $kasir->id_tenant,
                     'sup_user_email'        => $kasir->email,
                     'sup_user_type'         => 'kasir',
-                    'sup_user_token'        => $token
+                    'sup_user_token'        => $token,
+                    'app-version'           => $this->getAppversion()
                 ),
                 'status' => 200
             ]);
@@ -102,7 +110,8 @@ class LoginController extends Controller {
                     'sup_email_verification' => $tenant->email_verified_at,
                     'sup_phone_verification' => $tenant->phone_number_verified_at,
                     'sup_user_type'         => 'owner',
-                    'sup_user_token'        => $token
+                    'sup_user_token'        => $token,
+                    'app-version'           => $this->getAppversion()
                 ),
                 'status' => 200
             ]);
@@ -167,7 +176,8 @@ class LoginController extends Controller {
                     'message' => 'User Found',
                     'user-type' => $userType,
                     'user' => $user,
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 return response()->json([
@@ -182,7 +192,8 @@ class LoginController extends Controller {
                 'message' => 'User Found',
                 'user-type' => $userType,
                 'user' => $user,
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
@@ -235,7 +246,8 @@ class LoginController extends Controller {
         if($responseCode == 200){
             return response()->json([
                 'message' => 'OTP Sent!',
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             return response()->json([
@@ -287,7 +299,8 @@ class LoginController extends Controller {
                 ]);
                 return response()->json([
                     'message' => 'Password diperbarui!',
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 return response()->json([

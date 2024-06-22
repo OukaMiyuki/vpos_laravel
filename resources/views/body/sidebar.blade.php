@@ -681,6 +681,20 @@
                 @auth('admin')
                     <li class="menu-title mt-2">Other Menu</li>
                     <li>
+                        <a href="#app-setting" data-bs-toggle="collapse">
+                            <span class="mdi mdi-apple-keyboard-command"></span>
+                            <span> Application </span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <div class="collapse" id="app-setting">
+                            <ul class="nav-second-level">
+                                <li>
+                                    <a href="{{ route('admin.dashboard.application.appversion') }}">Application Version Setting</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
                         <a href="#role" data-bs-toggle="collapse">
                             <span class="mdi mdi-message-text-clock-outline"></span>
                             <span> History </span>

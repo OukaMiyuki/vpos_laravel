@@ -130,6 +130,9 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::get('dashboard/finance/settlement/history', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementHistory'])->name('admin.dashboard.finance.settlement.history');
     Route::get('dashboard/finance/settlement/history/{id}/{code}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementHistoryDetail'])->name('admin.dashboard.finance.settlement.history.detail');
 
+    Route::get('dashboard/application/app-version', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardAppVersion'])->name('admin.dashboard.application.appversion');
+    Route::post('dashboard/application/app-version', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardAppVersionUpdate'])->name('admin.dashboard.application.appversion.update');
+
     Route::get('dashboard/history', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistory'])->name('admin.dashboard.history');
     Route::get('dashboard/history/user-login', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserLogin'])->name('admin.dashboard.history.user.login');
     Route::get('dashboard/history/user-register', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserRegister'])->name('admin.dashboard.history.user.register');
