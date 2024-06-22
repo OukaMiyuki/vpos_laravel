@@ -123,6 +123,7 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::get('dashboard/finance/insentif/delete/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingDelete'])->name('admin.dashboard.finance.insentif.delete');
     Route::get('dashboard/finance/settlement', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingList'])->name('admin.dashboard.finance.settlement.list');
     Route::post('dashboard/finance/settlement', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingListInsert'])->name('admin.dashboard.finance.settlement.insert');
+    Route::get('dashboard/finance/settlement/delete/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementDelete'])->name('admin.dashboard.finance.settlement.delete');
     Route::post('dashboard/finance/settlement/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingListUpdate'])->name('admin.dashboard.finance.settlement.update');
     Route::get('dashboard/finance/settlement/history', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementHistory'])->name('admin.dashboard.finance.settlement.history');
     Route::get('dashboard/finance/settlement/history/{id}/{code}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementHistoryDetail'])->name('admin.dashboard.finance.settlement.history.detail');

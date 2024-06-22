@@ -71,7 +71,7 @@
                                                         <td>{{$stl->note}}</td>
                                                         <td class="text-center">
                                                             <a href="" title="Edit data settlement settings" id="edit-settlement" data-id="{{ $stl->id }}" data-start_date="{{ $stl->stat_date }}" data-end_date="{{ $stl->end_date }}" data-note="{{ $stl->note }}" data-bs-toggle="modal" data-bs-target="#edit-settlement-setting" class="btn btn-xs btn-primary"><i class="mdi mdi-pencil"></i></a>&nbsp;
-                                                            <a href="" class="btn btn-xs btn-danger"><i class="mdi mdi-trash-can"></i></a>
+                                                            <a href="{{ route('admin.dashboard.finance.settlement.delete', ['id' => $stl->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-trash-can"></i></a>
                                                         </td>
                                                     </tr>
                                                 @endforeach

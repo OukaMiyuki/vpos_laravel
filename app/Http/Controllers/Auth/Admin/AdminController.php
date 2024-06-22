@@ -2554,6 +2554,23 @@ class AdminController extends Controller {
         }
     }
 
+    public function adminDashboardSettlementDelete($id){
+        $settlementSetting = SettlementDateSetting::find($id);
+        if(is_null($settlementSetting) || empty($settlementSetting)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+        $settlementSetting->delete();
+        $notification = array(
+            'message' => 'Data berhasil dihapus!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('admin.dashboard.finance.settlement.list')->with($notification);
+    }
+
     public function adminDashboardSettlementSettingListUpdate(Request $request){
         $id = $request->id;
         $start_date = $request->start_date;
@@ -2642,7 +2659,13 @@ class AdminController extends Controller {
                                                 ])
                                                 ->where('nomor_settlement', $code)
                                                 ->find($id);
-
+        if(is_null($settlementDetailHistory) || empty($settlementDetailHistory)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
         return view('admin.admin_finance_settlement_history_detail', compact('settlementDetailHistory'));
     }
 }
