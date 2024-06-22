@@ -39,6 +39,7 @@ use App\Models\History;
 use App\Models\SettlementDateSetting;
 use App\Models\SettlementHstory;
 use App\Models\Settlement;
+use App\Models\HistoryCashbackPending;
 use Exception;
 
 class AdminController extends Controller {
@@ -667,6 +668,7 @@ class AdminController extends Controller {
         $agregateWalletforTransfer = AgregateWallet::where('wallet_type', 'transfer')->select(['saldo'])->first();
         $totalAgregate = $agregateWalletforMaintenance->saldo+$agregateWalletforTransfer->saldo;
         $historyCashbackAdmin = HistoryCashbackAdmin::sum('nominal_terima_mdr');
+        $historyCashbackAdminSettlement = HistoryCashbackPending::sum('nominal_terima_mdr');
         $nobuWithdrawFeeHistory = NobuWithdrawFeeHistory::sum('nominal');
         $withdrawals = Withdrawal::select([
                                     'withdrawals.id',
@@ -684,7 +686,7 @@ class AdminController extends Controller {
                                 ->latest()
                                 ->take(10)
                                 ->get();
-        return view('admin.admin_menu_dashboard_saldo', compact(['adminQrisWallet', 'totalAgregate', 'agregateWalletforMaintenance', 'agregateWalletforTransfer', 'historyCashbackAdmin', 'nobuWithdrawFeeHistory', 'withdrawals']));
+        return view('admin.admin_menu_dashboard_saldo', compact(['adminQrisWallet', 'totalAgregate', 'agregateWalletforMaintenance', 'agregateWalletforTransfer', 'historyCashbackAdmin', 'nobuWithdrawFeeHistory', 'withdrawals', 'historyCashbackAdminSettlement']));
     }
 
     public function adminDashboardSaldoQris(){
@@ -884,6 +886,36 @@ class AdminController extends Controller {
                                                 ->get();
         $totakCashback = $historyCashback->sum('nominal_terima_mdr');
         return view('admin.admin_menu_dashboard_saldo_history_cashback', compact(['historyCashback', 'totakCashback']));
+    }
+
+    public function adminDashboardSaldoCashbackPending(){
+        $historyCashback = HistoryCashbackPending::select([
+                                                        'history_cashback_pendings.id',
+                                                        'history_cashback_pendings.id_invoice',
+                                                        'history_cashback_pendings.nominal_terima_mdr',
+                                                        'history_cashback_pendings.settlement_status',
+                                                        'history_cashback_pendings.created_at'
+                                                    ])
+                                                    ->with([
+                                                        'invoice' => function($query){
+                                                            $query->select([
+                                                                'invoices.id',
+                                                                'invoices.nomor_invoice',
+                                                                'invoices.tanggal_transaksi',
+                                                                'invoices.jenis_pembayaran',
+                                                                'invoices.nominal_bayar',
+                                                                'invoices.mdr',
+                                                                'invoices.nominal_mdr',
+                                                                'invoices.nominal_terima_bersih',
+                                                                'invoices.created_at',
+                                                            ]);
+                                                        }
+                                                    ])
+                                                    ->where('settlement_status', 0)
+                                                    ->latest()
+                                                    ->get();
+        $totakCashback = $historyCashback->sum('nominal_terima_mdr');
+        return view('admin.admin_menu_dashboard_saldo_history_cashback_settlement_pending', compact(['historyCashback', 'totakCashback']));
     }
 
     public function adminDashboardNobuFeeTransfer(){

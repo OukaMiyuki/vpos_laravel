@@ -267,6 +267,9 @@
                                     <a href="{{ route('admin.dashboard.saldo.cashback') }}">History Cashback Transaksi</a>
                                 </li>
                                 <li>
+                                    <a href="{{ route('admin.dashboard.saldo.cashback.settlement') }}">History Cashback Pending Settlement</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('admin.dashboard.saldo.nobu.fee.transfer') }}">History Bank Fee Transfer</a>
                                 </li>
                             </ul>

@@ -111,7 +111,29 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6 col-xl-6">
+                <div class="col-md-4 col-xl-4">
+                    <div class="widget-rounded-circle card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <img src="{{ asset('assets/images/icons/pendingcashback.png') }}" class="img-fluid" alt="">
+                                </div>
+                                <div class="col-8">
+                                    <div class="text-end">
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $historyCashbackAdminSettlement }}</span></h4>
+                                        <p class="text-muted mb-1 text-truncate">Cashback Pending Settlement</p>
+                                        <a href="{{ route('admin.dashboard.saldo.cashback.settlement') }}" class="btn btn-blue btn-sm ms-2">
+                                            <i class="mdi mdi-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- end row-->
+                        </div>
+                    </div>
+                    <!-- end widget-rounded-circle-->
+                </div>
+                <div class="col-md-4 col-xl-4">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">
@@ -133,7 +155,7 @@
                     </div>
                     <!-- end widget-rounded-circle-->
                 </div>
-                <div class="col-md-6 col-xl-6">
+                <div class="col-md-4 col-xl-4">
                     <div class="widget-rounded-circle card">
                         <div class="card-body">
                             <div class="row">

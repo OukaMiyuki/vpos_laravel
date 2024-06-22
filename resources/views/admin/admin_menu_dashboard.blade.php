@@ -49,7 +49,7 @@
                                         </div>
                                     </div>
                                     <div class="row mt-3">
-                                        <a href="{{ route('admin.dashboard.menu') }}"><button title="Pengaturan akun" type="button" class="btn btn-info waves-effect waves-light">View Data</button></a>
+                                        <a href="{{ route('admin.dashboard.menu.userTransaction.settlementReady') }}"><button title="Pengaturan akun" type="button" class="btn btn-info waves-effect waves-light">View Data</button></a>
                                     </div>
                                 </div>
                             </div>

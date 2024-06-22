@@ -75,6 +75,7 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::get('dashboard/saldo/agregate-aplikasi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregateAplikasi'])->name('admin.dashboard.saldo.agregate.aplikasi');
     Route::get('dashboard/saldo/agregate-transfer', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregateTransfer'])->name('admin.dashboard.saldo.agregate.transfer');
     Route::get('dashboard/saldo/data-history-cashback', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoCashback'])->name('admin.dashboard.saldo.cashback');
+    Route::get('dashboard/saldo/data-history-cashback-settlement-pending', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoCashbackPending'])->name('admin.dashboard.saldo.cashback.settlement');
     Route::get('dashboard/saldo/data-bank-fee-transfer', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardNobuFeeTransfer'])->name('admin.dashboard.saldo.nobu.fee.transfer');
 
     Route::get('dashboard/mitra-aplikasi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketing'])->name('admin.dashboard.marketing');
