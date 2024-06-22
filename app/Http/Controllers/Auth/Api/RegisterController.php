@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller {
     public function registerTenant(Request $request) {
@@ -53,10 +54,12 @@ class RegisterController extends Controller {
             'id_inv_code' => $invitationcodeid->id
         ]);
 
+        $randomString = Str::random(30);
+
         if(!is_null($tenant)) {
             $tenant->detailTenantStore($tenant);
             $tenant->fieldInsert($tenant);
-            $tenant->storeInsert($tenant);
+            $tenant->storeInsert($tenant, $randomString);
             $tenant->createWallet($tenant);
         }
 
