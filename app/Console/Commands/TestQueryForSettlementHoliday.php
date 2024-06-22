@@ -34,9 +34,10 @@ class TestQueryForSettlementHoliday extends Command {
             $endDate = date('Y-m-d', strtotime($settlement->end_date));
             if (($now >= $startDate) && ($now <= $endDate)) {
                 $dateCollection+=1;
+                echo "\n Hari ".$settlement->stat_date." | ".$settlement->end_date."\n";
             }
         }
 
-        echo "\n Hasilnya : ".$dateCollection;
+        echo "\n Hasilnya : ".$dateCollection."\n";
     }
 }
