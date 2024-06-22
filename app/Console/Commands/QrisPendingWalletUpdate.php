@@ -13,6 +13,8 @@ use App\Models\History;
 use App\Models\Tenant;
 use App\Models\SettlementHstory;
 use App\Models\Settlement;
+use App\Models\SettlementPending;
+use App\Models\HistoryCashbackPending;
 use Exception;
 
 class QrisPendingWalletUpdate extends Command {
@@ -36,6 +38,7 @@ class QrisPendingWalletUpdate extends Command {
     public function handle() {
         $now = date('Y-m-d');
         $now=date('Y-m-d', strtotime($now));
+        $settlementNote = "Settlement ".Carbon::now()->format('d-m-Y');
         $settlementDate = SettlementDateSetting::latest()->get();
         $dateCollection = 0;
         foreach($settlementDate as $settlement){
@@ -47,6 +50,47 @@ class QrisPendingWalletUpdate extends Command {
         }
         //echo $dateCollection;
         if($dateCollection != 0){
+            $code = "PD-STL";
+            $dateCode = $code.Carbon::now()->format('dmY');
+            $tenantinvoice = Tenant::with([
+                                            'invoice' => function($query){
+                                                $query->where('settlement_status', 0)
+                                                    ->where('jenis_pembayaran', 'Qris')
+                                                    ->where('status_pembayaran', 1)
+                                                    ->whereDate('tanggal_transaksi', '!=', Carbon::now());
+                                            }
+                                        ])
+                                        ->get();
+
+            foreach($tenantinvoice as $sumInvoice){
+                $totalSum = $sumInvoice->invoice->sum('nominal_terima_bersih');
+                $totalSumFloor = floor($totalSum);
+                echo "Pending Settlement Insert - Nama : ".$sumInvoice->name." | ".$totalSumFloor." | Periode : ".Carbon::now()."\n";
+                $totalCashback = 0;
+                foreach($sumInvoice->invoice as $invoice){
+                    $nominal_mdr = $invoice->nominal_mdr;
+                    $insentif_cashback = $nominal_mdr*0.25;
+                    $insentif_cashbackFloor = floor($insentif_cashback);
+                    $totalCashback+=$insentif_cashbackFloor;
+                    HistoryCashbackPending::create([
+                        'id_invoice' => $invoice->id,
+                        'nominal_terima_mdr' => $insentif_cashbackFloor
+                    ]);
+                    Invoice::find($invoice->id)->update([
+                        'settlement_status' => 1
+                    ]);
+                }
+                SettlementPending::create([
+                    'id_user' => $sumInvoice->id,
+                    'email' => $sumInvoice->email,
+                    'nomor_settlement_pending' => $dateCode,
+                    'settlement_schedule' => Carbon::now(),
+                    'nominal_settle' => $totalSumFloor,
+                    'nominal_insentif_cashback' => $totalCashback,
+                    'settlement_pending_status' => 0,
+                ]);
+            }
+
             History::create([
                 'action' => 'Settlement Update : Pending due to holiday!',
                 'id_user' => NULL,
@@ -109,10 +153,52 @@ class QrisPendingWalletUpdate extends Command {
                             'settlement_time_stamp' => Carbon::now(),
                             'nominal_settle' => $totalSumFloor,
                             'nominal_insentif_cashback' => $totalCashback,
-                            'status' => 1
+                            'status' => 1,
+                            'note' => $settlementNote
                         ]);
                     } else {
                         echo "Wallet not found".$sumInvoice->email;
+                    }
+                }
+                $settlementPending = SettlementPending::where('settlement_pending_status', 0)->get();
+                if(!is_null($settlementPending) || !empty($settlementPending)){
+                    foreach($settlementPending as $stlPending){
+                        $qrisWalletTenant = QrisWallet::where('id_user', $stlPending->id)->where('email', $stlPending->email)->first();
+                        if(!is_null($qrisWalletTenant) || empty($qrisWalletTenant)){
+                            $saldoQrisTenant = $qrisWalletTenant->saldo;
+                            $qrisWalletTenant->update([
+                                'saldo' => $saldoQrisTenant+$stlPending->nominal_settle
+                            ]);
+                            $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
+                            $qrisWalletAdminSaldo = $qrisWalletAdmin->saldo;
+                            $qrisWalletAdmin->update([
+                                'saldo' => $qrisWalletAdminSaldo+$stlPending->nominal_insentif_cashback
+                            ]);
+                            SettlementHstory::create([
+                                'id_user' => $stlPending->id_user,
+                                'id_settlement' => $settlement->id,
+                                'email' => $stlPending->email,
+                                'settlement_time_stamp' => Carbon::now(),
+                                'nominal_settle' => $stlPending->nominal_settle,
+                                'nominal_insentif_cashback' => $stlPending->nominal_insentif_cashback,
+                                'status' => 1,
+                                'note' => $stlPending->nomor_settlement_pending." | ".Carbon::now()->format('d-m-Y')
+                            ]);
+                            $stlPending->update([
+                                'settlement_pending_status' => 1
+                            ]);
+                        }
+                    }
+
+                    $historySettleCashback = HistoryCashbackPending::where('settlement_status', 0)->get();
+                    foreach($historySettleCashback as $cashbackHistory){
+                        HistoryCashbackAdmin::create([
+                            'id_invoice' => $cashbackHistory->id_invoice,
+                            'nominal_terima_mdr' => $cashbackHistory->nominal_terima_mdr
+                        ]);
+                        $cashbackHistory->update([
+                            'settlement_status' => 1
+                        ]);
                     }
                 }
                 History::create([

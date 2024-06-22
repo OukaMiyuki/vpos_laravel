@@ -54,6 +54,7 @@
                                                     <th class="text-center">Nominal Settlement (Rp.)</th>
                                                     <th class="text-center">Nominal Insentif Cashback (Rp.)</th>
                                                     <th class="text-center">Status</th>
+                                                    <th>Note</th>
                                                 </tr>
                                             </thead>
                                             @php
@@ -75,6 +76,7 @@
                                                                 <span class="badge bg-soft-success text-success">Settlement Sukses</span>
                                                             @endif
                                                         </td>
+                                                        <td>{{$stl->note}}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
