@@ -211,7 +211,7 @@ class LoginController extends Controller {
             $this->createHistoryUser($user_id, $user_email, $action, $ex, 0);
         }
         if(is_null($postResponse) || empty($postResponse) || $postResponse == NULL || $postResponse == ""){
-            $this->createHistoryUser($user_id, $user_email, $action, "OTP Response NULL", 0);
+            $this->createHistoryUser($user_id, $user_email, $action, "Send User Login Notification Fail", 0);
         } else {
             $responseCode = $postResponse->getStatusCode();
             if($responseCode == 200){
