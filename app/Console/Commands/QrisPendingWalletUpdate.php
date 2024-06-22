@@ -36,6 +36,7 @@ class QrisPendingWalletUpdate extends Command {
      * Execute the console command.
      */
     public function handle() {
+        DB::connection()->enableQueryLog();
         $now = date('Y-m-d');
         $now=date('Y-m-d', strtotime($now));
         $settlementNote = "Settlement ".Carbon::now()->format('d-m-Y');
@@ -160,66 +161,67 @@ class QrisPendingWalletUpdate extends Command {
                         echo "Wallet not found".$sumInvoice->email;
                     }
                 }
-                // $settlementPending = SettlementPending::where('settlement_pending_status', 0)->get();
-                // if(!is_null($settlementPending) || !empty($settlementPending)){
-                //     foreach($settlementPending as $stlPending){
-                //         $qrisWalletTenant = QrisWallet::where('id_user', $stlPending->id)->where('email', $stlPending->email)->first();
-                //         if(!is_null($qrisWalletTenant) || empty($qrisWalletTenant)){
-                //             $saldoQrisTenant = $qrisWalletTenant->saldo;
-                //             $qrisWalletTenant->update([
-                //                 'saldo' => $saldoQrisTenant+$stlPending->nominal_settle
-                //             ]);
-                //             $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
-                //             $qrisWalletAdminSaldo = $qrisWalletAdmin->saldo;
-                //             $qrisWalletAdmin->update([
-                //                 'saldo' => $qrisWalletAdminSaldo+$stlPending->nominal_insentif_cashback
-                //             ]);
-                //             SettlementHstory::create([
-                //                 'id_user' => $stlPending->id_user,
-                //                 'id_settlement' => $settlement->id,
-                //                 'email' => $stlPending->email,
-                //                 'settlement_time_stamp' => Carbon::now(),
-                //                 'nominal_settle' => $stlPending->nominal_settle,
-                //                 'nominal_insentif_cashback' => $stlPending->nominal_insentif_cashback,
-                //                 'status' => 1,
-                //                 'note' => $stlPending->nomor_settlement_pending." | ".Carbon::now()->format('d-m-Y')
-                //             ]);
-                //             $stlPending->update([
-                //                 'settlement_pending_status' => 1
-                //             ]);
-                //         }
-                //     }
+                $settlementPending = SettlementPending::where('settlement_pending_status', 0)->get();
+                if(!is_null($settlementPending) || !empty($settlementPending)){
+                    foreach($settlementPending as $stlPending){
+                        $qrisWalletTenant = QrisWallet::where('id_user', $stlPending->id)->where('email', $stlPending->email)->first();
+                        if(!is_null($qrisWalletTenant) || empty($qrisWalletTenant)){
+                            $saldoQrisTenant = $qrisWalletTenant->saldo;
+                            $qrisWalletTenant->update([
+                                'saldo' => $saldoQrisTenant+$stlPending->nominal_settle
+                            ]);
+                            $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
+                            $qrisWalletAdminSaldo = $qrisWalletAdmin->saldo;
+                            $qrisWalletAdmin->update([
+                                'saldo' => $qrisWalletAdminSaldo+$stlPending->nominal_insentif_cashback
+                            ]);
+                            SettlementHstory::create([
+                                'id_user' => $stlPending->id_user,
+                                'id_settlement' => $settlement->id,
+                                'email' => $stlPending->email,
+                                'settlement_time_stamp' => Carbon::now(),
+                                'nominal_settle' => $stlPending->nominal_settle,
+                                'nominal_insentif_cashback' => $stlPending->nominal_insentif_cashback,
+                                'status' => 1,
+                                'note' => $stlPending->nomor_settlement_pending." | ".Carbon::now()->format('d-m-Y')
+                            ]);
+                            $stlPending->update([
+                                'settlement_pending_status' => 1
+                            ]);
+                        }
+                    }
 
-                //     $historySettleCashback = HistoryCashbackPending::where('settlement_status', 0)->get();
-                //     foreach($historySettleCashback as $cashbackHistory){
-                //         HistoryCashbackAdmin::create([
-                //             'id_invoice' => $cashbackHistory->id_invoice,
-                //             'nominal_terima_mdr' => $cashbackHistory->nominal_terima_mdr
-                //         ]);
-                //         $cashbackHistory->update([
-                //             'settlement_status' => 1
-                //         ]);
-                //     }
-                // }
+                    $historySettleCashback = HistoryCashbackPending::where('settlement_status', 0)->get();
+                    foreach($historySettleCashback as $cashbackHistory){
+                        HistoryCashbackAdmin::create([
+                            'id_invoice' => $cashbackHistory->id_invoice,
+                            'nominal_terima_mdr' => $cashbackHistory->nominal_terima_mdr
+                        ]);
+                        $cashbackHistory->update([
+                            'settlement_status' => 1
+                        ]);
+                    }
+                }
                 History::create([
-                    'action' => 'Settlement Update Success!',
+                    'action' => 'Settlement Update Success | Periode : '.Carbon::now(),
                     'id_user' => NULL,
                     'email' => NULL,
                     'lokasi_anda' => 'System Report',
                     'deteksi_ip' => 'System Report',
-                    'log' => Carbon::now(),
+                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog())),
                     'status' => 1
                 ]);
                 $settlement->status = 1;
                 $settlement->save();
             } catch(Exception $e){
+                echo $e;
                 History::create([
                     'action' => 'Settlement Update Failed! '.Carbon::now(),
                     'id_user' => NULL,
                     'email' => NULL,
                     'lokasi_anda' => 'System Report',
                     'deteksi_ip' => 'System Report',
-                    'log' => $e,
+                    'log' => str_replace("'", "\'", json_encode(DB::getQueryLog()))."\n Error Record : ".$e,
                     'status' => 0
                 ]);
                 $settlement->status = 0;
