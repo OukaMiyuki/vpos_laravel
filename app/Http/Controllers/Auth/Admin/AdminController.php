@@ -2687,7 +2687,8 @@ class AdminController extends Controller {
                                                             'tenant' => function($query){
                                                                 $query->select([
                                                                     'tenants.id',
-                                                                    'tenants.name'
+                                                                    'tenants.name',
+                                                                    'tenants.email'
                                                                 ]);
                                                             }
                                                         ])
