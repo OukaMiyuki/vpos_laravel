@@ -37,19 +37,19 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label for="name" class="form-label">Nama User</label>
-                                                <input readonly type="text" class="form-control" name="name" id="name" required value="{{ $user->name }}">
+                                                <input readonly type="text" class="form-control" name="name" id="name" required @if(is_null($user) || empty($user) || $user == "" || $user == NULL) value="Syetem Report" @else value="{{ $user->name }}" @endif>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label for="email" class="form-label">Email</label>
-                                                <input readonly type="email" class="form-control" name="email" id="email" required value="{{ $user->email }}">
+                                                <input readonly type="email" class="form-control" name="email" id="email" required @if(is_null($user) || empty($user) || $user == "" || $user == NULL) value="Syetem Report" @else value="{{ $user->email }}" @endif>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <label for="access" class="form-label">Access Level</label>
-                                                <input readonly type="text" class="form-control" name="access" id="access" required value="{{ $userType }}">
+                                                <input readonly type="text" class="form-control" name="access" id="access" required @if(is_null($userType) || empty($userType) || $userType == "" || $userType == NULL) value="System" @else value="{{ $userType }}" @endif>
                                             </div>
                                         </div>
                                     </div>
