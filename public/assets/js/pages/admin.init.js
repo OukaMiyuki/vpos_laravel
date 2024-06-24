@@ -262,7 +262,7 @@ $(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            "url": 'https://visipos.id/admin/dashboard/user/withdrawal',
+            "url": 'https://visipos.id/admin/dashboard/user/withdrawals',
             "type": "GET",
             data : function(data){
                 data.from_date = $('#daterange_user_withdraw').data('daterangepicker').startDate.format('YYYY-MM-DD');
