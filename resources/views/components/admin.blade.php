@@ -121,7 +121,7 @@
                   processing: true,
                   serverSide: true,
                   ajax: {
-                        "url": '{{ url(dashboard/mitra-bisnis/transaction/testing) }}' + '?_token=' + '{{ csrf_token() }}',
+                        "url": '{{ url("admin.dashboard.mitraBisnis.transactionList.testingWoi") }}' + '?_token=' + '{{ csrf_token() }}',
                         "type": "POST"
                   },
                   columns: [
