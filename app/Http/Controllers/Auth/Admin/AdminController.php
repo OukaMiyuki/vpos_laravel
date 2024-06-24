@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Auth\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Yajra\DataTables\Facades\Datatables;
 use Illuminate\Support\Facades\Response;
 use Stevebauman\Location\Facades\Location;
 use GuzzleHttp\Client as GuzzleHttpClient;
-use Yajra\Datatables\Datatables;
+// use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -128,7 +129,7 @@ class AdminController extends Controller {
             if($responseCode != 200){
                 $action = "Send Whatsapp Notification Fail to destination ".$phone;
                 $this->createHistoryUser($action, $ex, 0);
-            } 
+            }
         }
     }
 
@@ -271,7 +272,7 @@ class AdminController extends Controller {
                                         'insentif' => function($query){
                                             $query->select([
                                                 'biaya_admin_transfer_danas.id',
-                                                'biaya_admin_transfer_danas.jenis_insentif',  
+                                                'biaya_admin_transfer_danas.jenis_insentif',
                                             ]);
                                         }
                                     ]);
@@ -1746,46 +1747,136 @@ class AdminController extends Controller {
         return view('admin.admin_mitra_bisnis_merchant_qris_list', compact('qris'));
     }
 
-    public function adminDashboardMitraBisnisTransactionList(){
-        $tenantInvoice = Tenant::select(['tenants.id', 'tenants.name'])
-                                ->where('id_inv_code', 0)
-                                ->with([
-                                    'storeList' => function($query){
-                                        $query->select([
-                                            'store_lists.id',
-                                            'store_lists.id_user',
-                                            'store_lists.email',
-                                            'store_lists.store_identifier',
-                                            'store_lists.name',
-                                        ])
-                                        ->with([
-                                            'invoice' => function($query){
-                                                $query->select([
-                                                    'invoices.id',
-                                                    'invoices.store_identifier',
-                                                    'invoices.email',
-                                                    'invoices.id_tenant',
-                                                    'invoices.nomor_invoice',
-                                                    'invoices.tanggal_transaksi',
-                                                    'invoices.tanggal_pelunasan',
-                                                    'invoices.jenis_pembayaran',
-                                                    'invoices.status_pembayaran',
-                                                    'invoices.nominal_bayar',
-                                                    'invoices.kembalian',
-                                                    'invoices.mdr',
-                                                    'invoices.nominal_mdr',
-                                                    'invoices.nominal_terima_bersih',
-                                                    'invoices.created_at',
-                                                    'invoices.updated_at'
-                                                ])
-                                                ->latest()
-                                                ->get();
-                                            }
-                                        ]);
-                                    }
-                                ])
-                                ->get();
-        return view('admin.admin_mitra_bisnis_transaction_list', compact('tenantInvoice'));
+    public function adminDashboardMitraBisnisTransactionList(Request $request){
+        if ($request->ajax()) {
+            $data = Invoice::select([
+                                        'invoices.id',
+                                        'invoices.store_identifier',
+                                        'invoices.email',
+                                        'invoices.id_tenant',
+                                        'invoices.nomor_invoice',
+                                        'invoices.tanggal_transaksi',
+                                        'invoices.tanggal_pelunasan',
+                                        'invoices.jenis_pembayaran',
+                                        'invoices.status_pembayaran',
+                                        'invoices.nominal_bayar',
+                                        'invoices.kembalian',
+                                        'invoices.mdr',
+                                        'invoices.nominal_mdr',
+                                        'invoices.nominal_terima_bersih',
+                                        'invoices.created_at',
+                                        'invoices.updated_at'
+                                    ])
+                                    ->with([
+                                        'tenant' => function($query){
+                                            $query->select([
+                                                'tenants.id',
+                                                'tenants.name'
+                                            ]);
+                                        },
+                                        'storeMitra' => function($query){
+                                            $query->select([
+                                                'store_lists.id',
+                                                'store_lists.id_user',
+                                                'store_lists.email',
+                                                'store_lists.store_identifier',
+                                                'store_lists.name',
+                                            ]);
+                                        }
+                                    ])
+                                    ->whereHas('tenant', function($query){
+                                        $query->where('id_inv_code', '==', 0);
+                                    })
+                                    ->latest()
+                                    ->get();
+
+            return Datatables::of($data)
+                                ->addIndexColumn()
+                                ->editColumn('nomor_invoice', function($data) {
+                                    return $data->nomor_invoice;
+                                })
+                                ->editColumn('tenant', function($data) {
+                                    return $data->tenant->name;
+                                })
+                                ->editColumn('store_identifier', function($data) {
+                                    return $data->store_identifier;
+                                })
+                                ->editColumn('merchant_name', function($data) {
+                                    return $data->storeMitra->name;
+                                })
+                                ->editColumn('status', function($data) {
+                                    return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
+                                })
+                                ->editColumn('tanggal_transaksi', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
+                                    $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                    $dateTimeTransaksi = $date." ".$time;
+                                    return $dateTimeTransaksi;
+                                })
+                                ->editColumn('tanggal_pembayaran', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
+                                    $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
+                                    $dateTimePembayaran = $date." ".$time;
+                                    return $dateTimePembayaran;
+                                })
+                                ->editColumn('jenis_pembayaran', function($data) {
+                                    return $data->jenis_pembayaran;
+                                })
+                                ->editColumn('nominal_bayar', function($data) {
+                                    return $data->nominal_bayar;
+                                })
+                                ->editColumn('mdr', function($data) {
+                                    return $data->mdr;
+                                })
+                                ->editColumn('nominal_mdr', function($data) {
+                                    return $data->nominal_mdr;
+                                })
+                                ->editColumn('nominal_terima_bersih', function($data) {
+                                    return $data->nominal_terima_bersih;
+                                })
+                                ->rawColumns(['status'])
+                                ->make(true);
+        }
+        return view('admin.admin_mitra_bisnis_transaction_list');
+        // $tenantInvoice = Tenant::select(['tenants.id', 'tenants.name'])
+        //                         ->where('id_inv_code', 0)
+        //                         ->with([
+        //                             'storeList' => function($query){
+        //                                 $query->select([
+        //                                     'store_lists.id',
+        //                                     'store_lists.id_user',
+        //                                     'store_lists.email',
+        //                                     'store_lists.store_identifier',
+        //                                     'store_lists.name',
+        //                                 ])
+        //                                 ->with([
+        //                                     'invoice' => function($query){
+        //                                         $query->select([
+        //                                             'invoices.id',
+        //                                             'invoices.store_identifier',
+        //                                             'invoices.email',
+        //                                             'invoices.id_tenant',
+        //                                             'invoices.nomor_invoice',
+        //                                             'invoices.tanggal_transaksi',
+        //                                             'invoices.tanggal_pelunasan',
+        //                                             'invoices.jenis_pembayaran',
+        //                                             'invoices.status_pembayaran',
+        //                                             'invoices.nominal_bayar',
+        //                                             'invoices.kembalian',
+        //                                             'invoices.mdr',
+        //                                             'invoices.nominal_mdr',
+        //                                             'invoices.nominal_terima_bersih',
+        //                                             'invoices.created_at',
+        //                                             'invoices.updated_at'
+        //                                         ])
+        //                                         ->latest()
+        //                                         ->get();
+        //                                     }
+        //                                 ]);
+        //                             }
+        //                         ])
+        //                         ->get();
+        // return view('admin.admin_mitra_bisnis_transaction_list', compact('tenantInvoice'));
     }
 
     public function adminDashboardMitraBisnisWithdrawalList(){
@@ -1808,7 +1899,7 @@ class AdminController extends Controller {
                                 }])
                                 ->where('id_inv_code', 0)
                                 ->get();
-    
+
         return view('admin.admin_mitra_bisnis_withdrawal_list', compact('tenantWithdraw'));
     }
 
@@ -2419,7 +2510,7 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardFinanceInvoice($id){
-        $withdrawData = Withdrawal::select([ 
+        $withdrawData = Withdrawal::select([
                                     'withdrawals.id',
                                     'withdrawals.id_rekening',
                                     'withdrawals.invoice_pemarikan',
@@ -2443,7 +2534,7 @@ class AdminController extends Controller {
                                             'insentif' => function($query){
                                                 $query->select([
                                                     'biaya_admin_transfer_danas.id',
-                                                    'biaya_admin_transfer_danas.jenis_insentif',  
+                                                    'biaya_admin_transfer_danas.jenis_insentif',
                                                 ]);
                                             }
                                         ]);
@@ -2627,7 +2718,7 @@ class AdminController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             }
-            
+
             $settlement->update([
                 'stat_date' => $start_date,
                 'end_date' => $end_date,
@@ -2706,5 +2797,129 @@ class AdminController extends Controller {
             return redirect()->back()->with($notification);
         }
         return view('admin.admin_finance_settlement_history_detail', compact('settlementDetailHistory'));
+    }
+
+    public function adminDashboardMitraBisnisTransactionListTesting(Request $request){
+        if ($request->ajax()) {
+            // $data = Invoice::select(['id', 'store_identifier', 'email']);
+            // $data = Tenant::select(['tenants.id', 'tenants.name'])
+            //                         ->with([
+            //                             'storeList' => function($query){
+            //                                 $query->select([
+            //                                     'store_lists.id',
+            //                                     'store_lists.id_user',
+            //                                     'store_lists.email',
+            //                                     'store_lists.store_identifier',
+            //                                     'store_lists.name',
+            //                                 ]);
+            //                             }
+            //                         ])
+            //                         ->where('id_inv_code', 0)
+            //                         ->get();
+            // return Datatables::of($data)
+            //             ->addIndexColumn()
+            //             ->addColumn('action', function($row){
+            //                 $actionBtn = '<a href="javascript:void(0)" class="edit btn btn-success btn-sm">Edit</a> <a href="javascript:void(0)" class="delete btn btn-danger btn-sm">Delete</a>';
+            //                 return $actionBtn;
+            //             })
+            //             ->rawColumns(['action'])
+            //             ->make(true);
+            $data = Invoice::select([
+                                        'invoices.id',
+                                        'invoices.store_identifier',
+                                        'invoices.email',
+                                        'invoices.id_tenant',
+                                        'invoices.nomor_invoice',
+                                        'invoices.tanggal_transaksi',
+                                        'invoices.tanggal_pelunasan',
+                                        'invoices.jenis_pembayaran',
+                                        'invoices.status_pembayaran',
+                                        'invoices.nominal_bayar',
+                                        'invoices.kembalian',
+                                        'invoices.mdr',
+                                        'invoices.nominal_mdr',
+                                        'invoices.nominal_terima_bersih',
+                                        'invoices.created_at',
+                                        'invoices.updated_at'
+                                    ])
+                                    ->with([
+                                        'tenant' => function($query){
+                                            $query->select([
+                                                'tenants.id',
+                                                'tenants.name'
+                                            ]);
+                                        },
+                                        'storeMitra' => function($query){
+                                            $query->select([
+                                                'store_lists.id',
+                                                'store_lists.id_user',
+                                                'store_lists.email',
+                                                'store_lists.store_identifier',
+                                                'store_lists.name',
+                                            ]);
+                                        }
+                                    ])
+                                    ->whereHas('tenant', function($query){
+                                        $query->where('id_inv_code', '==', 0);
+                                    })
+                                    ->latest()
+                                    ->get();
+
+            return Datatables::of($data)
+                                ->addIndexColumn()
+                                ->editColumn('nomor_invoice', function($data) {
+                                    return $data->nomor_invoice;
+                                })
+                                ->editColumn('tenant', function($data) {
+                                    return $data->tenant->name;
+                                })
+                                ->editColumn('store_identifier', function($data) {
+                                    return $data->store_identifier;
+                                })
+                                ->editColumn('merchant_name', function($data) {
+                                    return $data->storeMitra->name;
+                                })
+                                ->editColumn('status', function($data) {
+                                    return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
+                                })
+                                ->editColumn('tanggal_transaksi', function($data) {
+                                    // return $data->tanggal_transaksi;
+                                    $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
+                                    $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                    $dateTimeTransaksi = $date." ".$time;
+                                    return $dateTimeTransaksi;
+                                })
+                                ->editColumn('tanggal_pembayaran', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
+                                    $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
+                                    $dateTimePembayaran = $date." ".$time;
+                                    return $dateTimePembayaran;
+                                })
+                                ->editColumn('jenis_pembayaran', function($data) {
+                                    return $data->jenis_pembayaran;
+                                })
+                                ->editColumn('nominal_bayar', function($data) {
+                                    return $data->nominal_bayar;
+                                })
+                                ->editColumn('mdr', function($data) {
+                                    return $data->mdr;
+                                })
+                                ->editColumn('nominal_mdr', function($data) {
+                                    return $data->nominal_mdr;
+                                })
+                                ->editColumn('nominal_terima_bersih', function($data) {
+                                    return $data->nominal_terima_bersih;
+                                })
+                                // ->editColumn('name', function($data) {
+                                //     return $data->tenant->name;
+                                // })
+                                // ->addColumn('action', function($row){
+                                //     $actionBtn = '<a href="javascript:void(0)" class="edit btn btn-success btn-sm">Edit</a> <a href="javascript:void(0)" class="delete btn btn-danger btn-sm">Delete</a>';
+                                //     return $actionBtn;
+                                // })
+                                ->rawColumns(['status'])
+                                ->make(true);
+        }
+        return view('testing');
     }
 }

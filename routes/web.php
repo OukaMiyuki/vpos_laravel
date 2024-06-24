@@ -141,6 +141,9 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::get('dashboard/history/error', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserError'])->name('admin.dashboard.history.user.error');
     Route::get('dashboard/history/detail/{activity}/{id}', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryDetail'])->name('admin.dashboard.history.user.detail');
 
+
+
+    Route::get('dashboard/mitra-bisnis/transaction/testing', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisTransactionListTesting'])->name('admin.dashboard.mitraBisnis.transactionList.testingWoi');
 });
 
 

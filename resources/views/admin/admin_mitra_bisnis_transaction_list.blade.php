@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Transaksi Mitra Bisnis</h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="selection-datatable" class="table data-table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -50,7 +50,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach($tenantInvoice as $key => $invoice)
                                             @foreach ($invoice->storeList as $invoiceStore )
                                                 @foreach ($invoiceStore->invoice as $invoiceList)
@@ -81,7 +81,7 @@
                                                     </tr>
                                                 @endforeach
                                             @endforeach
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>
