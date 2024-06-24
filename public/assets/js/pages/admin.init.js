@@ -122,22 +122,22 @@ $(function () {
     var table = $('.data-table').DataTable({
         processing: true,
         serverSide: true,
-        // ajax: {
-        //     "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/transaction',
-        //     "type": "GET",
-        //     data : function(data){
-        //         data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
-        //         data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
-        //     }
-        // },
         ajax: {
-            "url": 'http://localhost:8000/admin/dashboard/mitra-bisnis/transaction',
+            "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/transaction',
             "type": "GET",
             data : function(data){
                 data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
                 data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
             }
         },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/mitra-bisnis/transaction',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             // {data: 'name', name: 'name'},
@@ -174,22 +174,22 @@ $(function () {
     var table_user_transaction = $('.user-table-transaction').DataTable({
         processing: true,
         serverSide: true,
-        // ajax: {
-        //     "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/transaction',
-        //     "type": "GET",
-        //     data : function(data){
-        //         data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
-        //         data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
-        //     }
-        // },
         ajax: {
-            "url": 'http://localhost:8000/admin/dashboard/user/transaction',
+            "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/transaction',
             "type": "GET",
             data : function(data){
                 data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
                 data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
             }
         },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/user/transaction',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'nomor_invoice', name: 'nomor_invoice'},
