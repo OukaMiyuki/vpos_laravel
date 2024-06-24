@@ -143,7 +143,7 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
 
 
 
-    Route::get('dashboard/mitra-bisnis/transaction/testing', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisTransactionListTesting'])->name('admin.dashboard.mitraBisnis.transactionList.testingWoi');
+    Route::post('dashboard/mitra-bisnis/transaction/testing', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisTransactionListTesting'])->name('admin.dashboard.mitraBisnis.transactionList.testingWoi');
 });
 
 
