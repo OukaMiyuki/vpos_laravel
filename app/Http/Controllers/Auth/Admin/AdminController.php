@@ -252,10 +252,6 @@ class AdminController extends Controller {
                                 ->editColumn('email', function($data) {
                                     return $data->email;
                                 })
-                                ->editColumn('status', function($data) {
-                                    return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
-                                })
-                                ->rawColumns(['status'])
                                 ->editColumn('tanggal_transaksi', function($data) {
                                     $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
                                     $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
@@ -275,6 +271,10 @@ class AdminController extends Controller {
                                 ->editColumn('jenis_pembayaran', function($data) {
                                     return $data->jenis_pembayaran;
                                 })
+                                ->editColumn('status', function($data) {
+                                    return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
+                                })
+                                ->rawColumns(['status'])
                                 ->editColumn('nominal_bayar', function($data) {
                                     return $data->nominal_bayar;
                                 })
