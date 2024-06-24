@@ -1748,7 +1748,7 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMitraBisnisTransactionList(Request $request){
-      
+        if ($request->ajax()) {
             $data = Invoice::select([
                                         'invoices.id',
                                         'invoices.store_identifier',
@@ -1836,7 +1836,7 @@ class AdminController extends Controller {
                                     return $data->nominal_terima_bersih;
                                 })
                                 ->make(true);
-        
+        }
         return view('admin.admin_mitra_bisnis_transaction_list');
         // $tenantInvoice = Tenant::select(['tenants.id', 'tenants.name'])
         //                         ->where('id_inv_code', 0)
