@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
@@ -32,6 +33,9 @@ class AppServiceProvider extends ServiceProvider
         // if(config('app.env') === 'production') {
         //     URL::forceScheme('https');
         // }
+        if($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
         config(['app.locale' => 'id']);
         Carbon::setLocale('id');
         date_default_timezone_set('Asia/Jakarta');
