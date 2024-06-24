@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Auth\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
-use Yajra\DataTables\Facades\Datatables;
+// use Yajra\DataTables\Facades\Datatables;
 use Illuminate\Support\Facades\Response;
 use Stevebauman\Location\Facades\Location;
 use GuzzleHttp\Client as GuzzleHttpClient;
-// use Yajra\Datatables\Datatables;
+use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
