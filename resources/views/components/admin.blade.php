@@ -113,8 +113,7 @@
 
         <script src="{{ asset('assets/js/pages/calendar.init.js') }}"></script>
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
-        <script src="{{ asset('assets/js/pages/admin.init.js') }}"></script>
-        <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
+
         <script type="text/javascript">
             $(function () {
                 
@@ -122,7 +121,7 @@
                   processing: true,
                   serverSide: true,
                   ajax: {
-                        "url": '{{ url('admin.dashboard.mitraBisnis.transactionList.testingWoi') }}' + '?_token=' + '{{ csrf_token() }}',
+                        "url": '{{ route('admin.dashboard.mitraBisnis.transactionList.testingWoi') }}' + '?_token=' + '{{ csrf_token() }}',
                         "type": "POST"
                   },
                   columns: [
@@ -146,6 +145,8 @@
                 
             });
         </script>
+        <script src="{{ asset('assets/js/pages/admin.init.js') }}"></script>
+        <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
         <script>
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"
