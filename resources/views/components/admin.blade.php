@@ -121,7 +121,12 @@
               var table = $('.data-table').DataTable({
                   processing: true,
                   serverSide: true,
-                  ajax: "{{ route('admin.dashboard.mitraBisnis.transactionList') }}",
+                  "ajax": {
+                        "url": "{{ route('admin.dashboard.mitraBisnis.transactionList') }},
+                        "type": "GET",
+
+                  },
+                //   ajax: "{{ route('admin.dashboard.mitraBisnis.transactionList') }}",
                   columns: [
                       {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                       // {data: 'name', name: 'name'},
