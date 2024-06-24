@@ -194,6 +194,7 @@ $(function () {
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'nomor_invoice', name: 'nomor_invoice'},
             {data: 'store_identifier', name: 'store_identifier'},
+            {data: 'email', name: 'email'},
             {data: 'tanggal_transaksi', name: 'tanggal_transaksi'},
             {data: 'tanggal_pembayaran', name: 'tanggal_pembayaran'},
             {data: 'jenis_pembayaran', name: 'jenis_pembayaran'},

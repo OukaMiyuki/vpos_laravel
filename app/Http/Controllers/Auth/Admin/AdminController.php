@@ -249,6 +249,9 @@ class AdminController extends Controller {
                                 ->editColumn('store_identifier', function($data) {
                                     return $data->store_identifier;
                                 })
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
                                 ->editColumn('status', function($data) {
                                     return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
                                 })
@@ -1885,6 +1888,12 @@ class AdminController extends Controller {
                                 })
                                 ->rawColumns(['status'])
                                 ->editColumn('tanggal_transaksi', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
+                                    $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                    $dateTimeTransaksi = $date." ".$time;
+                                    return $dateTimeTransaksi;
+                                })
+                                ->editColumn('tanggal_pembayaran', function($data) {
                                     if(!is_null($data->tanggal_pelunasan) || !empty($data->tanggal_pelunasan)){
                                         $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
                                         $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
@@ -1893,12 +1902,6 @@ class AdminController extends Controller {
                                     } else {
                                         return "";
                                     }
-                                })
-                                ->editColumn('tanggal_pembayaran', function($data) {
-                                    $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
-                                    $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
-                                    $dateTimePembayaran = $date." ".$time;
-                                    return $dateTimePembayaran;
                                 })
                                 ->editColumn('jenis_pembayaran', function($data) {
                                     return $data->jenis_pembayaran;

@@ -50,6 +50,7 @@
                                             <th>No.</th>
                                             <th>No. Invoice</th>
                                             <th>Store Identifier</th>
+                                            <th>Email</th>
                                             <th class="text-center">Tanggal Transaksi</th>
                                             <th class="text-center">Tanggal Pembayaran</th>
                                             <th class="text-center">Jenis Pembayaran</th>
