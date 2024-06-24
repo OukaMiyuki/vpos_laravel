@@ -1748,104 +1748,95 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMitraBisnisTransactionList(Request $request){
-        if ($request->ajax()) {
-            $data = Invoice::select(['id', 'store_identifier', 'email']);
-            return Datatables::of($data)
-                        ->addIndexColumn()
-                        ->addColumn('action', function($row){
-                            $actionBtn = '<a href="javascript:void(0)" class="edit btn btn-success btn-sm">Edit</a> <a href="javascript:void(0)" class="delete btn btn-danger btn-sm">Delete</a>';
-                            return $actionBtn;
-                        })
-                        ->rawColumns(['action'])
-                        ->make(true);
-            // $data = Invoice::select([
-            //                             'invoices.id',
-            //                             'invoices.store_identifier',
-            //                             'invoices.email',
-            //                             'invoices.id_tenant',
-            //                             'invoices.nomor_invoice',
-            //                             'invoices.tanggal_transaksi',
-            //                             'invoices.tanggal_pelunasan',
-            //                             'invoices.jenis_pembayaran',
-            //                             'invoices.status_pembayaran',
-            //                             'invoices.nominal_bayar',
-            //                             'invoices.kembalian',
-            //                             'invoices.mdr',
-            //                             'invoices.nominal_mdr',
-            //                             'invoices.nominal_terima_bersih',
-            //                             'invoices.created_at',
-            //                             'invoices.updated_at'
-            //                         ])
-            //                         ->with([
-            //                             'tenant' => function($query){
-            //                                 $query->select([
-            //                                     'tenants.id',
-            //                                     'tenants.name'
-            //                                 ]);
-            //                             },
-            //                             'storeMitra' => function($query){
-            //                                 $query->select([
-            //                                     'store_lists.id',
-            //                                     'store_lists.id_user',
-            //                                     'store_lists.email',
-            //                                     'store_lists.store_identifier',
-            //                                     'store_lists.name',
-            //                                 ]);
-            //                             }
-            //                         ])
-            //                         ->whereHas('tenant', function($query){
-            //                             $query->where('id_inv_code', '==', 0);
-            //                         })
-            //                         ->latest()
-            //                         ->get();
+        // if ($request->ajax()) {
+            $data = Invoice::select([
+                                        'invoices.id',
+                                        'invoices.store_identifier',
+                                        'invoices.email',
+                                        'invoices.id_tenant',
+                                        'invoices.nomor_invoice',
+                                        'invoices.tanggal_transaksi',
+                                        'invoices.tanggal_pelunasan',
+                                        'invoices.jenis_pembayaran',
+                                        'invoices.status_pembayaran',
+                                        'invoices.nominal_bayar',
+                                        'invoices.kembalian',
+                                        'invoices.mdr',
+                                        'invoices.nominal_mdr',
+                                        'invoices.nominal_terima_bersih',
+                                        'invoices.created_at',
+                                        'invoices.updated_at'
+                                    ])
+                                    ->with([
+                                        'tenant' => function($query){
+                                            $query->select([
+                                                'tenants.id',
+                                                'tenants.name'
+                                            ]);
+                                        },
+                                        'storeMitra' => function($query){
+                                            $query->select([
+                                                'store_lists.id',
+                                                'store_lists.id_user',
+                                                'store_lists.email',
+                                                'store_lists.store_identifier',
+                                                'store_lists.name',
+                                            ]);
+                                        }
+                                    ])
+                                    ->whereHas('tenant', function($query){
+                                        $query->where('id_inv_code', '==', 0);
+                                    })
+                                    ->latest()
+                                    ->get();
 
-            // return Datatables::of($data)
-            //                     ->addIndexColumn()
-            //                     ->editColumn('nomor_invoice', function($data) {
-            //                         return $data->nomor_invoice;
-            //                     })
-            //                     ->editColumn('tenant', function($data) {
-            //                         return $data->tenant->name;
-            //                     })
-            //                     ->editColumn('store_identifier', function($data) {
-            //                         return $data->store_identifier;
-            //                     })
-            //                     ->editColumn('merchant_name', function($data) {
-            //                         return $data->storeMitra->name;
-            //                     })
-            //                     ->editColumn('status', function($data) {
-            //                         return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
-            //                     })
-            //                     ->rawColumns(['status'])
-            //                     ->editColumn('tanggal_transaksi', function($data) {
-            //                         $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
-            //                         $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
-            //                         $dateTimeTransaksi = $date." ".$time;
-            //                         return $dateTimeTransaksi;
-            //                     })
-            //                     ->editColumn('tanggal_pembayaran', function($data) {
-            //                         $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
-            //                         $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
-            //                         $dateTimePembayaran = $date." ".$time;
-            //                         return $dateTimePembayaran;
-            //                     })
-            //                     ->editColumn('jenis_pembayaran', function($data) {
-            //                         return $data->jenis_pembayaran;
-            //                     })
-            //                     ->editColumn('nominal_bayar', function($data) {
-            //                         return $data->nominal_bayar;
-            //                     })
-            //                     ->editColumn('mdr', function($data) {
-            //                         return $data->mdr;
-            //                     })
-            //                     ->editColumn('nominal_mdr', function($data) {
-            //                         return $data->nominal_mdr;
-            //                     })
-            //                     ->editColumn('nominal_terima_bersih', function($data) {
-            //                         return $data->nominal_terima_bersih;
-            //                     })
-            //                     ->make(true);
-        }
+            return Datatables::of($data)
+                                ->addIndexColumn()
+                                ->editColumn('nomor_invoice', function($data) {
+                                    return $data->nomor_invoice;
+                                })
+                                ->editColumn('tenant', function($data) {
+                                    return $data->tenant->name;
+                                })
+                                ->editColumn('store_identifier', function($data) {
+                                    return $data->store_identifier;
+                                })
+                                ->editColumn('merchant_name', function($data) {
+                                    return $data->storeMitra->name;
+                                })
+                                ->editColumn('status', function($data) {
+                                    return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
+                                })
+                                ->rawColumns(['status'])
+                                ->editColumn('tanggal_transaksi', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
+                                    $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                    $dateTimeTransaksi = $date." ".$time;
+                                    return $dateTimeTransaksi;
+                                })
+                                ->editColumn('tanggal_pembayaran', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
+                                    $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
+                                    $dateTimePembayaran = $date." ".$time;
+                                    return $dateTimePembayaran;
+                                })
+                                ->editColumn('jenis_pembayaran', function($data) {
+                                    return $data->jenis_pembayaran;
+                                })
+                                ->editColumn('nominal_bayar', function($data) {
+                                    return $data->nominal_bayar;
+                                })
+                                ->editColumn('mdr', function($data) {
+                                    return $data->mdr;
+                                })
+                                ->editColumn('nominal_mdr', function($data) {
+                                    return $data->nominal_mdr;
+                                })
+                                ->editColumn('nominal_terima_bersih', function($data) {
+                                    return $data->nominal_terima_bersih;
+                                })
+                                ->make(true);
+        // }
         return view('admin.admin_mitra_bisnis_transaction_list');
         // $tenantInvoice = Tenant::select(['tenants.id', 'tenants.name'])
         //                         ->where('id_inv_code', 0)
