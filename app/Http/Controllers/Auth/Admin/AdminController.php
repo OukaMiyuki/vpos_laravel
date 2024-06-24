@@ -1807,6 +1807,7 @@ class AdminController extends Controller {
                                 ->editColumn('status', function($data) {
                                     return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
                                 })
+                                ->rawColumns(['status'])
                                 ->editColumn('tanggal_transaksi', function($data) {
                                     $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
                                     $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
@@ -1834,7 +1835,6 @@ class AdminController extends Controller {
                                 ->editColumn('nominal_terima_bersih', function($data) {
                                     return $data->nominal_terima_bersih;
                                 })
-                                ->rawColumns(['status'])
                                 ->make(true);
         }
         return view('admin.admin_mitra_bisnis_transaction_list');
