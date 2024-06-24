@@ -39,7 +39,14 @@
                                             <th>Tenant</th>
                                             <th>Store Identifier</th>
                                             <th>Merchant Name</th>
-                                           
+                                            <th class="text-center">Status Pembayaran</th>
+                                            <th>Tanggal Transaksi</th>
+                                            <th>Tanggal Pembayaran</th>
+                                            <th>Jenis Pembayaran</th>
+                                            <th>Nominal Bayar</th>
+                                            <th>MDR (%)</th>
+                                            <th>Nominal MDR</th>
+                                            <th>Nominal Terima Bersih Qris</th>
                                         </tr>
                                     </thead>
                                     <tbody>

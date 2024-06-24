@@ -1804,7 +1804,37 @@ class AdminController extends Controller {
                                 ->editColumn('merchant_name', function($data) {
                                     return $data->storeMitra->name;
                                 })
-                               
+                                ->editColumn('status', function($data) {
+                                    return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
+                                })
+                                ->rawColumns(['status'])
+                                ->editColumn('tanggal_transaksi', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
+                                    $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                    $dateTimeTransaksi = $date." ".$time;
+                                    return $dateTimeTransaksi;
+                                })
+                                ->editColumn('tanggal_pembayaran', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
+                                    $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
+                                    $dateTimePembayaran = $date." ".$time;
+                                    return $dateTimePembayaran;
+                                })
+                                ->editColumn('jenis_pembayaran', function($data) {
+                                    return $data->jenis_pembayaran;
+                                })
+                                ->editColumn('nominal_bayar', function($data) {
+                                    return $data->nominal_bayar;
+                                })
+                                ->editColumn('mdr', function($data) {
+                                    return $data->mdr;
+                                })
+                                ->editColumn('nominal_mdr', function($data) {
+                                    return $data->nominal_mdr;
+                                })
+                                ->editColumn('nominal_terima_bersih', function($data) {
+                                    return $data->nominal_terima_bersih;
+                                })
                                 ->make(true);
         }
         return view('admin.admin_mitra_bisnis_transaction_list');
