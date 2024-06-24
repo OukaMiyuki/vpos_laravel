@@ -30,8 +30,21 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Transaksi User</h4>
+                            <div class="row">
+                                <div class="col-6">
+                                    
+                                </div>
+                                <div class="col-6 text-end">
+                                    <div id="daterange"  class="float-end" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%; text-align:center">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> 
+                                        <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="selection-datatable" class="table user-table-transaction dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -48,7 +61,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach($invoice as $key => $invoice)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
@@ -77,7 +90,7 @@
                                                 <td>{{ $invoice->nominal_mdr }}</td>
                                                 <td>{{ $invoice->nominal_terima_bersih }}</td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>
