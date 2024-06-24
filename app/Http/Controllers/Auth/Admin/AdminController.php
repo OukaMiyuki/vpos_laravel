@@ -2865,7 +2865,7 @@ class AdminController extends Controller {
                                     ->latest()
                                     ->get();
 
-            $tes =  Datatables::of($data)
+            return Datatables::of($data)
                                 ->addIndexColumn()
                                 ->editColumn('nomor_invoice', function($data) {
                                     return $data->nomor_invoice;
@@ -2919,7 +2919,6 @@ class AdminController extends Controller {
                                 // })
                                 ->rawColumns(['status'])
                                 ->make(true);
-            dd($tes);
         }
         return view('testing');
     }
