@@ -1748,6 +1748,47 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMitraBisnisTransactionList(Request $request){
+        $data = Invoice::select([
+                                'invoices.id',
+                                'invoices.store_identifier',
+                                'invoices.email',
+                                'invoices.id_tenant',
+                                'invoices.nomor_invoice',
+                                'invoices.tanggal_transaksi',
+                                'invoices.tanggal_pelunasan',
+                                'invoices.jenis_pembayaran',
+                                'invoices.status_pembayaran',
+                                'invoices.nominal_bayar',
+                                'invoices.kembalian',
+                                'invoices.mdr',
+                                'invoices.nominal_mdr',
+                                'invoices.nominal_terima_bersih',
+                                'invoices.created_at',
+                                'invoices.updated_at'
+                            ])
+                            ->with([
+                                'tenant' => function($query){
+                                    $query->select([
+                                        'tenants.id',
+                                        'tenants.name'
+                                    ]);
+                                },
+                                'storeMitra' => function($query){
+                                    $query->select([
+                                        'store_lists.id',
+                                        'store_lists.id_user',
+                                        'store_lists.email',
+                                        'store_lists.store_identifier',
+                                        'store_lists.name',
+                                    ]);
+                                }
+                            ])
+                            ->whereHas('tenant', function($query){
+                                $query->where('id_inv_code', '==', 0);
+                            })
+                            ->latest()
+                            ->get();
+        dd($data);
         if ($request->ajax()) {
             $data = Invoice::select([
                                         'invoices.id',
