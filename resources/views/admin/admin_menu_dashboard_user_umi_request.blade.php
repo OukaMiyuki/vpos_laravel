@@ -30,8 +30,21 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Request UMI</h4>
+                            <div class="row">
+                                <div class="col-6">
+                                    
+                                </div>
+                                <div class="col-6 text-end">
+                                    <div id="daterange_umi_request" class="float-end" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%; text-align:center">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> 
+                                        <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                <table id="scroll-horizontal-datatable" class="table user-table-umi-request dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -46,7 +59,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach($umiRequest as $key => $umi)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
@@ -82,7 +95,7 @@
                                                     @endif
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>

@@ -161,12 +161,12 @@ $(function () {
 $(function () {
     var start_date = moment().subtract(1, 'M');
     var end_date = moment();
-    $('#daterange span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
-    $('#daterange').daterangepicker({
+    $('#daterange_transaction span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_transaction').daterangepicker({
         startDate : start_date,
         endDate : end_date
     }, function(start_date, end_date){
-        $('#daterange span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+        $('#daterange_transaction span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
 
         table_user_transaction.draw();
     });
@@ -178,16 +178,16 @@ $(function () {
             "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/transaction',
             "type": "GET",
             data : function(data){
-                data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
-                data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
+                data.from_date = $('#daterange_transaction').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_transaction').data('daterangepicker').endDate.format('YYYY-MM-DD');
             }
         },
         // ajax: {
         //     "url": 'http://localhost:8000/admin/dashboard/user/transaction',
         //     "type": "GET",
         //     data : function(data){
-        //         data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
-        //         data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //         data.from_date = $('#daterange_transaction').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_transaction').data('daterangepicker').endDate.format('YYYY-MM-DD');
         //     }
         // },
         columns: [
@@ -204,6 +204,142 @@ $(function () {
             {data: 'nominal_mdr', name: 'nominal_mdr'},
             {data: 'nominal_terima_bersih', name: 'nominal_terima_bersih'},
             // {data: 'action', name: 'action', orderable: false, searchable: false},
-        ]
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [4,5] },
+        ],
+    });
+});
+
+$(function () {
+    var table_settlement_ready = $('.user-table-transaction-ready-settlement').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/user/transaction/settlement-ready',
+            "type": "GET",
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/user/transaction/settlement-ready',
+        //     "type": "GET",
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'nomor_invoice', name: 'nomor_invoice'},
+            {data: 'store_identifier', name: 'store_identifier'},
+            {data: 'email', name: 'email'},
+            {data: 'tanggal_transaksi', name: 'tanggal_transaksi'},
+            {data: 'tanggal_pembayaran', name: 'tanggal_pembayaran'},
+            {data: 'jenis_pembayaran', name: 'jenis_pembayaran'},
+            {data: 'status', name: 'status'},
+            {data: 'nominal_bayar', name: 'nominal_bayar'},
+            {data: 'mdr', name: 'mdr'},
+            {data: 'nominal_mdr', name: 'nominal_mdr'},
+            {data: 'nominal_terima_bersih', name: 'nominal_terima_bersih'},
+            // {data: 'action', name: 'action', orderable: false, searchable: false},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [4,5] },
+        ],
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_user_withdraw span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_user_withdraw').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_user_withdraw span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_withdrawal.draw();
+    });
+
+
+    var table_user_withdrawal = $('.user-table-withdrawal').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/user/withdrawal',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_user_withdraw').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_user_withdraw').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/user/withdrawals',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_user_withdraw').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_user_withdraw').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+            {data: 'nomor_invoice', name: 'nomor_invoice'},
+            {data: 'email', name: 'email'},
+            {data: 'jenis_penarikan', name: 'jenis_penarikan'},
+            {data: 'tanggal_penarikan', name: 'tanggal_penarikan'},
+            {data: 'nominal', name: 'nominal'},
+            {data: 'total_biaya', name: 'total_biaya'},
+            {data: 'status', name: 'status'},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [5] },
+        ],
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_umi_request span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_umi_request').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_umi_request span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_withdrawal.draw();
+    });
+
+
+    var table_user_withdrawal = $('.user-table-umi-request').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/user/request-umi',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_umi_request').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_umi_request').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/user/request-umi',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_umi_request').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_umi_request').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'email', name: 'email'},
+            {data: 'store_identifier', name: 'store_identifier'},
+            {data: 'tanggal_pengajuan', name: 'tanggal_pengajuan'},
+            {data: 'tanggal_approval', name: 'tanggal_approval'},
+            {data: 'status', name: 'status'},
+            {data: 'file_attach', name: 'file_attach'},
+            {data: 'note', name: 'note'},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [3, 4, 5, 6] },
+        ],
     });
 });

@@ -31,12 +31,13 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Transaksi User Settlement</h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="selection-datatable" class="table user-table-transaction-ready-settlement dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>No. Invoice</th>
                                             <th>Store Identifier</th>
+                                            <th>Email</th>
                                             <th class="text-center">Tanggal Transaksi</th>
                                             <th class="text-center">Tanggal Pembayaran</th>
                                             <th class="text-center">Jenis Pembayaran</th>
@@ -48,36 +49,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
-                                        @foreach($invoice as $key => $invoice)
-                                            <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $invoice->nomor_invoice }}</td>
-                                                <td>{{ $invoice->store_identifier }}</td>
-                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
-                                                <td class="text-center">
-                                                    @if (!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan))
-                                                        {{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}
-                                                    @endif
-                                                </td>
-                                                <td class="text-center">{{ $invoice->jenis_pembayaran }}</td>
-                                                <td>
-                                                    @if (!empty($invoice->jenis_pembayaran) || !is_null($invoice->jenis_pembayaran) || $invoice->jenis_pembayaran != "")
-                                                        @if($invoice->status_pembayaran == 0)
-                                                            <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
-                                                        @elseif($invoice->status_pembayaran == 1)
-                                                            <span class="badge bg-soft-success text-success">Selesai</span>
-                                                        @endif
-                                                    @else
-                                                        <span class="badge bg-soft-danger text-danger">Belum Diproses</span>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $invoice->nominal_bayar }}</td>
-                                                <td>{{ $invoice->mdr }}</td>
-                                                <td>{{ $invoice->nominal_mdr }}</td>
-                                                <td>{{ $invoice->nominal_terima_bersih }}</td>
-                                            </tr>
-                                        @endforeach
+                                        
                                     </tbody>
                                 </table>
                             </div>

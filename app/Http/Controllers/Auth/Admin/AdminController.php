@@ -290,38 +290,140 @@ class AdminController extends Controller {
                                 ->make(true);
         }
         return view('admin.admin_menu_dashboard_user_transaction');
-        // $invoice = Invoice::latest()->get();
-        // return view('admin.admin_menu_dashboard_user_transaction', compact('invoice'));
     }
 
-    public function adminMenuUserTransactionSettlementReady(){
-        $invoice = Invoice::where('settlement_status', 0)
+    public function adminMenuUserTransactionSettlementReady(Request $request){
+        if ($request->ajax()) {
+            $data = Invoice::select([
+                                        'invoices.id',
+                                        'invoices.store_identifier',
+                                        'invoices.email',
+                                        'invoices.id_tenant',
+                                        'invoices.nomor_invoice',
+                                        'invoices.tanggal_transaksi',
+                                        'invoices.tanggal_pelunasan',
+                                        'invoices.jenis_pembayaran',
+                                        'invoices.status_pembayaran',
+                                        'invoices.nominal_bayar',
+                                        'invoices.kembalian',
+                                        'invoices.mdr',
+                                        'invoices.nominal_mdr',
+                                        'invoices.nominal_terima_bersih',
+                                        'invoices.created_at',
+                                        'invoices.updated_at'
+                                    ])
+                                    ->where('settlement_status', 0)
                                     ->where('jenis_pembayaran', 'Qris')
                                     ->where('status_pembayaran', 1)
                                     ->whereDate('tanggal_transaksi', '!=', Carbon::now())
                                     ->latest()
                                     ->get();
-        return view('admin.admin_menu_dashboard_user_transaction_settlement', compact('invoice'));
+
+            return Datatables::of($data)
+                                    ->addIndexColumn()
+                                    ->editColumn('nomor_invoice', function($data) {
+                                        return $data->nomor_invoice;
+                                    })
+                                    ->editColumn('store_identifier', function($data) {
+                                        return $data->store_identifier;
+                                    })
+                                    ->editColumn('email', function($data) {
+                                        return $data->email;
+                                    })
+                                    ->editColumn('tanggal_transaksi', function($data) {
+                                        $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
+                                        $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                        $dateTimeTransaksi = $date." ".$time;
+                                        return $dateTimeTransaksi;
+                                    })
+                                    ->editColumn('tanggal_pembayaran', function($data) {
+                                        if(!is_null($data->tanggal_pelunasan) || !empty($data->tanggal_pelunasan)){
+                                            $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
+                                            $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
+                                            $dateTimePembayaran = $date." ".$time;
+                                            return $dateTimePembayaran;
+                                        } else {
+                                            return "";
+                                        }
+                                    })
+                                    ->editColumn('jenis_pembayaran', function($data) {
+                                        return $data->jenis_pembayaran;
+                                    })
+                                    ->editColumn('status', function($data) {
+                                        return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
+                                    })
+                                    ->rawColumns(['status'])
+                                    ->editColumn('nominal_bayar', function($data) {
+                                        return $data->nominal_bayar;
+                                    })
+                                    ->editColumn('mdr', function($data) {
+                                        return $data->mdr;
+                                    })
+                                    ->editColumn('nominal_mdr', function($data) {
+                                        return $data->nominal_mdr;
+                                    })
+                                    ->editColumn('nominal_terima_bersih', function($data) {
+                                        return $data->nominal_terima_bersih;
+                                    })
+                                    ->make(true);
+        }
+        return view('admin.admin_menu_dashboard_user_transaction_settlement');
     }
 
-    public function adminMenuUserWithdrawals(){
-        $withdrawals = Withdrawal::select([
-                                    'withdrawals.id',
-                                    'withdrawals.invoice_pemarikan',
-                                    'withdrawals.email',
-                                    'withdrawals.jenis_penarikan',
-                                    'withdrawals.tanggal_penarikan',
-                                    'withdrawals.nominal',
-                                    'withdrawals.biaya_admin',
-                                    'withdrawals.status',
-                                    'withdrawals.created_at',
-                                    'withdrawals.updated_at',
-                                ])
-                                ->where('email', '!=', 'adminsu@visipos.id')
-                                ->latest()
-                                ->get();
-
-        return view('admin.admin_menu_dashboard_user_withdrawals', compact(['withdrawals']));
+    public function adminMenuUserWithdrawals(Request $request){
+        if ($request->ajax()) {
+            $data = Withdrawal::select([
+                                        'withdrawals.id',
+                                        'withdrawals.invoice_pemarikan',
+                                        'withdrawals.email',
+                                        'withdrawals.jenis_penarikan',
+                                        'withdrawals.tanggal_penarikan',
+                                        'withdrawals.nominal',
+                                        'withdrawals.biaya_admin',
+                                        'withdrawals.status',
+                                        'withdrawals.created_at',
+                                        'withdrawals.updated_at',
+                                    ])
+                                    ->where('email', '!=', 'adminsu@visipos.id')
+                                    ->latest()
+                                    ->get();
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->whereBetween('tanggal_penarikan', [$request->from_date, $request->to_date]);
+            }
+            return Datatables::of($data)
+                                    ->addIndexColumn()
+                                    ->addColumn('action', function($row){
+                                        $actionBtn = '<a href="/admin/dashboard/user/withdrawals/'.$row->id.'" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>';
+                                        return $actionBtn;
+                                    })
+                                    ->editColumn('nomor_invoice', function($data) {
+                                        return $data->invoice_pemarikan;
+                                    })
+                                    ->editColumn('email', function($data) {
+                                        return $data->email;
+                                    })
+                                    ->editColumn('jenis_penarikan', function($data) {
+                                        return $data->jenis_penarikan;
+                                    })
+                                    ->editColumn('tanggal_penarikan', function($data) {
+                                        $date = \Carbon\Carbon::parse($data->tanggal_penarikan)->format('d-m-Y');
+                                        $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                        $dateTimeTransaksi = $date." ".$time;
+                                        return $dateTimeTransaksi;
+                                    })
+                                    ->editColumn('nominal', function($data) {
+                                        return $data->nominal;
+                                    })
+                                    ->editColumn('total_biaya', function($data) {
+                                        return $data->biaya_admin;
+                                    })
+                                    ->editColumn('status', function($data) {
+                                        return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Penarikan Sukses</span>':'<span class="badge bg-soft-warning text-danger">Penarikan Gagal</span>');
+                                    })
+                                    ->rawColumns(['status', 'action'])
+                                    ->make(true);
+        }
+        return view('admin.admin_menu_dashboard_user_withdrawals');
     }
 
     public function adminMenuUserWithdrawalDetail($id){
@@ -379,23 +481,79 @@ class AdminController extends Controller {
         return view('admin.admin_user_withdraw_invoice', compact(['withdraw', 'user', 'userType', 'rekening']));
     }
 
-    public function adminMenuUserUmiRequest(){
-        $umiRequest = UmiRequest::select([
-                                    'umi_requests.id',
-                                    'umi_requests.id_tenant',
-                                    'umi_requests.email',
-                                    'umi_requests.store_identifier',
-                                    'umi_requests.tanggal_pengajuan',
-                                    'umi_requests.tanggal_approval',
-                                    'umi_requests.is_active',
-                                    'umi_requests.file_path',
-                                    'umi_requests.note',
-                                    'umi_requests.created_at',
-                                    'umi_requests.updated_at'
-                                ])
-                                ->latest()
-                                ->get();
-        return view('admin.admin_menu_dashboard_user_umi_request', compact(['umiRequest']));
+    public function adminMenuUserUmiRequest(Request $request){
+        if ($request->ajax()) {
+            $data = UmiRequest::select([
+                                        'umi_requests.id',
+                                        'umi_requests.id_tenant',
+                                        'umi_requests.email',
+                                        'umi_requests.store_identifier',
+                                        'umi_requests.tanggal_pengajuan',
+                                        'umi_requests.tanggal_approval',
+                                        'umi_requests.is_active',
+                                        'umi_requests.file_path',
+                                        'umi_requests.note',
+                                        'umi_requests.created_at',
+                                        'umi_requests.updated_at'
+                                    ])
+                                    ->latest()
+                                    ->get();
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->whereBetween('tanggal_pengajuan', [$request->from_date, $request->to_date]);
+            }
+
+            return Datatables::of($data)
+                                ->addIndexColumn()
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('store_identifier', function($data) {
+                                    return $data->store_identifier;
+                                })
+                                ->editColumn('tanggal_pengajuan', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->tanggal_pengajuan)->format('d-m-Y');
+                                    $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                    $dateTimeTransaksi = $date." ".$time;
+                                    return $dateTimeTransaksi;
+                                })
+                                ->editColumn('tanggal_approval', function($data) {
+                                    if(!is_null($data->tanggal_approval) || !empty($data->tanggal_approval)){
+                                        $date = \Carbon\Carbon::parse($data->tanggal_approval)->format('d-m-Y');
+                                        $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
+                                        $dateTimeTransaksi = $date." ".$time;
+                                        return $dateTimeTransaksi;
+                                    } else {
+                                        return "";
+                                    }
+                                })
+                                ->editColumn('status', function($data) {
+                                    if($data->is_avtive == 0){
+                                        return '<span class="badge bg-soft-warning text-warning">Belum Disetujui</span>';
+                                    } else if($data->is_avtive == 1){
+                                        return '<span class="badge bg-soft-success text-success">Disetujui</span>';
+                                    } else if ($data->is_avtive == 2){
+                                        return '<span class="badge bg-soft-danger text-danger">Ditolak</span>';
+                                    }
+                                })
+                                ->addColumn('file_attach', function($row){
+                                    $actionBtn = '<a title="Download dokumen request UMI" href="/admin/dashboard/user/request-umi/download/'.$row->id.'" class="btn btn-info btn-xs font-16 text-white"><i class="dripicons-download"></i></a>';
+                                    return $actionBtn;
+                                })
+                                ->editColumn('note', function($data) {
+                                    return $data->note;
+                                })
+                                ->addColumn('action', function($row){
+                                    if($row->is_avtive == 0){
+                                        $actionBtn = '<a href="" id="approval-umi" data-id="'.$row->id.'" data-store_identifier="'.$row->store_identifier.'" data-bs-toggle="modal" data-bs-target="#approve-umi-modal" class="btn btn-xs btn-success"><i class="mdi mdi-check-bold"></i></a> <a href="" id="reject-umi" data-id="'.$row->id.'" data-store_identifier="'.$row->store_identifier.'" class="btn btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#reject-umi-modal"><i class="mdi mdi-close-thick"></i></a>';
+                                        return $actionBtn;
+                                    } else {
+                                        return "";
+                                    }
+                                })
+                                ->rawColumns(['status', 'file_attach', 'action'])
+                                ->make(true);
+        }
+        return view('admin.admin_menu_dashboard_user_umi_request');
     }
 
     public function adminMenuUserUmiRequestDownload($id){
