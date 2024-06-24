@@ -129,14 +129,7 @@
                       {data: 'tenant', name: 'tenant'},
                       {data: 'store_identifier', name: 'store_identifier'},
                       {data: 'merchant_name', name: 'merchant_name'},
-                      {data: 'status', name: 'status'},
-                      {data: 'tanggal_transaksi', name: 'tanggal_transaksi'},
-                      {data: 'tanggal_pembayaran', name: 'tanggal_pembayaran'},
-                      {data: 'jenis_pembayaran', name: 'jenis_pembayaran'},
-                      {data: 'nominal_bayar', name: 'nominal_bayar'},
-                      {data: 'mdr', name: 'mdr'},
-                      {data: 'nominal_mdr', name: 'nominal_mdr'},
-                      {data: 'nominal_terima_bersih', name: 'nominal_terima_bersih'},
+                     
                       // {data: 'action', name: 'action', orderable: false, searchable: false},
                   ]
               });
