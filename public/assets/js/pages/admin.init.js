@@ -157,15 +157,28 @@ $(function () {
         ]
     });
 
-    var table = $('.user-table-transaction').DataTable({
+    var start_date_user_transaction = moment().subtract(1, 'M');
+    var end_date_user_transaction = moment();
+    $('#daterange-filter-user-transaction span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange-filter-user-transaction').daterangepicker({
+        startDate : start_date_user_transaction,
+        endDate : end_date_user_transaction
+    }, function(start_date, end_date){
+        $('#daterange span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_transaction_user.draw();
+    });
+
+
+    var table_transaction_user = $('.user-table-transaction').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
             "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/transaction',
             "type": "GET",
             data : function(data){
-                data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
-                data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
+                data.from_date = $('#daterange-filter-user-transaction').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange-filter-user-transaction').data('daterangepicker').endDate.format('YYYY-MM-DD');
             }
         },
         // ajax: {
