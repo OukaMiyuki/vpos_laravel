@@ -121,8 +121,8 @@
                   processing: true,
                   serverSide: true,
                   ajax: {
-                        "url": '{{ route('admin.dashboard.mitraBisnis.transactionList.testingWoi') }}' + '?_token=' + '{{ csrf_token() }}',
-                        "type": "POST"
+                        "url": '{{ route('admin.dashboard.mitraBisnis.transactionList') }}',
+                        "type": "GET"
                   },
                   columns: [
                       {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
