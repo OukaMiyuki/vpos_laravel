@@ -34,10 +34,10 @@
                                 <table id="selection-datatable" class="table data-table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th>No.</th>
-                                            <th>No. Invoice</th>
-                                            <th>Tenant</th>
+                                            <th>ID</th>
                                             <th>Store Identifier</th>
+                                            <th>Email</th>
+                                            {{-- <th>Store Identifier</th>
                                             <th>Merchant Name</th>
                                             <th class="text-center">Status Pembayaran</th>
                                             <th>Tanggal Transaksi</th>
@@ -46,7 +46,7 @@
                                             <th>Nominal Bayar</th>
                                             <th>MDR (%)</th>
                                             <th>Nominal MDR</th>
-                                            <th>Nominal Terima Bersih Qris</th>
+                                            <th>Nominal Terima Bersih Qris</th> --}}
                                         </tr>
                                     </thead>
                                     <tbody>

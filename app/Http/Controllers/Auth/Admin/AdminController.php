@@ -1749,7 +1749,15 @@ class AdminController extends Controller {
 
     public function adminDashboardMitraBisnisTransactionList(Request $request){
         if ($request->ajax()) {
-            return "coba";
+            $data = Invoice::select(['id', 'store_identifier', 'email']);
+            return Datatables::of($data)
+                        ->addIndexColumn()
+                        ->addColumn('action', function($row){
+                            $actionBtn = '<a href="javascript:void(0)" class="edit btn btn-success btn-sm">Edit</a> <a href="javascript:void(0)" class="delete btn btn-danger btn-sm">Delete</a>';
+                            return $actionBtn;
+                        })
+                        ->rawColumns(['action'])
+                        ->make(true);
             // $data = Invoice::select([
             //                             'invoices.id',
             //                             'invoices.store_identifier',
