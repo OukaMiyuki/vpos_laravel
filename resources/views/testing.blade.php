@@ -47,6 +47,7 @@
     var table = $('.data-table').DataTable({
         processing: true,
         serverSide: true,
+        type : JSON,
         ajax: "{{ route('admin.dashboard.mitraBisnis.transactionList.testingWoi') }}",
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
