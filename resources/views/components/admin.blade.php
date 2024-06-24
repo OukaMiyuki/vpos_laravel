@@ -26,6 +26,10 @@
         <link href="{{ asset('assets/libs/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet" type="text/css" />
+        
+       
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+        
         <!-- App css -->
         <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-style"/>
         <!-- icons -->
@@ -93,7 +97,7 @@
         <script src="{{ asset('assets/libs/pdfmake/build/vfs_fonts.js') }}"></script>
         <script src="{{ asset('assets/libs/moment/min/moment.min.js') }}"></script>
         <script src="{{ asset('assets/libs/fullcalendar/main.min.js') }}"></script>
-
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
         @if(!Route::is('admin.dashboard.mitraBisnis.transactionList'))
             {{-- Datatables init Old --}}
             <script src="{{ asset('assets/js/pages/datatables.init.js') }}"></script>
@@ -116,32 +120,57 @@
 
         <script type="text/javascript">
             $(function () {
-                
-              var table = $('.data-table').DataTable({
-                  processing: true,
-                  serverSide: true,
-                  ajax: {
+                var start_date = moment().subtract(1, 'M');
+                var end_date = moment();
+
+                $('#daterange span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+                $('#daterange').daterangepicker({
+                    startDate : start_date,
+                    endDate : end_date
+                }, function(start_date, end_date){
+                    $('#daterange span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+                    table.draw();
+                });
+            
+                var table = $('.data-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
                         "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/transaction',
-                        "type": "GET"
-                  },
-                  columns: [
-                      {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-                      // {data: 'name', name: 'name'},
-                      {data: 'nomor_invoice', name: 'nomor_invoice'},
-                      {data: 'tenant', name: 'tenant'},
-                      {data: 'store_identifier', name: 'store_identifier'},
-                      {data: 'merchant_name', name: 'merchant_name'},
-                      {data: 'status', name: 'status'},
-                      {data: 'tanggal_transaksi', name: 'tanggal_transaksi'},
-                      {data: 'tanggal_pembayaran', name: 'tanggal_pembayaran'},
-                      {data: 'jenis_pembayaran', name: 'jenis_pembayaran'},
-                      {data: 'nominal_bayar', name: 'nominal_bayar'},
-                      {data: 'mdr', name: 'mdr'},
-                      {data: 'nominal_mdr', name: 'nominal_mdr'},
-                      {data: 'nominal_terima_bersih', name: 'nominal_terima_bersih'},
-                      // {data: 'action', name: 'action', orderable: false, searchable: false},
-                  ]
-              });
+                        "type": "GET",
+                        data : function(data){
+                            data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                            data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
+                        }
+                    },
+                    // ajax: {
+                    //     "url": 'http://localhost:8000/admin/dashboard/mitra-bisnis/transaction',
+                    //     "type": "GET",
+                    //     data : function(data){
+                    //         data.from_date = $('#daterange').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                    //         data.to_date = $('#daterange').data('daterangepicker').endDate.format('YYYY-MM-DD');
+                    //     }
+                    // },
+                    columns: [
+                        {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                        // {data: 'name', name: 'name'},
+                        {data: 'nomor_invoice', name: 'nomor_invoice'},
+                        {data: 'tenant', name: 'tenant'},
+                        {data: 'store_identifier', name: 'store_identifier'},
+                        {data: 'merchant_name', name: 'merchant_name'},
+                        {data: 'status', name: 'status'},
+                        {data: 'tanggal_transaksi', name: 'tanggal_transaksi'},
+                        {data: 'tanggal_pembayaran', name: 'tanggal_pembayaran'},
+                        {data: 'jenis_pembayaran', name: 'jenis_pembayaran'},
+                        {data: 'nominal_bayar', name: 'nominal_bayar'},
+                        {data: 'mdr', name: 'mdr'},
+                        {data: 'nominal_mdr', name: 'nominal_mdr'},
+                        {data: 'nominal_terima_bersih', name: 'nominal_terima_bersih'},
+                        // {data: 'action', name: 'action', orderable: false, searchable: false},
+                    ]
+                });
                 
             });
         </script>

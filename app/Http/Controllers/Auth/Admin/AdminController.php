@@ -1789,6 +1789,10 @@ class AdminController extends Controller {
                                     })
                                     ->latest()
                                     ->get();
+            
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->whereBetween('created_at', [$request->from_date, $request->to_date]);
+            }
 
             return Datatables::of($data)
                                 ->addIndexColumn()
