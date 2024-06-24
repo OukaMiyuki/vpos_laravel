@@ -260,10 +260,14 @@ class AdminController extends Controller {
                                     return $dateTimeTransaksi;
                                 })
                                 ->editColumn('tanggal_pembayaran', function($data) {
-                                    $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
-                                    $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
-                                    $dateTimePembayaran = $date." ".$time;
-                                    return $dateTimePembayaran;
+                                    if(!is_null($data->tanggal_pelunasan) || !empty($data->tanggal_pelunasan)){
+                                        $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
+                                        $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
+                                        $dateTimePembayaran = $date." ".$time;
+                                        return $dateTimePembayaran;
+                                    } else {
+                                        return "";
+                                    }
                                 })
                                 ->editColumn('jenis_pembayaran', function($data) {
                                     return $data->jenis_pembayaran;
@@ -1881,10 +1885,14 @@ class AdminController extends Controller {
                                 })
                                 ->rawColumns(['status'])
                                 ->editColumn('tanggal_transaksi', function($data) {
-                                    $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
-                                    $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
-                                    $dateTimeTransaksi = $date." ".$time;
-                                    return $dateTimeTransaksi;
+                                    if(!is_null($data->tanggal_pelunasan) || !empty($data->tanggal_pelunasan)){
+                                        $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
+                                        $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
+                                        $dateTimePembayaran = $date." ".$time;
+                                        return $dateTimePembayaran;
+                                    } else {
+                                        return "";
+                                    }
                                 })
                                 ->editColumn('tanggal_pembayaran', function($data) {
                                     $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
