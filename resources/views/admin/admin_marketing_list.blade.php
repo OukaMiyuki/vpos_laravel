@@ -31,22 +31,21 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Mitra Aplikasi</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                <table id="basic-datatable" class="table user-table-marketing-list dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
+                                            <th class="text-center">Action</th>
                                             <th>Nama</th>
                                             <th>No. KTP</th>
                                             <th>Phone</th>
                                             <th>Email</th>
                                             <th class="text-center">Tanggal Gabung</th>
-                                            <th class="text-center">Jenis Kelamin</th>
                                             <th class="text-center">Status</th>
-                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach ($marketing as $marketing)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
@@ -78,7 +77,7 @@
                                                     </a>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>

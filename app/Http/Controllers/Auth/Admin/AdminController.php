@@ -215,6 +215,7 @@ class AdminController extends Controller {
     }
 
     public function adminMenuUserTransaction(Request $request){
+        DB::connection()->enableQueryLog();
         if ($request->ajax()) {
             $data = Invoice::select([
                                         'invoices.id',
@@ -238,7 +239,10 @@ class AdminController extends Controller {
                                     ->get();
             
             if($request->filled('from_date') && $request->filled('to_date')) {
-                $data = $data->whereBetween('created_at', [$request->from_date, $request->to_date]);
+                //$data = $data->whereBetween('created_at', [$request->from_date, $request->to_date]);
+                $data = $data->where('tanggal_transaksi', '>=', $request->from_date)->where('tanggal_transaksi', '<=', $request->to_date);
+                // $action = "Testing Search | ".$request->from_date." | ".$request->to_date;
+                // $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             }
 
             return Datatables::of($data)
@@ -388,7 +392,8 @@ class AdminController extends Controller {
                                     ->latest()
                                     ->get();
             if($request->filled('from_date') && $request->filled('to_date')) {
-                $data = $data->whereBetween('tanggal_penarikan', [$request->from_date, $request->to_date]);
+                //$data = $data->whereBetween('tanggal_penarikan', [$request->from_date, $request->to_date]);
+                $data = $data->where('tanggal_penarikan', '>=', $request->from_date)->where('tanggal_penarikan', '<=', $request->to_date);
             }
             return Datatables::of($data)
                                     ->addIndexColumn()
@@ -499,7 +504,8 @@ class AdminController extends Controller {
                                     ->latest()
                                     ->get();
             if($request->filled('from_date') && $request->filled('to_date')) {
-                $data = $data->whereBetween('tanggal_pengajuan', [$request->from_date, $request->to_date]);
+                //$data = $data->whereBetween('tanggal_pengajuan', [$request->from_date, $request->to_date]);
+                $data = $data->where('tanggal_pengajuan', '>=', $request->from_date)->where('tanggal_pengajuan', '<=', $request->to_date);
             }
 
             return Datatables::of($data)
@@ -984,6 +990,7 @@ class AdminController extends Controller {
                                         'withdrawals.updated_at',
                                     ])
                                     ->where('email', '!=', 'adminsu@visipos.id')
+                                    ->take(20)
                                     ->latest()
                                     ->get();
         $insentifFromTenant = 0;
@@ -1332,28 +1339,80 @@ class AdminController extends Controller {
         return view('admin.admin_marketing_profile', compact('marketing'));
     }
 
-    public function adminDashboardMarketingList(){
-        $marketing = Marketing::select([
-                                'marketings.id',
-                                'marketings.name',
-                                'marketings.email',
-                                'marketings.email_verified_at',
-                                'marketings.phone',
-                                'marketings.phone_number_verified_at',
-                                'marketings.is_active',
-                                'marketings.created_at',
-                            ])
-                            ->with(['detail' => function($query){
-                                $query->select([
-                                    'detail_marketings.id',
-                                    'detail_marketings.id_marketing',
-                                    'detail_marketings.jenis_kelamin',
-                                    'detail_marketings.no_ktp',
-                                ]);
-                            }])
-                            ->latest()
-                            ->get();
-        return view('admin.admin_marketing_list', compact('marketing'));
+    public function adminDashboardMarketingList(Request $request){
+        if ($request->ajax()) {
+            $data = Marketing::select([
+                                            'marketings.id',
+                                            'marketings.name',
+                                            'marketings.email',
+                                            'marketings.email_verified_at',
+                                            'marketings.phone',
+                                            'marketings.phone_number_verified_at',
+                                            'marketings.is_active',
+                                            'marketings.created_at',
+                                        ])
+                                        ->with(['detail' => function($query){
+                                            $query->select([
+                                                'detail_marketings.id',
+                                                'detail_marketings.id_marketing',
+                                                'detail_marketings.no_ktp',
+                                            ]);
+                                        }])
+                                        ->latest()
+                                        ->get();
+                return Datatables::of($data)
+                                        ->addIndexColumn()
+                                        ->editColumn('name', function($data) {
+                                            return $data->name;
+                                        })
+                                        ->editColumn('no_ktp', function($data) {
+                                            return $data->detail->no_ktp;
+                                        })
+                                        ->editColumn('phone', function($data) {
+                                            if(!is_null($data->phone_number_verified_at) || !empty($data->phone_number_verified_at)){
+                                                return $data->phone.' '.'<span class="text-success mdi mdi-check-decagram-outline"></span>';
+                                            } else {
+                                                return $data->phone.' '.'<span class="text-warning mdi mdi-clock-outline"></span>';
+                                            }
+                                            return $data->email;
+                                        })
+                                        ->editColumn('email', function($data) {
+                                            if(!is_null($data->email_verified_at) || !empty($data->email_verified_at)){
+                                                return $data->email.' '.'<span class="text-success mdi mdi-check-decagram-outline"></span>';
+                                            } else {
+                                                return $data->email.' '.'<span class="text-warning mdi mdi-clock-outline"></span>';
+                                            }
+                                        })
+                                        ->editColumn('tanggal_gabung', function($data) {
+                                            $date = \Carbon\Carbon::parse($data->created_at)->format('d-m-Y');
+                                            return $date;
+                                        })
+                                        ->editColumn('status', function($data) {
+                                            if($data->is_active  == 0){
+                                                return '<span class="badge bg-soft-warning text-warning">Belum Aktif</span>';
+                                            } else if($data->is_active == 1) {
+                                                return '<span class="badge bg-soft-success text-success">Aktif</span>';
+                                            } else if($data->is_active == 2){
+                                                return '<span class="badge bg-soft-danger text-danger">Non Aktif</span>';
+                                            }
+                                        })
+                                        ->editColumn('action', function($data) {
+                                            $btnAction = "";
+                                            $btnDetail = "";
+                                            if($data->is_active  == 0){
+                                                $btnAction = '<a title="Aktifkan Mitra Aplikasi" href="/admin/dashboard/mitra-aplikasi/activation/'.$data->id.'" class="btn btn-warning rounded-pill waves-effect waves-light"><i class="mdi mdi-check-all"></i></a>';
+                                            } else if($data->is_active == 1) {
+                                                $btnAction = '<a title="Non-Aktifkan Mitra Aplikasi" href="/admin/dashboard/mitra-aplikasi/activation/'.$data->id.'" class="btn btn-danger rounded-pill waves-effect waves-light"><i class="mdi mdi-power"></i></a>';
+                                            } else if($data->is_active == 2){
+                                                $btnAction = '<a title="Aktifkan Kembali Mitra Aplikasi" href="/admin/dashboard/mitra-aplikasi/activation/'.$data->id.'" class="btn btn-success rounded-pill waves-effect waves-light"><i class="mdi mdi-power"></i></a>';
+                                            }
+                                            $btnDetail = '<a href="/admin/dashboard/mitra-aplikasi/profile/'.$data->id.'"><button title="Lihat data mitra aplikasi" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button></a>';
+                                            return $btnAction."&nbsp;".$btnDetail;
+                                        })
+                                        ->rawColumns(['phone', 'email', 'status', 'action'])
+                                        ->make(true);
+        }
+        return view('admin.admin_marketing_list');
     }
 
     public function adminDashboardMarketingInvitationCodeList(){
@@ -1558,14 +1617,9 @@ class AdminController extends Controller {
         return view('admin.admin_marketing_invitation_code_income_list', compact(['storeList', 'pemasukan']));
     }
 
-    public function adminDashboardMarketingWithdrawalList(){
-        $marketingWD = Marketing::select([
-                                'marketings.id',
-                                'marketings.name',
-                                'marketings.email',
-                            ])
-                            ->with(['withdraw' => function($query){
-                                $query->select([
+    public function adminDashboardMarketingWithdrawalList(Request $request){
+        if ($request->ajax()) {
+            $data = Withdrawal::select([
                                     'withdrawals.id',
                                     'withdrawals.invoice_pemarikan',
                                     'withdrawals.email',
@@ -1577,11 +1631,59 @@ class AdminController extends Controller {
                                     'withdrawals.created_at',
                                     'withdrawals.updated_at',
                                 ])
+                                ->with([
+                                    'marketing' => function($query){
+                                        $query->select([
+                                            'marketings.id',
+                                            'marketings.name',
+                                            'marketings.email',
+                                        ]);
+                                    }
+                                ])
+                                ->whereHas('marketing')
                                 ->latest()
                                 ->get();
-                            }])
-                            ->get();
-        return view('admin.admin_marketing_withdraw', compact('marketingWD'));
+            
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->where('tanggal_penarikan', '>=', $request->from_date)->where('tanggal_penarikan', '<=', $request->to_date);
+            }
+
+            return Datatables::of($data)
+                                    ->addIndexColumn()
+                                    ->editColumn('action', function($data) {
+                                        $actionBtn = '<a href="/admin//dashboard/user/withdrawals/'.$data->id.'" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>';
+                                        return $actionBtn;
+                                    })
+                                    ->editColumn('nomor_invoice', function($data) {
+                                        return $data->invoice_pemarikan;
+                                    })
+                                    ->editColumn('name', function($data) {
+                                        return $data->marketing->name;
+                                        //return "voila";
+                                    })
+                                    ->editColumn('email', function($data) {
+                                        return $data->marketing->email;
+                                        //return "keila";
+                                    })
+                                    ->editColumn('tanggal_penarikan', function($data) {
+                                        $date = \Carbon\Carbon::parse($data->tanggal_penarikan)->format('d-m-Y');
+                                        $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                        $dateTimePenarikan = $date." ".$time;
+                                        return $dateTimePenarikan;
+                                    })
+                                    ->editColumn('nominal', function($data) {
+                                        return $data->nominal;
+                                    })
+                                    ->editColumn('biaya_admin', function($data) {
+                                        return $data->biaya_admin;
+                                    })
+                                    ->editColumn('status', function($data) {
+                                        return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Penarikan Sukses</span>':'<span class="badge bg-soft-warning text-danger">Penarikan Gagal</span>');
+                                    })
+                                    ->rawColumns(['status', 'action'])
+                                    ->make(true);
+        }
+        return view('admin.admin_marketing_withdraw');
     }
 
     public function adminDashboardMitraBisnis(){
@@ -1624,21 +1726,78 @@ class AdminController extends Controller {
         return view('admin.admin_mitra_bisnis_dashboard', compact(['tenantCount', 'merchantCount', 'merchantTransactionCount', 'withdrawalCount', 'tenantBaru', 'tenantActivation']));
     }
 
-    public function adminDashboardMitraBisnisList(){
-        $tenantList = Tenant::select(['tenants.id',
-                                'tenants.name',
-                                'tenants.email',
-                                'tenants.phone',
-                                'tenants.email_verified_at',
-                                'tenants.phone_number_verified_at',
-                                'tenants.is_active',
-                                'tenants.created_at'])
-                        ->where('id_inv_code', 0)
-                        ->withCount(['storeList'])
-                        ->withCount(['withdrawal'])
-                        ->latest()
-                        ->get();
-        return view('admin.admin_mitra_bisnis_list', compact('tenantList'));
+    public function adminDashboardMitraBisnisList(Request $request){
+        if ($request->ajax()) {
+            $data = Tenant::select(['tenants.id',
+                                    'tenants.name',
+                                    'tenants.email',
+                                    'tenants.phone',
+                                    'tenants.email_verified_at',
+                                    'tenants.phone_number_verified_at',
+                                    'tenants.is_active',
+                                    'tenants.created_at'])
+                            ->where('id_inv_code', 0)
+                            ->withCount(['storeList'])
+                            ->withCount(['withdrawal'])
+                            ->latest()
+                            ->get();
+
+            return Datatables::of($data)
+                            ->addIndexColumn()
+                            ->editColumn('name', function($data) {
+                                return $data->name;
+                            })
+                            ->editColumn('phone', function($data) {
+                                if(!is_null($data->phone_number_verified_at) || !empty($data->phone_number_verified_at)){
+                                    return $data->phone.' '.'<span class="text-success mdi mdi-check-decagram-outline"></span>';
+                                } else {
+                                    return $data->phone.' '.'<span class="text-warning mdi mdi-clock-outline"></span>';
+                                }
+                                return $data->email;
+                            })
+                            ->editColumn('email', function($data) {
+                                if(!is_null($data->email_verified_at) || !empty($data->email_verified_at)){
+                                    return $data->email.' '.'<span class="text-success mdi mdi-check-decagram-outline"></span>';
+                                } else {
+                                    return $data->email.' '.'<span class="text-warning mdi mdi-clock-outline"></span>';
+                                }
+                            })
+                            ->editColumn('tanggal_gabung', function($data) {
+                                $date = \Carbon\Carbon::parse($data->created_at)->format('d-m-Y');
+                                return $date;
+                            })
+                            ->editColumn('total_merchant', function($data) {
+                                return $data->store_list_count;
+                            })
+                            ->editColumn('total_withdraw', function($data) {
+                                return $data->withdrawal_count;
+                            })
+                            ->editColumn('status', function($data) {
+                                if($data->is_active  == 0){
+                                    return '<span class="badge bg-soft-warning text-warning">Belum Aktif</span>';
+                                } else if($data->is_active == 1) {
+                                    return '<span class="badge bg-soft-success text-success">Aktif</span>';
+                                } else if($data->is_active == 2){
+                                    return '<span class="badge bg-soft-danger text-danger">Non Aktif</span>';
+                                }
+                            })
+                            ->editColumn('action', function($data) {
+                                $btnAction = "";
+                                $btnDetail = "";
+                                if($data->is_active  == 0){
+                                    $btnAction = '<a title="Aktifkan Mitra Bisnis" href="/admin/dashboard/mitra-bisnis/activation/'.$data->id.'" class="btn btn-warning rounded-pill waves-effect waves-light"><i class="mdi mdi-check-all"></i></a>';
+                                } else if($data->is_active == 1) {
+                                    $btnAction = '<a title="Non-Aktifkan Mitra Bisnis" href="/admin/dashboard/mitra-bisnis/activation/'.$data->id.'" class="btn btn-danger rounded-pill waves-effect waves-light"><i class="mdi mdi-power"></i></a>';
+                                } else if($data->is_active == 2){
+                                    $btnAction = '<a title="Aktifkan Kembali Mitra Nosmos" href="/admin/dashboard/mitra-bisnis/activation/'.$data->id.'" class="btn btn-success rounded-pill waves-effect waves-light"><i class="mdi mdi-power"></i></a>';
+                                }
+                                $btnDetail = '<a href="/admin/dashboard/mitra-bisnis/profile/'.$data->id.'"><button title="Lihat data mitra bisnis" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button></a>';
+                                return $btnAction."&nbsp;".$btnDetail;
+                            })
+                            ->rawColumns(['phone', 'email', 'status', 'action'])
+                            ->make(true);
+        }
+        return view('admin.admin_mitra_bisnis_list');
     }
 
     public function adminDashboardMitraBisnisProfile($id){
@@ -1741,29 +1900,92 @@ class AdminController extends Controller {
         return redirect()->route('admin.dashboard.mitraBisnis.list')->with($notification);
     }
 
-    public function adminDashboardMitraBisnisMerchantList(){
-        $storeList = StoreList::select([
-                                'store_lists.id',
-                                'store_lists.id_user',
-                                'store_lists.email',
-                                'store_lists.store_identifier',
-                                'store_lists.name',
-                                'store_lists.jenis_usaha',
-                                'store_lists.status_umi',
-                                'store_lists.is_active',
-                            ])
-                            ->with(['tenant' => function($query){
-                                $query->select([
-                                    'tenants.id',
-                                    'tenants.name',
-                                    'tenants.email',
-                                ]);
-                            }])
-                            ->withCount(['invoice'])
-                            ->latest()
-                            ->get();
+    public function adminDashboardMitraBisnisMerchantList(Request $request){
+        if ($request->ajax()) {
+            $data = StoreList::select([
+                                    'store_lists.id',
+                                    'store_lists.id_user',
+                                    'store_lists.email',
+                                    'store_lists.store_identifier',
+                                    'store_lists.name',
+                                    'store_lists.jenis_usaha',
+                                    'store_lists.status_umi',
+                                    'store_lists.is_active',
+                                ])
+                                ->with(['tenant' => function($query){
+                                    $query->select([
+                                        'tenants.id',
+                                        'tenants.name',
+                                        'tenants.email',
+                                    ]);
+                                }])
+                                ->withCount(['invoice'])
+                                ->withSum([
+                                    'invoice' => function($query){
+                                        $query->where('status_pembayaran', 1)->where('jenis_pembayaran', 'Qris');
+                                    }
+                                ], 'nominal_terima_bersih')
+                                ->latest()
+                                ->get();
 
-        return view('admin.admin_mitra_bisnis_merchant_list', compact('storeList'));
+            return Datatables::of($data)
+                                    ->addIndexColumn()
+                                    ->editColumn('merchant_name', function($data) {
+                                        return $data->name;
+                                    })
+                                    ->editColumn('store_identifier', function($data) {
+                                        return $data->store_identifier;
+                                    })
+                                    ->editColumn('mitra_bisnis', function($data) {
+                                        return $data->tenant->name;
+                                    })
+                                    ->editColumn('email', function($data) {
+                                        return $data->tenant->email;
+                                    })
+                                    ->editColumn('jenis_usaha', function($data) {
+                                        return $data->jenis_usaha;
+                                    })
+                                    ->editColumn('status', function($data) {
+                                        if ($data->is_active == 0){
+                                            return '<span class="badge bg-soft-danger text-danger">Non Aktif</span>';
+                                        } else if($data->is_active == 1){
+                                            return '<span class="badge bg-soft-success text-success">Aktif</span>';
+                                        } 
+                                    })
+                                    ->editColumn('status_umi', function($data) {
+                                        if ($data->status_umi == 0){
+                                            return '<span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>';
+                                        } else if($data->status_umi == 1){
+                                            return '<span class="badge bg-soft-success text-success">Terdaftar</span>';
+                                        } else if($data->status_umi == 2){
+                                            return '<span class="badge bg-soft-danger text-danger">Ditolak</span>';
+                                        }
+                                    })
+                                    ->editColumn('total_transaksi', function($data) {
+                                        return $data->invoice_count;
+                                    })
+                                    ->editColumn('total_penghasilan', function($data) {
+                                        return floor($data->invoice_sum_nominal_terima_bersih);
+                                    })
+                                    ->editColumn('invoice_list_action', function($data) {
+                                        $invoiceBtn = '<a href="/admin/dashboard/mitra-bisnis/merchant/invoice/'.$data->id.'/'.$data->store_identifier.'"><button title="Lihat daftar invoice" type="button" class="btn btn-xs btn-primary rounded-pill waves-effect waves-light">Lihat Invoice</button>&nbsp;</a>';
+                                        return $invoiceBtn;
+                                    })
+                                    ->editColumn('action', function($data) {
+                                        $action = '';
+                                        if ($data->is_active == 0){
+                                            $action = '<a href="/admin/dashboard/mitra-bisnis/merchant/activation/'.$data->id.'/'.$data->store_identifier.'"><button title="Aktifkan Merchant" type="button" class="btn btn-xs btn-success waves-effect waves-light"><span class="mdi mdi-power"></span></button></a>';
+                                        } else if($data->is_active == 1){
+                                            $action = '<a href="/admin/dashboard/mitra-bisnis/merchant/activation/'.$data->id.'/'.$data->store_identifier.'"><button title="Nonaktifkan Merchant" type="button" class="btn btn-xs btn-danger waves-effect waves-light"><span class="mdi mdi-power"></span></button></a>';
+                                        } 
+                                        $detailBtn = '<a href="/admin/dashboard/mitra-bisnis/merchant/detail/'.$data->id.'/'.$data->store_identifier.'"><button title="Lihat detail merchant" type="button" class="btn btn-xs btn-info waves-effect waves-light"><span class="mdi mdi-eye"></span></button></a>';
+                                        return $action."&nbsp;".$detailBtn;
+                                    })
+                                    ->rawColumns(['status', 'status_umi', 'invoice_list_action', 'action'])
+                                    ->make(true);
+            
+        }
+        return view('admin.admin_mitra_bisnis_merchant_list');
     }
 
     public function adminDashboardMitraBisnisMerchantInvoiceList($id, $store_identifier){
@@ -2024,7 +2246,8 @@ class AdminController extends Controller {
                                     ->get();
             
             if($request->filled('from_date') && $request->filled('to_date')) {
-                $data = $data->whereBetween('created_at', [$request->from_date, $request->to_date]);
+                //$data = $data->whereBetween('created_at', [$request->from_date, $request->to_date]);
+                $data = $data->where('tanggal_transaksi', '>=', $request->from_date)->where('tanggal_transaksi', '<=', $request->to_date);
             }
 
             return Datatables::of($data)

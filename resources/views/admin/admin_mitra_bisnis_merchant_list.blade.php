@@ -31,24 +31,25 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Merchant Mitra Bisnis</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                <table id="scroll-horizontal-datatable" class="table user-table-mitra-bisnis-merchant-list w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>Merchant Name</th>
                                             <th>Store Identifier</th>
-                                            <th>MItra Bisnis</th>
+                                            <th>Mitra Bisnis</th>
                                             <th>Email</th>
                                             <th>Jenis Usaha</th>
                                             <th class="text-center">Status</th>
                                             <th>Status UMI</th>
                                             <th class="text-center">Total Transaksi</th>
+                                            <th class="text-center">Total Penghasilan (Rp.)</th>
                                             <th class="text-center">Lihat Invoice</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach ($storeList as $store)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
@@ -95,7 +96,7 @@
                                                     </a>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>

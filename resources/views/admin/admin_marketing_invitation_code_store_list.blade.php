@@ -42,7 +42,7 @@
                             <div class="responsive-table-plugin">
                                 <div class="table-rep-plugin">
                                     <div class="table-responsive" data-pattern="priority-columns">
-                                        <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                        <table id="scroll-horizontal-table" class="table w-100 nowrap">
                                             <thead>
                                                 <tr>
                                                     <th>No.</th>
@@ -60,28 +60,30 @@
                                             @endphp
                                             <tbody>
                                                 @foreach ($storeList->tenant as $tenantList)
-                                                    <td>{{ $no+=1 }}</td>
-                                                    <td>{{ $storeList->marketing->name }}</td>
-                                                    <td>{{ $tenantList->name }}</td>
-                                                    <td>{{ $tenantList->storeDetail->name }}</td>
-                                                    <td>{{ $tenantList->storeDetail->jenis_usaha }}</td>
-                                                    <td class="text-center">
-                                                        @if ($tenantList->storeDetail->status_umi == 0)
-                                                            <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
-                                                        @elseif($tenantList->storeDetail->status_umi == 1)
-                                                            <span class="badge bg-soft-success text-success">Terdaftar</span>
-                                                        @elseif($tenantList->storeDetail->status_umi == 2)
-                                                            <span class="badge bg-soft-danger text-danger">Ditolak</span>
-                                                        @endif
-                                                    </td>
-                                                    <td class="text-center">{{\Carbon\Carbon::parse($tenantList->tanggal_penarikan)->format('d-m-Y')}}</td>
-                                                    <td class="text-center">
-                                                        @if ($storeList->is_active == 0)
-                                                            <span class="badge bg-soft-danger text-danger">Tidak Aktif</span>
-                                                        @else
-                                                            <span class="badge bg-soft-success text-success">Aktif</span>
-                                                        @endif
-                                                    </td>
+                                                    <tr>
+                                                        <td>{{ $no+=1 }}</td>
+                                                        <td>{{ $storeList->marketing->name }}</td>
+                                                        <td>{{ $tenantList->name }}</td>
+                                                        <td>{{ $tenantList->storeDetail->name }}</td>
+                                                        <td>{{ $tenantList->storeDetail->jenis_usaha }}</td>
+                                                        <td class="text-center">
+                                                            @if ($tenantList->storeDetail->status_umi == 0)
+                                                                <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
+                                                            @elseif($tenantList->storeDetail->status_umi == 1)
+                                                                <span class="badge bg-soft-success text-success">Terdaftar</span>
+                                                            @elseif($tenantList->storeDetail->status_umi == 2)
+                                                                <span class="badge bg-soft-danger text-danger">Ditolak</span>
+                                                            @endif
+                                                        </td>
+                                                        <td class="text-center">{{\Carbon\Carbon::parse($tenantList->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                        <td class="text-center">
+                                                            @if ($storeList->is_active == 0)
+                                                                <span class="badge bg-soft-danger text-danger">Tidak Aktif</span>
+                                                            @else
+                                                                <span class="badge bg-soft-success text-success">Aktif</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
                                                 @endforeach
                                             </tbody>
                                         </table>

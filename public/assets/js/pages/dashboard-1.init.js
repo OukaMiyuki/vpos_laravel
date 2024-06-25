@@ -18,7 +18,7 @@ var options = {
         labels: ["Revenue"]
     },
     chart = new ApexCharts(document.querySelector("#total-revenue"), options);
-chart.render();
+
 colors = ["#1abc9c", "#4a81d4"];
 (dataColors = $("#sales-analytics").data("colors")) && (colors = dataColors.split(","));
 options = {
@@ -85,9 +85,3 @@ options = {
         }
     }]
 };
-(chart = new ApexCharts(document.querySelector("#sales-analytics"), options)).render(), $("#dash-daterange").flatpickr({
-    altInput: !0,
-    mode: "range",
-    altFormat: "F j, y",
-    defaultDate: "today"
-});

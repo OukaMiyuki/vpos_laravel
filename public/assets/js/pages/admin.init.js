@@ -303,7 +303,7 @@ $(function () {
         endDate : end_date
     }, function(start_date, end_date){
         $('#daterange_umi_request span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
-
+        console.log("Walla");
         table_user_withdrawal.draw();
     });
 
@@ -343,3 +343,206 @@ $(function () {
         ],
     });
 });
+
+$(function () {
+    var table_settlement_ready = $('.user-table-marketing-list').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/mitra-aplikasi/list',
+            "type": "GET",
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/mitra-aplikasi/list',
+        //     "type": "GET",
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'action', name: 'action'},
+            {data: 'name', name: 'name'},
+            {data: 'no_ktp', name: 'no_ktp'},
+            {data: 'phone', name: 'phone'},
+            {data: 'email', name: 'email'},
+            {data: 'tanggal_gabung', name: 'tanggal_gabung'},
+            {data: 'status', name: 'status'},
+            // {data: 'action', name: 'action', orderable: false, searchable: false},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [6,7] },
+        ],
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_user_withdraw_mitra_alikasi span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_user_withdraw_mitra_alikasi').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_user_withdraw_mitra_alikasi span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_withdrawal.draw();
+    });
+
+
+    var table_user_withdrawal = $('.user-table-withdrawal-mitra-aplikasi').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/mitra-aplikasi/withdraw',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_user_withdraw_mitra_alikasi').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_user_withdraw_mitra_alikasi').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/mitra-aplikasi/withdraw',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_user_withdraw_mitra_alikasi').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_user_withdraw_mitra_alikasi').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+            {data: 'nomor_invoice', name: 'nomor_invoice'},
+            {data: 'name', name: 'name'},
+            {data: 'email', name: 'email'},
+            {data: 'tanggal_penarikan', name: 'tanggal_penarikan'},
+            {data: 'nominal', name: 'nominal'},
+            {data: 'biaya_admin', name: 'biaya_admin'},
+            {data: 'status', name: 'status'},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [5] },
+        ],
+    });
+});
+
+$(function () {
+    var table_user_withdrawal = $('.user-table-mitra-bisnis-list').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/list',
+            "type": "GET",
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/mitra-bisnis/list',
+        //     "type": "GET",
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'name', name: 'name'},
+            {data: 'phone', name: 'phone'},
+            {data: 'email', name: 'email'},
+            {data: 'tanggal_gabung', name: 'tanggal_gabung'},
+            {data: 'total_merchant', name: 'total_merchant'},
+            {data: 'total_withdraw', name: 'total_withdraw'},
+            {data: 'status', name: 'status'},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [5] },
+        ],
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+});
+
+$(function () {
+    var table_user_withdrawal = $('.user-table-mitra-bisnis-merchant-list').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/merchant',
+            "type": "GET",
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/mitra-bisnis/merchant',
+        //     "type": "GET",
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'merchant_name', name: 'merchant_name'},
+            {data: 'store_identifier', name: 'store_identifier'},
+            {data: 'mitra_bisnis', name: 'mitra_bisnis'},
+            {data: 'email', name: 'email'},
+            {data: 'jenis_usaha', name: 'jenis_usaha'},
+            {data: 'status', name: 'status'},
+            {data: 'status_umi', name: 'status_umi'},
+            {data: 'total_transaksi', name: 'total_transaksi'},
+            {data: 'total_penghasilan', name: 'total_penghasilan'},
+            {data: 'invoice_list_action', name: 'invoice_list_action', orderable: false, searchable: false},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [6,7,8,10,11] },
+        ],
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+});
+
+$(document).ready(function() {
+    $("#basic-table").DataTable({
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+
+    // $("#selection-datatable").DataTable({
+    //     select: {
+    //         style: "multi"
+    //     },
+    //     language: {
+    //         paginate: {
+    //             previous: "<i class='mdi mdi-chevron-left'>",
+    //             next: "<i class='mdi mdi-chevron-right'>"
+    //         }
+    //     },
+    //     drawCallback: function() {
+    //         $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+    //     }
+    // });
+
+    $("#scroll-horizontal-table").DataTable({
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+});
+

@@ -52,7 +52,7 @@
                             </div>
                             <h4 class="header-title mb-3">History Insentif Agregate Transfer</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="basic-table" class="table nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>

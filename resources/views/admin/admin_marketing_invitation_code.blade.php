@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Invitation Code</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                <table id="basic-table" class="table w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>

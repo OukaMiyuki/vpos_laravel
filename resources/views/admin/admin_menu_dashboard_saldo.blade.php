@@ -192,7 +192,7 @@
                             </div>
                             <h4 class="header-title mb-3">Insentif Transfer Baru</h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="basic-table" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>

@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Mitra Bisnis</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                <table id="scroll-horizontal-datatable" class="table user-table-mitra-bisnis-list w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -46,7 +46,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach ($tenantList as $tenant)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
@@ -78,7 +78,7 @@
                                                     </a>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>
