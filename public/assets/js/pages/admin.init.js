@@ -174,22 +174,22 @@ $(function () {
     var table_user_transaction = $('.user-table-transaction').DataTable({
         processing: true,
         serverSide: true,
-        // ajax: {
-        //     "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/transaction',
-        //     "type": "GET",
-        //     data : function(data){
-        //         data.from_date = $('#daterange_transaction').data('daterangepicker').startDate.format('YYYY-MM-DD');
-        //         data.to_date = $('#daterange_transaction').data('daterangepicker').endDate.format('YYYY-MM-DD');
-        //     }
-        // },
         ajax: {
-            "url": 'http://localhost:8000/admin/dashboard/user/transaction',
+            "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/transaction',
             "type": "GET",
             data : function(data){
                 data.from_date = $('#daterange_transaction').data('daterangepicker').startDate.format('YYYY-MM-DD');
                 data.to_date = $('#daterange_transaction').data('daterangepicker').endDate.format('YYYY-MM-DD');
             }
         },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/user/transaction',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_transaction').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_transaction').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'nomor_invoice', name: 'nomor_invoice'},
@@ -849,6 +849,301 @@ $(function () {
         ],
         columnDefs: [
             { className: 'text-center', targets: [2,5,6] },
+        ],
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_user_login_history span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_user_login_history').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_user_login_history span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_login_history.draw();
+    });
+
+
+    var table_user_login_history = $('.user-table-login-history').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/history/user-login',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_user_login_history').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_user_login_history').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/history/user-login',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_user_login_history').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_user_login_history').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'email', name: 'email'},
+            {data: 'activity', name: 'activity'},
+            {data: 'lokasi', name: 'lokasi'},
+            {data: 'ip_address', name: 'ip_address'},
+            {data: 'tanggal', name: 'tanggal'},
+            {data: 'status', name: 'status'},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [5,6,7] },
+        ],
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_user_register_history span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_user_register_history').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_user_register_history span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_register_history.draw();
+    });
+
+
+    var table_user_register_history = $('.user-table-register-history').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/history/user-register',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_user_register_history').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_user_register_history').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/history/user-register',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_user_register_history').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_user_register_history').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'email', name: 'email'},
+            {data: 'activity', name: 'activity'},
+            {data: 'lokasi', name: 'lokasi'},
+            {data: 'ip_address', name: 'ip_address'},
+            {data: 'tanggal', name: 'tanggal'},
+            {data: 'status', name: 'status'},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [5,6,7] },
+        ],
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_user_activity_history span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_user_activity_history').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_user_activity_history span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_activity_history.draw();
+    });
+
+
+    var table_user_activity_history = $('.user-table-activity-history').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/history/user-activity',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_user_activity_history').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_user_activity_history').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/history/user-activity',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_user_activity_history').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_user_activity_history').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'email', name: 'email'},
+            {data: 'activity', name: 'activity'},
+            {data: 'lokasi', name: 'lokasi'},
+            {data: 'ip_address', name: 'ip_address'},
+            {data: 'tanggal', name: 'tanggal'},
+            {data: 'status', name: 'status'},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [5,6,7] },
+        ],
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_user_withdraw_history span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_user_withdraw_history').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_user_withdraw_history span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_withdraw_history.draw();
+    });
+
+
+    var table_user_withdraw_history = $('.user-table-withdraw-history-list').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/history/user-withdrawal',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_user_withdraw_history').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_user_withdraw_history').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/history/user-withdrawal',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_user_withdraw_history').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_user_withdraw_history').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'email', name: 'email'},
+            {data: 'activity', name: 'activity'},
+            {data: 'lokasi', name: 'lokasi'},
+            {data: 'ip_address', name: 'ip_address'},
+            {data: 'tanggal', name: 'tanggal'},
+            {data: 'status', name: 'status'},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [5,6,7] },
+        ],
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_user_error_history span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_user_error_history').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_user_error_history span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_error_history.draw();
+    });
+
+
+    var table_user_error_history = $('.user-table-error-history-list').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/admin/dashboard/history/error',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_user_error_history').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_user_error_history').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/admin/dashboard/history/error',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_user_error_history').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_user_error_history').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'email', name: 'email'},
+            {data: 'activity', name: 'activity'},
+            {data: 'lokasi', name: 'lokasi'},
+            {data: 'ip_address', name: 'ip_address'},
+            {data: 'tanggal', name: 'tanggal'},
+            {data: 'status', name: 'status'},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+        ],
+        columnDefs: [
+            { className: 'text-center', targets: [5,6,7] },
         ],
         scrollX: !0,
         language: {

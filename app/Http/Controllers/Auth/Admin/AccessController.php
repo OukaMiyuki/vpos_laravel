@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth\Admin;
 
 use App\Http\Controllers\Controller;
+use Yajra\Datatables\Datatables;
 use App\Models\History;
 use App\Models\Tenant;
 use App\Models\Admin;
@@ -34,39 +35,238 @@ class AccessController extends Controller {
         return view('admin.admin_history_dashboard');
     }
 
-    public function adminDashboardHistoryUserLogin(){
-        $activity = "Login";
-        $history = History::where('action', 'LIKE', '%'.$activity.'%')->latest()->get();
-        return view('admin.admin_history_dashboard_user_login_history', compact(['history']));
+    public function adminDashboardHistoryUserLogin(Request $request){
+        if ($request->ajax()) {
+            $activity = "Login";
+            $data = History::where('action', 'LIKE', '%'.$activity.'%')->latest()->get();
+
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->where('created_at', '>=', $request->from_date)->where('created_at', '<=', $request->to_date);
+            }
+
+            return Datatables::of($data)
+                                ->addIndexColumn()
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('activity', function($data) {
+                                    return $data->action;
+                                })
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('lokasi', function($data) {
+                                    return $data->lokasi_anda;
+                                })
+                                ->editColumn('ip_address', function($data) {
+                                    return $data->deteksi_ip;
+                                })
+                                ->editColumn('tanggal', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:i:s');
+                                    return $date;
+                                })
+                                ->editColumn('status', function($data) {
+                                    return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Sukses</span>':'<span class="badge bg-soft-warning text-warning">Failed</span>');
+                                })
+                                ->editColumn('action', function($data) {
+                                    $actionBtn = '';
+                                    $activity = "Login";
+                                    $id = $data->id;
+                                    $actionBtn = '<a href="/admin/dashboard/history/detail/'.$activity.'/'.$id.'" class="btn btn-xs btn-success"><i class="mdi mdi-eye"></i></a>';
+                                    return $actionBtn;
+                                })
+                                ->rawColumns(['status', 'action'])
+                                ->make(true);
+        }
+        return view('admin.admin_history_dashboard_user_login_history');
     }
 
-    public function adminDashboardHistoryUserRegister(){
-        $activity = "Register";
-        $history = History::where('action', 'LIKE', '%'.$activity.'%')->latest()->get();
-        return view('admin.admin_history_dashboard_user_register_history', compact(['history']));
+    public function adminDashboardHistoryUserRegister(Request $request){
+        if ($request->ajax()) {
+            $activity = "Register";
+            $data = History::where('action', 'LIKE', '%'.$activity.'%')->latest()->get();
+
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->where('created_at', '>=', $request->from_date)->where('created_at', '<=', $request->to_date);
+            }
+
+            return Datatables::of($data)
+                                ->addIndexColumn()
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('activity', function($data) {
+                                    return $data->action;
+                                })
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('lokasi', function($data) {
+                                    return $data->lokasi_anda;
+                                })
+                                ->editColumn('ip_address', function($data) {
+                                    return $data->deteksi_ip;
+                                })
+                                ->editColumn('tanggal', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:i:s');
+                                    return $date;
+                                })
+                                ->editColumn('status', function($data) {
+                                    return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Sukses</span>':'<span class="badge bg-soft-warning text-warning">Failed</span>');
+                                })
+                                ->editColumn('action', function($data) {
+                                    $actionBtn = '';
+                                    $activity = "Register";
+                                    $id = $data->id;
+                                    $actionBtn = '<a href="/admin/dashboard/history/detail/'.$activity.'/'.$id.'" class="btn btn-xs btn-success"><i class="mdi mdi-eye"></i></a>';
+                                    return $actionBtn;
+                                })
+                                ->rawColumns(['status', 'action'])
+                                ->make(true);
+        }
+        return view('admin.admin_history_dashboard_user_register_history');
     }
 
-    public function adminDashboardHistoryUserActivity(){
-        $activityRegister = "Register";
-        $activityLogin = "Login";
-        $activityWithdraw = "Withdraw";
-        $history = History::where('action', 'NOT LIKE', '%'.$activityRegister.'%')
-                            ->where('action', 'NOT LIKE', '%'.$activityLogin.'%')
-                            ->where('action', 'NOT LIKE', '%'.$activityWithdraw.'%')
-                            ->latest()
-                            ->get();
-        return view('admin.admin_history_dashboard_user_activity_history', compact(['history']));
+    public function adminDashboardHistoryUserActivity(Request $request){
+        if ($request->ajax()) {
+            $activityRegister = "Register";
+            $activityLogin = "Login";
+            $activityWithdraw = "Withdraw";
+            $data = History::where('action', 'NOT LIKE', '%'.$activityRegister.'%')
+                                ->where('action', 'NOT LIKE', '%'.$activityLogin.'%')
+                                ->where('action', 'NOT LIKE', '%'.$activityWithdraw.'%')
+                                ->latest()
+                                ->get();
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->where('created_at', '>=', $request->from_date)->where('created_at', '<=', $request->to_date);
+            }
+
+            return Datatables::of($data)
+                                ->addIndexColumn()
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('activity', function($data) {
+                                    return $data->action;
+                                })
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('lokasi', function($data) {
+                                    return $data->lokasi_anda;
+                                })
+                                ->editColumn('ip_address', function($data) {
+                                    return $data->deteksi_ip;
+                                })
+                                ->editColumn('tanggal', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:i:s');
+                                    return $date;
+                                })
+                                ->editColumn('status', function($data) {
+                                    return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Sukses</span>':'<span class="badge bg-soft-warning text-warning">Failed</span>');
+                                })
+                                ->editColumn('action', function($data) {
+                                    $actionBtn = '';
+                                    $activity = "Register";
+                                    $id = $data->id;
+                                    $actionBtn = '<a href="/admin/dashboard/history/detail/'.$activity.'/'.$id.'" class="btn btn-xs btn-success"><i class="mdi mdi-eye"></i></a>';
+                                    return $actionBtn;
+                                })
+                                ->rawColumns(['status', 'action'])
+                                ->make(true);
+        }
+        return view('admin.admin_history_dashboard_user_activity_history');
     }
 
-    public function adminDashboardHistoryUserWithdrawal(){
-        $activity = "Withdraw";
-        $history = History::where('action', 'LIKE', '%'.$activity.'%')->latest()->get();
-        return view('admin.admin_history_dashboard_user_withdraw_history', compact(['history']));
+    public function adminDashboardHistoryUserWithdrawal(Request $request){
+        if ($request->ajax()) {
+            $activity = "Withdraw";
+            $data = History::where('action', 'LIKE', '%'.$activity.'%')->latest()->get();
+
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->where('created_at', '>=', $request->from_date)->where('created_at', '<=', $request->to_date);
+            }
+
+            return Datatables::of($data)
+                                ->addIndexColumn()
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('activity', function($data) {
+                                    return $data->action;
+                                })
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('lokasi', function($data) {
+                                    return $data->lokasi_anda;
+                                })
+                                ->editColumn('ip_address', function($data) {
+                                    return $data->deteksi_ip;
+                                })
+                                ->editColumn('tanggal', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:i:s');
+                                    return $date;
+                                })
+                                ->editColumn('status', function($data) {
+                                    return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Sukses</span>':'<span class="badge bg-soft-warning text-warning">Failed</span>');
+                                })
+                                ->editColumn('action', function($data) {
+                                    $actionBtn = '';
+                                    $activity = "Register";
+                                    $id = $data->id;
+                                    $actionBtn = '<a href="/admin/dashboard/history/detail/'.$activity.'/'.$id.'" class="btn btn-xs btn-success"><i class="mdi mdi-eye"></i></a>';
+                                    return $actionBtn;
+                                })
+                                ->rawColumns(['status', 'action'])
+                                ->make(true);
+        }
+        return view('admin.admin_history_dashboard_user_withdraw_history');
     }
 
-    public function adminDashboardHistoryUserError(){
-        $history = History::where('status', 0)->latest()->get();
-        return view('admin.admin_history_dashboard_user_error_history', compact(['history']));
+    public function adminDashboardHistoryUserError(Request $request){
+        if ($request->ajax()) {
+            $data = History::where('status', 0)->latest()->get();
+
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->where('created_at', '>=', $request->from_date)->where('created_at', '<=', $request->to_date);
+            }
+
+            return Datatables::of($data)
+                                ->addIndexColumn()
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('activity', function($data) {
+                                    return $data->action;
+                                })
+                                ->editColumn('email', function($data) {
+                                    return $data->email;
+                                })
+                                ->editColumn('lokasi', function($data) {
+                                    return $data->lokasi_anda;
+                                })
+                                ->editColumn('ip_address', function($data) {
+                                    return $data->deteksi_ip;
+                                })
+                                ->editColumn('tanggal', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:i:s');
+                                    return $date;
+                                })
+                                ->editColumn('status', function($data) {
+                                    return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Sukses</span>':'<span class="badge bg-soft-warning text-warning">Failed</span>');
+                                })
+                                ->editColumn('action', function($data) {
+                                    $actionBtn = '';
+                                    $activity = "Register";
+                                    $id = $data->id;
+                                    $actionBtn = '<a href="/admin/dashboard/history/detail/'.$activity.'/'.$id.'" class="btn btn-xs btn-success"><i class="mdi mdi-eye"></i></a>';
+                                    return $actionBtn;
+                                })
+                                ->rawColumns(['status', 'action'])
+                                ->make(true);
+        }
+        return view('admin.admin_history_dashboard_user_error_history');
     }
 
     public function adminDashboardHistoryDetail($activity, $id){
