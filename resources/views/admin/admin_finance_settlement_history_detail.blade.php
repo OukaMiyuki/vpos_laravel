@@ -67,8 +67,8 @@
                                                         <td>{{$stl->tenant->name}}</td>
                                                         <td>{{$stl->tenant->email}}</td>
                                                         <td class="text-center">{{\Carbon\Carbon::parse($stl->settlement_time_stamp)->format('d-m-Y H:i:s')}}</td>
-                                                        <td>{{$stl->nominal_settle}}</td>
-                                                        <td>{{$stl->nominal_insentif_cashback}}</td>
+                                                        <td>@currency($stl->nominal_settle)</td>
+                                                        <td>@currency($stl->nominal_insentif_cashback)</td>
                                                         <td>
                                                             @if ($stl->status == 0)
                                                                 <span class="badge bg-soft-warning text-danger">Settlement Gagal</span>

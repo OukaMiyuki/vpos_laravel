@@ -37,7 +37,7 @@
                                     
                                 </div>
                                 <div class="col-6 text-end">
-                                    <h3 class="mb-3"><span>Total Insentif : </span>Rp. {{$totalInsentif}}</h3>
+                                    <h3 class="mb-3"><span>Total Insentif : </span>@currency($totalInsentif)</h3>
                                 </div>
                             </div>
                             <div class="responsive-table-plugin">

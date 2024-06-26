@@ -209,18 +209,12 @@
                                         <tr>
                                             <th>No.</th>
                                             <th class="text-center">Action</th>
-                                            <th>Invoice Penarikan</th>
+                                            <th>No. Invoice</th>
                                             <th>Nama</th>
-                                            <th>Email</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Nominal</th>
-                                            <th>Biaya Transfer</th>
-                                            <th>Nominal Bersih Penarikan</th>
-                                            <th>Biaya Nobu</th>
-                                            <th>Biaya Mitra</th>
-                                            <th>Biaya Tenant</th>
-                                            <th>Biaya Admin SU</th>
-                                            <th>Biaya Agregate</th>
+                                            <th>User Email</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th>Nominal (Rp.)</th>
+                                            <th>Total Biaya Transfer (Rp.)</th>
                                             <th class="text-center">Status</th>
                                         </tr>
                                     </thead>
@@ -229,22 +223,16 @@
                                         @foreach ($tenantWithdrawNew as $wd)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                 </td>
                                                 <td>{{ $wd->invoice_pemarikan }}</td>
                                                 <td>{{ $wd->tenant->name }}</td>
                                                 <td>{{ $wd->tenant->email }}</td>
-                                                <td>{{ $wd->tanggal_penarikan }}</td>
-                                                <td>{{ $wd->nominal }}</td>
-                                                <td>{{ $wd->biaya_admin }}</td>
-                                                <td>{{ $wd->detailWithdraw->nominal_bersih_penarikan }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_nobu }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_mitra }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_tenant }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_admin_su }}</td>
-                                                <td>{{ $wd->detailWithdraw->biaya_agregate }}</td>
-                                                <td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                <td>@currency($wd->nominal)</td>
+                                                <td>@currency($wd->biaya_admin)</td>
+                                                <td class="text-center">
                                                     @if ($wd->status == 0)
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
                                                     @else

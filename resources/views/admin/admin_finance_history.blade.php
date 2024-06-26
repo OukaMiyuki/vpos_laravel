@@ -26,7 +26,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $allDataSum }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($allDataSum)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Penarikan Dana</p>
                                     </div>
                                 </div>
@@ -45,7 +45,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $adminQrisWallet->saldo }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($adminQrisWallet->saldo)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Saldo Qris</p>
                                     </div>
                                 </div>
@@ -64,7 +64,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $agregateWallet->saldo }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($agregateWallet->saldo)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Saldo Agregate</p>
                                     </div>
                                 </div>
@@ -112,8 +112,8 @@
                                                 <td>{{ $wdData->invoice_pemarikan }}</td>
                                                 <td>{{ $wdData->jenis_penarikan }}</td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($wdData->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wdData->created_at)->format('H:i:s')}}</td>
-                                                <td class="text-center">{{ $wdData->nominal }}</td>
-                                                <td class="text-center">{{ $wdData->biaya_admin }}</td>
+                                                <td class="text-center">@currency($wdData->nominal)</td>
+                                                <td class="text-center">@currency($wdData->biaya_admin)</td>
                                                 <td>
                                                     @if ($wdData->status == 0)
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>

@@ -2411,10 +2411,14 @@ class AdminController extends Controller {
                                         return $dateTimeTransaksi;
                                     })
                                     ->editColumn('nominal', function($data) {
-                                        return $data->nominal;
+                                        $tarik = floor($data->nominal);
+                                        $hasil_rupiah = "Rp " . number_format($tarik,2,',','.');
+                                        return $hasil_rupiah;
                                     })
                                     ->editColumn('total_biaya', function($data) {
-                                        return $data->biaya_admin;
+                                        $admin = floor($data->biaya_admin);
+                                        $hasil_rupiah = "Rp " . number_format($admin,2,',','.');
+                                        return $hasil_rupiah;
                                     })
                                     ->editColumn('status', function($data) {
                                         return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Penarikan Sukses</span>':'<span class="badge bg-soft-warning text-danger">Penarikan Gagal</span>');
@@ -2486,12 +2490,7 @@ class AdminController extends Controller {
                                                     $query->select([
                                                         'detail_penarikans.id',
                                                         'detail_penarikans.id_penarikan',
-                                                        'detail_penarikans.nominal_bersih_penarikan',
-                                                        'detail_penarikans.biaya_nobu',
-                                                        'detail_penarikans.biaya_mitra',
-                                                        'detail_penarikans.biaya_tenant',
-                                                        'detail_penarikans.biaya_admin_su',
-                                                        'detail_penarikans.biaya_agregate',
+                                                        'detail_penarikans.nominal'
                                                     ]);
                                                 }
                                         ])
@@ -2501,6 +2500,7 @@ class AdminController extends Controller {
                                         ->take(10)
                                         ->latest()
                                         ->get();
+
         return view('admin.admin_mitra_tenant_dashboard', compact(['tenantCount', 'storeCount', 'withdrawalCount', 'merchantTransactionCount', 'kasir', 'tenantBaru', 'tenantWithdrawNew']));
     }
 
@@ -3310,10 +3310,14 @@ class AdminController extends Controller {
                                         return $dateTimeTransaksi;
                                     })
                                     ->editColumn('nominal', function($data) {
-                                        return $data->nominal;
+                                        $tarik = floor($data->nominal);
+                                        $hasil_rupiah = "Rp " . number_format($tarik,2,',','.');
+                                        return $hasil_rupiah;
                                     })
                                     ->editColumn('total_biaya', function($data) {
-                                        return $data->biaya_admin;
+                                        $admin = floor($data->biaya_admin);
+                                        $hasil_rupiah = "Rp " . number_format($admin,2,',','.');
+                                        return $hasil_rupiah;
                                     })
                                     ->editColumn('status', function($data) {
                                         return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Penarikan Sukses</span>':'<span class="badge bg-soft-warning text-danger">Penarikan Gagal</span>');
@@ -3592,10 +3596,14 @@ class AdminController extends Controller {
                                     return $date;
                                 })
                                 ->editColumn('nominal', function($data) {
-                                    return $data->settlement_history_sum_nominal_settle;
+                                    $nominal = floor($data->settlement_history_sum_nominal_settle);
+                                    $hasil_rupiah = "Rp " . number_format($nominal,2,',','.');
+                                    return $hasil_rupiah;
                                 })
                                 ->editColumn('total_cashback', function($data) {
-                                    return $data->settlement_history_sum_nominal_insentif_cashback;
+                                    $nominal = floor($data->settlement_history_sum_nominal_insentif_cashback);
+                                    $hasil_rupiah = "Rp " . number_format($nominal,2,',','.');
+                                    return $hasil_rupiah;
                                 })
                                 ->editColumn('status', function($data) {
                                     return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Settlement Sukses</span>':'<span class="badge bg-soft-warning text-danger">Settlement Gagal</span>');
