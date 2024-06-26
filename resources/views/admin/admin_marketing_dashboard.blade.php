@@ -172,10 +172,11 @@
                                 <table id="scroll-vertical-datatable" class="table dt-responsive nowrap w-100">
                                     <thead class="table-light">
                                         <tr>
+                                            <th>No.</th>
+                                            <th>Action</th>
                                             <th>Nama</th>
                                             <th>Tanggal Gabung</th>
                                             <th>Status</th>
-                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     @php
@@ -184,15 +185,15 @@
                                     <tbody>
                                         @foreach ($marketingAktivasi as $marketingAktivasi)
                                             <tr>
+                                                <td>{{ $nomer+=1 }}</td>
                                                 <td>
                                                     <a href="{{ route('admin.dashboard.marketing.account.activation', ['id'=>$marketingAktivasi->id]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
                                                 </td>
-                                                <td>{{ $nomer+=1 }}</td>
                                                 <td>
                                                     <h5 class="m-0 fw-normal">{{ $marketingAktivasi->name }}</h5>
                                                 </td>
                                                 <td>
-                                                    {{ $marketingAktivasi->created_at }}
+                                                    {{\Carbon\Carbon::parse($marketingAktivasi->created_at)->format('d-m-Y H:i:s')}}
                                                 </td>
                                                 <td>
                                                     <span class="badge bg-soft-warning text-warning">Non Aktif</span>

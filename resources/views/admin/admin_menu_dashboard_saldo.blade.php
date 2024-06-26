@@ -28,7 +28,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $adminQrisWallet->saldo }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($adminQrisWallet->saldo)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Saldo Qris</p>
                                         <a href="{{ route('admin.dashboard.saldo.qris') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -51,7 +51,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $historyCashbackAdmin }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($historyCashbackAdmin)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Total Cashback Transaksi</p>
                                         <a href="{{ route('admin.dashboard.saldo.cashback') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $nobuWithdrawFeeHistory }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($nobuWithdrawFeeHistory)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Total Bank Fee Transfer</p>
                                         <a href="{{ route('admin.dashboard.saldo.nobu.fee.transfer') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalAgregate }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($totalAgregate)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Total Saldo Agregate</p>
                                         <a href="{{ route('admin.dashboard.saldo.agregate') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -120,7 +120,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $historyCashbackAdminSettlement }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($historyCashbackAdminSettlement)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Cashback Pending Settlement</p>
                                         <a href="{{ route('admin.dashboard.saldo.cashback.settlement') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -142,7 +142,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $agregateWalletforMaintenance->saldo }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($agregateWalletforMaintenance->saldo)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Saldo Agregate Aplikasi</p>
                                         <a href="{{ route('admin.dashboard.saldo.agregate') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -164,7 +164,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $agregateWalletforTransfer->saldo }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($agregateWalletforTransfer->saldo)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Saldo Agregate Transfer</p>
                                         <a href="{{ route('admin.dashboard.saldo.agregate') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -220,8 +220,8 @@
                                                 <td class="text-center">
                                                     {{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s')}}
                                                 </td>
-                                                <td>{{$wd->nominal}}</td>
-                                                <td class="text-center">{{$wd->biaya_admin}}</td>
+                                                <td>@currency($wd->nominal)</td>
+                                                <td class="text-center">@currency($wd->biaya_admin)</td>
                                                 <td class="text-center">
                                                     @if ($wd->status == 0)
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>

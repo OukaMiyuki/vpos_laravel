@@ -27,7 +27,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $agregateSaldoAplikasi->saldo }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@currency($agregateSaldoAplikasi->saldo)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Saldo Agregate Aplikasi</p>
                                     </div>
                                 </div>
@@ -74,7 +74,7 @@
                                                     <td>{{ $wd->invoice_pemarikan }}</td>
                                                     <td>{{ $wd->jenis_penarikan }}</td>
                                                     <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s')}}</td>
-                                                    <td class="text-center">{{$wddt->nominal}}</td>
+                                                    <td class="text-center">@money($wddt->nominal)</td>
                                                     <td>
                                                         @if ($wd->status == 0)
                                                             <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>

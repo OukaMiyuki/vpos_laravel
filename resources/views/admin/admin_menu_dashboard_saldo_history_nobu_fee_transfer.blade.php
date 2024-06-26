@@ -38,8 +38,8 @@
                                             <th>No. Invoice</th>
                                             <th>Jenis Penarikan</th>
                                             <th class="text-center">Tanggal Penarikan</th>
-                                            <th class="text-center">Nominal Penarikan (Rp.)</th>
-                                            <th class="text-center">Total Biaya Transfer (Rp.)</th>
+                                            <th>Nominal Penarikan (Rp.)</th>
+                                            <th>Total Biaya Transfer (Rp.)</th>
                                             <th class="text-center">Bank Transfer Fee (Rp.)</th>
                                         </tr>
                                     </thead>
@@ -53,9 +53,9 @@
                                                 <td>{{$fee->withdraw->invoice_pemarikan}}</td>
                                                 <td>{{$fee->withdraw->jenis_penarikan}}</td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($fee->withdraw->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($fee->withdraw->created_at)->format('H:i:s')}}</td>
-                                                <td class="text-center">{{$fee->withdraw->nominal}}</td>
-                                                <td class="text-center">{{$fee->withdraw->biaya_admin}}</td>
-                                                <td class="text-center">{{$fee->nominal}}</td>
+                                                <td>@currency($fee->withdraw->nominal)</td>
+                                                <td>@currency($fee->withdraw->biaya_admin)</td>
+                                                <td class="text-center">@currency($fee->nominal)</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

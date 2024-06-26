@@ -31,7 +31,7 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileAccountUpdate'])->name('admin.profile.account.update');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileInfoUpdate'])->name('admin.profile.info.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'password'])->name('admin.password');
-    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:10,1'])->name('admin.settings.whatsappotp');
+    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:90,1'])->name('admin.settings.whatsappotp');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'passwordUpdate'])->name('admin.password.update');
 });
 
@@ -168,7 +168,7 @@ Route::middleware(['auth:marketing', 'auth', 'throttle'])->prefix('marketing')->
 Route::middleware(['auth:marketing', 'auth', 'marketingemailverified', 'throttle', 'isMarketingActive'])->prefix('mitra')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'index'])->name('marketing.dashboard');
 
-    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:6,1'])->name('marketing.settings.whatsappotp');
+    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:90,1'])->name('marketing.settings.whatsappotp');
     Route::post('settings/validate/whatsapp-otp', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'whatsappOTPSubmit'])->name('marketing.settings.whatsappotp.validate');
     Route::get('settings', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'marketingSettings'])->name('marketing.settings');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profile'])->name('marketing.profile');
@@ -226,7 +226,7 @@ Route::middleware(['auth:tenant', 'auth', 'throttle'])->prefix('tenant')->group(
 
 Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'isTenantActive'])->prefix('tenant')->group( function () {
     Route::get('settings', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tenantSettings'])->name('tenant.settings');
-    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:10,1'])->name('tenant.settings.whatsappotp');
+    Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:90,1'])->name('tenant.settings.whatsappotp');
     Route::post('settings/validate/whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappOTPSubmit'])->name('tenant.settings.whatsappotp.validate');
 
     Route::get('settings/profile', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profile'])->name('tenant.profile');

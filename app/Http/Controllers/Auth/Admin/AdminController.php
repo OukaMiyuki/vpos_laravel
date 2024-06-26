@@ -417,10 +417,14 @@ class AdminController extends Controller {
                                         return $dateTimeTransaksi;
                                     })
                                     ->editColumn('nominal', function($data) {
-                                        return $data->nominal;
+                                        $tarik = floor($data->nominal);
+                                        $hasil_rupiah = "Rp " . number_format($tarik,2,',','.');
+                                        return $hasil_rupiah;
                                     })
                                     ->editColumn('total_biaya', function($data) {
-                                        return $data->biaya_admin;
+                                        $admin = floor($data->biaya_admin);
+                                        $hasil_rupiah = "Rp " . number_format($admin,2,',','.');
+                                        return $hasil_rupiah;
                                     })
                                     ->editColumn('status', function($data) {
                                         return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Penarikan Sukses</span>':'<span class="badge bg-soft-warning text-danger">Penarikan Gagal</span>');
@@ -1672,10 +1676,14 @@ class AdminController extends Controller {
                                         return $dateTimePenarikan;
                                     })
                                     ->editColumn('nominal', function($data) {
-                                        return $data->nominal;
+                                        $tarik = floor($data->nominal);
+                                        $hasil_rupiah = "Rp " . number_format($tarik,2,',','.');
+                                        return $hasil_rupiah;
                                     })
                                     ->editColumn('biaya_admin', function($data) {
-                                        return $data->biaya_admin;
+                                        $admin = floor($data->biaya_admin);
+                                        $hasil_rupiah = "Rp " . number_format($admin,2,',','.');
+                                        return $hasil_rupiah;
                                     })
                                     ->editColumn('status', function($data) {
                                         return (($data->status == 1)?'<span class="badge bg-soft-success text-success">Penarikan Sukses</span>':'<span class="badge bg-soft-warning text-danger">Penarikan Gagal</span>');

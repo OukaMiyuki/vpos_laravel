@@ -105,7 +105,7 @@
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalWithdrawToday }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($totalWithdrawToday)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Insentif Withdraw Hari Ini</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                         <i class="mdi mdi-eye"></i>

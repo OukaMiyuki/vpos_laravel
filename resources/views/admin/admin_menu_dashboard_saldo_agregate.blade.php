@@ -27,7 +27,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $agregate }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($agregate)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Insentif Agregate</p>
                                     </div>
                                 </div>
@@ -46,7 +46,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $agregateSaldo }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($agregateSaldo)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Saldo Agregate</p>
                                     </div>
                                 </div>
@@ -93,7 +93,7 @@
                                                 <td>{{ $wd->jenis_penarikan }}</td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s')}}</td>
                                                 <td class="text-center">
-                                                    {{$wd->detailWithdraw->sum('nominal')}}
+                                                    @currency($wd->detailWithdraw->sum('nominal'))
                                                 </td>
                                                 <td>
                                                     @if ($wd->status == 0)
