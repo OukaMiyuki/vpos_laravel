@@ -35,16 +35,16 @@
                             <h4 class="header-title mb-3">Settlement Info on {{\Carbon\Carbon::parse($settlementDetailHistory->tanggal_settlement)->format('d-m-Y')}}</h4>
                             <div class="row">
                                 <div class="col-6">
-                                    <h3 class="mb-3"><span>Total Settlement : </span>{{ $settlementDetailHistory->settlement_history_sum_nominal_settle }}</h3>
+                                    <h3 class="mb-3"><span>Total Settlement : </span> @currency($settlementDetailHistory->settlement_history_sum_nominal_settle)</h3>
                                 </div>
                                 <div class="col-6 text-end">
-                                    <h3 class="mb-3"><span>Total Insentif Cashback : </span>{{ $settlementDetailHistory->settlement_history_sum_nominal_insentif_cashback }} </h3>
+                                    <h3 class="mb-3"><span>Total Insentif Cashback : </span>@currency($settlementDetailHistory->settlement_history_sum_nominal_insentif_cashback) </h3>
                                 </div>
                             </div>
                             <div class="responsive-table-plugin">
                                 <div class="table-rep-plugin">
                                     <div class="table-responsive" data-pattern="priority-columns">
-                                        <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                        <table id="scroll-horizontal-table" class="table dt-responsive nowrap w-100">
                                             <thead>
                                                 <tr>
                                                     <th>No.</th>
