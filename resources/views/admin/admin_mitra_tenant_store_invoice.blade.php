@@ -36,10 +36,20 @@
                             <h4 class="header-title mb-3">Store Info</h4>
                             <div class="row">
                                 <div class="col-6">
-                                    <h3 class="mb-3"><span>Store Name : </span>{{ $storeDetail->name }}</h3>
+                                    <h4 class="mb-3"><span>Store Name : </span>{{ $storeDetail->name }}</h4>
                                 </div>
                                 <div class="col-6 text-end">
-                                    <h3 class="mb-3"><span>Total Transaksi : </span>{{ $storeDetail->invoice->count() }} </h3>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <h4 class="mb-3"><span>Total Transaksi : </span>{{ $storeDetail->invoice->count() }} </h4>
+                                        </div>
+                                        <div class="col-6">
+                                            @php
+                                                $penghasilan = floor($storeDetail->invoice_sum_nominal_terima_bersih);
+                                            @endphp
+                                            <h4 class="mb-3"><span>Total Penghasilan : </span>@currency($penghasilan) </h4>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="responsive-table-plugin">

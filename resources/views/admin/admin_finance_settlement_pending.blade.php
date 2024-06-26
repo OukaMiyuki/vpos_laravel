@@ -44,7 +44,7 @@
                             <div class="responsive-table-plugin">
                                 <div class="table-rep-plugin">
                                     <div class="table-responsive" data-pattern="priority-columns">
-                                        <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                        <table id="basic-table" class="table dt-responsive nowrap w-100">
                                             <thead>
                                                 <tr>
                                                     <th>No.</th>

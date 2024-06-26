@@ -35,11 +35,21 @@
                             </div>
                             <h4 class="header-title mb-3">Merchant Info</h4>
                             <div class="row">
-                                <div class="col-6">
-                                    <h3 class="mb-3"><span>Merchant Name : </span>{{ $storeList->name }}</h3>
+                                <div class="col-5">
+                                    <h4 class="mb-3"><span>Merchant Name : </span>{{ $storeList->name }}</h4>
                                 </div>
-                                <div class="col-6 text-end">
-                                    <h3 class="mb-3"><span>Total Transaksi : </span>{{ $storeList->invoice->count() }} </h3>
+                                <div class="col-7 text-end">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <h4 class="mb-3"><span>Total Transaksi : </span>{{ $storeList->invoice->count() }} </h4>
+                                        </div>
+                                        <div class="col-6">
+                                            @php
+                                                $penghasilan = floor($storeList->invoice_sum_nominal_terima_bersih);
+                                            @endphp
+                                            <h4 class="mb-3"><span>Total Penghasilan : </span>@currency($penghasilan) </h4>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="responsive-table-plugin">

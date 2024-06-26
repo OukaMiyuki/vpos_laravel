@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar UMI Request Tenant</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                <table id="scroll-horizontal-table" class="table w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -78,16 +78,16 @@
                                                 <td class="text-center">{{\Carbon\Carbon::parse($umiReq->tanggal_pengajuan)->format('d-m-Y')}}</td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($umiReq->tanggal_approval)->format('d-m-Y')}}</td>
                                                 <td class="text-center">
-                                                    <a title="Download dokumen request UMI" href="{{ route('admin.dashboard.menu.userUmiRequest.download', ['id' => $umiReq->id]) }}" class="btn btn-info btn-xs font-16 text-white">
+                                                    <a title="Download dokumen request UMI" href="{{ route('admin.dashboard.menu.userUmiRequest.download', ['id' => $umiReq->id]) }}" class="btn btn-info btn-xs text-white">
                                                         <i class="dripicons-download"></i>
                                                     </a>
                                                 </td>
                                                 <td>{{$umiReq->note}}</td>
                                                 <td class="text-center">
                                                     @if ($umiReq->is_active == 0)
-                                                        <a href="" id="approval-umi" data-id="{{$umiReq->id}}" data-store_identifier="{{ $umiReq->store_identifier }}" data-bs-toggle="modal" data-bs-target="#approve-umi-modal" class="btn btn-success"><i class="mdi mdi-check-bold"></i></a>
+                                                        <a href="" id="approval-umi" data-id="{{$umiReq->id}}" data-store_identifier="{{ $umiReq->store_identifier }}" data-bs-toggle="modal" data-bs-target="#approve-umi-modal" class="btn btn-xs btn-success"><i class="mdi mdi-check-bold"></i></a>
                                                         &nbsp;
-                                                        <a href="" id="reject-umi" data-id="{{$umiReq->id}}" data-store_identifier="{{ $umiReq->store_identifier }}" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reject-umi-modal"><i class="mdi mdi-close-thick"></i></a>
+                                                        <a href="" id="reject-umi" data-id="{{$umiReq->id}}" data-store_identifier="{{ $umiReq->store_identifier }}" class="btn btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#reject-umi-modal"><i class="mdi mdi-close-thick"></i></a>
                                                     @endif
                                                 </td>
                                             @endforeach

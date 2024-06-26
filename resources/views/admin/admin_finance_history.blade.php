@@ -89,7 +89,7 @@
                             </div>
                             <h4 class="header-title mb-3">History Penarikan Dana</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="scroll-horizontal-table" class="table nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>

@@ -30,8 +30,21 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Withdraw Mitra Tenant</h4>
+                            <div class="row">
+                                <div class="col-6">
+                                    
+                                </div>
+                                <div class="col-6 text-end">
+                                    <div id="daterange_user_mitra_tenant_withdraw" class="float-end" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%; text-align:center">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> 
+                                        <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="selection-horizontal-datatable" class="table user-table-withdrawal-mitra-tenant nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -46,7 +59,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach($tenantWithdraw as $key => $wd)
                                             @foreach ($wd->withdrawal as $withdraw)
                                                 <tr>
@@ -69,7 +82,7 @@
                                                     </td>
                                                 </tr>
                                             @endforeach
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>

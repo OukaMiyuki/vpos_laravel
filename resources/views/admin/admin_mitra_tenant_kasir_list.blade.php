@@ -31,10 +31,11 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Akun Kasir</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                <table id="scroll-horizontal-datatable" class="table user-table-kasir-list w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
+                                            <th class="text-center">Action</th>
                                             <th>Nama</th>
                                             <th>Email</th>
                                             <th>Phone</th>
@@ -43,11 +44,10 @@
                                             <th>Store Identifier</th>
                                             <th>Store Name</th>
                                             <th>Tenant</th>
-                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach ($kasir as $kasir)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
@@ -81,7 +81,7 @@
                                                     </a>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>

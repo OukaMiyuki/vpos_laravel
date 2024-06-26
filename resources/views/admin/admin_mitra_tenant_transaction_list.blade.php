@@ -30,13 +30,27 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Transaksi Mitra Tenant</h4>
+                            <div class="row">
+                                <div class="col-6">
+                                    
+                                </div>
+                                <div class="col-6 text-end">
+                                    <div id="daterange_mitra_tenant_transaction" class="float-end" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%; text-align:center">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> 
+                                        <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="selection-datatable" class="table data-table-user-mitra-tenant-transaction dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>No. Invoice</th>
                                             <th>Tenant</th>
+                                            <th>Store Identifier</th>
                                             <th>Store Name</th>
                                             <th>Status Pembayaran</th>
                                             <th>Tanggal Transaksi</th>
@@ -54,7 +68,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach($tenantInvoice as $key => $invoice)
                                             @foreach ($invoice->storeDetail->invoice as $invoiceList )
                                                 <tr>
@@ -86,8 +100,8 @@
                                                     <td>{{$invoiceList->nominal_mdr}}</td>
                                                     <td>{{$invoiceList->nominal_terima_bersih}}</td>
                                                 </tr>
-                                            @endforeach
-                                        @endforeach
+                                            @endforeach --}}
+                                        {{-- @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>

@@ -32,10 +32,23 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar History Settlement</h4>
+                            <div class="row">
+                                <div class="col-6">
+                                    
+                                </div>
+                                <div class="col-6 text-end">
+                                    <div id="daterange_user_settlement_history" class="float-end" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%; text-align:center">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> 
+                                        <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
                             <div class="responsive-table-plugin">
                                 <div class="table-rep-plugin">
                                     <div class="table-responsive" data-pattern="priority-columns">
-                                        <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                        <table id="scroll-horizontal-datatable" class="table user-table-settlement-history w-100 nowrap">
                                             <thead>
                                                 <tr>
                                                     <th width="2%">No.</th>
@@ -51,7 +64,7 @@
                                                 $no=0;
                                             @endphp
                                             <tbody>
-                                                @foreach($settlement as $stl)
+                                                {{-- @foreach($settlement as $stl)
                                                     <tr>
                                                         <td>{{$no+=1}}</td>
                                                         <td>{{$stl->nomor_settlement}}</td>
@@ -69,7 +82,7 @@
                                                             <a href="{{ route('admin.dashboard.finance.settlement.history.detail', ['id' => $stl->id, 'code' => $stl->nomor_settlement]) }}" title="Lihat detail settlement" class="btn btn-xs btn-primary"><i class="mdi mdi-eye"></i></a>
                                                         </td>
                                                     </tr>
-                                                @endforeach
+                                                @endforeach --}}
                                             </tbody>
                                         </table>
                                     </div>

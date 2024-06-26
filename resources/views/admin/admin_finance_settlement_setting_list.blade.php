@@ -35,7 +35,7 @@
                             <div class="responsive-table-plugin">
                                 <div class="table-rep-plugin">
                                     <div class="table-responsive" data-pattern="priority-columns">
-                                        <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                        <table id="scroll-horizontal-table" class="table w-100 nowrap">
                                             <thead>
                                                 <tr>
                                                     <th width="2%">No.</th>

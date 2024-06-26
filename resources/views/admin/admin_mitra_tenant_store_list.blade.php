@@ -30,57 +30,56 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Store Mitra Tenant</h4>
-                            <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
-                                    <thead>
+                            <table id="scroll-horizontal-datatable" class="table user-table-mitra-tenant-store-list w-100 nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Tenant</th>
+                                        <th>Email</th>
+                                        <th>Store Identifier</th>
+                                        <th>Store Name</th>
+                                        <th>Jenis Usaha</th>
+                                        <th class="text-center">Status UMI</th>
+                                        <th class="text-center">Total Transaksi</th>
+                                        <th class="text-center">Total Penghasilan (Rp.)</th>
+                                        <th class="text-center">Data Invoice</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{-- @php $no=0; @endphp
+                                    @foreach ($storeDetail as $store)
                                         <tr>
-                                            <th>No.</th>
-                                            <th>Tenant</th>
-                                            <th>Email</th>
-                                            <th>Store Identifier</th>
-                                            <th>Store Name</th>
-                                            <th>Jenis Usaha</th>
-                                            <th class="text-center">Status UMI</th>
-                                            <th class="text-center">Total Invoice</th>
-                                            <th class="text-center">Data Invoice</th>
-                                            <th class="text-center">Action</th>
+                                            <td>{{ $no+=1 }}</td>
+                                            <td>{{ $store->tenant->name }}</td>
+                                            <td>{{ $store->tenant->email }}</td>
+                                            <td>{{ $store->store_identifier }}</td>
+                                            <td>{{ $store->name }}</td>
+                                            <td>{{ $store->jenis_usaha }}</td>
+                                            <td class="text-center">
+                                                @if ($store->status_umi == 0)
+                                                    <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
+                                                @elseif($store->status_umi == 1)
+                                                    <span class="badge bg-soft-success text-success">Terdaftar</span>
+                                                @elseif($store->status_umi == 2)
+                                                    <span class="badge bg-soft-danger text-danger">Ditolak</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $store->invoice_count }}</td>
+                                            <td>
+                                                <a href="{{ route('admin.dashboard.mitraTenant.store.invoice', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
+                                                    <button title="Lihat daftar invoice" type="button" class="btn btn-primary rounded-pill waves-effect waves-light">Lihat Invoice</button>&nbsp;
+                                                </a>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{{ route('admin.dashboard.mitraTenant.store.detail', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
+                                                    <button title="Lihat data admin" type="button" class="btn btn-info waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
+                                                </a>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php $no=0; @endphp
-                                        @foreach ($storeDetail as $store)
-                                            <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $store->tenant->name }}</td>
-                                                <td>{{ $store->tenant->email }}</td>
-                                                <td>{{ $store->store_identifier }}</td>
-                                                <td>{{ $store->name }}</td>
-                                                <td>{{ $store->jenis_usaha }}</td>
-                                                <td class="text-center">
-                                                    @if ($store->status_umi == 0)
-                                                        <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
-                                                    @elseif($store->status_umi == 1)
-                                                        <span class="badge bg-soft-success text-success">Terdaftar</span>
-                                                    @elseif($store->status_umi == 2)
-                                                        <span class="badge bg-soft-danger text-danger">Ditolak</span>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $store->invoice_count }}</td>
-                                                <td>
-                                                    <a href="{{ route('admin.dashboard.mitraTenant.store.invoice', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
-                                                        <button title="Lihat daftar invoice" type="button" class="btn btn-primary rounded-pill waves-effect waves-light">Lihat Invoice</button>&nbsp;
-                                                    </a>
-                                                </td>
-                                                <td class="text-center">
-                                                    <a href="{{ route('admin.dashboard.mitraTenant.store.detail', ['id' => $store->id, 'store_identifier' => $store->store_identifier]) }}">
-                                                        <button title="Lihat data admin" type="button" class="btn btn-info waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                                    @endforeach --}}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 
@@ -23,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void {
         Model::preventLazyLoading();
+        Blade::directive('currency', function ( $expression ) { return "Rp. <?php echo number_format($expression,2,',','.'); ?>"; });
+        Blade::directive('money', function ( $expression ) { return "<?php echo number_format($expression,0,',','.'); ?>"; });
         // Model::handleLazyLoadingViolationUsing(function($model, $relation){
         //     $class = $model->$relation()->getRelated();
 

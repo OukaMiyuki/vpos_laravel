@@ -31,11 +31,13 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Mitra Tenant</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                <table id="scroll-horizontal-datatable" class="table user-table-mitra-tenant-list w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
+                                            <th class="text-center">Action</th>
                                             <th>Nama</th>
+                                            <th>No. KTP</th>
                                             <th>Phone</th>
                                             <th>Email</th>
                                             <th class="text-center">Tanggal Gabung</th>
@@ -46,11 +48,10 @@
                                             <th class="text-center">Invitation Code</th>
                                             <th class="text-center">Holder</th>
                                             <th class="text-center">Nama Mitra</th>
-                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach ($tenantMitra as $mitra)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
@@ -87,7 +88,7 @@
                                                     </a>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>
