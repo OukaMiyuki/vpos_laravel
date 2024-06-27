@@ -7,6 +7,14 @@ $(document).ready(function(){
         reader.readAsDataURL(e.target.files['0']);
     });
 
+    $('#swift_code').on('change',function(){
+        if($(this).val() != "default"){
+            $('#nama_bank').val($( "#swift_code option:selected" ).text());
+        }else{
+            $('#nama_bank').val('');
+        }
+    });
+
     $(document).on("click", "#detailsupplier", function() {
         var nama_supplier = $(this).data('nama');
         var email_supplier = $(this).data('email');
@@ -136,6 +144,25 @@ $(document).ready(function() {
             kmbtxtt.value = formatRupiah(kembl, "Rp. ");
         } else {
             $('#kem').val(0);
+        }
+    });
+});
+
+$(document).ready(function() {
+    let total_tarik = document.getElementById("total_tarik");
+    $('#nominal_tarik_dana').on("input", function() {
+        var nominal = parseInt(document.getElementById("nominal_tarik_dana").value);
+        if(nominal<10000){
+            total_tarik.value = 0;
+        } else {
+            var biaya_transfer = parseInt(document.getElementById("biaya_transfer_bank").value);
+            var total = nominal+biaya_transfer;
+            // let nominal_clean = nominal.replace(/[^0-9.-]+/g,"");
+            // let biaya_transfer_clean = biaya_transfer.replace(/[^0-9.-]+/g,"");
+            // let total =biaya_transfer+nominal;
+            // let total_withdraw = parseInt(total);
+            total_tarik.value = formatRupiah(total, "Rp. ");
+            // total_tarik.value = total;
         }
     });
 });

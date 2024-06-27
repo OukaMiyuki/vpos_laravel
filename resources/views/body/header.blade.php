@@ -202,6 +202,10 @@
                             <i class="mdi mdi-credit-card-outline"></i>
                             <span>Rekening</span>
                         </a>
+                        <a href="{{ route('tenant.withdraw') }}" class="dropdown-item notify-item">
+                            <i class="mdi mdi-cash-multiple"></i>
+                            <span>Withdraw</span>
+                        </a>
                     @endauth
                     @auth('marketing')
                         <a href="{{ route('marketing.rekening.setting') }}" class="dropdown-item notify-item">
@@ -220,7 +224,7 @@
                     @auth('admin')
                         @if (auth()->user()->access_level == 0)
                             <a href="{{ route('admin.withdraw') }}" class="dropdown-item notify-item">
-                                <span class="mdi mdi-cash-multiple"></span>&nbsp;
+                                <i class="mdi mdi-cash-multiple"></i>
                                 <span>Withdraw</span>
                             </a>
                         @endif

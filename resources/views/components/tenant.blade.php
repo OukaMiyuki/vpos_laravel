@@ -107,26 +107,6 @@
         <script src="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js') }}"></script>
         <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
         <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-        <script type="text/javascript">
-            var pusher = new Pusher('3ebcf6da343f1f1aea17', {
-                encrypted: true
-            });
-            var channel = pusher.subscribe('post-liked');
-            var auto_refresh = setInterval(
-                function () {
-                    $.ajax({
-                        url: '/check-payment',
-                        type: 'get',
-                        success:function(data){
-                            channel.bind('App\Events\PaymentCheck', function(data) {
-
-                            });
-                        }
-
-                    })
-                }, 10000);
-        </script>
-
         <!-- Init js-->
         <script src="{{ asset('assets/js/pages/form-advanced.init.js') }}"></script>
         <Script type="text/javascript" src="{{ asset('assets/js/pages/tenant.init.js') }}"></Script>
@@ -165,7 +145,7 @@
             @endif
         </script>
         <Script type="text/javascript" src="{{ asset('assets/js/pages/getUserLocation.js') }}"></Script>
-        <script>
+        {{-- <script>
             $(document).ready(function(){
                 $('a[data-bs-toggle="tab"]').click(function(e) {
                     localStorage.setItem('activeTab', $(e.target).attr('href'));
@@ -177,6 +157,6 @@
                     //console.log('Walla');
                 }
             });
-        </script>
+        </script> --}}
     </body>
 </html>

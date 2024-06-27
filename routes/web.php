@@ -236,8 +236,8 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
     Route::get('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeingSetting'])->name('tenant.rekening.setting');
     Route::post('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeningSettingUpdate'])->name('tenant.rekening.setting.update');
 
-    Route::post('settings/profile/tarik-dana', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tarikDanaQris'])->name('tenant.profile.tarik');
-    Route::post('settings/profile/tarik-dana/proses', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'prosesTarikDana'])->name('tenant.profile.tarik.proses');
+    Route::get('settings/withdraw', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'withdraw'])->name('tenant.withdraw');
+    Route::post('settings/withdraw', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'withdrawProcess'])->name('tenant.withdraw.process');
 
     Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'historyPenarikan'])->name('tenant.finance.history_penarikan');
     Route::get('/dashboard/finance/history-penarikan/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'invoiceTarikDana'])->name('tenant.finance.history_penarikan.invoice');

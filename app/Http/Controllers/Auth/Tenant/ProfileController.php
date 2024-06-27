@@ -383,7 +383,12 @@ class ProfileController extends Controller{
     }
 
     public function rekeingSetting(){
-        $rekening = Rekening::where('id_user', auth()->user()->id)
+        $rekening = Rekening::select([
+                                'rekenings.nama_bank',
+                                'rekenings.swift_code',
+                                'rekenings.no_rekening',
+                            ])
+                            ->where('id_user', auth()->user()->id)
                             ->where('email', auth()->user()->email)
                             ->first();
         $dataRekening = "";
@@ -410,9 +415,9 @@ class ProfileController extends Controller{
                 $dataRekening = json_decode($getRek->getBody());
             } catch (Exception $e) {
                 if(auth()->user()->id_inv_code == 0){
-                    $action = "Mitra Bisnis : Update Profile";
+                    $action = "Mitra Bisnis : Rekening Inquiry Fail";
                 } else {
-                    $action = "Tenant : Update Profile";
+                    $action = "Tenant : Rekening Inquiry Fail";
                 }
                 $this->createHistoryUser($action, $e, 0);
             }
@@ -431,6 +436,7 @@ class ProfileController extends Controller{
         $kode = (int) $request->otp;
         $swift_code = $request->swift_code;
         $rekening = $request->no_rekening;
+        $nama_bank = $request->nama_bank;
 
         $action = "";
         if(auth()->user()->id_inv_code == 0){
@@ -453,6 +459,7 @@ class ProfileController extends Controller{
                                         ->where('email', auth()->user()->email)
                                         ->first();
                 $rekeningAkun->update([
+                    'nama_bank' => $nama_bank,
                     'no_rekening' => $rekening,
                     'swift_code' => $swift_code,
                 ]);
@@ -473,6 +480,375 @@ class ProfileController extends Controller{
                 'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
+        }
+    }
+
+    public function withdraw(){
+        $qrisWallet = QrisWallet::select(['saldo'])
+                                ->where('id_user', auth()->user()->id)
+                                ->where('email', auth()->user()->email)
+                                ->first();
+        $rekening = Rekening::select([
+                                'rekenings.nama_bank',
+                                'rekenings.swift_code',
+                                'rekenings.no_rekening',
+                            ])
+                            ->where('id_user', auth()->user()->id)
+                            ->where('email', auth()->user()->email)
+                            ->first();
+        $biayaAdmin = BiayaAdminTransferDana::sum('nominal');
+        $dataRekening = "";
+        $action = "";
+        if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
+            $ip = "36.84.106.3";
+            $PublicIP = $this->get_client_ip();
+            $getLoc = Location::get($ip);
+            $lat = $getLoc->latitude;
+            $long = $getLoc->longitude;
+            $rekClient = new GuzzleHttpClient();
+            $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
+            try {
+                $getRek = $rekClient->request('POST',  $urlRek, [
+                    'form_params' => [
+                        'latitude' => $lat,
+                        'longitude' => $long,
+                        'bankCode' => $rekening->swift_code,
+                        'accountNo' => $rekening->no_rekening,
+                        'secret_key' => "Vpos71237577Inquiry"
+                    ]
+                ]);
+                $responseCode = $getRek->getStatusCode();
+                $dataRekening = json_decode($getRek->getBody());
+            } catch (Exception $e) {
+                if(auth()->user()->id_inv_code == 0){
+                    $action = "Mitra Bisnis : Rekening Inquiry Fail";
+                } else {
+                    $action = "Tenant : Rekening Inquiry Fail";
+                }
+                $this->createHistoryUser($action, $e, 0);
+            }
+        }
+        return view('tenant.tenant_withdraw', compact('qrisWallet', 'dataRekening', 'rekening', 'biayaAdmin'));
+    }
+
+    public function withdrawProcess(Request $request){
+        DB::connection()->enableQueryLog();
+        $url = 'https://erp.pt-best.com/api/rek_transfer';
+        $client = new GuzzleHttpClient();
+        $ip = "125.164.243.227";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        
+        $otp = $request->wa_otp;
+
+        try{
+            $otp = (new Otp)->validate(auth()->user()->phone, $otp);
+            if(!$otp->status){
+                $notification = array(
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $nominal_tarik = $request->nominal_tarik_dana;
+                $total_tarik = (int) str_replace(['.', ' ', 'Rp'], '', $request->total_tarik);
+
+                $transferFee = BiayaAdminTransferDana::get();
+                $biayaAdmin = $transferFee->sum('nominal');
+
+                
+                $rekeningTenant = Rekening::select(['swift_code', 'no_rekening', 'id'])
+                                            ->where('id_user', auth()->user()->id)
+                                            ->where('email', auth()->user()->email)
+                                            ->first();
+                $qrisWalletTenant = QrisWallet::where('id_user', auth()->user()->id)
+                                            ->where('email', auth()->user()->email)
+                                            ->first();
+                                            
+                $total_tarik_dana = $nominal_tarik+$biayaAdmin;
+
+                if($nominal_tarik<10000){
+                    $notification = array(
+                        'message' => 'Minimal tarik dana Rp. 10.000!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                } else {
+                    if($qrisWalletTenant->saldo<$total_tarik_dana){
+                        $notification = array(
+                            'message' => 'Saldo anda tidak mencukupi untuk melakukan proses penarikan!',
+                            'alert-type' => 'warning',
+                        );
+                        return redirect()->back()->with($notification);
+                    } else {
+                        $transfer = "";
+                        $transfer = $this->prosesTarikDanaTenant($nominal_tarik, $total_tarik_dana);
+
+                        if(!is_null($transfer) || !empty($transfer) || $transfer != "" || $transfer != NULL){
+                            if($transfer != 0) {
+                                $notification = array(
+                                    'message' => 'Penarikan dana sukses!',
+                                    'alert-type' => 'success',
+                                );
+                                return redirect()->route('tenant.finance.history_penarikan.invoice', array('id' => $transfer))->with($notification);
+                            } else {
+                                $notification = array(
+                                    'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                                    'alert-type' => 'error',
+                                );
+                                return redirect()->route('tenant.withdraw')->with($notification);
+                            }
+                        } else {
+                            $notification = array(
+                                'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                                'alert-type' => 'warning',
+                            );
+                            return redirect()->route('tenant.withdraw')->with($notification);
+                        }
+                    }
+                }
+                
+            }
+        } catch(Exception $e){
+            $action = "";
+            if(auth()->user()->id_inv_code == 0){
+                $action = "Mitra Bisnis : Withdrawal Process Error | OTP Error Problem";
+            } else {
+                $action = "Tenant : Withdrawal Process Error | OTP Error Problem";
+            }
+            $this->createHistoryUser($action, $e, 0);
+            $notification = array(
+                'message' => 'Penarikan dana gagal, harap hubungi admin!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
+    private function prosesTarikDanaTenant($nominal_tarik, $total_tarik){
+        $url = 'https://erp.pt-best.com/api/rek_transfer';
+        $client = new GuzzleHttpClient();
+        $ip = "125.164.243.227";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $transferFee = BiayaAdminTransferDana::get();
+        $biayaAdmin = $transferFee->sum('nominal');
+        $aplikator = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Admin')->first();
+        $mitra = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Mitra Aplikasi')->first();
+        $agregateMaintenance = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Agregate Server')->first();
+        $agregateTransfer = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Transfer')->first();
+        DB::connection()->enableQueryLog();
+
+        $rekeningTenant = Rekening::select(['swift_code', 'no_rekening', 'id'])
+                                    ->where('id_user', auth()->user()->id)
+                                    ->where('email', auth()->user()->email)
+                                    ->first();
+        $qrisWalletTenant = QrisWallet::where('id_user', auth()->user()->id)
+                                        ->where('email', auth()->user()->email)
+                                        ->first();
+        $agregateWalletforMaintenance = AgregateWallet::find(1);
+        $agregateWalletforTransfer = AgregateWallet::find(2);
+        $qrisAdmin = QrisWallet::where('email', 'adminsu@visipos.id')->find(1);
+        $marketing = "";
+        $saldoMitra = "";
+
+        if(auth()->user()->id_inv_code != 0){
+            $marketing = InvitationCode::select([
+                                            'invitation_codes.id',
+                                            'invitation_codes.id_marketing',
+                                        ])
+                                        ->with(['marketing' => function ($query){
+                                            $query->select([
+                                                        'marketings.id',
+                                                        'marketings.email'
+                                                    ])
+                                                    ->get();
+                                        }])
+                                        ->find(auth()->user()->id_inv_code);
+
+            $saldoMitra = QrisWallet::where('id_user', $marketing->marketing->id)
+                                    ->where('email', $marketing->marketing->email)
+                                    ->first();
+        }
+        $agregateSaldoforMaintenance = $agregateWalletforMaintenance->saldo;
+        $agregateSaldoforTransfer = $agregateWalletforTransfer->saldo;
+
+        try{
+            $nominal_penarikan = filter_var($nominal_tarik, FILTER_SANITIZE_NUMBER_INT);
+            $total_penarikan = filter_var($total_tarik, FILTER_SANITIZE_NUMBER_INT);
+            $saldoTenant = $qrisWalletTenant->saldo;
+            if($saldoTenant < $total_penarikan){
+                $notification = array(
+                    'message' => 'Saldo anda tidak mencukupi!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                try {
+                    $postResponse = $client->request('POST',  $url, [
+                        'form_params' => [
+                            'latitude' => $lat,
+                            'longitude' => $long,
+                            'bankCode' => $rekeningTenant->swift_code,
+                            'accountNo' => $rekeningTenant->no_rekening,
+                            'amount' => $nominal_penarikan,
+                            'secret_key' => "Vpos71237577Transfer"
+                        ]
+                    ]);
+                    $responseCode = $postResponse->getStatusCode();
+                    $data = json_decode($postResponse->getBody());
+                    $responseCode = $data->responseCode;
+                    $responseMessage = $data->responseMessage;
+                    if($responseCode == 2001800 && $responseMessage == "Request has been processed successfully") {
+                        $jenis_penarikan = "";
+                        if(auth()->user()->id_inv_code != 0){
+                            $jenis_penarikan = "Penarikan Dana Tenant";
+                        } else if(auth()->user()->id_inv_code == 0){
+                            $jenis_penarikan = "Penarikan Dana Mitra Bisnis";
+                        }
+                        $withDraw = Withdrawal::create([
+                            'id_user' => auth()->user()->id,
+                            'id_rekening' => $rekeningTenant->id,
+                            'email' => auth()->user()->email,
+                            'jenis_penarikan' => $jenis_penarikan,
+                            'tanggal_penarikan' => Carbon::now(),
+                            'nominal' => $nominal_penarikan,
+                            'biaya_admin' => $biayaAdmin,
+                            'tanggal_masuk' => Carbon::now(),
+                            'deteksi_ip_address' => $ip,
+                            'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                            'status' => 1
+                        ]);
+
+                        if(!is_null($withDraw) || !empty($withDraw)){
+                            $qrisWalletTenant->update([
+                                'saldo' => $saldoTenant-$total_penarikan
+                            ]);
+                            $adminSaldo = $qrisAdmin->saldo;
+                            if(auth()->user()->id_inv_code != 0){
+                                $qrisAdmin->update([
+                                    'saldo' => $adminSaldo+$aplikator->nominal
+                                ]);
+
+                                $mitraSaldo = $saldoMitra->saldo;
+                                $saldoMitra->update([
+                                    'saldo' => $mitraSaldo+$mitra->nominal
+                                ]);
+                            } else if(auth()->user()->id_inv_code == 0){
+                                $qrisAdmin->update([
+                                    'saldo' => $adminSaldo+$aplikator->nominal+$mitra->nominal
+                                ]);
+                            }
+
+                            $agregateWalletforMaintenance->update([
+                                'saldo' =>$agregateSaldoforMaintenance+$agregateMaintenance->nominal
+                            ]);
+
+                            $agregateWalletforTransfer->update([
+                                'saldo' =>$agregateSaldoforTransfer+$agregateTransfer->nominal
+                            ]);
+
+                            foreach($transferFee as $fee){
+                                DetailPenarikan::create([
+                                    'id_penarikan' => $withDraw->id,
+                                    'id_insentif' => $fee->id,
+                                    'nominal' => $fee->nominal,
+                                ]);
+                            }
+
+                            NobuWithdrawFeeHistory::create([
+                                'id_penarikan' => $withDraw->id,
+                                'nominal' => 300
+                            ]);
+
+                            $action = "";
+                            if(auth()->user()->id_inv_code == 0){
+                                $action = "Mitra Bisnis : Withdrawal Process Success";
+                            } else {
+                                $action = "Tenant : Withdrawal Process Success";
+                            }
+
+                            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                            $date = Carbon::now()->format('d-m-Y H:i:s');
+                            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan."  pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $this->sendNotificationToUser($body);
+
+                            return $withDraw->id;
+
+                        } else {
+
+                            $action = "";
+                            if(auth()->user()->id_inv_code == 0){
+                                $action = "Mitra Bisnis : Withdrawal Process Failed";
+                            } else {
+                                $action = "Tenant : Withdrawal Process Failed";
+                            }
+                            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+                            $date = Carbon::now()->format('d-m-Y H:i:s');
+                            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $this->sendNotificationToUser($body);
+                            
+                            return 0;
+                        }
+                    } else {
+                        $withDraw = Withdrawal::create([
+                            'id_user' => auth()->user()->id,
+                            'email' => auth()->user()->email,
+                            'tanggal_penarikan' => Carbon::now(),
+                            'nominal' => $nominal_penarikan,
+                            'biaya_admin' => $biayaAdmin,
+                            'tanggal_masuk' => Carbon::now(),
+                            'deteksi_ip_address' => $ip,
+                            'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+                            'status' => 0
+                        ]);
+
+                        $action = "";
+                        if(auth()->user()->id_inv_code == 0){
+                            $action = "Mitra Bisnis : Withdrawal Transaction fail invalid";
+                        } else {
+                            $action = "Tenant : Withdrawal Transaction fail invalid";
+                        }
+
+                        $this->createHistoryUser($action, $responseMessage, 0);
+                        $date = Carbon::now()->format('d-m-Y H:i:s');
+                        $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                        $this->sendNotificationToUser($body);
+                        
+                        return 0;
+                    }
+                } catch (Exception $e) {
+                    $action = "";
+                    if(auth()->user()->id_inv_code == 0){
+                        $action = "Mitra Bisnis : Withdraw Process | Error (HTTP API Error)";
+                    } else {
+                        $action = "Tenant : Withdraw Process | Error (HTTP API Error)";
+                    }
+                    $this->createHistoryUser($action, $e, 0);
+                    $date = Carbon::now()->format('d-m-Y H:i:s');
+                    $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                    $this->sendNotificationToUser($body);
+                    
+                    return 0;
+                }
+            }
+        } catch (Exception $e){
+            $action = "";
+            if(auth()->user()->id_inv_code == 0){
+                $action = "Mitra Bisnis : Withdraw Process | Error";
+            } else {
+                $action = "Tenant : Withdraw Process | Error";
+            }
+            $this->createHistoryUser($action, $e, 0);
+            $date = Carbon::now()->format('d-m-Y H:i:s');
+            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+            $this->sendNotificationToUser($body);
+
+            return 0;
         }
     }
 
@@ -715,337 +1091,337 @@ class ProfileController extends Controller{
         }
     }
 
-    public function tarikDanaQris(Request $request){
-        $ip = "125.164.243.227";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
-        $biayaAdmin = BiayaAdminTransferDana::sum('nominal');
-        $nominal_tarik = $request->nominal_tarik;
-        $otp = $request->wa_otp;
+    // public function tarikDanaQris(Request $request){
+    //     $ip = "125.164.243.227";
+    //     $PublicIP = $this->get_client_ip();
+    //     $getLoc = Location::get($ip);
+    //     $lat = $getLoc->latitude;
+    //     $long = $getLoc->longitude;
+    //     $biayaAdmin = BiayaAdminTransferDana::sum('nominal');
+    //     $nominal_tarik = $request->nominal_tarik;
+    //     $otp = $request->wa_otp;
 
-        try{
-            $otp = (new Otp)->validate(auth()->user()->phone, $otp);
-            if(!$otp->status){
-                $notification = array(
-                    'message' => 'OTP salah atau tidak sesuai!',
-                    'alert-type' => 'error',
-                );
-                return redirect()->back()->with($notification);
-            } else {
-                $qrisWallet = QrisWallet::where('id_user', auth()->user()->id)
-                                        ->where('email', auth()->user()->email)
-                                        ->first();
-                if($qrisWallet->saldo<$nominal_tarik){
-                    $notification = array(
-                        'message' => 'Saldo anda tidak mencukupi!',
-                        'alert-type' => 'warning',
-                    );
-                    return redirect()->back()->with($notification);
-                } else {
-                    if($nominal_tarik<10000){
-                        $notification = array(
-                            'message' => 'Minimal tarik dana Rp. 10.000!',
-                            'alert-type' => 'warning',
-                        );
-                        return redirect()->back()->with($notification);
-                    }
+    //     try{
+    //         $otp = (new Otp)->validate(auth()->user()->phone, $otp);
+    //         if(!$otp->status){
+    //             $notification = array(
+    //                 'message' => 'OTP salah atau tidak sesuai!',
+    //                 'alert-type' => 'error',
+    //             );
+    //             return redirect()->back()->with($notification);
+    //         } else {
+    //             $qrisWallet = QrisWallet::where('id_user', auth()->user()->id)
+    //                                     ->where('email', auth()->user()->email)
+    //                                     ->first();
+    //             if($qrisWallet->saldo<$nominal_tarik){
+    //                 $notification = array(
+    //                     'message' => 'Saldo anda tidak mencukupi!',
+    //                     'alert-type' => 'warning',
+    //                 );
+    //                 return redirect()->back()->with($notification);
+    //             } else {
+    //                 if($nominal_tarik<10000){
+    //                     $notification = array(
+    //                         'message' => 'Minimal tarik dana Rp. 10.000!',
+    //                         'alert-type' => 'warning',
+    //                     );
+    //                     return redirect()->back()->with($notification);
+    //                 }
 
-                    $rekening = Rekening::where('id_user', auth()->user()->id)
-                                        ->where('email', auth()->user()->email)
-                                        ->first();
-                    $totalPenarikan = $nominal_tarik+$biayaAdmin;
-                    $rekClient = new GuzzleHttpClient();
-                    $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
-                    try {
-                        $getRek = $rekClient->request('POST',  $urlRek, [
-                            'form_params' => [
-                                'latitude' => $lat,
-                                'longitude' => $long,
-                                'bankCode' => $rekening->swift_code,
-                                'accountNo' => $rekening->no_rekening,
-                                'secret_key' => "Vpos71237577Inquiry"
-                            ]
-                        ]);
-                        $responseCode = $getRek->getStatusCode();
-                        $dataRekening = json_decode($getRek->getBody());
-                        if($dataRekening->responseMessage == "Inactive Account"){
-                            $notification = array(
-                                'message' => 'Rekening Error!, harap cek kembali apakah rekening sudah benar!',
-                                'alert-type' => 'error',
-                            );
-                            return redirect()->route('tenant.profile')->with($notification);
-                        }
-                        return view('tenant.tenant_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan', 'biayaAdmin']));
-                    } catch (Exception $e) {
-                        $action = "";
-                        if(auth()->user()->id_inv_code == 0){
-                            $action = "Mitra Bisnis : Cek Rekening Error";
-                        } else {
-                            $action = "Tenant : Cek Rekening Error";
-                        }
-                        $this->createHistoryUser($action, $e, 0);
-                        $notification = array(
-                            'message' => 'Tarik dana error, harap hubungi admin!',
-                            'alert-type' => 'error',
-                        );
-                        return redirect()->back()->with($notification);
-                    }
-                }
-            }
-        } catch(Exception $e){
-            $action = "";
-            if(auth()->user()->id_inv_code == 0){
-                $action = "Mitra Bisnis : Withdrawal Process Error";
-            } else {
-                $action = "Tenant : Withdrawal Process Error";
-            }
-            $this->createHistoryUser($action, $e, 0);
-            $notification = array(
-                'message' => 'Penarikan dana gagal, harap hubungi admin!',
-                'alert-type' => 'error',
-            );
-            return redirect()->back()->with($notification);
-        }
-    }
+    //                 $rekening = Rekening::where('id_user', auth()->user()->id)
+    //                                     ->where('email', auth()->user()->email)
+    //                                     ->first();
+    //                 $totalPenarikan = $nominal_tarik+$biayaAdmin;
+    //                 $rekClient = new GuzzleHttpClient();
+    //                 $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
+    //                 try {
+    //                     $getRek = $rekClient->request('POST',  $urlRek, [
+    //                         'form_params' => [
+    //                             'latitude' => $lat,
+    //                             'longitude' => $long,
+    //                             'bankCode' => $rekening->swift_code,
+    //                             'accountNo' => $rekening->no_rekening,
+    //                             'secret_key' => "Vpos71237577Inquiry"
+    //                         ]
+    //                     ]);
+    //                     $responseCode = $getRek->getStatusCode();
+    //                     $dataRekening = json_decode($getRek->getBody());
+    //                     if($dataRekening->responseMessage == "Inactive Account"){
+    //                         $notification = array(
+    //                             'message' => 'Rekening Error!, harap cek kembali apakah rekening sudah benar!',
+    //                             'alert-type' => 'error',
+    //                         );
+    //                         return redirect()->route('tenant.profile')->with($notification);
+    //                     }
+    //                     return view('tenant.tenant_form_cek_penarikan', compact(['dataRekening', 'rekening', 'nominal_tarik', 'totalPenarikan', 'biayaAdmin']));
+    //                 } catch (Exception $e) {
+    //                     $action = "";
+    //                     if(auth()->user()->id_inv_code == 0){
+    //                         $action = "Mitra Bisnis : Cek Rekening Error";
+    //                     } else {
+    //                         $action = "Tenant : Cek Rekening Error";
+    //                     }
+    //                     $this->createHistoryUser($action, $e, 0);
+    //                     $notification = array(
+    //                         'message' => 'Tarik dana error, harap hubungi admin!',
+    //                         'alert-type' => 'error',
+    //                     );
+    //                     return redirect()->back()->with($notification);
+    //                 }
+    //             }
+    //         }
+    //     } catch(Exception $e){
+    //         $action = "";
+    //         if(auth()->user()->id_inv_code == 0){
+    //             $action = "Mitra Bisnis : Withdrawal Process Error";
+    //         } else {
+    //             $action = "Tenant : Withdrawal Process Error";
+    //         }
+    //         $this->createHistoryUser($action, $e, 0);
+    //         $notification = array(
+    //             'message' => 'Penarikan dana gagal, harap hubungi admin!',
+    //             'alert-type' => 'error',
+    //         );
+    //         return redirect()->back()->with($notification);
+    //     }
+    // }
 
-    public function prosesTarikDana(Request $request){
-        $url = 'https://erp.pt-best.com/api/rek_transfer';
-        $client = new GuzzleHttpClient();
-        $ip = "125.164.243.227";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
-        $transferFee = BiayaAdminTransferDana::get();
-        $biayaAdmin = $transferFee->sum('nominal');
-        $aplikator = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Admin')->first();
-        $mitra = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Mitra Aplikasi')->first();
-        $agregateMaintenance = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Agregate Maintenance')->first();
-        $agregateTransfer = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Transfer')->first();
-        DB::connection()->enableQueryLog();
+    // public function prosesTarikDana(Request $request){
+    //     $url = 'https://erp.pt-best.com/api/rek_transfer';
+    //     $client = new GuzzleHttpClient();
+    //     $ip = "125.164.243.227";
+    //     $PublicIP = $this->get_client_ip();
+    //     $getLoc = Location::get($ip);
+    //     $lat = $getLoc->latitude;
+    //     $long = $getLoc->longitude;
+    //     $transferFee = BiayaAdminTransferDana::get();
+    //     $biayaAdmin = $transferFee->sum('nominal');
+    //     $aplikator = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Admin')->first();
+    //     $mitra = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Mitra Aplikasi')->first();
+    //     $agregateMaintenance = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Agregate Maintenance')->first();
+    //     $agregateTransfer = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Transfer')->first();
+    //     DB::connection()->enableQueryLog();
 
-        $nominal_tarik = $request->nominal_penarikan;
-        $total_tarik = $request->total_tarik;
+    //     $nominal_tarik = $request->nominal_penarikan;
+    //     $total_tarik = $request->total_tarik;
 
-        $rekeningTenant = Rekening::select(['swift_code', 'no_rekening', 'id'])
-                            ->where('id_user', auth()->user()->id)
-                            ->where('email', auth()->user()->email)
-                            ->first();
-        $qrisWalletTenant = QrisWallet::where('id_user', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
-        $agregateWalletforMaintenance = AgregateWallet::find(1);
-        $agregateWalletforTransfer = AgregateWallet::find(2);
-        $qrisAdmin = QrisWallet::where('email', 'adminsu@visipos.id')->find(1);
-        $marketing = "";
-        $saldoMitra = "";
-        if(auth()->user()->id_inv_code != 0){
-            $marketing = InvitationCode::select(['invitation_codes.id',
-                                                    'invitation_codes.id_marketing',
-                                                ])
-                                        ->with(['marketing' => function ($query){
-                                            $query->select(['marketings.id',
-                                                            'marketings.email'
-                                            ])->get();
-                                        }])
-                                        ->find(auth()->user()->id_inv_code);
+    //     $rekeningTenant = Rekening::select(['swift_code', 'no_rekening', 'id'])
+    //                         ->where('id_user', auth()->user()->id)
+    //                         ->where('email', auth()->user()->email)
+    //                         ->first();
+    //     $qrisWalletTenant = QrisWallet::where('id_user', auth()->user()->id)
+    //                             ->where('email', auth()->user()->email)
+    //                             ->first();
+    //     $agregateWalletforMaintenance = AgregateWallet::find(1);
+    //     $agregateWalletforTransfer = AgregateWallet::find(2);
+    //     $qrisAdmin = QrisWallet::where('email', 'adminsu@visipos.id')->find(1);
+    //     $marketing = "";
+    //     $saldoMitra = "";
+    //     if(auth()->user()->id_inv_code != 0){
+    //         $marketing = InvitationCode::select(['invitation_codes.id',
+    //                                                 'invitation_codes.id_marketing',
+    //                                             ])
+    //                                     ->with(['marketing' => function ($query){
+    //                                         $query->select(['marketings.id',
+    //                                                         'marketings.email'
+    //                                         ])->get();
+    //                                     }])
+    //                                     ->find(auth()->user()->id_inv_code);
 
-            $saldoMitra = QrisWallet::where('id_user', $marketing->marketing->id)
-                                    ->where('email', $marketing->marketing->email)
-                                    ->first();
-        }
-        $agregateSaldoforMaintenance = $agregateWalletforMaintenance->saldo;
-        $agregateSaldoforTransfer = $agregateWalletforTransfer->saldo;
+    //         $saldoMitra = QrisWallet::where('id_user', $marketing->marketing->id)
+    //                                 ->where('email', $marketing->marketing->email)
+    //                                 ->first();
+    //     }
+    //     $agregateSaldoforMaintenance = $agregateWalletforMaintenance->saldo;
+    //     $agregateSaldoforTransfer = $agregateWalletforTransfer->saldo;
 
-        try{
-            $nominal_penarikan = filter_var($nominal_tarik, FILTER_SANITIZE_NUMBER_INT);
-            $total_penarikan = filter_var($total_tarik, FILTER_SANITIZE_NUMBER_INT);
-            $saldoTenant = $qrisWalletTenant->saldo;
-            if($saldoTenant < $total_penarikan){
-                $notification = array(
-                    'message' => 'Saldo anda tidak mencukupi!',
-                    'alert-type' => 'warning',
-                );
-                return redirect()->back()->with($notification);
-            } else {
-                try {
-                    $postResponse = $client->request('POST',  $url, [
-                        'form_params' => [
-                            'latitude' => $lat,
-                            'longitude' => $long,
-                            'bankCode' => $rekeningTenant->swift_code,
-                            'accountNo' => $rekeningTenant->no_rekening,
-                            'amount' => $nominal_penarikan,
-                            'secret_key' => "Vpos71237577Transfer"
-                        ]
-                    ]);
-                    $responseCode = $postResponse->getStatusCode();
-                    $data = json_decode($postResponse->getBody());
-                    $responseCode = $data->responseCode;
-                    $responseMessage = $data->responseMessage;
-                    if($responseCode == 2001800 && $responseMessage == "Request has been processed successfully") {
-                        $jenis_penarikan = "";
-                        if(auth()->user()->id_inv_code != 0){
-                            $jenis_penarikan = "Penarikan Dana Tenant";
-                        } else if(auth()->user()->id_inv_code == 0){
-                            $jenis_penarikan = "Penarikan Dana Mitra Bisnis";
-                        }
-                        $withDraw = Withdrawal::create([
-                            'id_user' => auth()->user()->id,
-                            'id_rekening' => $rekeningTenant->id,
-                            'email' => auth()->user()->email,
-                            'jenis_penarikan' => $jenis_penarikan,
-                            'tanggal_penarikan' => Carbon::now(),
-                            'nominal' => $nominal_penarikan,
-                            'biaya_admin' => $biayaAdmin,
-                            'tanggal_masuk' => Carbon::now(),
-                            'deteksi_ip_address' => $ip,
-                            'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                            'status' => 1
-                        ]);
+    //     try{
+    //         $nominal_penarikan = filter_var($nominal_tarik, FILTER_SANITIZE_NUMBER_INT);
+    //         $total_penarikan = filter_var($total_tarik, FILTER_SANITIZE_NUMBER_INT);
+    //         $saldoTenant = $qrisWalletTenant->saldo;
+    //         if($saldoTenant < $total_penarikan){
+    //             $notification = array(
+    //                 'message' => 'Saldo anda tidak mencukupi!',
+    //                 'alert-type' => 'warning',
+    //             );
+    //             return redirect()->back()->with($notification);
+    //         } else {
+    //             try {
+    //                 $postResponse = $client->request('POST',  $url, [
+    //                     'form_params' => [
+    //                         'latitude' => $lat,
+    //                         'longitude' => $long,
+    //                         'bankCode' => $rekeningTenant->swift_code,
+    //                         'accountNo' => $rekeningTenant->no_rekening,
+    //                         'amount' => $nominal_penarikan,
+    //                         'secret_key' => "Vpos71237577Transfer"
+    //                     ]
+    //                 ]);
+    //                 $responseCode = $postResponse->getStatusCode();
+    //                 $data = json_decode($postResponse->getBody());
+    //                 $responseCode = $data->responseCode;
+    //                 $responseMessage = $data->responseMessage;
+    //                 if($responseCode == 2001800 && $responseMessage == "Request has been processed successfully") {
+    //                     $jenis_penarikan = "";
+    //                     if(auth()->user()->id_inv_code != 0){
+    //                         $jenis_penarikan = "Penarikan Dana Tenant";
+    //                     } else if(auth()->user()->id_inv_code == 0){
+    //                         $jenis_penarikan = "Penarikan Dana Mitra Bisnis";
+    //                     }
+    //                     $withDraw = Withdrawal::create([
+    //                         'id_user' => auth()->user()->id,
+    //                         'id_rekening' => $rekeningTenant->id,
+    //                         'email' => auth()->user()->email,
+    //                         'jenis_penarikan' => $jenis_penarikan,
+    //                         'tanggal_penarikan' => Carbon::now(),
+    //                         'nominal' => $nominal_penarikan,
+    //                         'biaya_admin' => $biayaAdmin,
+    //                         'tanggal_masuk' => Carbon::now(),
+    //                         'deteksi_ip_address' => $ip,
+    //                         'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+    //                         'status' => 1
+    //                     ]);
 
-                        if(!is_null($withDraw) || !empty($withDraw)){
-                            $qrisWalletTenant->update([
-                                'saldo' => $saldoTenant-$total_penarikan
-                            ]);
-                            $adminSaldo = $qrisAdmin->saldo;
-                            if(auth()->user()->id_inv_code != 0){
-                                $qrisAdmin->update([
-                                    'saldo' => $adminSaldo+$aplikator->nominal
-                                ]);
+    //                     if(!is_null($withDraw) || !empty($withDraw)){
+    //                         $qrisWalletTenant->update([
+    //                             'saldo' => $saldoTenant-$total_penarikan
+    //                         ]);
+    //                         $adminSaldo = $qrisAdmin->saldo;
+    //                         if(auth()->user()->id_inv_code != 0){
+    //                             $qrisAdmin->update([
+    //                                 'saldo' => $adminSaldo+$aplikator->nominal
+    //                             ]);
 
-                                $mitraSaldo = $saldoMitra->saldo;
-                                $saldoMitra->update([
-                                    'saldo' => $mitraSaldo+$mitra->nominal
-                                ]);
-                            } else if(auth()->user()->id_inv_code == 0){
-                                $qrisAdmin->update([
-                                    'saldo' => $adminSaldo+$aplikator->nominal+$mitra->nominal
-                                ]);
-                            }
+    //                             $mitraSaldo = $saldoMitra->saldo;
+    //                             $saldoMitra->update([
+    //                                 'saldo' => $mitraSaldo+$mitra->nominal
+    //                             ]);
+    //                         } else if(auth()->user()->id_inv_code == 0){
+    //                             $qrisAdmin->update([
+    //                                 'saldo' => $adminSaldo+$aplikator->nominal+$mitra->nominal
+    //                             ]);
+    //                         }
 
-                            $agregateWalletforMaintenance->update([
-                                'saldo' =>$agregateSaldoforMaintenance+$agregateMaintenance->nominal
-                            ]);
+    //                         $agregateWalletforMaintenance->update([
+    //                             'saldo' =>$agregateSaldoforMaintenance+$agregateMaintenance->nominal
+    //                         ]);
 
-                            $agregateWalletforTransfer->update([
-                                'saldo' =>$agregateSaldoforTransfer+$agregateTransfer->nominal
-                            ]);
+    //                         $agregateWalletforTransfer->update([
+    //                             'saldo' =>$agregateSaldoforTransfer+$agregateTransfer->nominal
+    //                         ]);
 
-                            foreach($transferFee as $fee){
-                                DetailPenarikan::create([
-                                    'id_penarikan' => $withDraw->id,
-                                    'id_insentif' => $fee->id,
-                                    'nominal' => $fee->nominal,
-                                ]);
-                            }
+    //                         foreach($transferFee as $fee){
+    //                             DetailPenarikan::create([
+    //                                 'id_penarikan' => $withDraw->id,
+    //                                 'id_insentif' => $fee->id,
+    //                                 'nominal' => $fee->nominal,
+    //                             ]);
+    //                         }
 
-                            NobuWithdrawFeeHistory::create([
-                                'id_penarikan' => $withDraw->id,
-                                'nominal' => 300
-                            ]);
+    //                         NobuWithdrawFeeHistory::create([
+    //                             'id_penarikan' => $withDraw->id,
+    //                             'nominal' => 300
+    //                         ]);
 
-                            $action = "";
-                            if(auth()->user()->id_inv_code == 0){
-                                $action = "Mitra Bisnis : Withdrawal Process Success";
-                            } else {
-                                $action = "Tenant : Withdrawal Process Success";
-                            }
+    //                         $action = "";
+    //                         if(auth()->user()->id_inv_code == 0){
+    //                             $action = "Mitra Bisnis : Withdrawal Process Success";
+    //                         } else {
+    //                             $action = "Tenant : Withdrawal Process Success";
+    //                         }
 
-                            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
-                            $date = Carbon::now()->format('d-m-Y H:i:s');
-                            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan."  pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                            $this->sendNotificationToUser($body);
+    //                         $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+    //                         $date = Carbon::now()->format('d-m-Y H:i:s');
+    //                         $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan."  pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+    //                         $this->sendNotificationToUser($body);
 
-                            $notification = array(
-                                'message' => 'Penarikan dana sukses!',
-                                'alert-type' => 'success',
-                            );
-                            return redirect()->route('tenant.finance.history_penarikan.invoice', array('id' => $withDraw->id))->with($notification);
-                        } else {
+    //                         $notification = array(
+    //                             'message' => 'Penarikan dana sukses!',
+    //                             'alert-type' => 'success',
+    //                         );
+    //                         return redirect()->route('tenant.finance.history_penarikan.invoice', array('id' => $withDraw->id))->with($notification);
+    //                     } else {
 
-                            $action = "";
-                            if(auth()->user()->id_inv_code == 0){
-                                $action = "Mitra Bisnis : Withdrawal Process Failed";
-                            } else {
-                                $action = "Tenant : Withdrawal Process Failed";
-                            }
-                            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
-                            $date = Carbon::now()->format('d-m-Y H:i:s');
-                            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                            $this->sendNotificationToUser($body);
-                            $notification = array(
-                                'message' => 'Penarikan dana gagal, harap hubungi admin!',
-                                'alert-type' => 'error',
-                            );
-                            return redirect()->route('tenant.profile')->with($notification);
-                        }
-                    } else {
-                        $withDraw = Withdrawal::create([
-                            'id_user' => auth()->user()->id,
-                            'email' => auth()->user()->email,
-                            'tanggal_penarikan' => Carbon::now(),
-                            'nominal' => $nominal_penarikan,
-                            'biaya_admin' => $biayaAdmin,
-                            'tanggal_masuk' => Carbon::now(),
-                            'deteksi_ip_address' => $ip,
-                            'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
-                            'status' => 0
-                        ]);
+    //                         $action = "";
+    //                         if(auth()->user()->id_inv_code == 0){
+    //                             $action = "Mitra Bisnis : Withdrawal Process Failed";
+    //                         } else {
+    //                             $action = "Tenant : Withdrawal Process Failed";
+    //                         }
+    //                         $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+    //                         $date = Carbon::now()->format('d-m-Y H:i:s');
+    //                         $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+    //                         $this->sendNotificationToUser($body);
+    //                         $notification = array(
+    //                             'message' => 'Penarikan dana gagal, harap hubungi admin!',
+    //                             'alert-type' => 'error',
+    //                         );
+    //                         return redirect()->route('tenant.profile')->with($notification);
+    //                     }
+    //                 } else {
+    //                     $withDraw = Withdrawal::create([
+    //                         'id_user' => auth()->user()->id,
+    //                         'email' => auth()->user()->email,
+    //                         'tanggal_penarikan' => Carbon::now(),
+    //                         'nominal' => $nominal_penarikan,
+    //                         'biaya_admin' => $biayaAdmin,
+    //                         'tanggal_masuk' => Carbon::now(),
+    //                         'deteksi_ip_address' => $ip,
+    //                         'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
+    //                         'status' => 0
+    //                     ]);
 
-                        $action = "";
-                        if(auth()->user()->id_inv_code == 0){
-                            $action = "Mitra Bisnis : Withdrawal Transaction fail invalid";
-                        } else {
-                            $action = "Tenant : Withdrawal Transaction fail invalid";
-                        }
+    //                     $action = "";
+    //                     if(auth()->user()->id_inv_code == 0){
+    //                         $action = "Mitra Bisnis : Withdrawal Transaction fail invalid";
+    //                     } else {
+    //                         $action = "Tenant : Withdrawal Transaction fail invalid";
+    //                     }
 
-                        $this->createHistoryUser($action, $responseMessage, 0);
-                        $date = Carbon::now()->format('d-m-Y H:i:s');
-                        $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                        $this->sendNotificationToUser($body);
-                        $notification = array(
-                            'message' => 'Penarikan dana gagal, harap hubungi admin!',
-                            'alert-type' => 'error',
-                        );
-                        return redirect()->route('tenant.profile')->with($notification);
-                    }
-                } catch (Exception $e) {
-                    $action = "";
-                    if(auth()->user()->id_inv_code == 0){
-                        $action = "Mitra Bisnis : Withdraw Process | Error (HTTP API Error)";
-                    } else {
-                        $action = "Tenant : Withdraw Process | Error (HTTP API Error)";
-                    }
-                    $this->createHistoryUser($action, $e, 0);
-                    $date = Carbon::now()->format('d-m-Y H:i:s');
-                    $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                    $this->sendNotificationToUser($body);
-                    $notification = array(
-                        'message' => 'Penarikan dana gagal, harap hubungi admin!',
-                        'alert-type' => 'error',
-                    );
-                    return redirect()->route('tenant.profile')->with($notification);
-                }
-            }
-        } catch (Exception $e){
-            $action = "";
-            if(auth()->user()->id_inv_code == 0){
-                $action = "Mitra Bisnis : Withdraw Process | Error";
-            } else {
-                $action = "Tenant : Withdraw Process | Error";
-            }
-            $this->createHistoryUser($action, $e, 0);
-            $date = Carbon::now()->format('d-m-Y H:i:s');
-            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-            $this->sendNotificationToUser($body);
-            $notification = array(
-                'message' => 'Penarikan dana gagal, harap hubungi admin!',
-                'alert-type' => 'error',
-            );
-            return redirect()->route('tenant.profile')->with($notification);
-        }
-    }
+    //                     $this->createHistoryUser($action, $responseMessage, 0);
+    //                     $date = Carbon::now()->format('d-m-Y H:i:s');
+    //                     $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+    //                     $this->sendNotificationToUser($body);
+    //                     $notification = array(
+    //                         'message' => 'Penarikan dana gagal, harap hubungi admin!',
+    //                         'alert-type' => 'error',
+    //                     );
+    //                     return redirect()->route('tenant.profile')->with($notification);
+    //                 }
+    //             } catch (Exception $e) {
+    //                 $action = "";
+    //                 if(auth()->user()->id_inv_code == 0){
+    //                     $action = "Mitra Bisnis : Withdraw Process | Error (HTTP API Error)";
+    //                 } else {
+    //                     $action = "Tenant : Withdraw Process | Error (HTTP API Error)";
+    //                 }
+    //                 $this->createHistoryUser($action, $e, 0);
+    //                 $date = Carbon::now()->format('d-m-Y H:i:s');
+    //                 $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+    //                 $this->sendNotificationToUser($body);
+    //                 $notification = array(
+    //                     'message' => 'Penarikan dana gagal, harap hubungi admin!',
+    //                     'alert-type' => 'error',
+    //                 );
+    //                 return redirect()->route('tenant.profile')->with($notification);
+    //             }
+    //         }
+    //     } catch (Exception $e){
+    //         $action = "";
+    //         if(auth()->user()->id_inv_code == 0){
+    //             $action = "Mitra Bisnis : Withdraw Process | Error";
+    //         } else {
+    //             $action = "Tenant : Withdraw Process | Error";
+    //         }
+    //         $this->createHistoryUser($action, $e, 0);
+    //         $date = Carbon::now()->format('d-m-Y H:i:s');
+    //         $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+    //         $this->sendNotificationToUser($body);
+    //         $notification = array(
+    //             'message' => 'Penarikan dana gagal, harap hubungi admin!',
+    //             'alert-type' => 'error',
+    //         );
+    //         return redirect()->route('tenant.profile')->with($notification);
+    //     }
+    // }
 }

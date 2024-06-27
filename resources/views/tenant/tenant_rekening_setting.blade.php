@@ -20,7 +20,7 @@
             </div>
             <!-- end page title -->
             <div class="row">
-                <div class="col-lg-7 col-xl-7">
+                <div class="col-lg-6 col-xl-6">
                     <div class="card">
                         <div class="card-body">
                             @if (auth()->user()->is_active == 0)
@@ -54,6 +54,7 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="no_rekening" class="form-label">Nomor Rekening</label>
+                                                    <input type="hidden" class="d-none" name="nama_bank" id="nama_bank" required value="{{ $rekening->nama_bank }}">
                                                     <input type="text" class="form-control" name="no_rekening" id="no_rekening" required value="{{ $rekening->no_rekening }}" placeholder="Masukkan nomor rekening">
                                                 </div>
                                             </div>
@@ -81,7 +82,7 @@
                 @if (!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "")
                     @if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != "")
                         @if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600")
-                            <div class="col-lg-5 col-xl-5">
+                            <div class="col-lg-6 col-xl-6">
                                 <div class="card">
                                     <div class="card-body">
                                         <h4 class="header-title">Informasi Rekening</h4>
@@ -93,6 +94,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
+                                                        <th>Nama Bank</th>
                                                         <th>Atas Nama</th>
                                                         <th>Nomor Rekening</th>
                                                     </tr>
@@ -100,6 +102,7 @@
                                                 <tbody>
                                                     <tr>
                                                         <th scope="row">1</th>
+                                                        <th>{{ $rekening->nama_bank }}</th>
                                                         <td>{{ $dataRekening->beneficiaryAccountName }}</td>
                                                         <td>{{ $dataRekening->beneficiaryAccountNo }}</td>
                                                     </tr>

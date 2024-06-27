@@ -71,7 +71,7 @@ $(document).ready(function() {
     }), $("#pos-table").DataTable({
         paging: false,
         scrollCollapse: true,
-        scrollY: '40vh',
+        // scrollY: '40vh',
         "ordering": false,
         "info":     false,
         "searching": false,

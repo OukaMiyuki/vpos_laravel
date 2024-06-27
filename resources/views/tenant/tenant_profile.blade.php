@@ -60,11 +60,6 @@
                                         Detail Information
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="#saldo" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
-                                        Penarikan Saldo
-                                    </a>
-                                </li>
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane show active" id="settings">
@@ -205,79 +200,6 @@
                                                 <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>
                                             </div>
                                         </form>
-                                    @endif
-                                </div>
-                                <div class="tab-pane" id="saldo">
-                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-cash-multiple me-1"></i> Proses Penarikan Saldo Qris</h5>
-                                    @if(auth()->user()->is_active == 0)
-                                        <div class="message">
-                                            <h1 class="acces-denied">Access to this feature is restricted</h1>
-                                            <p class="sub-header">Saat ini akun anda belum diaktifkan dan diverifikasi oleh Admin.<br> silahkan hubungi admin kami untuk melanjutkan ke proses selanjutnya, Terima Kasih!.</p>
-                                        </div>
-                                    @elseif(auth()->user()->is_active == 1)
-                                        @if (empty($profilTenant->phone_number_verified_at) || is_null($profilTenant->phone_number_verified_at) || $profilTenant->phone_number_verified_at == NULL || $profilTenant->phone_number_verified_at == "")
-                                            <div class="message">
-                                                <h1 class="acces-denied">Access to this page is restricted</h1>
-                                                <p class="sub-header text-danger"><strong>Lakukan verifikasi nomor Whatsapp sebelum melakukan penarikan saldo.</strong></p>
-                                            </div>
-                                        @else
-                                            @if (empty($rekening->swift_code) && empty($rekening->no_rekening) || is_null($rekening->swift_code) && is_null($rekening->no_rekening) )
-                                                <div class="message">
-                                                    <h1 class="acces-denied">Access to this page is restricted</h1>
-                                                    <p class="sub-header">Anda belum memasukkan informasi rekening! Silahkan terlebih dahulu memperbarui rekening anda.</p>
-                                                </div>
-                                            @else
-                                                <p class="sub-header text-danger"><strong>*Note : Per-tarik dana akan dikenakan biaya transfer BI-Fast sebesar Rp. 1500</strong></p>
-                                                <div class="col-md-12">
-                                                    <div class="mb-3">
-                                                        <label for="saldo" class="form-label">Saldo Anda (Rp.)</label>
-                                                        <input readonly type="text" class="form-control" name="saldo" id="saldo" required value="{{ $qrisWallet->saldo }}" placeholder="Masukkan jumlah saldo">
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="mb-3">
-                                                            <label for="no_wa" class="form-label">Nomor Whatsapp</label>
-                                                            <div class="row">
-                                                                <div class="col-8">
-                                                                    <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ $profilTenant->phone }}" placeholder="Masukkan nomor Whatsapp">
-                                                                </div>
-                                                                <div class="col-4">
-                                                                    <form method="post" action="{{ route('tenant.settings.whatsappotp') }}">
-                                                                        @csrf
-                                                                        <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-email-outline"></i> Kirim Kode OTP</button>
-                                                                    </form>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <form method="post" action="{{ route('tenant.profile.tarik') }}">
-                                                    @csrf
-                                                    <div class="row">
-                                                        <div class="col-md-12">
-                                                            <div class="mb-3">
-                                                                <label for="nominal" class="form-label">Nominal Tarik (Rp.)</label>
-                                                                <input type="number" min="0" oninput="this.value = Math.abs(this.value)" class="form-control" name="nominal_tarik" id="nominal_tarik" required value="" placeholder="Masukkan nominal tarik dana">
-                                                                <small id="emailHelp" class="form-text text-muted"><strong>Minimal tarik dana Rp. 10.000, Pastikan saldo anda cukup, sebelum melakukan penarikan!</strong></small>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-12">
-                                                            <div class="mb-3">
-                                                                <label for="nominal" class="form-label">Whatsapp OTP</label>
-                                                                <input type="text" class="form-control" name="wa_otp" id="wa_otp" required value="" placeholder="Masukkan kode OTP Whatsapp">
-                                                                <small id="emailHelp" class="form-text text-muted"><strong>Wajib melampirkan OTP Whatsapp!</strong></small>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-end">
-                                                        <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Tarik</button>
-                                                    </div>
-                                                </form>
-                                            @endif
-                                        @endif
                                     @endif
                                 </div>
                             </div>

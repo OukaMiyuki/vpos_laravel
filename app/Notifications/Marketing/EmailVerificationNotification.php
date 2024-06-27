@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\HtmlString;
 use Ichtrojan\Otp\Otp;
 
 class EmailVerificationNotification extends Notification {
@@ -49,8 +50,8 @@ class EmailVerificationNotification extends Notification {
     protected function buildMailMessage($url, $otp) {
         return (new MailMessage)
             ->subject(Lang::get('Verify Email Addres Mitra Aplikasi'))
-            ->line(Lang::get('Terima Kasih Sudah mendaftar! Harap masukkan kode OTP Berikut untuk memverifikasi akun anda!'))
-            ->line('Kode OTP Akun : '.$otp->token)
+            ->line(Lang::get('Anda sudah mendaftar Sebagai Mitra Aplikasi! Harap masukkan kode OTP Berikut untuk memverifikasi akun anda!'))
+            ->line(new HtmlString('Kode OTP Akun : <strong>'.$otp->token.'</strong>'))
             // ->action(Lang::get('Verify Email Address'), $url)
             ->line(Lang::get('Kode OTP ini hanya valid selama 5 menit!'));
     }
