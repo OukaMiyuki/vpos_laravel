@@ -21,7 +21,7 @@
             <!-- end page title -->
             <div class="row">
                 {{-- <strong><p class="sub-header" id="locationData"></p></strong> --}}
-                <div class="col-lg-7 col-xl-7">
+                <div class="col-lg-6 col-xl-6">
                     <div class="card">
                         <div class="card-body">
                             @if (auth()->user()->is_active == 0)
@@ -49,7 +49,7 @@
                                                         @endforeach
                                                     </select>
                                                     <small id="emailHelp" class="form-text text-danger"><strong>Pastikan anda memasukkan data bank dan nomor rekening dengan benar!</strong></small>
-                                                    <input type="hidden" readonly class="d-none" name="nama_bank" id="nama_bank" required value="">
+                                                    <input type="hidden" readonly class="d-none" name="nama_bank" id="nama_bank" required value="{{$rekening->nama_bank}}">
                                                 </div>
                                             </div>
                                         </div>
@@ -87,7 +87,7 @@
                     @if (!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "")
                         @if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != "")
                             @if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600")
-                                <div class="col-lg-5 col-xl-5">
+                                <div class="col-lg-6 col-xl-6">
                                     <div class="card">
                                         <div class="card-body">
                                             <h4 class="header-title">Informasi Rekening</h4>
@@ -99,6 +99,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>#</th>
+                                                            <th>Nama Bank</th>
                                                             <th>Atas Nama</th>
                                                             <th>Nomor Rekening</th>
                                                         </tr>
@@ -106,6 +107,7 @@
                                                     <tbody>
                                                         <tr>
                                                             <th scope="row">1</th>
+                                                            <td>{{$rekening->nama_bank}}</td>
                                                             <td>{{ $dataRekening->beneficiaryAccountName }}</td>
                                                             <td>{{ $dataRekening->beneficiaryAccountNo }}</td>
                                                         </tr>

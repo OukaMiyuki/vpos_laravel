@@ -212,6 +212,10 @@
                             <i class="mdi mdi-credit-card-outline"></i>
                             <span>Rekening</span>
                         </a>
+                        <a href="{{ route('marketing.withdraw') }}" class="dropdown-item notify-item">
+                            <i class="mdi mdi-cash-multiple"></i>
+                            <span>Withdraw</span>
+                        </a>
                     @endauth
                     @auth('admin')
                         @if (auth()->user()->access_level == 0)

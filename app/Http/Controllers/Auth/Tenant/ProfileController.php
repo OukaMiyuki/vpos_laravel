@@ -553,16 +553,11 @@ class ProfileController extends Controller{
                 return redirect()->back()->with($notification);
             } else {
                 $nominal_tarik = $request->nominal_tarik_dana;
-                $total_tarik = (int) str_replace(['.', ' ', 'Rp'], '', $request->total_tarik);
+                // $total_tarik = (int) str_replace(['.', ' ', 'Rp'], '', $request->total_tarik);
 
                 $transferFee = BiayaAdminTransferDana::get();
                 $biayaAdmin = $transferFee->sum('nominal');
 
-                
-                $rekeningTenant = Rekening::select(['swift_code', 'no_rekening', 'id'])
-                                            ->where('id_user', auth()->user()->id)
-                                            ->where('email', auth()->user()->email)
-                                            ->first();
                 $qrisWalletTenant = QrisWallet::where('id_user', auth()->user()->id)
                                             ->where('email', auth()->user()->email)
                                             ->first();
@@ -774,7 +769,7 @@ class ProfileController extends Controller{
 
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                             $date = Carbon::now()->format('d-m-Y H:i:s');
-                            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan."  pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." sukses pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
                             $this->sendNotificationToUser($body);
 
                             return $withDraw->id;

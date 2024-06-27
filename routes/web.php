@@ -156,10 +156,10 @@ Route::middleware(['guest:marketing', 'throttle'])->prefix('marketing')->group( 
 Route::middleware(['auth:marketing', 'auth', 'throttle'])->prefix('marketing')->group( function () {
     Route::get('/verify-email', [App\Http\Controllers\Auth\Marketing\EmailVerificationPromptController::class, 'emailVerificationView'])->name('marketing.verification.notice');
     Route::post('verify-email', [App\Http\Controllers\Auth\Marketing\VerifyEmailController::class, 'processVerification'])
-                ->middleware(['throttle:6,1'])
+                ->middleware(['throttle:80,1'])
                 ->name('marketing.verification.verify');
     Route::post('email/verification-notification', [App\Http\Controllers\Auth\Marketing\EmailVerificationNotificationController::class, 'store'])
-                ->middleware(['throttle:6,1'])
+                ->middleware(['throttle:80,1'])
                 ->name('marketing.verification.send');
 
     Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('marketing.logout');
@@ -197,6 +197,9 @@ Route::middleware(['auth:marketing', 'auth', 'marketingemailverified', 'throttle
     Route::get('/dashboard/finance/history-penarikan', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'historyPenarikan'])->name('marketing.finance.history_penarikan');
     Route::get('/dashboard/finance/history-penarikan/{id}', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invoiceTarikDana'])->name('marketing.finance.history_penarikan.invoice');
 
+    Route::get('settings/withdraw', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'withdraw'])->name('marketing.withdraw');
+    Route::post('settings/withdraw', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'withdrawProcess'])->name('marketing.withdraw.process');
+
     Route::post('settings/profile/tarik-dana', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'tarikDanaQris'])->name('marketing.profile.tarik');
     Route::post('settings/profile/tarik-dana/proses', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'prosesTarikDana'])->name('marketing.profile.tarik.proses');
 });
@@ -215,10 +218,10 @@ Route::middleware(['guest:tenant', 'throttle'])->prefix('tenant')->group( functi
 Route::middleware(['auth:tenant', 'auth', 'throttle'])->prefix('tenant')->group( function () {
     Route::get('/verify-email', [App\Http\Controllers\Auth\Tenant\EmailVerificationPromptController::class, 'emailVerificationView'])->name('tenant.verification.notice');
     Route::post('verify-email', [App\Http\Controllers\Auth\Tenant\VerifyEmailController::class, 'processVerification'])
-                    ->middleware(['throttle:6,1'])
+                    ->middleware(['throttle:80,1'])
                     ->name('tenant.verification.verify');
     Route::post('email/verification-notification', [App\Http\Controllers\Auth\Tenant\EmailVerificationNotificationController::class, 'store'])
-                ->middleware('throttle:6,1')
+                ->middleware('throttle:80,1')
                 ->name('tenant.verification.send');
 
     Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('tenant.logout');
