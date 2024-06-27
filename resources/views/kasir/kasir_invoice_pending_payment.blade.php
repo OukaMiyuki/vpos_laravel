@@ -31,17 +31,17 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Transaction Pending Qris Payment List</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="basic-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th>Action</th>
                                             <th>No.</th>
+                                            <th class="text-center">Action</th>
                                             <th>Invoice</th>
                                             <th class="text-center">Tanggal Transaksi</th>
                                             <th class="text-center">Tanggal Pembayaran</th>
                                             <th class="text-center">Pembayaran</th>
-                                            <th>Status Transaksi</th>
-                                            <th>Status Pembayaran</th>
+                                            <th class="text-center">Status Transaksi</th>
+                                            <th class="text-center">Status Pembayaran</th>
                                             <th class="text-center">Sub Total (Rp.)</th>
                                             <th class="text-center">Pajak (Rp.)</th>
                                             <th class="text-center">Diskon (Rp.)</th>
@@ -56,17 +56,17 @@
                                         @php $no=0; @endphp
                                         @foreach($invoice as $invoice)
                                             <tr>
+                                                <td>{{$no+=1}}</td>
                                                 <td>
                                                     <a href="{{ route('kasir.pos.transaction.invoice', ['id' => $invoice->id ]) }}">
-                                                        <button title="Lihat Invoice" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                        <button title="Lihat Invoice" type="button" class="btn btn-info btn-xs waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                 </td>
-                                                <td>{{$no+=1}}</td>
                                                 <td>{{$invoice->nomor_invoice}}</td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
                                                 <td class="text-center">@if(!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan)){{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}@endif</td>
                                                 <td class="text-center">{{$invoice->jenis_pembayaran}}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     @if (!empty($invoice->jenis_pembayaran) || !is_null($invoice->jenis_pembayaran) || $invoice->jenis_pembayaran != "")
                                                         @if($invoice->status_pembayaran == 0)
                                                             <span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>
@@ -77,7 +77,7 @@
                                                         <span class="badge bg-soft-danger text-danger">Belum Diproses</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     @if($invoice->status_pembayaran == 0)
                                                         <span class="badge bg-soft-warning text-warning">Belum Bayar</span>
                                                     @elseif($invoice->status_pembayaran == 1)

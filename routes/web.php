@@ -334,12 +334,12 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
     Route::get('/dashboard/toko/stock/delete/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockDelete'])->name('tenant.product.stock.delete');
     Route::get('/dashboard/toko/stock/barcode/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockBarcode'])->name('tenant.product.stock.barcode.show');
 
-    Route::get('/dashboard/transaction', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantTransaction'])->name('tenant.transaction');
-    Route::get('/dashboard/transaction/list/today', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantThisDayTransaction'])->name('tenant.transaction.today');
-    Route::get('/dashboard/transaction/list/finish', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionFinishList'])->name('tenant.transaction.finish');
-    Route::get('/dashboard/transaction/list/finish/payment', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionQrisFinishList'])->name('tenant.transaction.finish.qris');
-    Route::get('/dashboard/transaction/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionList'])->name('tenant.transaction.list');
+    Route::get('/dashboard/transaction', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionList'])->name('tenant.transaction');
+    Route::get('/dashboard/transaction/tunai', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListTunai'])->name('tenant.transaction.list.tunai');
+    Route::get('/dashboard/transaction/qris', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListQris'])->name('tenant.transaction.list.qris');
     Route::get('/dashboard/transaction/list/pending', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPending'])->name('tenant.transaction.list.pending');
+    Route::get('/dashboard/transaction/list/pending-payment', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPendingPayment'])->name('tenant.transaction.list.pending.payment');
+
     Route::get('/dashboard/transaction/list/pending/delete/{id}', [App\Http\Controllers\Auth\Tenant\PosController::class, 'transactionPendingDelete'])->name('tenant.transaction.pending.delete');
     Route::get('/dashboard/transaction/list/pending/restore/{id}', [App\Http\Controllers\Auth\Tenant\PosController::class, 'transactionPendingRestore'])->name('tenant.transaction.list.pending.restore');
     Route::post('/dashboard/transaction/list/pending/addcart', [App\Http\Controllers\Auth\Tenant\PosController::class, 'transactionPendingAddCart'])->name('tenant.transaction.pending.addCart');
@@ -347,16 +347,16 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
     Route::post('/dashboard/transaction/list/pending/deletecart', [App\Http\Controllers\Auth\Tenant\PosController::class, 'transactionPendingDeleteCart'])->name('tenant.transaction.pending.deleteCart');
     Route::post('/dashboard/transaction/list/pending/process', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionPendingProcess'])->name('tenant.pos.transaction.pending.process');
 
-    Route::get('/dashboard/transaction/list/pending/payment', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPendingPayment'])->name('tenant.transaction.list.pending.payment');
     Route::get('/dashboard/transaction/list/invoice/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionInvoiceView'])->name('tenant.transaction.invoice');
 
+    Route::get('/dashboard/pemasukan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukan'])->name('tenant.pemasukan');
+    Route::get('/dashboard/pemasukan/qris', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisAll'])->name('tenant.pemasukan.qris');
+
     Route::get('/dashboard/finance', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'financeDashboard'])->name('tenant.finance');
-    Route::get('/dashboard/finance/pemasukan', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'financePemasukan'])->name('tenant.finance.pemasukan');
     Route::get('/dashboard/finance/saldo', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'saldoData'])->name('tenant.saldo');
-    Route::get('/dashboard/finance/saldo/tunai', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanTunai'])->name('tenant.finance.pemasukan.tunai');
-    Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-yesterday', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisPending'])->name('tenant.finance.pemasukan.qris.pending');
+    Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-settlement', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisPending'])->name('tenant.finance.pemasukan.qris.pending');
     Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-today', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQrisToday'])->name('tenant.finance.pemasukan.qris.today');
-    Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-all', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'pemasukanQris'])->name('tenant.finance.pemasukan.qris.all');
+    Route::get('/dashboard/finance/saldo/settlement', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'settlement'])->name('tenant.finance.settlement');
 
     Route::get('/dashboard/management', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'storeManagement'])->name('tenant.store.management');
     Route::get('/dashboard/management/discount', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'discountModify'])->name('tenant.discount.modify');

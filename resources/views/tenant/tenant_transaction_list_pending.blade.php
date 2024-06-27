@@ -34,13 +34,13 @@
                                 <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th>Action</th>
-                                            <th>No.</th>
+                                            <th class="text-center">No.</th>
+                                            <th class="text-center">Action</th>
                                             <th>Customer</th>
                                             <th>Invoice</th>
                                             <th>Kasir</th>
-                                            <th>Transaksi Oleh</th>
-                                            <th>Tanggal Transaksi</th>
+                                            <th class="text-center">Transaksi Oleh</th>
+                                            <th class="text-center">Tanggal Transaksi</th>
                                             <th>Status Transaksi</th>
                                         </tr>
                                     </thead>
@@ -48,15 +48,15 @@
                                         @php $no=0; @endphp
                                         @foreach($invoice as $invoice)
                                             <tr>
-                                                <td>
+                                                <td class="text-center">{{$no+=1}}</td>
+                                                <td class="text-center">
                                                     <a href="{{ route('tenant.transaction.list.pending.restore', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restore transaction" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-history"></span></button>&nbsp;
+                                                        <button title="Restore transaction" type="button" class="btn btn-info btn-xs waves-effect waves-light"><span class="mdi mdi-history"></span></button>&nbsp;
                                                     </a>
                                                     <a href="{{ route('tenant.transaction.pending.delete', ['id' => $invoice->id ]) }}">
-                                                        <button title="Hapus transaksi pending" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                        <button title="Hapus transaksi pending" type="button" class="btn btn-danger btn-xs waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                     </a>
                                                 </td>
-                                                <td>{{$no+=1}}</td>
                                                 <td>{{$invoice->customer->customer_info}}</td>
                                                 <td>{{$invoice->nomor_invoice}}</td>
                                                 <td>
@@ -66,7 +66,7 @@
                                                         {{$invoice->kasir->name}}
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")
                                                         Tenant
                                                     @else

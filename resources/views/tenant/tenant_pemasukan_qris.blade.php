@@ -9,101 +9,12 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Transaction</li>
+                                <li class="breadcrumb-item"><a href="#">Pemasukan</a></li>
+                                <li class="breadcrumb-item active">Pemasukan Transaksi Qris</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Dashboard Transaksi</h4>
+                        <h4 class="page-title">Data Pemasukan Transaksi Qris</h4>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-3 col-xl-3">
-                    <div class="widget-rounded-circle card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-5">
-                                    <img src="{{ asset('assets/images/icons/transaction-data.png') }}" class="img-fluid" alt="">
-                                </div>
-                                <div class="col-7">
-                                    <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $transaksiTunaiCount }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Transaksi Tunai</p>
-                                        <a href="{{ route('tenant.transaction.list.tunai') }}" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row-->
-                        </div>
-                    </div>
-                    <!-- end widget-rounded-circle-->
-                </div>
-                <div class="col-md-3 col-xl-3">
-                    <div class="widget-rounded-circle card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-5">
-                                    <img src="{{ asset('assets/images/icons/payment-finish.png') }}" class="img-fluid" alt="">
-                                </div>
-                                <div class="col-7">
-                                    <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $transaksiQrisCount }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Transaksi Qris</p>
-                                        <a href="{{ route('tenant.transaction.list.qris') }}" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row-->
-                        </div>
-                    </div>
-                    <!-- end widget-rounded-circle-->
-                </div>
-                <div class="col-md-3 col-xl-3">
-                    <div class="widget-rounded-circle card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-5">
-                                    <img src="{{ asset('assets/images/icons/time.png') }}" class="img-fluid" alt="">
-                                </div>
-                                <div class="col-7">
-                                    <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $transaksiPendingCount }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Transaksi Pending</p>
-                                        <a href="{{ route('tenant.transaction.list.pending') }}" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row-->
-                        </div>
-                    </div>
-                    <!-- end widget-rounded-circle-->
-                </div>
-                <div class="col-md-3 col-xl-3">
-                    <div class="widget-rounded-circle card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-5">
-                                    <img src="{{ asset('assets/images/icons/payment-pending.png') }}" class="img-fluid" alt="">
-                                </div>
-                                <div class="col-7">
-                                    <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $paymentPendingCount }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Payment Qris Pending</p>
-                                        <a href="{{ route('tenant.transaction.list.pending.payment') }}" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row-->
-                        </div>
-                    </div>
-                    <!-- end widget-rounded-circle-->
                 </div>
             </div>
             <div class="row">
@@ -118,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar Semua Transaksi</h4>
+                            <h4 class="header-title mb-3">Tabel Daftar Pemasukan Transaksi Qris</h4>
                             <div class="table-responsive">
                                 <table id="basic-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>

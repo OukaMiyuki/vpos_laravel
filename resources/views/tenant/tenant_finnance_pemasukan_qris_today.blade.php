@@ -32,11 +32,11 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Data Transaksi Qris Toko Hari Ini</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="basic-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th>Action</th>
                                             <th>No.</th>
+                                            <th>Action</th>
                                             <th>Invoice</th>
                                             <th>Kasir</th>
                                             <th class="text-center">Tanggal Transaksi</th>
@@ -57,12 +57,12 @@
                                         @php $no=0; @endphp
                                         @foreach($invoice as $invoice)
                                             <tr>
+                                                <td>{{ $no+=1 }}</td>
                                                 <td>
                                                     <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
-                                                        <button title="Lihat Invoice" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                        <button title="Lihat Invoice" type="button" class="btn btn-info btn-xs waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                 </td>
-                                                <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
                                                 <td>
                                                     @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")

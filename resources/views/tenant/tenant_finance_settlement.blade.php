@@ -1,4 +1,4 @@
-<x-kasir-layout>
+<x-tenant-layout>
     <div class="content">
         <!-- Start Content-->
         <div class="container-fluid">
@@ -8,12 +8,12 @@
                     <div class="page-title-box">
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('kasir.transaction') }}">Transaction</a></li>
-                                <li class="breadcrumb-item active">Pending</li>
+                                <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="">Finance</a></li>
+                                <li class="breadcrumb-item active">Settlement</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Pending Transaction (Belum Dirposes)</h4>
+                        <h4 class="page-title">Data History Settlement</h4>
                     </div>
                 </div>
             </div>
@@ -29,36 +29,35 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Data Pending Transaction List</h4>
+                            <h4 class="header-title mb-3">Tabel Data History Settlement</h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Invoice</th>
-                                            <th>Customer Info</th>
-                                            <th class="text-center">Tanggal Transaksi</th>
+                                            <th>Nomor Settlement</th>
+                                            <th>Periode Settlement</th>
+                                            <th>Nominal Settlement (Rp.)</th>
                                             <th class="text-center">Status</th>
-                                            <th class="text-center">Action</th>
+                                            <th>Note</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $no=0; @endphp
-                                        @foreach($invoice as $invoice)
+                                        @foreach($SettlementHstory as $stl)
                                             <tr>
                                                 <td>{{$no+=1}}</td>
-                                                <td>{{$invoice->nomor_invoice}}</td>
-                                                <td>{{$invoice->customer->customer_info}}</td>
-                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}}</td>
-                                                <td class="text-center"><span class="badge bg-soft-danger text-danger">Belum Diproses</span></td>
+                                                <td>{{$stl->settlement->nomor_settlement}}</td>
+                                                <td>{{\Carbon\Carbon::parse($stl->settlement_time_stamp)->format('d-m-Y H:i:s')}}</td>
+                                                <td>@currency($stl->nominal_settle)</td>
                                                 <td class="text-center">
-                                                    <a href="{{ route('kasir.transaction.pending.restore', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restore transaction" type="button" class="btn btn-success btn-xs waves-effect waves-light"><span class="mdi mdi-history"></span></button>&nbsp;
-                                                    </a>
-                                                    <a href="{{ route('kasir.transaction.pending.delete', ['id' => $invoice->id ]) }}">
-                                                        <button title="Hapus transaksi pending" type="button" class="btn btn-danger btn-xs waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
-                                                    </a>
+                                                    @if($stl->status == 0)
+                                                        <span class="badge bg-soft-danger text-danger">Settlement Gagal</span>
+                                                    @elseif($stl->status == 1)
+                                                        <span class="badge bg-soft-success text-success">Settlement Sukses</span>
+                                                    @endif
                                                 </td>
+                                                <td>{{$stk->note}}</td>        
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -68,8 +67,7 @@
                     </div>
                 </div>
             </div>
-            <!-- end row -->
         </div>
         <!-- container -->
     </div>
-</x-kasir-layout>
+</x-tenant-layout>

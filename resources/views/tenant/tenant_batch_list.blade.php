@@ -34,10 +34,10 @@
                                 <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th>No.</th>
-                                            <th>Nama</th>
+                                            <th width="20">No.</th>
+                                            <th width="50">Nama</th>
                                             <th>Keterangan</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -47,12 +47,12 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $batch->batch_code  }}</td>
                                                 <td>{{ $batch->keterangan  }}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="" id="editbatch" data-id="{{ $batch->id }}" data-kode="{{ $batch->batch_code }}"  data-keterangan="{{ $batch->keterangan }}" data-bs-toggle="modal" data-bs-target="#modaleditsupplier">
-                                                        <button title="Lihat data kasir" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
+                                                        <button title="Lihat data kasir" type="button" class="btn btn-success btn-xs waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
                                                     </a>
                                                     <a href="{{ route('tenant.batch.delete', ['id' => $batch->id]) }}">
-                                                        <button title="Hapus data supplier" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                        <button title="Hapus data supplier" type="button" class="btn btn-danger btn-xs waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                     </a>
                                                 </td>
                                             </tr>

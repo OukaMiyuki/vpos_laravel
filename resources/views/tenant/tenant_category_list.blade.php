@@ -34,9 +34,9 @@
                                 <table id="selection-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th>No.</th>
-                                            <th>Nama</th>
-                                            <th>Action</th>
+                                            <th width="20">No.</th>
+                                            <th width="50">Nama</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -45,12 +45,12 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $cat->name }}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="" id="editkategori" data-id="{{ $cat->id }}" data-nama="{{ $cat->name }}"  data-bs-toggle="modal" data-bs-target="#modaleditsupplier">
-                                                        <button title="Lihat data kasir" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
+                                                        <button title="Lihat data kasir" type="button" class="btn btn-success btn-xs waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
                                                     </a>
                                                     <a href="{{ route('tenant.category.delete', ['id' => $cat->id]) }}">
-                                                        <button title="Hapus data supplier" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                        <button title="Hapus data supplier" type="button" class="btn btn-danger btn-xs waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                     </a>
                                                 </td>
                                             </tr>

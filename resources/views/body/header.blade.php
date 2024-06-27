@@ -435,7 +435,7 @@
                                         <h5 class="text-dark mt-0">Transaksi</h5>
                                         <ul class="list-unstyled megamenu-list">
                                             <li>
-                                                <a href="{{ route('tenant.transaction.list') }}">Semua Transaksi</a>
+                                                <a href="#">Semua Transaksi</a>
                                             </li>
                                             <li>
                                                 <a href="{{ route('tenant.transaction.list.pending') }}">Transaction Pending</a>
@@ -491,9 +491,9 @@
                                     <div class="col-md-3">
                                         <h5 class="text-dark mt-0">Finance</h5>
                                         <ul class="list-unstyled megamenu-list">
-                                            <li>
+                                            {{-- <li>
                                                 <a href="{{ route('tenant.finance.pemasukan') }}">Pemasukan</a>
-                                            </li>
+                                            </li> --}}
                                             <li>
                                                 <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
                                             </li>

@@ -35,8 +35,8 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Action</th>
-                                            <th>Photo</th>
+                                            <th class="text-center">Action</th>
+                                            <th class="text-center">Photo</th>
                                             <th>Product Batch Code</th>
                                             <th>Product Name</th>
                                             <th>Kategori</th>
@@ -48,25 +48,25 @@
                                         @foreach($product as $product)
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="{{ route('tenant.product.batch.detail', ['id' => $product->id]) }}">
-                                                        <button title="Lihat detail produk" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                        <button title="Lihat detail produk" type="button" class="btn btn-primary btn-xs waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                     <a href="{{ route('tenant.product.batch.edit', ['id' => $product->id]) }}">
-                                                        <button title="Edit data produk" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
+                                                        <button title="Edit data produk" type="button" class="btn btn-success btn-xs waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
                                                     </a>
                                                     <a href="{{ route('tenant.product.batch.delete', ['id' => $product->id]) }}">
-                                                        <button title="Hapus produk" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                        <button title="Hapus produk" type="button" class="btn btn-danger btn-xs waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                     </a>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <img src="{{ !empty($product->photo) ? Storage::url('images/product/'.$product->photo) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" alt="Product Photo" width="80">
                                                 </td>
                                                 <td>{{ $product->product_code }}</td>
                                                 <td>{{ $product->product_name }}</td>
                                                 <td>{{ $product->category->name }}</td>
                                                 {{-- <td>{{ $product->stok }}</td> --}}
-                                                <td>{{ $product->harga_jual }}</td>
+                                                <td>@money($product->harga_jual)</td>
                                             </tr>
                                         @endforeach
                                     </tbody>

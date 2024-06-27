@@ -27,9 +27,9 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $tunai->saldo }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($tunai->saldo)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Pemasukan Tunai</p>
-                                        <a href="{{ route('tenant.finance.pemasukan.tunai') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.transaction.list.tunai') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -47,8 +47,8 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qrisPending }}</span></h4>
-                                        <p class="text-muted mb-1 text-truncate">Saldo Transaksi</p>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($qrisPending)</span></h4>
+                                        <p class="text-muted mb-1 text-truncate">Saldo Settlement Qris</p>
                                         <a href="{{ route('tenant.finance.pemasukan.qris.pending') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
@@ -67,8 +67,8 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qrisHariIni }}</span></h4>
-                                        <p class="text-muted mb-1 text-truncate">Saldo Transaksi Hari Ini</p>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($qrisHariIni)</span></h4>
+                                        <p class="text-muted mb-1 text-truncate">Pemasukan Qris Hari Ini</p>
                                         <a href="{{ route('tenant.finance.pemasukan.qris.today') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
@@ -87,9 +87,9 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qris->saldo }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($qris->saldo)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Saldo Qris Anda</p>
-                                        <a href="{{ route('tenant.finance.pemasukan.qris.all') }}" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{ route('tenant.pemasukan.qris') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                         {{-- <a title="Tarik Saldo" href="" class="btn btn-blue btn-sm ms-2">
@@ -116,11 +116,11 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Pemasukan Qris Hari Ini (Pembayaran Qris Sukses)</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="basic-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th>Action</th>
                                             <th>No.</th>
+                                            <th>Action</th>
                                             <th>Invoice</th>
                                             <th>Kasir</th>
                                             <th class="text-center">Tanggal Transaksi</th>
@@ -141,12 +141,12 @@
                                         @php $no=0; @endphp
                                         @foreach($invoiceQrisSukses as $invoice)
                                             <tr>
+                                                <td>{{ $no+=1 }}</td>
                                                 <td>
                                                     <a href="{{ route('tenant.transaction.invoice', ['id' => $invoice->id ]) }}">
-                                                        <button title="Lihat Invoice" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                        <button title="Lihat Invoice" type="button" class="btn btn-info btn-xs waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                 </td>
-                                                <td>{{ $no+=1 }}</td>
                                                 <td>{{ $invoice->nomor_invoice }}</td>
                                                 <td>
                                                     @if (empty($invoice->kasir->name ) || is_null($invoice->kasir->name) || $invoice->kasir->name == NULL || $invoice->kasir->name == "")

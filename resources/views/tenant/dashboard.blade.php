@@ -35,9 +35,9 @@
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $todayTransaction }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Transaksi Masuk Hari Ini</p>
-                                        <a href="{{ route('tenant.product.batch.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $transaksiTunaiCount }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Transaksi Tunai</p>
+                                        <a href="{{ route('tenant.transaction.list.tunai') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -58,9 +58,9 @@
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $todayTransactionFinish }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Transaksi Selesai Hari Ini</p>
-                                        <a href="{{ route('tenant.supplier.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $transaksiQrisCount }}</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Transaksi Qris</p>
+                                        <a href="{{ route('tenant.transaction.list.qris') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -82,8 +82,8 @@
                                 <div class="col-9">
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1""><span data-plugin="counterup">{{ $invoice }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Total Transaksi</p>
-                                        <a href="{{ route('tenant.transaction.list') }}" class="btn btn-blue btn-sm ms-2">
+                                        <p class="text-muted mb-1 text-truncate">Total Semua Transaksi</p>
+                                        <a href="{{ route('tenant.transaction') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -106,11 +106,8 @@
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $pemasukanHariIni }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($pemasukanHariIni)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Pemasukan hari ini</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -129,11 +126,8 @@
                                 </div>
                                 <div class="col-9">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalSaldo }}</span></h3>
-                                        <p class="text-muted mb-1 text-truncate">Total Penghasilan Anda</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
-                                            <i class="mdi mdi-eye"></i>
-                                        </a>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($totalSaldo)</span></h3>
+                                        <p class="text-muted mb-1 text-truncate">Total Penghasilan Toko</p>
                                     </div>
                                 </div>
                             </div>
@@ -167,7 +161,7 @@
                                             <th>Kasir</th>
                                             <th class="text-center">Tanggal Transaksi</th>
                                             <th class="text-center">Jenis Pembayaran</th>
-                                            <th class="text-center">Nilai Transaksi</th>
+                                            <th class="text-center">Nilai Transaksi (Rp.)</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                     </thead>

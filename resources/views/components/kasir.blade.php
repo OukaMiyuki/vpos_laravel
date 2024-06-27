@@ -105,12 +105,13 @@
         <script src="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.js') }}"></script>
         <script src="{{ asset('assets/libs/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
 
-        {{-- ON SCAN --}}
-        <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
-
         <!-- Init js-->
         <script src="{{ asset('assets/js/pages/form-advanced.init.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/pages/kasir.init.js') }}"></script>
+        @if (Route::is('kasir.pos'))
+            <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
+            <Script type="text/javascript" src="{{ asset('assets/js/pages/posinit.js') }}"></Script>
+        @endif
 
 
         {{-- Custom FOrm JS --}}

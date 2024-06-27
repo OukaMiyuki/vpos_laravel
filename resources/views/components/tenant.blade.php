@@ -127,15 +127,17 @@
                 }, 10000);
         </script>
 
-        {{-- ON SCAN --}}
-        <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
-
         <!-- Init js-->
         <script src="{{ asset('assets/js/pages/form-advanced.init.js') }}"></script>
         <Script type="text/javascript" src="{{ asset('assets/js/pages/tenant.init.js') }}"></Script>
-
-        @if(Route::is('tenant.product.stock.add') || Route::is('tenant.product.stock.edit') || Route::is('tenant.pos'))
+        
+        @if(Route::is('tenant.product.stock.add') || Route::is('tenant.product.stock.edit'))
+            <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
             <Script type="text/javascript" src="{{ asset('assets/js/pages/onscaninit.js') }}"></Script>
+        @endif
+        @if (Route::is('tenant.pos'))
+            <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
+            <Script type="text/javascript" src="{{ asset('assets/js/pages/posinit.js') }}"></Script>
         @endif
 
         {{-- Custom FOrm JS --}}

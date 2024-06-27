@@ -38,7 +38,7 @@
                                             <th>Nama</th>
                                             <th>Email</th>
                                             <th>Contact</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -49,15 +49,15 @@
                                                 <td>{{ $supply->nama_supplier }}</td>
                                                 <td>{{ $supply->email_supplier }}</td>
                                                 <td>{{ $supply->phone_supplier }}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="" id="detailsupplier" data-id="{{ $supply->id }}" data-nama="{{ $supply->nama_supplier }}" data-email="{{ $supply->email_supplier }}" data-phone="{{ $supply->phone_supplier }}" data-alamat="{{ $supply->alamat_supplier }}" data-keterangan="{{ $supply->keterangan }}" data-bs-toggle="modal" data-bs-target="#modaldetailsupplier">
-                                                        <button title="Lihat data supplier" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
+                                                        <button title="Lihat data supplier" type="button" class="btn btn-primary btn-xs waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>
                                                     <a href="" id="editsupplier" data-id="{{ $supply->id }}" data-nama="{{ $supply->nama_supplier }}" data-email="{{ $supply->email_supplier }}" data-phone="{{ $supply->phone_supplier }}" data-alamat="{{ $supply->alamat_supplier }}" data-keterangan="{{ $supply->keterangan }}" data-bs-toggle="modal" data-bs-target="#modaleditsupplier">
-                                                        <button title="Edit data supplier" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
+                                                        <button title="Edit data supplier" type="button" class="btn btn-success btn-xs waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
                                                     </a>
                                                     <a href="{{ route('tenant.supplier.delete', ['id' => $supply->id]) }}">
-                                                        <button title="Hapus data supplier" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                        <button title="Hapus data supplier" type="button" class="btn btn-danger btn-xs waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                     </a>
                                                 </td>
                                             </tr>

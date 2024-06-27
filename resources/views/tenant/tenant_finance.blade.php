@@ -21,7 +21,7 @@
                 <div class="col-xl-4 col-md-4">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="header-title mb-0">Pemasukan</h4>
+                            <h4 class="header-title mb-0">Saldo Pemasukan</h4>
                             <div id="cardCollpase1" class="collapse show">
                                 <div class="text-center pt-3">
                                     <div class="row text-center">
@@ -30,7 +30,7 @@
                                         </div>
                                     </div>
                                     <div class="row mt-3">
-                                        <a href="{{ route('tenant.finance.pemasukan') }}"><button title="Pengaturan akun" type="button" class="btn btn-info waves-effect waves-light">Lihat Data</button></a>
+                                        <a href="{{ route('tenant.saldo') }}"><button title="Pengaturan akun" type="button" class="btn btn-info waves-effect waves-light">Lihat Data</button></a>
                                     </div>
                                 </div>
                             </div>
@@ -40,7 +40,7 @@
                 <div class="col-xl-4 col-md-4">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="header-title mb-0">Data Saldo</h4>
+                            <h4 class="header-title mb-0">History Settlement</h4>
                             <div id="cardCollpase1" class="collapse show">
                                 <div class="text-center pt-3">
                                     <div class="row text-center">
@@ -49,7 +49,7 @@
                                         </div>
                                     </div>
                                     <div class="row mt-3">
-                                        <a href="{{ route('tenant.saldo') }}"><button title="Pengaturan profil toko" type="button" class="btn btn-info waves-effect waves-light">Lihat Data</button></a>
+                                        <a href="{{ route('tenant.finance.settlement') }}"><button title="Pengaturan profil toko" type="button" class="btn btn-info waves-effect waves-light">Lihat Data</button></a>
                                     </div>
                                 </div>
                             </div>

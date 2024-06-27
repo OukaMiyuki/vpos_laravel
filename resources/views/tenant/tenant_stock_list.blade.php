@@ -35,13 +35,13 @@
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th>Action</th>
-                                        <th>Photo</th>
+                                        <th class="text-center">Action</th>
+                                        <th class="text-center">Photo</th>
                                         <th>Barcode</th>
                                         <th>Product Name</th>
                                         <th>Stok Barang</th>
-                                        <th>Tanggal Beli</th>
-                                        <th>Tanggal Expired</th>
+                                        <th class="text-center">Tanggal Beli</th>
+                                        <th class="text-center">Tanggal Expired</th>
                                         <th>Harga Beli (Rp.)</th>
                                     </tr>
                                 </thead>
@@ -52,26 +52,26 @@
                                     @foreach($stock as $stok)
                                         <tr>
                                             <td>{{ $no+=1 }}</td>
-                                            <td>
+                                            <td class="text-center">
                                                 <a href="{{ route('tenant.product.stock.barcode.show', ['id' => $stok->id]) }}">
-                                                    <button title="Lihat barcode" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-barcode-scan"></span></button>&nbsp;
+                                                    <button title="Lihat barcode" type="button" class="btn btn-info btn-xs waves-effect waves-light"><span class="mdi mdi-barcode-scan"></span></button>&nbsp;
                                                 </a>
                                                 <a href="{{ route('tenant.product.stock.edit', ['id' => $stok->id]) }}">
-                                                    <button title="Edit data stok" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
+                                                    <button title="Edit data stok" type="button" class="btn btn-success btn-xs waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
                                                 </a>
                                                 <a href="{{ route('tenant.product.stock.delete', ['id' => $stok->id]) }}">
-                                                    <button title="Hapus produk" type="button" class="btn btn-danger rounded-pill waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
+                                                    <button title="Hapus produk" type="button" class="btn btn-danger btn-xs waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                 </a>
                                             </td>
-                                            <td>
+                                            <td class="text-center">
                                                 <img src="{{ !empty($stok->product->photo) ? Storage::url('images/product/'.$stok->product->photo) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" alt="Product Photo" width="80">
                                             </td>
                                             <td>{{ $stok->barcode }}</td>
                                             <td>{{ $stok->product->product_name }}</td>
                                             <td>{{ $stok->stok }}</td>
-                                            <td>{{ $stok->tanggal_beli }}</td>
-                                            <td>{{ $stok->tanggal_expired }}</td>
-                                            <td>{{ $stok->harga_beli }}</td>
+                                            <td class="text-center">{{ $stok->tanggal_beli }}</td>
+                                            <td class="text-center">{{ $stok->tanggal_expired }}</td>
+                                            <td>@money($stok->harga_beli)</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

@@ -27,7 +27,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukanHariini }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp.sss <span data-plugin="counterup">@money($totalPemasukanHariini)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Pemasukan Hari Ini</p>
                                     </div>
                                 </div>

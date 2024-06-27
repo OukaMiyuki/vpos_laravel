@@ -82,7 +82,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $pemasukanHariIni }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($pemasukanHariIni)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Pemasukan Hari Ini</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -104,7 +104,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $totalPemasukan }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($totalPemasukan)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Total Pemasukan</p>
                                         <a href="" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>

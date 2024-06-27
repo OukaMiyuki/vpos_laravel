@@ -509,6 +509,7 @@
                             <span class="menu-arrow"></span>
                         </a>
                         <div class="collapse" id="transaksi">
+                            {{-- Akses Menu Transaksi Mitra Bisnis --}}
                             @if (auth()->user()->id_inv_code == 0)
                                 <ul class="nav-second-level">
                                     <li>
@@ -525,19 +526,23 @@
                                     </li>
                                 </ul>
                             @else
+                            {{-- Akses Menu Transaksi Mitra Tenant --}}
                                 <ul class="nav-second-level">
                                     <li>
                                         <a href="{{ route('tenant.transaction') }}">Dashboard Transaksi</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('tenant.transaction.list') }}">Semua Transaksi</a>
+                                        <a href="{{ route('tenant.transaction.list.tunai') }}">Transaksi Tunai</a>
                                     </li>
                                     <li>
+                                        <a href="{{ route('tenant.transaction.list.qris') }}">Transaksi Qris</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.transaction.list.pending') }}">Transaksi Pending</a>
+                                    </li>
+                                    {{-- <li>
                                         <a href="{{ route('tenant.transaction.finish') }}">Transaction Finish</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('tenant.transaction.list.pending') }}">Transaction Pending</a>
-                                    </li>
+                                    </li> --}}
                                     <li>
                                         <a href="{{ route('tenant.transaction.list.pending.payment') }}">Payment Qris Pending</a>
                                     </li>
@@ -545,6 +550,25 @@
                             @endif
                         </div>
                     </li>
+                    @if (auth()->user()->id_inv_code != 0)
+                        <li>
+                            <a href="#pemasukan-tenant" data-bs-toggle="collapse">
+                                <i class="mdi mdi-inbox-arrow-down"></i>
+                                <span> Pemasukan </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="pemasukan-tenant">
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('tenant.pemasukan') }}">Dashboard Pemasukan</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('tenant.pemasukan.qris') }}">Pemasukan Transaksi Qris</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    @endif
                     @if (auth()->user()->id_inv_code == 0)
                         <li>
                             <a href="#aplikasi" data-bs-toggle="collapse">
@@ -626,11 +650,14 @@
                                         <a href="{{ route('tenant.finance') }}">Dashboard Finansial</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('tenant.finance.pemasukan') }}">Pemasukan</a>
+                                        <a href="{{ route('tenant.saldo') }}">Saldo Pemasukan</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('tenant.saldo') }}">Total Saldo</a>
+                                        <a href="{{ route('tenant.finance.settlement') }}">History Settlement Transaksi</a>
                                     </li>
+                                    {{-- <li>
+                                        <a href="{{ route('tenant.finance.pemasukan') }}">Pemasukan</a>
+                                    </li> --}}
                                     <li>
                                         <a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan Anda</a>
                                     </li>
@@ -650,7 +677,10 @@
                                         <a href="{{ route('tenant.mitra.dashboard.finance') }}">Dashboard Finansial</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('tenant.mitra.dashboard.finance.saldo') }}">Total Saldo</a>
+                                        <a href="{{ route('tenant.mitra.dashboard.finance.saldo') }}">Saldo Anda</a>
+                                    </li>
+                                    <li>
+                                        <a href="#">History Settlement Transaksi</a>
                                     </li>
                                     <li>
                                         <a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan Anda</a>

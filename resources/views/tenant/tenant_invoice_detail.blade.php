@@ -114,22 +114,74 @@
                                         $field = App\Models\TenantField::where('store_identifier', $identifier)->first();
                                     @endphp
                                     @if (!empty($field))
+                                    <address>
                                         <address>
-                                            @if (!empty($field->baris1)) {{ $field->baris1 }} : @if(!empty($invoice->invoiceField->content1)) {{ $invoice->invoiceField->content1 }} @endif<br>@endif
-                                            @if (!empty($field->baris2)) {{ $field->baris2 }} : @if(!empty($invoice->invoiceField->content2)) {{ $invoice->invoiceField->content2 }} @endif<br>@endif
-                                            @if (!empty($field->baris3)) {{ $field->baris3 }} : @if(!empty($invoice->invoiceField->content3)) {{ $invoice->invoiceField->content3 }} @endif<br>@endif
-                                            @if (!empty($field->baris4)) {{ $field->baris4 }} : @if(!empty($invoice->invoiceField->content4)) {{ $invoice->invoiceField->content4 }} @endif<br>@endif
-                                            @if (!empty($field->baris5)) {{ $field->baris5 }} : @if(!empty($invoice->invoiceField->content5)) {{ $invoice->invoiceField->content5 }} @endif<br>@endif
+                                            <table>
+                                                @if ($field->baris_1_activation == 1)
+                                                    <tr>
+                                                        <td><strong>@if (!empty($field->baris1) || !is_null($field->baris1) || $field->baris1 != NULL) {{ $field->baris1 }} @endif</strong></td>
+                                                        <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                        <td>@if(!empty($invoice->invoiceField->content1)) {{ $invoice->invoiceField->content1 }} @endif</td>
+                                                    </tr>
+                                                @endif
+                                                @if ($field->baris_2_activation == 1)
+                                                    <tr>
+                                                        <td><strong>@if (!empty($field->baris2) || !is_null($field->baris2) || $field->baris2 != NULL) {{ $field->baris2 }} @endif</strong></td>
+                                                        <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                        <td>@if(!empty($invoice->invoiceField->content2)) {{ $invoice->invoiceField->content2 }} @endif</td>
+                                                    </tr>
+                                                @endif
+                                                @if ($field->baris_3_activation == 1)
+                                                    <tr>
+                                                        <td><strong>@if (!empty($field->baris3) || !is_null($field->baris3) || $field->baris3 != NULL) {{ $field->baris3 }} @endif</strong></td>
+                                                        <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                        <td>@if(!empty($invoice->invoiceField->content3)) {{ $invoice->invoiceField->content3 }} @endif</td>
+                                                    </tr>
+                                                @endif
+                                                @if ($field->baris_4_activation == 1)
+                                                    <tr>
+                                                        <td><strong>@if (!empty($field->baris4) || !is_null($field->baris4) || $field->baris4 != NULL) {{ $field->baris4 }} @endif</strong></td>
+                                                        <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                        <td>@if(!empty($invoice->invoiceField->content4)) {{ $invoice->invoiceField->content4 }} @endif</td>
+                                                    </tr>
+                                                @endif
+                                                @if ($field->baris_5_activation == 1)
+                                                    <tr>
+                                                        <td><strong>@if (!empty($field->baris5) || !is_null($field->baris5) || $field->baris5 != NULL) {{ $field->baris5 }} @endif</strong></td>
+                                                        <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                        <td>@if(!empty($invoice->invoiceField->content5)) {{ $invoice->invoiceField->content5 }} @endif</td>
+                                                    </tr>
+                                                @endif
+                                            </table>
                                         </address>
-                                    @endif
+                                    </address>
+                                @endif
                                 </div> <!-- end col -->
                                 <div class="col-sm-6">
                                     <h6>Info Kasir</h6>
                                     <address>
-                                        Nama Kasir : @if(!empty($invoice->kasir)) {{ $invoice->kasir->name }} @endif<br>
-                                        Jabatan : @if(!empty($invoice->kasir) || !is_null($invoice->kasir)) Kasir @endif<br>
-                                        Nomor Telp./WA : @if(!empty($invoice->kasir)) {{ $invoice->kasir->phone }} @endif<br>
-                                        Email : @if(!empty($invoice->kasir)) {{ $invoice->kasir->email }} @endif<br>
+                                        <table>
+                                            <tr>
+                                                <td><strong>Nama Kasir</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>@if(!empty($invoice->kasir)) {{ $invoice->kasir->name }} @endif</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Jabatan</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>@if(!empty($invoice->kasir) || !is_null($invoice->kasir)) Kasir @endif</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Nomor Telp./WA</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>@if(!empty($invoice->kasir)) {{ $invoice->kasir->phone }} @endif</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Email</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>@if(!empty($invoice->kasir)) {{ $invoice->kasir->email }} @endif</td>
+                                            </tr>
+                                        </table>
                                     </address>
                                 </div> <!-- end col -->
                             </div>
@@ -144,8 +196,8 @@
                                                     <th width="width:5%">#</th>
                                                     <th width="width:25%">Nama</th>
                                                     <th width="width:10%">QTY</th>
-                                                    <th width="width:25%">Harga Satuan</th>
-                                                    <th width="width:25%">Sub Total</th>
+                                                    <th width="width:25%">Harga Satuan (Rp.)</th>
+                                                    <th width="width:25%">Sub Total (Rp.)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -158,8 +210,8 @@
                                                         <td>{{ $no+=1 }}</td>
                                                         <td>{{ $cart->product_name }}</td>
                                                         <td>{{ $cart->qty }}</td></td>
-                                                        <td>{{ $cart->harga }}</td>
-                                                        <td>{{ $cart->sub_total }}</td>
+                                                        <td>@money($cart->harga)</td>
+                                                        <td>@money($cart->sub_total)</td>
                                                         @php
                                                             $total+=$cart->sub_total;
                                                         @endphp
@@ -196,14 +248,14 @@
                                                                     ->first();
                                     @endphp
                                     <div class="float-end">
-                                        <p><b>Sub-total (Rp.):</b> <span class="float-end">{{ $total }}</span></p>
+                                        <p><b>Sub-total (Rp.):</b> <span class="float-end">@money($total)</span></p>
                                         <p><b>Discount (@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif):</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{$invoice->diskon}}</span></p>
-                                        <p><b>Total (Rp.):</b> <span class="float-end">{{ $invoice->sub_total }}</span></p>
+                                        <p><b>Total (Rp.):</b> <span class="float-end">@money($invoice->sub_total)</span></p>
                                         <p><b>Pajak (@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif):</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{$invoice->pajak}}</span></p>
-                                        <h3>Tagihan : Rp. {{$invoice->sub_total+$invoice->pajak}}</h3>
+                                        <h3>Tagihan : @currency($invoice->sub_total+$invoice->pajak)</h3>
                                         @if ($invoice->jenis_pembayaran == "Tunai")
-                                            <p><b>Nominal di bayar (Rp.):</b> <span class="float-end"><strong>{{ $invoice->nominal_bayar }}</strong></span></p>
-                                            <p><b>Kambalian (Rp.):</b> <span class="float-end"><strong>{{ $invoice->kembalian }}</strong></span></p>
+                                            <p><b>Nominal di bayar : </b> <span class="float-end"><strong>@currency($invoice->nominal_bayar)</strong></span></p>
+                                            <p><b>Kambalian : </b> <span class="float-end"><strong>@currency($invoice->kembalian)</strong></span></p>
                                         @endif
                                     </div>
                                     <div class="clearfix"></div>
