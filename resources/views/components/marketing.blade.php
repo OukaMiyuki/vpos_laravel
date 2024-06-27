@@ -104,7 +104,7 @@
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
         {{-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script> --}}
         <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
-        <Script type="text/javascript" src="{{ asset('assets/js/pages/marketing.init.js') }}"></Script>
+        <Script type="text/javascript" src="{{ asset('assets/js/pages/marketingjs.init.js') }}"></Script>
         <script>
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"

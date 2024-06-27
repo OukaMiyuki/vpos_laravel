@@ -19,7 +19,6 @@ $(document).ready(function(){
 $(document).ready(function() {
     let total_tarik = document.getElementById("total_tarik");
     $('#nominal_tarik_dana').on("input", function() {
-        console.log('voila');
         var nominal = parseInt(document.getElementById("nominal_tarik_dana").value);
         if(nominal<10000){
             total_tarik.value = 0;
