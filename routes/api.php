@@ -32,7 +32,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'abilities:kasir', 'throt
 });
 
 
-Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:100,1', 'custom.restrict'])->prefix('tenant')->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:200,1', 'custom.restrict'])->prefix('tenant')->group(function () {
     Route::post('/send-mail-otp', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'sendMailOTP']);
     Route::post('/verify-email-otp', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'verifyMailOTP']);
 
@@ -90,7 +90,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:100,1', 'custom
     Route::post('/withdraw', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'withdrawList']);
 });
 
-Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:100,1', 'custom.restrict'])->prefix('kasir')->group(function () {
+Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:200,1', 'custom.restrict'])->prefix('kasir')->group(function () {
     Route::post('/user/detail', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'userDetail']);
     Route::post('/user/update', [\App\Http\Controllers\Auth\Kasir\Api\AuthController::class, 'userUpdate']);
     Route::get('/product', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'productList']);
