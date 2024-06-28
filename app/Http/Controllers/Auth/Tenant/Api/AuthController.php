@@ -231,7 +231,17 @@ class AuthController extends Controller {
                     'headers' => $headers,
                     'json' => $data,
                 ]);
+                // return response()->json([
+                //     'message' => $$postResponse,
+                //     'status' => "testing",
+                //     'app-version' => $this->getAppversion()
+                // ]);
             } catch(Exception $ex){
+                return response()->json([
+                    'message' => $ex,
+                    'status' => "testing walla",
+                    'app-version' => $this->getAppversion()
+                ]);
                 return $ex;
             }
             $responseCode = $postResponse->getStatusCode();
