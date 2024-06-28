@@ -65,19 +65,19 @@
                                     <div class="col-md-12" id="saldo-qris-txt">
                                         <div class="mb-3">
                                             <label for="saldo-qris" class="form-label">Saldo Insentif Qris Anda (Rp.)</label>
-                                            <input readonly type="text" class="form-control" name="saldo-qris" id="saldo-qris" required value="{{ $adminQrisWallet->saldo }}" placeholder="Masukkan jumlah saldo">
+                                            <input readonly type="text" class="form-control" name="saldo-qris" id="saldo-qris" required value="@money($adminQrisWallet->saldo)" placeholder="Masukkan jumlah saldo">
                                         </div>
                                     </div>
                                     <div class="col-md-12" id="saldo-agregate-aplikasi-txt">
                                         <div class="mb-3">
                                             <label for="saldo-agregate" class="form-label">Saldo Insentif Agregate Aplikasi (Rp.)</label>
-                                            <input readonly type="text" class="form-control" name="saldo-agregate-aplikasi" id="saldo-agregate-aplikasi" required value="{{ $agregateWalletAplikasi->saldo }}" placeholder="Masukkan jumlah saldo">
+                                            <input readonly type="text" class="form-control" name="saldo-agregate-aplikasi" id="saldo-agregate-aplikasi" required value="@money($agregateWalletAplikasi->saldo)" placeholder="Masukkan jumlah saldo">
                                         </div>
                                     </div>
                                     <div class="col-md-12" id="saldo-agregate-transfer-txt">
                                         <div class="mb-3">
                                             <label for="saldo-agregate" class="form-label">Saldo Insentif Agregate Transfer (Rp.)</label>
-                                            <input readonly type="text" class="form-control" name="saldo-agregate-transfer" id="saldo-agregate-transfer" required value="{{ $agregateWalletTransfer->saldo }}" placeholder="Masukkan jumlah saldo">
+                                            <input readonly type="text" class="form-control" name="saldo-agregate-transfer" id="saldo-agregate-transfer" required value="@money($agregateWalletTransfer->saldo)" placeholder="Masukkan jumlah saldo">
                                         </div>
                                     </div>
                                     <form method="post" action="{{ route('admin.withdraw.tarik') }}">
