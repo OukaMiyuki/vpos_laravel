@@ -45,9 +45,9 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::get('settings/rekening/edit/{id}', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningListEdit'])->name('admin.rekening.setting.edit');
     Route::post('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningSettingUpdate'])->name('admin.rekening.setting.update');
 
-    Route::get('settings/wiithdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdraw'])->name('admin.withdraw');
-    Route::post('settings/wiithdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdrawTarik'])->name('admin.withdraw.tarik');
-    Route::post('settings/wiithdraw/process', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdrawTarikProcess'])->name('admin.withdraw.tarik.process');
+    Route::get('settings/withdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdraw'])->name('admin.withdraw');
+    Route::post('settings/withdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdrawTarik'])->name('admin.withdraw.tarik');
+    Route::post('settings/withdraw/process', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdrawTarikProcess'])->name('admin.withdraw.tarik.process');
 
     Route::get('/dashboard/admin', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuDashboard'])->name('admin.dashboard.menu');
     Route::get('/dashboard/user/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTransaction'])->name('admin.dashboard.menu.userTransaction');
