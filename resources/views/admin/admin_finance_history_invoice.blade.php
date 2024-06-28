@@ -113,12 +113,17 @@
                                             <tr>
                                                 <td><strong>Nama Bank</strong></td>
                                                 <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
-                                                <td>{{ $withdrawData->rekAdmin->nama_bank }}</td>
+                                                <td>{{ $withdrawData->rekening->nama_bank }}</td>
                                             </tr>
                                             <tr>
-                                                <td><strong>No. Rekening</strong></td>
+                                                <td><strong>Atas Nama</strong></td>
                                                 <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
-                                                <td>{{ $withdrawData->rekAdmin->no_rekening }}</td>
+                                                <td>{{ $withdrawData->rekening->atas_nama }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Rek. Tujuan</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $withdrawData->rekening->no_rekening }}</td>
                                             </tr>
                                         </table>
                                     </address>

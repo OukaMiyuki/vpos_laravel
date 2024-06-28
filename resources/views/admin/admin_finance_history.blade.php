@@ -89,16 +89,19 @@
                             </div>
                             <h4 class="header-title mb-3">History Penarikan Dana</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-table" class="table nowrap w-100">
+                                <table id="basic-table" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
+                                            <th class="text-center">Action</th>
                                             <th>No. Invoice</th>
                                             <th>Jenis Penarikan</th>
+                                            <th>Nama Bank</th>
+                                            <th>Atas Nama</th>
+                                            <th>No. Rekening</th>
                                             <th class="text-center">Tanggal Penarikan</th>
                                             <th class="text-center">Nominal</th>
                                             <th class="text-center">Biaya Transfer</th>
-                                            <th>Jenis Penarikan</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
@@ -108,9 +111,15 @@
                                         @endphp
                                         @foreach ($allData as $wdData)
                                             <tr>
-                                                <td>{{ $no+=1 }}</td>
-                                                <td>{{ $wdData->invoice_pemarikan }}</td>
-                                                <td>{{ $wdData->jenis_penarikan }}</td>
+                                                <td>{{$no+=1}}</td>
+                                                <td class="text-center">
+                                                    <a href="{{ route('admin.dashboard.finance.withdraw.invoice', ['id' => $wdData->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
+                                                </td>
+                                                <td>{{$wdData->invoice_pemarikan}}</td>
+                                                <td>{{$wdData->jenis_penarikan}}</td>
+                                                <td>{{$wdData->rekening->nama_bank}}</td>
+                                                <td>{{$wdData->rekening->atas_nama}}</td>
+                                                <td>{{$wdData->rekening->no_rekening}}</td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($wdData->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($wdData->created_at)->format('H:i:s')}}</td>
                                                 <td class="text-center">@currency($wdData->nominal)</td>
                                                 <td class="text-center">@currency($wdData->biaya_admin)</td>
@@ -120,9 +129,6 @@
                                                     @else
                                                         <span class="badge bg-soft-success text-success">Penarikan Sukses</span>
                                                     @endif
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('admin.dashboard.finance.withdraw.invoice', ['id' => $wdData->id]) }}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>
                                                 </td>
                                             </tr>
                                         @endforeach

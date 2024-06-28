@@ -3331,7 +3331,8 @@ class AdminController extends Controller {
     public function adminDashboardFinance(){
         $adminQrisWallet = QrisWallet::select(['saldo'])->where('email', auth()->user()->email)->find(auth()->user()->id);
         $agregateWallet = AgregateWallet::select(['saldo'])->first();
-        $withdrawData = Withdrawal::where('id_user', auth()->user()->id)
+        $withdrawData = Withdrawal::with(['rekening'])
+                                    ->where('id_user', auth()->user()->id)
                                     ->where('email', auth()->user()->email)
                                     ->latest();
         $allData = $withdrawData->get();
@@ -3369,12 +3370,13 @@ class AdminController extends Controller {
                                             }
                                         ]);
                                     },
-                                    'rekAdmin' => function($query){
+                                    'rekening' => function($query){
                                         $query->select([
-                                            'rekening_admins.id',
-                                            'rekening_admins.nama_rekening',
-                                            'rekening_admins.nama_bank',
-                                            'rekening_admins.no_rekening',
+                                            'rekening_withdraws.id',
+                                            'rekening_withdraws.id_penarikan',
+                                            'rekening_withdraws.atas_nama',
+                                            'rekening_withdraws.nama_bank',
+                                            'rekening_withdraws.no_rekening',
                                         ]);
                                     }
                                 ])

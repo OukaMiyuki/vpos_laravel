@@ -91,6 +91,7 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Atas Nama</th>
+                                                    <th>Nama Bank</th>
                                                     <th>Nomor Rekening</th>
                                                 </tr>
                                             </thead>
@@ -98,6 +99,7 @@
                                                 <tr>
                                                     <th scope="row">1</th>
                                                     <td>{{ $dataRekening->beneficiaryAccountName }}</td>
+                                                    <td>{{$rekening->atas_nama}}</td>
                                                     <td>{{ $dataRekening->beneficiaryAccountNo }}</td>
                                                 </tr>
                                             </tbody>
