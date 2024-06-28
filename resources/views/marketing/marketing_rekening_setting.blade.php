@@ -50,6 +50,7 @@
                                                     </select>
                                                     <small id="emailHelp" class="form-text text-danger"><strong>Pastikan anda memasukkan data bank dan nomor rekening dengan benar!</strong></small>
                                                     <input type="hidden" readonly class="d-none" name="nama_bank" id="nama_bank" required value="{{$rekening->nama_bank}}">
+                                                    <input type="hidden" class="d-none" name="atas_nama" id="atas_nama" required value="{{ $rekening->atas_nama }}">
                                                 </div>
                                             </div>
                                         </div>

@@ -71,16 +71,19 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Histori Penarikan</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="basic-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
+                                            <th class="text-center">Detail</th>
                                             <th>Nomor Invoice</th>
                                             <th>Email</th>
+                                            <th>Nama Bank</th>
+                                            <th>Atas Nama</th>
+                                            <th>Nomor Rekening</th>
                                             <th class="text-center">Tanggal Penarikan</th>
                                             <th class="text-center">Nominal (Rp.)</th>
                                             <th class="text-center">Status</th>
-                                            <th class="text-center">Detail</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -90,8 +93,16 @@
                                         @foreach ($allData as $data)
                                             <tr>
                                                 <td>{{$no+=1}}</td>
+                                                <td class="text-center">
+                                                    <a href="{{ route('marketing.finance.history_penarikan.invoice', ['id' => $data->id]) }}">
+                                                        <button title="Lihat detail invoice" type="button" class="btn btn-primary btn-xs waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
+                                                    </a>
+                                                </td>
                                                 <td>{{$data->invoice_pemarikan}}</td>
                                                 <td>{{$data->email}}</td>
+                                                <td>{{$data->rekening->nama_bank}}</td>
+                                                <td>{{$data->rekening->atas_nama}}</td>
+                                                <td>{{$data->rekening->no_rekening}}</td>
                                                 <td class="text-center">
                                                     {{\Carbon\Carbon::parse($data->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($data->created_at)->format('H:i:s')}}
                                                 </td>
@@ -104,11 +115,6 @@
                                                     @elseif($data->status == 2)
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
                                                     @endif
-                                                </td>
-                                                <td class="text-center">
-                                                    <a href="{{ route('marketing.finance.history_penarikan.invoice', ['id' => $data->id]) }}">
-                                                        <button title="Lihat detail invoice" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
-                                                    </a>
                                                 </td>
                                             </tr>
                                         @endforeach

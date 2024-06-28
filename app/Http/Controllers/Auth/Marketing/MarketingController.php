@@ -636,7 +636,8 @@ class MarketingController extends Controller {
     }
 
     public function historyPenarikan(){
-        $withdrawData = Withdrawal::where('id_user', auth()->user()->id)
+        $withdrawData = Withdrawal::with(['rekening'])
+                                ->where('id_user', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
                                 ->latest();
         $allData = $withdrawData->get();
@@ -648,16 +649,27 @@ class MarketingController extends Controller {
 
     public function invoiceTarikDana($id){
         $withdrawData = Withdrawal::select([ 
-                                                'withdrawals.id',
-                                                'withdrawals.email',
-                                                'withdrawals.invoice_pemarikan',
-                                                'withdrawals.tanggal_penarikan',
-                                                'withdrawals.nominal',
-                                                'withdrawals.biaya_admin',
-                                                'withdrawals.tanggal_masuk',
-                                                'withdrawals.status',
-                                                'withdrawals.created_at'
-                                            ])
+                                    'withdrawals.id',
+                                    'withdrawals.email',
+                                    'withdrawals.invoice_pemarikan',
+                                    'withdrawals.tanggal_penarikan',
+                                    'withdrawals.nominal',
+                                    'withdrawals.biaya_admin',
+                                    'withdrawals.tanggal_masuk',
+                                    'withdrawals.status',
+                                    'withdrawals.created_at'
+                                ])
+                                ->with([
+                                    'rekening' => function($query){
+                                        $query->select([
+                                            'rekening_withdraws.id',
+                                            'rekening_withdraws.id_penarikan',
+                                            'rekening_withdraws.atas_nama',
+                                            'rekening_withdraws.nama_bank',
+                                            'rekening_withdraws.no_rekening',
+                                        ]);
+                                    }
+                                ])
                                 ->where('email', auth()->user()->email)
                                 ->find($id);
         if(is_null($withdrawData) || empty($withdrawData)){

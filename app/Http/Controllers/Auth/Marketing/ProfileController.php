@@ -23,6 +23,7 @@ use App\Models\DetailPenarikan;
 use App\Models\NobuWithdrawFeeHistory;
 use App\Models\BiayaAdminTransferDana;
 use App\Models\Withdrawal;
+use App\Models\RekeningWithdraw;
 use Exception;
 
 class ProfileController extends Controller {
@@ -476,20 +477,70 @@ class ProfileController extends Controller {
                 $rekeningAkun = Rekening::where('id_user', auth()->user()->id)
                                         ->where('email', auth()->user()->email)
                                         ->first();
-                $rekeningAkun->update([
-                    'no_rekening' => $rekening,
-                    'nama_bank' => $nama_bank,
-                    'swift_code' => $swift_code,
-                ]);
-                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
-                $date = Carbon::now()->format('d-m-Y H:i:s');
-                $body = "Rekening anda berhasil diupdate pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                $this->sendNotificationToUser($body);
-                $notification = array(
-                    'message' => 'Update nomor rekening berhasil!',
-                    'alert-type' => 'success',
-                );
-                return redirect()->back()->with($notification);
+                
+                if(!is_null($swift_code) && !is_null($rekening)){
+                    $ip = "36.84.106.3";
+                    $PublicIP = $this->get_client_ip();
+                    $getLoc = Location::get($ip);
+                    $lat = $getLoc->latitude;
+                    $long = $getLoc->longitude;
+                    $rekClient = new GuzzleHttpClient();
+                    $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
+                    try {
+                        $getRek = $rekClient->request('POST',  $urlRek, [
+                            'form_params' => [
+                                'latitude' => $lat,
+                                'longitude' => $long,
+                                'bankCode' => $swift_code,
+                                'accountNo' => $rekening,
+                                'secret_key' => "Vpos71237577Inquiry"
+                            ]
+                        ]);
+                        $responseCode = $getRek->getStatusCode();
+                        $dataRekening = json_decode($getRek->getBody());
+                        if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600"){    
+                            $rekeningAkun->update([
+                                'atas_nama' => $dataRekening->beneficiaryAccountName,
+                                'nama_bank' => $nama_bank,
+                                'no_rekening' => $dataRekening->beneficiaryAccountNo,
+                                'swift_code' => $swift_code,
+                            ]);
+                            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                            $date = Carbon::now()->format('d-m-Y H:i:s');
+                            $body = "Rekening anda berhasil diupdate pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $this->sendNotificationToUser($body);
+                            $notification = array(
+                                'message' => 'Update nomor rekening berhasil!',
+                                'alert-type' => 'success',
+                            );
+                            return redirect()->back()->with($notification);
+                        } else {
+                            $notification = array(
+                                'message' => 'Cek rekening gagal, pastikan nomor rekening yang anda inputkan benar!',
+                                'alert-type' => 'warning',
+                            );
+                            return redirect()->back()->with($notification);
+                        }
+                    } catch (Exception $e) {
+                        if(auth()->user()->id_inv_code == 0){
+                            $action = "Mitra Bisnis : Rekening Inquiry Fail";
+                        } else {
+                            $action = "Tenant : Rekening Inquiry Fail";
+                        }
+                        $this->createHistoryUser($action, $e, 0);
+                        $notification = array(
+                            'message' => 'Cek rekening gagal, harap hubungi admin!',
+                            'alert-type' => 'error',
+                        );
+                        return redirect()->back()->with($notification);
+                    }
+                } else {
+                    $notification = array(
+                        'message' => 'Inputan rekening dan bank tidak boleh ada yang kosong!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                }
             }
         } catch(Exception $e){
             $this->createHistoryUser($action, $e, 0);
@@ -649,7 +700,7 @@ class ProfileController extends Controller {
         $agregateTransfer = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Transfer')->first();
         DB::connection()->enableQueryLog();
 
-        $rekeningMarketing = Rekening::select(['swift_code', 'no_rekening', 'id'])
+        $rekeningMarketing = Rekening::select(['swift_code', 'no_rekening', 'id', 'nama_bank', 'atas_nama'])
                                     ->where('id_user', auth()->user()->id)
                                     ->where('email', auth()->user()->email)
                                     ->first();
@@ -705,6 +756,12 @@ class ProfileController extends Controller {
                         ]);
 
                         if(!is_null($withDraw) || !empty($withDraw)){
+                            RekeningWithdraw::create([
+                                'id_penarikan' => $withDraw->id,
+                                'atas_nama' => $rekeningMarketing->atas_nama,
+                                'nama_bank' => $rekeningMarketing->nama_bank,
+                                'no_rekening' => $rekeningMarketing->no_rekening,
+                            ]);
                             $qrisWalletMarketing->update([
                                 'saldo' => $saldoMarketing-$total_penarikan
                             ]);
