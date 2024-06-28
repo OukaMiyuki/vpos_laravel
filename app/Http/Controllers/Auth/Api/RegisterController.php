@@ -12,6 +12,9 @@ use App\Models\DetailMarketing;
 use App\Models\DetailTenant;
 use App\Models\DetailKasir;
 use App\Models\InvitationCode;
+use App\Models\History;
+use Illuminate\Support\Facades\DB;
+use Stevebauman\Location\Facades\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -21,8 +24,49 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 
 class RegisterController extends Controller {
-    public function registerTenant(Request $request) {
 
+    private function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
+    private function createHistoryUser($action, $user_id,  $user_email, $log, $status){
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
+    }
+
+    public function registerTenant(Request $request) {
+        DB::connection()->enableQueryLog();
+        $action = "Register : Tenant Using Application";
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
@@ -66,7 +110,9 @@ class RegisterController extends Controller {
         event(new Registered($tenant));
 
         $token = $tenant->createToken('auth_token')->plainTextToken;
-
+        $login_id = NULL;
+        $login_email = $request->email;
+        $this->createHistoryUser($action, $login_id, $login_email, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         return response()->json([
             'data' => $tenant,
             'access_token' => $token,

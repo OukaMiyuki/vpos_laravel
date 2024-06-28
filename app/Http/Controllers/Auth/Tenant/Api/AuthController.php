@@ -23,6 +23,9 @@ use App\Models\Withdrawal;
 use App\Models\DetailPenarikan;
 use App\Models\NobuWithdrawFeeHistory;
 use App\Models\AppVersion;
+use App\Models\BiayaAdminTransferDana;
+use App\Models\RekeningWithdraw;
+use App\Models\History;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -40,6 +43,88 @@ class AuthController extends Controller {
     private function getAppversion(){
         $appVersion = AppVersion::find(1);
         return $appVersion->versi;
+    }
+
+    private function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
+    }
+
+    private function sendNotificationToUser($body){
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $postResponse = "";
+        $noHP = auth()->user()->phone;
+        if(!preg_match("/[^+0-9]/",trim($noHP))){
+            if(substr(trim($noHP), 0, 2)=="62"){
+                $hp    =trim($noHP);
+            }
+            else if(substr(trim($noHP), 0, 1)=="0"){
+                $hp    ="62".substr(trim($noHP), 1);
+            }
+        }
+
+        $url = 'https://waq.my.id/send-message';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            'api_key' => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            'message' => $body
+        ];
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            $action = "Send Whatsapp Notification Fail";
+            $this->createHistoryUser($action, $ex, 0);
+        }
+        $responseCode = $postResponse->getStatusCode();
+        if($responseCode != 200){
+            $action = "Send Whatsapp Notification Fail";
+            $this->createHistoryUser($action, $ex, 0);
+        } 
     }
 
     public function register(Request $request) {
@@ -388,6 +473,30 @@ class AuthController extends Controller {
         return response()->json(['message' => 'Update Success', 'status' => 200, 'app-version' => $this->getAppversion()]);
     }
 
+    public function userUpdatePassword(Request $request) : JsonResponse {
+        $rules = [
+            'otp' => 'required|numeric',
+            'password' => 'required|confirmed|min:8',
+        ];
+    
+        $customMessages = [
+            'required' => 'Inputan tidak boleh kosong!',
+            'confirmed' => 'Konformasi password tidak sesuai'
+        ];
+    
+        $validator = $this->validate($request, $rules, $customMessages);
+
+        if($validator){
+            $password = $request->password;
+            $otp = $request->password;
+            return response()->json([
+                'message' => 'Walla bener!',
+                'validation' => $validator,
+                'status' => 200
+            ]);
+        }
+    }
+
     public function userUpdateStore(Request $request) : JsonResponse {
         $nama_toko = $request->nama_toko;
         $alamat_toko = $request->alamat_toko;
@@ -552,7 +661,7 @@ class AuthController extends Controller {
 
     public function rekeningupdate(Request $request){
         $swift_code = $request->swift_code;
-        $rekening = $request->no_rekening;
+        $no_rekening = $request->no_rekening;
         $nama_bank = $request->nama_bank;
         $rekeningAkun = Rekening::where('id_user', auth()->user()->id)
                                         ->where('email', auth()->user()->email)
@@ -565,18 +674,57 @@ class AuthController extends Controller {
             ]);
         }
 
-        $rekeningAkun->update([
-            'nama_bank' => $nama_bank,
-            'no_rekening' => $rekening,
-            'swift_code' => $swift_code,
-        ]);
-
-        return response()->json([
-            'message' => 'Rekening berhasil diupdate!',
-            'data-rekening' => $rekeningAkun,
-            'status' => 200,
-            'app-version' => $this->getAppversion()
-        ]);
+        $ip = "36.84.106.3";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $rekClient = new GuzzleHttpClient();
+        $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
+        try {
+            $getRek = $rekClient->request('POST',  $urlRek, [
+                'form_params' => [
+                    'latitude' => $lat,
+                    'longitude' => $long,
+                    'bankCode' => $swift_code,
+                    'accountNo' => $no_rekening,
+                    'secret_key' => "Vpos71237577Inquiry"
+                ]
+            ]);
+            $responseCode = $getRek->getStatusCode();
+            $dataRekening = json_decode($getRek->getBody());
+            if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600"){   
+                $rekeningAkun->update([
+                    'atas_nama' => $dataRekening->beneficiaryAccountName,
+                    'nama_bank' => $nama_bank,
+                    'no_rekening' => $dataRekening->beneficiaryAccountNo,
+                    'swift_code' => $swift_code,
+                ]);
+                return response()->json([
+                    'message' => 'Rekening berhasil diupdate!',
+                    'data-bank' => $dataRekening,
+                    'data-rekening' => $rekeningAkun,
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Rekening Inquiry Error!',
+                    'rekening-status' => 'Akun Bank Tidak Terdeteksi, Harap cek kembali nomor rekening dan nama bank yang anda inputkan',
+                    'data-bank' => $dataRekening,
+                    'data-rekening' => $rekeningAkun,
+                    'status' => 404
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Rekening Inquiry Error!',
+                'rekening-status' => 'Akun Bank Tidak Terdeteksi, Harap cek kembali nomor rekening dan nama bank yang anda inputkan',
+                'data-bank' => $dataRekening,
+                'data-rekening' => $rekeningAkun,
+                'status' => 404
+            ]);
+        }
     }
 
     public function cekSaldoQris(){
@@ -593,6 +741,7 @@ class AuthController extends Controller {
     }
 
     public function tarikDana(Request $request){
+        DB::connection()->enableQueryLog();
         $url = 'https://erp.pt-best.com/api/rek_transfer';
         $client = new GuzzleHttpClient();
         $ip = "125.164.243.227";
@@ -600,14 +749,23 @@ class AuthController extends Controller {
         $getLoc = Location::get($ip);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
-        $agregate = 350;
-        $aplikator = 350;
-        $mitra = 500;
+        // $agregate = 350;
+        // $aplikator = 350;
+        // $mitra = 500;
         $nominal_tarik = $request->nominal_penarikan;
-        $total_biaya_transfer = 1500;
-        $total_tarik = (int) $nominal_tarik+$total_biaya_transfer;
+        // $total_biaya_transfer = 1500;
         $withDraw = "";
         $qrisWallet = "";
+
+        $transferFee = BiayaAdminTransferDana::get();
+        $biayaAdmin = $transferFee->sum('nominal');
+        $aplikator = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Admin')->first();
+        $mitra = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Mitra Aplikasi')->first();
+        $agregateMaintenance = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Agregate Server')->first();
+        $agregateTransfer = BiayaAdminTransferDana::select(['nominal', 'id'])->where('jenis_insentif', 'Insentif Transfer')->first();
+
+        $total_tarik = (int) $nominal_tarik+$biayaAdmin;
+
         $qrisWallet = QrisWallet::where('id_user', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
                                 ->first();
@@ -632,11 +790,12 @@ class AuthController extends Controller {
                         'status' => 200
                     ]);
                 } else {
-                    $rekening = Rekening::select(['swift_code', 'no_rekening'])
+                    $rekening = Rekening::select(['swift_code', 'no_rekening', 'nama_bank', 'atas_nama', 'id'])
                                         ->where('id_user', auth()->user()->id)
                                         ->where('email', auth()->user()->email)
                                         ->first();
-                    $agregateWallet = AgregateWallet::find(1);
+                    $agregateWalletMaintenance = AgregateWallet::find(1);
+                    $agregateWalletTransfer = AgregateWallet::find(2);
                     $qrisAdmin = QrisWallet::where('email', 'adminsu@visipos.id')->find(1);
 
                     $marketing = InvitationCode::select(['invitation_codes.id',
@@ -668,14 +827,16 @@ class AuthController extends Controller {
                         $data = json_decode($postResponse->getBody());
                         $responseCode = $data->responseCode;
                         $responseMessage = $data->responseMessage;
-
+ 
                         if($responseCode == 2001800 && $responseMessage == "Request has been processed successfully") {
                             $withDraw = Withdrawal::create([
                                 'id_user' => auth()->user()->id,
+                                'id_rekening' => $rekening->id,
                                 'email' => auth()->user()->email,
+                                'jenis_penarikan' => "Penarikan Dana Tenant",
                                 'tanggal_penarikan' => Carbon::now(),
                                 'nominal' => $nominal_tarik,
-                                'biaya_admin' => $total_biaya_transfer,
+                                'biaya_admin' => $biayaAdmin,
                                 'tanggal_masuk' => Carbon::now(),
                                 'deteksi_ip_address' => $ip,
                                 'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
@@ -683,41 +844,54 @@ class AuthController extends Controller {
                             ]);
                             // return $withDraw;
                             if(!is_null($withDraw) || !empty($withDraw)){
+                                RekeningWithdraw::create([
+                                    'id_penarikan' => $withDraw->id,
+                                    'atas_nama' => $rekening->atas_nama,
+                                    'nama_bank' => $rekening->nama_bank,
+                                    'no_rekening' => $rekening->no_rekening,
+                                ]);
+
                                 $qrisWallet->update([
                                     'saldo' => $saldo_tenant-$total_tarik
                                 ]);
                                 $adminSaldo = $qrisAdmin->saldo;
 
                                 $qrisAdmin->update([
-                                    'saldo' => $adminSaldo+$aplikator
+                                    'saldo' => $adminSaldo+$aplikator->nominal
                                 ]);
 
                                 $mitraSaldo = $saldoMitra->saldo;
                                 $saldoMitra->update([
-                                    'saldo' => $mitraSaldo+$mitra
-                                ]);
-                                $agregateSaldo = $agregateWallet->saldo;
-                                $agregateWallet->update([
-                                    'saldo' =>$agregateSaldo+$agregate
+                                    'saldo' => $mitraSaldo+$mitra->nominal
                                 ]);
 
-                                DetailPenarikan::create([
-                                    'id_penarikan' => $withDraw->id,
-                                    'nominal_penarikan' => $total_tarik,
-                                    'nominal_bersih_penarikan' => $nominal_tarik,
-                                    'total_biaya_admin' => $total_biaya_transfer,
-                                    'biaya_nobu' => 300,
-                                    'biaya_tenant' => $nominal_tarik,
-                                    'biaya_mitra' => $mitra,
-                                    'biaya_admin_su' => $aplikator,
-                                    'biaya_agregate' => $agregate
+                                $agregateSaldoMaintenance = $agregateWalletMaintenance->saldo;
+                                $agregateWalletMaintenance->update([
+                                    'saldo' =>$agregateSaldoMaintenance+$agregateMaintenance->nominal
                                 ]);
+
+                                $agregateSaldoTransfer = $agregateWalletTransfer->saldo;
+                                $agregateWalletTransfer->update([
+                                    'saldo' =>$agregateSaldoTransfer+$agregateTransfer->nominal
+                                ]);
+
+                                foreach($transferFee as $fee){
+                                    DetailPenarikan::create([
+                                        'id_penarikan' => $withDraw->id,
+                                        'id_insentif' => $fee->id,
+                                        'nominal' => $fee->nominal,
+                                    ]);
+                                }
 
                                 NobuWithdrawFeeHistory::create([
                                     'id_penarikan' => $withDraw->id,
                                     'nominal' => 300
                                 ]);
-
+                                $action = "Tenant : Withdrawal Process Success | Using Application";
+                                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                                $date = Carbon::now()->format('d-m-Y H:i:s');
+                                $body = "Penarikan dana Qris sebesar Rp. ".$nominal_tarik." melalui aplikasi android sukses pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                                $this->sendNotificationToUser($body);
                                 return response()->json([
                                     'message' => 'Penarikan Berhasil!',
                                     'data-withdraw' => $withDraw,
@@ -726,6 +900,11 @@ class AuthController extends Controller {
                                     'app-version' => $this->getAppversion()
                                 ]);
                             } else {
+                                $action = "Tenant : Withdrawal Process Failed | Using Application";
+                                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+                                $date = Carbon::now()->format('d-m-Y H:i:s');
+                                $body = "Penarikan dana Qris sebesar Rp. ".$nominal_tarik." melalui aplikasi android gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                                $this->sendNotificationToUser($body);
                                 return response()->json([
                                     'message' => 'Transaction Error!',
                                     'status' => 500
@@ -737,30 +916,28 @@ class AuthController extends Controller {
                                 'email' => auth()->user()->email,
                                 'tanggal_penarikan' => Carbon::now(),
                                 'nominal' => $nominal_tarik,
-                                'biaya_admin' => $total_biaya_transfer,
+                                'biaya_admin' => $biayaAdmin,
                                 'tanggal_masuk' => Carbon::now(),
                                 'deteksi_ip_address' => $ip,
                                 'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                                 'status' => 0
                             ]);
-                            DetailPenarikan::create([
-                                'id_penarikan' => $withDraw->id,
-                                'nominal_penarikan' => NULL,
-                                'nominal_bersih_penarikan' => NULL,
-                                'total_biaya_admin' => NULL,
-                                'biaya_nobu' => NULL,
-                                'biaya_tenant' => NULL,
-                                'biaya_mitra' => NULL,
-                                'biaya_admin_su' => NULL,
-                                'biaya_agregate' => NULL
-                            ]);
-
+                            $action = "Tenant : Withdrawal Transaction fail invalid";
+                            $this->createHistoryUser($action, $responseMessage, 0);
+                            $date = Carbon::now()->format('d-m-Y H:i:s');
+                            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_tarik." melalui aplikasi android gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $this->sendNotificationToUser($body);
                             return response()->json([
                                 'message' => 'Penarikan gagal, harap hubungi admin!',
                                 'status' => 500
                             ]);
                         }
                     } catch(Exception $e){
+                        $action = "Tenant : Withdraw Process | Error (HTTP API Error)";
+                        $this->createHistoryUser($action, $e, 0);
+                        $date = Carbon::now()->format('d-m-Y H:i:s');
+                        $body = "Penarikan dana Qris sebesar Rp. ".$nominal_tarik." melalui aplikasi android gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                        $this->sendNotificationToUser($body);
                         return response()->json([
                             'message' => 'Penarikan gagal, harap hubungi admin!',
                             'error' => $e,
@@ -770,27 +947,6 @@ class AuthController extends Controller {
                 }
             }
         }
-    }
-
-    function get_client_ip() {
-        $ipaddress = '';
-        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
-            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
-            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
-            $ipaddress = $_SERVER['HTTP_FORWARDED'];
-        } else if (isset($_SERVER['REMOTE_ADDR'])) {
-            $ipaddress = $_SERVER['REMOTE_ADDR'];
-        } else {
-            $ipaddress = 'UNKNOWN';
-        }
-
-        return $ipaddress;
     }
 
     public function logout() {

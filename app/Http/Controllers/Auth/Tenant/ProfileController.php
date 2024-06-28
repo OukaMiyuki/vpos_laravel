@@ -59,7 +59,6 @@ class ProfileController extends Controller{
         return $ipaddress;
     }
 
-
     private function createHistoryUser($action, $log, $status){
         $user_id = auth()->user()->id;
         $user_email = auth()->user()->email;

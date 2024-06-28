@@ -112,7 +112,7 @@ class LoginController extends Controller {
         $this->createHistoryUser($login_id, $login_email, $action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $noHp = "";
         $date = Carbon::now()->format('d-m-Y H:i:s');
-        $body = "Anda berhasil melakukan login pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+        $body = "";
         if(Auth::guard('admin')->check()){
             $action = "Login User Admin";
             $user = Admin::select([
@@ -122,6 +122,11 @@ class LoginController extends Controller {
                             ])
                             ->where('email', $login_email)
                             ->first();
+            if($user->access_level == 0){
+                $body = "Anda berhasil melakukan login sebagai Admin Super User pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+            } else {
+                $body = "Anda berhasil melakukan login sebagai Administrator pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+            }
             $noHp = $user->phone;
             $id = $user->id;
             $email = $user->email;
@@ -129,6 +134,7 @@ class LoginController extends Controller {
             return redirect()->intended(RouteServiceProvider::ADMIN_DASHBOARD)->with($notification);
         } else if(Auth::guard('marketing')->check()){
             $action = "Login User Mitra Aplikasi";
+            $body = "Anda berhasil melakukan login sebagai Mitra Aplikasi pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
             $user = Marketing::select([
                                     'marketings.id',
                                     'marketings.email',
@@ -150,6 +156,11 @@ class LoginController extends Controller {
                                 ])
                                 ->where('email', $login_email)
                                 ->first();
+            if($user->id_inv_code == 0){
+                $body = "Anda berhasil melakukan login sebagai Mitra Bisnis pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+            } else {
+                $body = "Anda berhasil melakukan login sebagai Mitra Tenant pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+            }
             $noHp = $user->phone;
             $id = $user->id;
             $email = $user->email;
@@ -160,6 +171,7 @@ class LoginController extends Controller {
             return redirect()->intended(RouteServiceProvider::TENANT_DASHBOARD)->with($notification);
         } else if(Auth::guard('kasir')->check()){
             $action = "Login User Kasir";
+            $body = "Anda berhasil melakukan login sebagai Kasir pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
             $user = Kasir::select([
                             'kasirs.id',
                             'kasirs.email',

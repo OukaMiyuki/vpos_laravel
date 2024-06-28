@@ -41,6 +41,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:200,1', 'custom
 
     Route::post('/user/detail', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userDetail']);
     Route::post('/user/update', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userUpdate']);
+    Route::post('/user/update/password', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userUpdatePassword']);
     Route::post('/user/update-store', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'userUpdateStore']);
     Route::get('/cs-info', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'csInfo']);
 

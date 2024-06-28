@@ -218,7 +218,7 @@
                                     <a href="javascript:void(0);" class="dropdown-item">Lihat Semua Laporan</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">History Penarikan Terbaru</h4>
+                            <h4 class="header-title mb-3">History Penarikan User Terbaru</h4>
                             <div class="table-responsive">
                                 <table class="table table-borderless table-nowrap table-hover table-centered m-0">
                                     <thead class="table-light">
