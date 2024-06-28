@@ -11,6 +11,7 @@ use App\Models\Marketing;
 use App\Models\Admin;
 use App\Models\Rekening;
 use App\Models\RekeningAdmin;
+use App\Models\RekeningWithdraw;
 
 class Withdrawal extends Model {
     use HasFactory;
@@ -19,6 +20,10 @@ class Withdrawal extends Model {
 
     public function nobuFee() {
         return $this->hasMany(NobuWithdrawFeeHistory::class, 'id_penarikan', 'id');
+    }
+
+    public function rekening() {
+        return $this->hasOne(RekeningWithdraw::class, 'id_penarikan', 'id');
     }
 
     public function detailWithdraw(){

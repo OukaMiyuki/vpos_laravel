@@ -1927,7 +1927,8 @@ class TenantController extends Controller {
     }
 
     public function historyPenarikan(){
-        $withdrawData = Withdrawal::where('id_user', auth()->user()->id)
+        $withdrawData = Withdrawal::with(['rekening'])
+                                ->where('id_user', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
                                 ->latest();
         $allData = $withdrawData->get();

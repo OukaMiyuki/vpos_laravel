@@ -55,6 +55,7 @@
                                                 <div class="mb-3">
                                                     <label for="no_rekening" class="form-label">Nomor Rekening</label>
                                                     <input type="hidden" class="d-none" name="nama_bank" id="nama_bank" required value="{{ $rekening->nama_bank }}">
+                                                    <input type="hidden" class="d-none" name="atas_nama" id="atas_nama" required value="{{ $rekening->atas_nama }}">
                                                     <input type="text" class="form-control" name="no_rekening" id="no_rekening" required value="{{ $rekening->no_rekening }}" placeholder="Masukkan nomor rekening">
                                                 </div>
                                             </div>
