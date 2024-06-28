@@ -181,7 +181,7 @@ Route::middleware(['auth:marketing', 'auth', 'marketingemailverified', 'throttle
     Route::get('/dashboard/code', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeDashboard'])->name('marketing.dashboard.invitationcode');
     Route::post('/dashboard/code/insert', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeInsert'])->name('marketing.dashboard.invitationcode.insert');
     Route::get('/dashboard/code/cashout/info/{code}', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutList'])->name('marketing.dashboard.invitationcode.cashout.list');
-    Route::get('/dashboard/code/cashout/invoice', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutInvoice'])->name('marketing.dashboard.invitationcode.cashout.invoice');
+    // Route::get('/dashboard/code/cashout/invoice', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'invitationCodeCashoutInvoice'])->name('marketing.dashboard.invitationcode.cashout.invoice');
 
     Route::get('/dashboard/code/tenant/', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantList'])->name('marketing.dashboard.tenant.list');
     Route::get('/dashboard/code/tenant/detail/{inv_code}/{id}', [App\Http\Controllers\Auth\Marketing\MarketingController::class, 'marketingTenantDetail'])->name('marketing.dashboard.tenant.detail');

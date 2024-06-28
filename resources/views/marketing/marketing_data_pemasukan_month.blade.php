@@ -37,14 +37,14 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Invitation Code</th>
+                                            <th class="text-center">Invitation Code</th>
                                             <th>Holder</th>
                                             <th>Nama Tenant</th>
                                             <th>Nama Toko</th>
-                                            <th>Insentif Mitra (Rp.)</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Bulan</th>
-                                            <th>Status</th>
+                                            <th class="text-center">Insentif Mitra (Rp.)</th>
+                                            <th class="text-center">Tanggal Insentif</th>
+                                            <th class="text-center">Bulan</th>
+                                            <th class="text-center">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -53,21 +53,23 @@
                                         @endphp
                                         @foreach($pemasukanTerbaru->invitationCodeTenant as $inv)
                                             @foreach($inv->withdrawal as $withdrawal)
-                                                <tr>
-                                                    <td>{{ $no+=1 }}</td>
-                                                    <td>{{ $inv->invitationCode->inv_code }}</td>
-                                                    <td>{{ $inv->invitationCode->holder }}</td>
-                                                    <td>{{ $inv->name }}</td>
-                                                    <td>{{ $inv->storeDetail->store_name }}</td>
-                                                    <td>{{ $withdrawal->detailWithdraw->biaya_mitra }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('d-m-Y') }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('F') }}</td>
-                                                    <td>
-                                                        @if ($withdrawal->status == 1)
-                                                            <span class="badge bg-soft-success text-success">Sukses</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
+                                                @foreach ($withdrawal->detailWithdraw as $dtwd)
+                                                    <tr>
+                                                        <td>{{ $no+=1 }}</td>
+                                                        <td class="text-center">{{ $inv->invitationCode->inv_code }}</td>
+                                                        <td>{{ $inv->invitationCode->holder }}</td>
+                                                        <td>{{ $inv->name }}</td>
+                                                        <td>{{ $inv->storeDetail->store_name }}</td>
+                                                        <td class="text-center">@currency($dtwd->nominal)</td>
+                                                        <td class="text-center">{{\Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                        <td class="text-center">{{\Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('F')}}</td>
+                                                        <td class="text-center">
+                                                            @if ($withdrawal->status == 1)
+                                                                <span class="badge bg-soft-success text-success">Sukses</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
                                             @endforeach
                                         @endforeach
                                     </tbody>

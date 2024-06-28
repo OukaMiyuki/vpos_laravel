@@ -405,7 +405,7 @@
                                     <a href="{{ route('marketing.dashboard.invitationcode') }}">Dashboard Code</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('marketing.dashboard.pemasukan') }}">Pemasukan</a>
+                                    <a href="{{ route('marketing.dashboard.pemasukan') }}">Daftar Pemasukan</a>
                                 </li>
                                 <li>
                                     <a href="{{ route('marketing.dashboard.pemasukan.today') }}">Pemasukan Hari Ini</a>

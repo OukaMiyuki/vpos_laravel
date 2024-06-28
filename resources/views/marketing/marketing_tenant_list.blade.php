@@ -35,11 +35,11 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Invitation Code</th>
+                                            <th class="text-center">Invitation Code</th>
                                             <th>Nama Tenant</th>
-                                            <th>Tanggal Bergabung</th>
+                                            <th class="text-center">Tanggal Bergabung</th>
                                             <th>Phone</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -48,11 +48,11 @@
                                             @foreach ($t->invitationCodeTenant as $userTenant)
                                                 <tr>
                                                     <td>{{ $no+=1 }}</td>
-                                                    <td>{{ $userTenant->invitationCode->inv_code }}</td>
+                                                    <td class="text-center">{{ $userTenant->invitationCode->inv_code }}</td>
                                                     <td>{{ $userTenant->name }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($userTenant->tanggal_bergabung)->format('d-m-Y') }}</td>
+                                                    <td class="text-center">{{ \Carbon\Carbon::parse($userTenant->tanggal_bergabung)->format('d-m-Y') }}</td>
                                                     <td>{{ $userTenant->phone }}</td>
-                                                    <td>
+                                                    <td class="text-center">
                                                         <a href="{{ route('marketing.dashboard.tenant.detail', ['inv_code' => $userTenant->invitationCode->id, 'id' => $userTenant->id_tenant]) }}">
                                                             <button title="Lihat detail tenant" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                         </a>

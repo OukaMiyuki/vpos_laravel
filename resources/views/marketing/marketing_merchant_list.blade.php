@@ -37,10 +37,10 @@
                                             <th>Invitation Code</th>
                                             <th>Nama Tenant</th>
                                             <th>Nama Toko</th>
-                                            <th>Tanggal Bergabung</th>
+                                            <th class="text-center">Tanggal Bergabung</th>
                                             <th>Phone</th>
                                             <th>Total Insentif Mitra (Rp.)</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -51,12 +51,12 @@
                                                 <td>{{ $inv->invitationCode->inv_code }} - {{ $inv->invitationCode->holder }}</td>
                                                 <td>{{ $inv->name }}</td>
                                                 <td>{{ $inv->storeDetail->store_name }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($inv->created_at)->format('d-m-Y') }}</td>
+                                                <td class="text-center">{{ \Carbon\Carbon::parse($inv->created_at)->format('d-m-Y') }}</td>
                                                 <td>{{ $inv->phone }}</td>
                                                 <td>
-                                                    {{ $inv->withdrawal_detail_sum_biaya_mitra }}
+                                                    @currency($inv->withdrawal->sum('detail_withdraw_sum_nominal'))
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="{{ route('marketing.dashboard.tenant.detail', ['inv_code' => $inv->invitationCode->id, 'id' => $inv->id]) }}">
                                                         <button title="Lihat detail tenant" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>

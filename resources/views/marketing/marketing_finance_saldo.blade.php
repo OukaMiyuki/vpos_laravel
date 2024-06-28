@@ -27,7 +27,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h2 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qrisWallet->saldo }}</span></h2>
+                                        <h2 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($qrisWallet->saldo)</span></h2>
                                         <p class="text-muted mb-1 text-truncate">Saldo Insentif Mitra</p>
                                         <a title="Tarik Saldo" href="" class="btn btn-blue btn-sm ms-2">
                                             Tarik Saldo

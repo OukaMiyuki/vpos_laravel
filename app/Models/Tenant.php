@@ -105,6 +105,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         return $this->hasMany(Withdrawal::class, 'email', 'email');
     }
 
+
     public function storeListUMI(){
         return $this->hasManyThrough(
             UmiRequest::class,

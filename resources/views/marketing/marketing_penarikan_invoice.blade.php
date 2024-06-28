@@ -120,8 +120,8 @@
                                                 <tr>
                                                     <th width="width:5%">#</th>
                                                     <th width="width:25%">Email</th>
-                                                    <th width="width:10%">Nominal</th>
-                                                    <th width="width:25%">Biaya Transfer BI-Fast</th>
+                                                    <th width="width:10%">Nominal (Rp.)</th>
+                                                    <th width="width:25%">Biaya Transfer BI-Fast (Rp.)</th>
                                                     <th width="width:25%">Tanggal</th>
                                                 </tr>
                                             </thead>
@@ -132,9 +132,9 @@
                                                 <tr>
                                                     <td>{{ $no+=1 }}</td>
                                                     <td>{{ auth()->user()->email }}</td>
-                                                    <td>{{ $withdrawData->nominal }}</td></td>
-                                                    <td>{{ $withdrawData->biaya_admin }}</td>
-                                                    <td>{{ $withdrawData->tanggal_penarikan }}</td>
+                                                    <td>@money($withdrawData->nominal)</td></td>
+                                                    <td>@money($withdrawData->biaya_admin)</td>
+                                                    <td>{{\Carbon\Carbon::parse($withdrawData->tanggal_penarikan)->format('d-m-Y')}}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -159,7 +159,7 @@
                                 </div> <!-- end col -->
                                 <div class="col-sm-6">
                                     <div class="float-end">
-                                        <h3><b>Total (Rp.): </b> <span class="float-end">{{ $withdrawData->nominal+$withdrawData->biaya_admin }}</span></h3>
+                                        <h3><b>Total (Rp.): </b> <span class="float-end">&nbsp;@money($withdrawData->nominal+$withdrawData->biaya_admin)</span></h3>
                                     </div>
                                     <div class="clearfix"></div>
                                 </div> <!-- end col -->

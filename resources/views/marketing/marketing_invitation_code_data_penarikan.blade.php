@@ -38,7 +38,7 @@
                                     <h3 class="mb-3"><span>Invitation Code : </span>{{ $withdrawList->inv_code }} - {{ $withdrawList->holder }}</h3>
                                 </div>
                                 <div class="col-6">
-                                    <h3 class="mb-3 text-end"><span>Total Saldo : </span>Rp. {{ $totalInsentif }}</h3>
+                                    <h3 class="mb-3 text-end"><span>Total Saldo : </span>Rp. @money($totalInsentif)</h3>
                                 </div>
                             </div>
                             <div class="responsive-table-plugin">
@@ -50,9 +50,9 @@
                                                     <th>No.</th>
                                                     <th>Nama Tenant</th>
                                                     <th>Nama Toko</th>
-                                                    <th>Tanggal Penarikan</th>
-                                                    <th>Nominal (Rp.)</th>
-                                                    <th>Insentif Mitra (Rp.)</th>
+                                                    <th class="text-center">Tanggal Penarikan</th>
+                                                    <th class="text-center">Nominal (Rp.)</th>
+                                                    <th class="text-center">Insentif Mitra (Rp.)</th>
                                                 </tr>
                                             </thead>
                                             @php
@@ -61,14 +61,16 @@
                                             <tbody>
                                                 @foreach ($withdrawList->tenant as $tenantWD)
                                                     @foreach ($tenantWD->withdrawal as $wd)
-                                                        <tr>
-                                                            <td>{{ $no+=1 }}</td>
-                                                            <td>{{ $tenantWD->name }}</td>
-                                                            <td>{{ $tenantWD->storeDetail->store_name }}</td>
-                                                            <td>{{ \Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }}</td>
-                                                            <td>{{ $wd->nominal }}</td>
-                                                            <td>{{ $wd->detailWithdraw->biaya_mitra }}</td>
-                                                        </tr>
+                                                        @foreach ($wd->detailWithdraw as $dtwd)
+                                                            <tr>
+                                                                <td>{{ $no+=1 }}</td>
+                                                                <td>{{ $tenantWD->name }}</td>
+                                                                <td>{{ $tenantWD->storeDetail->store_name }}</td>
+                                                                <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                                <td class="text-center">@currency($wd->nominal)</td>
+                                                                <td class="text-center">@currency($dtwd->nominal)</td>
+                                                            </tr>
+                                                        @endforeach
                                                     @endforeach
                                                 @endforeach
                                             </tbody>

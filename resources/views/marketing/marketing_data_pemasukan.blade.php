@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h2 class="text-dark mt-1">Rp.<span data-plugin="counterup">{{ $totalWithdrawMitra }}</span></h2>
+                                        <h2 class="text-dark mt-1">Rp.<span data-plugin="counterup">@money($totalWithdrawMitra)</span></h2>
                                         <p class="text-muted mb-1 text-truncate">Total Pemasukan</p>
                                     </div>
                                 </div>
@@ -99,9 +99,9 @@
                                             <th>Holder</th>
                                             <th>Nama Tenant</th>
                                             <th>Nama Toko</th>
-                                            <th>Insentif Mitra (Rp.)</th>
-                                            <th>Tanggal Penarikan</th>
-                                            <th>Status</th>
+                                            <th class="text-center">Insentif Mitra (Rp.)</th>
+                                            <th class="text-center">Tanggal Penarikan</th>
+                                            <th class="text-center">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -110,20 +110,22 @@
                                         @endphp
                                         @foreach($pemasukanTotal->invitationCodeTenant as $inv)
                                             @foreach($inv->withdrawal as $withdrawal)
-                                                <tr>
-                                                    <td>{{ $no+=1 }}</td>
-                                                    <td>{{ $inv->invitationCode->inv_code }}</td>
-                                                    <td>{{ $inv->invitationCode->holder }}</td>
-                                                    <td>{{ $inv->name }}</td>
-                                                    <td>{{ $inv->storeDetail->store_name }}</td>
-                                                    <td>{{ $withdrawal->detailWithdraw->nominal }}</td>
-                                                    <td>{{ \Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('d-m-Y') }}</td>
-                                                    <td>
-                                                        @if ($withdrawal->status == 1)
-                                                            <span class="badge bg-soft-success text-success">Sukses</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
+                                                @foreach ($withdrawal->detailWithdraw as $dtwd)
+                                                    <tr>
+                                                        <td>{{ $no+=1 }}</td>
+                                                        <td>{{ $inv->invitationCode->inv_code }}</td>
+                                                        <td>{{ $inv->invitationCode->holder }}</td>
+                                                        <td>{{ $inv->name }}</td>
+                                                        <td>{{ $inv->storeDetail->store_name }}</td>
+                                                        <td class="text-center">@currency($dtwd->nominal)</td>
+                                                        <td class="text-center">{{ \Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('d-m-Y') }}</td>
+                                                        <td class="text-center">
+                                                            @if ($withdrawal->status == 1)
+                                                                <span class="badge bg-soft-success text-success">Sukses</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
                                             @endforeach
                                         @endforeach
                                     </tbody>

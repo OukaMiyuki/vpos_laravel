@@ -27,7 +27,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@if(is_null($penarikanTerbaru) || empty($penarikanTerbaru)) 0 @else {{ $penarikanTerbaru->nominal }} @endif</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@if(is_null($penarikanTerbaru) || empty($penarikanTerbaru)) 0 @else @money($penarikanTerbaru->nominal) @endif</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Penarikan Terbaru</p>
                                     </div>
                                 </div>
@@ -46,7 +46,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $allDataSum }}</span></h3>
+                                        <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($allDataSum)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Semua Penarikan</p>
                                     </div>
                                 </div>
@@ -92,11 +92,11 @@
                                                 <td>{{$no+=1}}</td>
                                                 <td>{{$data->invoice_pemarikan}}</td>
                                                 <td>{{$data->email}}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     {{\Carbon\Carbon::parse($data->tanggal_penarikan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($data->created_at)->format('H:i:s')}}
                                                 </td>
-                                                <td>{{$data->nominal}}</td>
-                                                <td>
+                                                <td class="text-center">@currency($data->nominal)</td>
+                                                <td class="text-center">
                                                     @if ($data->status == 0)
                                                         <span class="badge bg-soft-warning text-warning">Pending</span>
                                                     @elseif($data->status == 1)
@@ -105,7 +105,7 @@
                                                         <span class="badge bg-soft-danger text-danger">Penarikan Gagal</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="{{ route('marketing.finance.history_penarikan.invoice', ['id' => $data->id]) }}">
                                                         <button title="Lihat detail invoice" type="button" class="btn btn-primary rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
                                                     </a>

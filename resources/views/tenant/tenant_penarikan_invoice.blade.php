@@ -120,8 +120,8 @@
                                                 <tr>
                                                     <th width="width:5%">#</th>
                                                     <th width="width:25%">Email</th>
-                                                    <th width="width:10%">Nominal</th>
-                                                    <th width="width:25%">Biaya Transfer BI-Fast</th>
+                                                    <th width="width:10%">Nominal (Rp.)</th>
+                                                    <th width="width:25%">Biaya Transfer BI-Fast (Rp.)</th>
                                                     <th width="width:25%">Tanggal</th>
                                                 </tr>
                                             </thead>

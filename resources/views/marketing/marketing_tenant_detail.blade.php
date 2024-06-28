@@ -146,7 +146,7 @@
                                     <h4 class="mb-3"><span>Invitation Code : </span>{{ $tenant->invitationCode->inv_code }} - {{ $tenant->invitationCode->holder }}</h4>
                                 </div>
                                 <div class="col-6">
-                                    <h4 class="mb-3 text-end"><span>Total Insentif : </span>Rp. {{ $totalPenghasilan }}</h4>
+                                    <h4 class="mb-3 text-end"><span>Total Insentif : </span>Rp. @money($totalPenghasilan)</h4>
                                 </div>
                             </div>
                             <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
@@ -154,10 +154,10 @@
                                     <tr>
                                         <th>No.</th>
                                         <th>Nama</th>
-                                        <th>Tanggal Penarikan</th>
-                                        <th>Nominal</th>
-                                        <th>Insentif Mitra</th>
-                                        <th>Status Penarikan</th>
+                                        <th class="text-center">Tanggal Penarikan</th>
+                                        <th class="text-center">Nominal (Rp.)</th>
+                                        <th class="text-center">Insentif Mitra (Rp.)</th>
+                                        <th class="text-center">Status Penarikan</th>
                                     </tr>
                                 </thead>
                                 @php
@@ -165,18 +165,20 @@
                                 @endphp
                                 <tbody>
                                     @foreach ($tenant->withdrawal as $wd)
-                                        <tr>
-                                            <td>{{ $no+=1 }}</td>
-                                            <td>{{ $tenant->name }}</td>
-                                            <td>{{ $wd->tanggal_penarikan }}</td>
-                                            <td>{{ $wd->nominal }}</td>
-                                            <td>{{ $wd->detailWithdraw->biaya_mitra }}</td>
-                                            <td>
-                                                @if ($wd->status == 1)
-                                                    <span class="badge bg-soft-success text-success">Sukses</span>
-                                                @endif
-                                            </td>
+                                        @foreach ($wd->detailWithdraw as $dtwd)
+                                            <tr>
+                                                <td>{{ $no+=1 }}</td>
+                                                <td>{{ $tenant->name }}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y')}}</td>
+                                                <td class="text-center">@currency($wd->nominal)</td>
+                                                <td class="text-center">@currency($dtwd->nominal)</td>
+                                                <td class="text-center">
+                                                    @if ($wd->status == 1)
+                                                        <span class="badge bg-soft-success text-success">Sukses</span>
+                                                    @endif
+                                                </td>
                                         </tr>
+                                        @endforeach
                                     @endforeach
                                 </tbody>
                             </table>
