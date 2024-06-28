@@ -368,8 +368,8 @@ class TenantController extends Controller {
                                             $query->where('harga_jual', '!=',0);
                                     }])
                                     ->where(function ($query) {
-                                            $query->where('stok', '!=', 0)
-                                                ->where('harga_beli', '!=', 0);
+                                            $query->where('stok', '!=', 0);
+                                                // ->where('harga_beli', '!=', 0);
                                     })
                                     ->where('store_identifier', $identifier)
                                     ->latest()

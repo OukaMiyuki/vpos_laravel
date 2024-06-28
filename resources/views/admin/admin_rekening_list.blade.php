@@ -31,11 +31,12 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Rekening Admin</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
+                                <table id="scroll-horizontal-table" class="table w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
                                             <th>Nama Rekening</th>
+                                            <th>Atas Nama</th>
                                             <th>Nama Bank</th>
                                             <th>Swift Code</th>
                                             <th>Nomor Rekening</th>
@@ -48,6 +49,7 @@
                                             <tr>
                                                 <td>{{$no+=1}}</td>
                                                 <td>{{$rekening->nama_rekening}}</td>
+                                                <td>{{$rekening->atas_nama}}</td>
                                                 <td>{{$rekening->nama_bank}}</td>
                                                 <td>{{$rekening->swift_code}}</td>
                                                 <td>{{$rekening->no_rekening}}</td>
