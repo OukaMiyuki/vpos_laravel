@@ -500,6 +500,9 @@ class ProfileController extends Controller{
                             );
                             return redirect()->back()->with($notification);
                         } else {
+                            $action = "Tenant : Inquiry Rekening Fail";
+                            $log = "Response from API : ".$dataRekening->responseCode;
+                            $this->createHistoryUser($action, $log, 0);
                             $notification = array(
                                 'message' => 'Cek rekening gagal, pastikan nomor rekening yang anda inputkan benar!',
                                 'alert-type' => 'warning',

@@ -389,23 +389,71 @@ class ProfileController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             } else {
-                RekeningAdmin::create([
-                    'id_user' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'nama_rekening' => $request->nama_rekening,
-                    'nama_bank' => $request->nama_bank,
-                    'swift_code' => $request->swift_code,
-                    'no_rekening' => $request->no_rekening
-                ]);
-                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
-                $date = Carbon::now()->format('d-m-Y H:i:s');
-                $body = "Anda telah menambahkan rekening ". $request->nama_rekening." pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                $this->sendNotificationToUser($body);
-                $notification = array(
-                    'message' => 'Rekening berhasil ditambahkan!',
-                    'alert-type' => 'success',
-                );
-                return redirect()->route('admin.rekening.setting')->with($notification);
+                if(!is_null($request->swift_code) && !is_null($request->no_rekening)){
+                    $ip = "36.84.106.3";
+                    $PublicIP = $this->get_client_ip();
+                    $getLoc = Location::get($ip);
+                    $lat = $getLoc->latitude;
+                    $long = $getLoc->longitude;
+                    $rekClient = new GuzzleHttpClient();
+                    $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
+                    try {
+                        $getRek = $rekClient->request('POST',  $urlRek, [
+                            'form_params' => [
+                                'latitude' => $lat,
+                                'longitude' => $long,
+                                'bankCode' => $request->swift_code,
+                                'accountNo' => $request->no_rekening,
+                                'secret_key' => "Vpos71237577Inquiry"
+                            ]
+                        ]);
+                        $responseCode = $getRek->getStatusCode();
+                        $dataRekening = json_decode($getRek->getBody());
+                        if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600"){    
+                            RekeningAdmin::create([
+                                'id_user' => auth()->user()->id,
+                                'email' => auth()->user()->email,
+                                'atas_nama' => $dataRekening->beneficiaryAccountName,
+                                'nama_rekening' => $request->nama_rekening,
+                                'nama_bank' => $request->nama_bank,
+                                'swift_code' => $request->swift_code,
+                                'no_rekening' => $dataRekening->beneficiaryAccountNo,
+                            ]);
+                            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                            $date = Carbon::now()->format('d-m-Y H:i:s');
+                            $body = "Anda telah sukses menambahkan rekening ". $request->nama_rekening." pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $this->sendNotificationToUser($body);
+                            $notification = array(
+                                'message' => 'Rekening berhasil ditambahkan!',
+                                'alert-type' => 'success',
+                            );
+                            return redirect()->route('admin.rekening.setting')->with($notification);
+                        } else {
+                            $action = "Admin Super User : Inquiry Rekening Fail";
+                            $log = "Response from API : ".$dataRekening->responseCode;
+                            $this->createHistoryUser($action, $log, 0);
+                            $notification = array(
+                                'message' => 'Cek rekening gagal, pastikan nomor rekening yang anda inputkan benar!',
+                                'alert-type' => 'warning',
+                            );
+                            return redirect()->route('admin.rekening.setting')->with($notification);
+                        }
+                    } catch (Exception $e) {
+                        $action = "Admin Super User : Add Rekening Fail";
+                        $this->createHistoryUser($action, $e, 0);
+                        $notification = array(
+                            'message' => 'Cek rekening gagal!',
+                            'alert-type' => 'error',
+                        );
+                        return redirect()->route('admin.rekening.setting')->with($notification);
+                    }
+                } else {
+                    $notification = array(
+                        'message' => 'Inputan rekening dan bank tidak boleh ada yang kosong!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->route('admin.rekening.setting')->with($notification);
+                }
             }
         } catch(Exception $e){
             $this->createHistoryUser($action, $e, 0);
