@@ -413,19 +413,31 @@ class MarketingController extends Controller {
         $pemasukanTotal = Marketing::select(['marketings.id'])
                                         ->with(['invitationCodeTenant' => function($query){
                                             $query->select('tenants.id', 'tenants.name', 'tenants.id_inv_code')
-                                                    ->with(['withdrawal' => function($query){
-                                                        $query->select(['withdrawals.id', 'withdrawals.id_user', 'withdrawals.tanggal_penarikan', 'withdrawals.status'])
-                                                                ->with(['detailWithdraw' => function($query){
-                                                                    $query->select(['detail_penarikans.id',
-                                                                                    'detail_penarikans.id_penarikan',
-                                                                                    'detail_penarikans.biaya_mitra',
-                                                                                ])->get();
-                                                                }])
-                                                                ->withSum('detailWithdraw', 'biaya_mitra')
-                                                                ->where('withdrawals.status', 1)
-                                                                ->latest()
-                                                                // ->whereDate('tanggal_penarikan', Carbon::now())
-                                                                ->get();
+                                                    ->with([
+                                                        'withdrawal' => function($query){
+                                                            $query->select([
+                                                                    'withdrawals.id', 
+                                                                    'withdrawals.id_user', 
+                                                                    'withdrawals.tanggal_penarikan', 
+                                                                    'withdrawals.status'
+                                                            ])
+                                                            ->with([
+                                                                'detailWithdraw' => function($query){
+                                                                    $query->select([
+                                                                        'detail_penarikans.id',
+                                                                        'detail_penarikans.id_insentif',
+                                                                        'detail_penarikans.nominal',
+                                                                    ])->get();
+                                                            }])
+                                                            ->withSum([
+                                                                'detailWithdraw' => function($query){
+                                                                    $query->where('id_insentif', 5);
+                                                                }
+                                                            ], 'nominal')
+                                                            ->where('withdrawals.status', 1)
+                                                            ->latest()
+                                                            // ->whereDate('tanggal_penarikan', Carbon::now())
+                                                            ->get();
                                                     },
                                                     'invitationCode' => function($query) {
                                                         $query->select('invitation_codes.id', 'invitation_codes.inv_code', 'invitation_codes.holder')
@@ -445,6 +457,7 @@ class MarketingController extends Controller {
                                                     ])->get();
                                         }])
                                         ->find(auth()->user()->id);
+        dd($pemasukanTotal);
         $todayWithdraw = "";
         $monthWithdraw = "";
         $totalWithdrawMitra = 0;
@@ -454,7 +467,7 @@ class MarketingController extends Controller {
             foreach($inv->withdrawal as $withdrawal){
                 //$totalWithdrawMitra = $withdrawal->detailWithdraw->sum('biaya_mitra');
                 //dd($withdrawal->toArray());
-                $totalWithdrawMitra+=$withdrawal->detail_withdraw_sum_biaya_mitra;
+                $totalWithdrawMitra+=$withdrawal->detail_withdraw_sum_nominal;
                 //dd($inv->invitationCode->inv_code);
                 //dd($inv->storeDetail->store_name);
             }

@@ -199,9 +199,6 @@ Route::middleware(['auth:marketing', 'auth', 'marketingemailverified', 'throttle
 
     Route::get('settings/withdraw', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'withdraw'])->name('marketing.withdraw');
     Route::post('settings/withdraw', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'withdrawProcess'])->name('marketing.withdraw.process');
-
-    Route::post('settings/profile/tarik-dana', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'tarikDanaQris'])->name('marketing.profile.tarik');
-    Route::post('settings/profile/tarik-dana/proses', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'prosesTarikDana'])->name('marketing.profile.tarik.proses');
 });
 
 Route::middleware(['guest:tenant', 'throttle'])->prefix('tenant')->group( function () {
@@ -276,6 +273,7 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
 
     Route::get('/dashboard/finance', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'financeDashboard'])->name('tenant.mitra.dashboard.finance');
     Route::get('/dashboard/finance/saldo', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'saldoData'])->name('tenant.mitra.dashboard.finance.saldo');
+    Route::get('/dashboard/finance/settlement', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'settlementMitra'])->name('tenant.mitra.dashboard.finance.settlement');
 
     Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-yesterday', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'pemasukanQrisPending'])->name('tenant.mitra.dashboard.finance.pemasukan.qris.pending');
     Route::get('/dashboard/finance/saldo/invoice-transaksi-qris-today', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'pemasukanQrisToday'])->name('tenant.mitra.dashboard.finance.pemasukan.qris.today');

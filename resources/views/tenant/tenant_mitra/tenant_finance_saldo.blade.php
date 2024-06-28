@@ -27,8 +27,8 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qrisPending }}</span></h4>
-                                        <p class="text-muted mb-1 text-truncate">Saldo Transaksi</p>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($qrisPending)</span></h4>
+                                        <p class="text-muted mb-1 text-truncate">Saldo Settlement Qris</p>
                                         <a href="{{ route('tenant.mitra.dashboard.finance.pemasukan.qris.pending') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
@@ -47,7 +47,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qrisHariIni }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($qrisHariIni)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Saldo Transaksi Hari Ini</p>
                                         <a href="{{ route('tenant.mitra.dashboard.finance.pemasukan.qris.today') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
@@ -67,7 +67,7 @@
                                 </div>
                                 <div class="col-8">
                                     <div class="text-end">
-                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">{{ $qris->saldo }}</span></h4>
+                                        <h4 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($qris->saldo)</span></h4>
                                         <p class="text-muted mb-1 text-truncate">Saldo Qris Anda</p>
                                         <a href="{{ route('tenant.mitra.dashboard.finance.pemasukan.qris.all') }}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>

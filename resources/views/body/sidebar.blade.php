@@ -680,7 +680,7 @@
                                         <a href="{{ route('tenant.mitra.dashboard.finance.saldo') }}">Saldo Anda</a>
                                     </li>
                                     <li>
-                                        <a href="#">History Settlement Transaksi</a>
+                                        <a href="{{ route('tenant.mitra.dashboard.finance.settlement') }}">History Settlement Transaksi</a>
                                     </li>
                                     <li>
                                         <a href="{{ route('tenant.finance.history_penarikan') }}">History Penarikan Anda</a>

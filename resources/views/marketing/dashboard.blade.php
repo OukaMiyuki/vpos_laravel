@@ -76,7 +76,7 @@
                                     </div>
                                     <div class="col-7">
                                         <div class="text-end">
-                                            <h4 class="text-dark mt-1">RP.&nbsp;<span data-plugin="counterup">{{ $qrisWallet->saldo }}</span></h4>
+                                            <h4 class="text-dark mt-1">RP.&nbsp;<span data-plugin="counterup">@money($qrisWallet->saldo)</span></h4>
                                             <p class="text-muted mb-1 text-truncate">Saldo Anda</p>
                                             <a href="{{ route('marketing.finance.saldo') }}" class="btn btn-blue btn-sm ms-2">
                                                 <i class="mdi mdi-eye"></i>

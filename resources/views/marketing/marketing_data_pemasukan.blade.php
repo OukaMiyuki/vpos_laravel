@@ -116,7 +116,7 @@
                                                     <td>{{ $inv->invitationCode->holder }}</td>
                                                     <td>{{ $inv->name }}</td>
                                                     <td>{{ $inv->storeDetail->store_name }}</td>
-                                                    <td>{{ $withdrawal->detailWithdraw->biaya_mitra }}</td>
+                                                    <td>{{ $withdrawal->detailWithdraw->nominal }}</td>
                                                     <td>{{ \Carbon\Carbon::parse($withdrawal->tanggal_penarikan)->format('d-m-Y') }}</td>
                                                     <td>
                                                         @if ($withdrawal->status == 1)

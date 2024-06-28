@@ -83,10 +83,10 @@
                                             <th>No.</th>
                                             <th>Invitation Code</th>
                                             <th>Holder</th>
-                                            <th>Tanggal Dibuat</th>
-                                            <th>Redeemed</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Tanggal Dibuat</th>
+                                            <th class="text-center">Redeemed</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -96,16 +96,16 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $code->inv_code }}</td>
                                                 <td>{{ $code->holder }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($code->created_at)->format('d-m-Y') }}</td>
-                                                <td>{{ $code->tenant->count() }}</td>
-                                                <td>
+                                                <td class="text-center">{{ \Carbon\Carbon::parse($code->created_at)->format('d-m-Y') }}</td>
+                                                <td class="text-center">{{ $code->tenant->count() }}</td>
+                                                <td class="text-center">
                                                     @if($code->is_active == 1)
                                                         <span class="badge bg-soft-success text-success">Aktif</span>
                                                     @else
                                                         <span class="badge bg-soft-danger text-danger">Non Aktif</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="{{ route('marketing.dashboard.invitationcode.cashout.list', ['code' => $code->inv_code]) }}">
                                                         <button title="Lihat data penarikan" type="button" class="btn btn-info rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>&nbsp;
                                                     </a>

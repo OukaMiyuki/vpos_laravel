@@ -25,6 +25,7 @@ use App\Models\TenantQrisAccount;
 use App\Models\ApiKey;
 use App\Models\CallbackApiData;
 use App\Models\History;
+use App\Models\SettlementHstory;
 use File;
 use Mail;
 use Exception;
@@ -837,6 +838,36 @@ class TenantMitraController extends Controller {
                                     ->get();
 
         return view('tenant.tenant_mitra.tenant_finance_saldo', compact(['qris', 'qrisPending', 'qrisHariIni', 'invoiceQrisSukses']));
+    }
+
+    public function settlementMitra(){
+        $SettlementHstory = SettlementHstory::select([
+                                                    'settlement_hstories.id',
+                                                    'settlement_hstories.id_user',
+                                                    'settlement_hstories.id_settlement',
+                                                    'settlement_hstories.settlement_time_stamp',
+                                                    'settlement_hstories.nominal_settle',
+                                                    'settlement_hstories.status',
+                                                    'settlement_hstories.note',
+                                                ])
+                                                ->with([
+                                                    'settlement' => function($query){
+                                                        $query->select([
+                                                            'settlements.id',
+                                                            'settlements.nomor_settlement'
+                                                        ]);
+                                                    }
+                                                ])
+                                                ->where('id_user', auth()->user()->id)
+                                                ->where('email', auth()->user()->email)
+                                                ->where('nominal_settle', '!=', 0)
+                                                ->latest()
+                                                ->get();
+        return view('tenant.tenant_mitra.tenant_finance_settlement', compact('SettlementHstory'));
+    }
+
+    public function historyPenarikan(){
+        
     }
 
     public function pemasukanQrisPending(){
