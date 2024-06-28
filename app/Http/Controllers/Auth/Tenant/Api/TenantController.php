@@ -1061,7 +1061,7 @@ class TenantController extends Controller {
                                                     'content4',
                                                     'content5',
                                                 ])
-                                                ->distinct()
+                                                ->groupBy(['content1', 'content2', 'content3', 'content4', 'content5'])
                                                 ->where('store_identifier', $identifier)
                                                 ->when($alias1, function($query) use ($alias1){
                                                     $query->where('content1', 'LIKE', '%'.$alias1.'%');
