@@ -73,7 +73,6 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:200,1', 'custom
     Route::post('/update-rekening', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'rekeningupdate']);
 
     Route::post('/cek-saldo-qris', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'cekSaldoQris']);
-
     Route::post('/tarik-dana-qris', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'tarikDana']);
 
     Route::post('/transaction', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionList']);

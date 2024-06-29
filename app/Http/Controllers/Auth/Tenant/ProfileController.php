@@ -67,7 +67,7 @@ class ProfileController extends Controller{
         $user_email = auth()->user()->email;
         $ip = "125.164.244.223";
         $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
+        $getLoc = Location::get($PublicIP);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
@@ -78,7 +78,7 @@ class ProfileController extends Controller{
         ]);
 
         if(!is_null($history) || !empty($history)) {
-            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+            $history->createHistory($history, $action, $user_location, $PublicIP, $log, $status);
         }
     }
 
@@ -569,7 +569,7 @@ class ProfileController extends Controller{
         if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
             $ip = "36.84.106.3";
             $PublicIP = $this->get_client_ip();
-            $getLoc = Location::get($ip);
+            $getLoc = Location::get($PublicIP);
             $lat = $getLoc->latitude;
             $long = $getLoc->longitude;
             $rekClient = new GuzzleHttpClient();
@@ -636,7 +636,7 @@ class ProfileController extends Controller{
                 if(!is_null($swift_code) && !is_null($rekening)){
                     $ip = "36.84.106.3";
                     $PublicIP = $this->get_client_ip();
-                    $getLoc = Location::get($ip);
+                    $getLoc = Location::get($PublicIP);
                     $lat = $getLoc->latitude;
                     $long = $getLoc->longitude;
                     $rekClient = new GuzzleHttpClient();
@@ -730,7 +730,7 @@ class ProfileController extends Controller{
         if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != ""){
             $ip = "36.84.106.3";
             $PublicIP = $this->get_client_ip();
-            $getLoc = Location::get($ip);
+            $getLoc = Location::get($PublicIP);
             $lat = $getLoc->latitude;
             $long = $getLoc->longitude;
             $rekClient = new GuzzleHttpClient();
@@ -765,7 +765,7 @@ class ProfileController extends Controller{
         $client = new GuzzleHttpClient();
         $ip = "125.164.243.227";
         $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
+        $getLoc = Location::get($PublicIP);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         
@@ -855,7 +855,7 @@ class ProfileController extends Controller{
         $client = new GuzzleHttpClient();
         $ip = "125.164.243.227";
         $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
+        $getLoc = Location::get($PublicIP);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $transferFee = BiayaAdminTransferDana::get();
@@ -942,7 +942,7 @@ class ProfileController extends Controller{
                             'nominal' => $nominal_penarikan,
                             'biaya_admin' => $biayaAdmin,
                             'tanggal_masuk' => Carbon::now(),
-                            'deteksi_ip_address' => $ip,
+                            'deteksi_ip_address' => $PublicIP,
                             'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                             'status' => 1
                         ]);
@@ -1031,7 +1031,7 @@ class ProfileController extends Controller{
                             'nominal' => $nominal_penarikan,
                             'biaya_admin' => $biayaAdmin,
                             'tanggal_masuk' => Carbon::now(),
-                            'deteksi_ip_address' => $ip,
+                            'deteksi_ip_address' => $PublicIP,
                             'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                             'status' => 0
                         ]);
