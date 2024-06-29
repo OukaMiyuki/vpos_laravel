@@ -717,7 +717,7 @@ class KasirController extends Controller {
         }
     }
 
-    public function transactionListAlias(Request $request) : JsonResponse {
+    public function transactionListAliasSearch(Request $request) : JsonResponse {
         $alias1 = $request->alias1;
         $alias2 = $request->alias2;
         $alias3 = $request->alias3;

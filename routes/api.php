@@ -77,7 +77,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:200,1', 'custom
     Route::post('/tarik-dana-qris', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'tarikDana']);
 
     Route::post('/transaction', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionList']);
-    Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionListAlias']);
+    Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionListAliasSearch']);
     Route::get('/transaction/pending', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionPending']);
 
 
@@ -110,7 +110,7 @@ Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:200,1', 'custom.
     Route::post('/cart-invoice', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'listCartInvoice']);
     Route::get('/get-alias', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'getAlias']);
     Route::post('/transaction', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionList']);
-    Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionListAlias']);
+    Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionListAliasSearch']);
     Route::get('/transaction/pending', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionPending']);
     Route::post('/transaction/pending/cart/add', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionCartAdd']);
     Route::post('/transaction/pending/cart/delete', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionCartDelete']);

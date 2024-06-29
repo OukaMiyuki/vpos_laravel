@@ -1044,7 +1044,7 @@ class TenantController extends Controller {
         }
     }
 
-    public function transactionListAlias(Request $request) : JsonResponse {
+    public function transactionListAliasSearch(Request $request) : JsonResponse {
         $identifier = $this->getStoreIdentifier();
         $alias1 = $request->alias1;
         $alias2 = $request->alias2;
