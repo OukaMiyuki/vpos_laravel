@@ -1478,6 +1478,7 @@ class TenantController extends Controller {
                                     'withdrawals.nominal',
                                     'withdrawals.biaya_admin',
                                     'withdrawals.status',
+                                    'withdrawals.created_at',
                                 ])
                                 ->with([
                                     'rekening' => function($query){

@@ -252,6 +252,23 @@
                     </a>
                     <a href="
                         @auth('admin')
+                            #
+                        @endauth
+                        @auth('marketing')
+                            #
+                        @endauth
+                        @auth('tenant')
+                            #
+                        @endauth
+                        @auth('kasir')
+                            #
+                        @endauth
+                    " class="dropdown-item notify-item">
+                        <i class="mdi mdi-card-account-phone-outline"></i>
+                        <span>Change Phone Number</span>
+                    </a>
+                    <a href="
+                        @auth('admin')
                             {{ route('admin.setting') }}
                         @endauth
                         @auth('marketing')
