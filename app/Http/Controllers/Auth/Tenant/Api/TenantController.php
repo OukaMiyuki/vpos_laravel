@@ -1054,7 +1054,13 @@ class TenantController extends Controller {
         $id_user = $request->id_user;
         $invoiceAliasSearch = "";
         try {
-            $invoiceAliasSearch = InvoiceField::distinct()
+            $invoiceAliasSearch = InvoiceField::select([
+                                                    'content1',
+                                                    'content2',
+                                                    'content3',
+                                                    'content4',
+                                                    'content5',
+                                                ])
                                                 ->where('store_identifier', $identifier)
                                                 ->when($alias1, function($query) use ($alias1){
                                                     $query->where('content1', 'LIKE', '%'.$alias1.'%');
@@ -1071,6 +1077,13 @@ class TenantController extends Controller {
                                                 ->when($alias5, function($query) use ($alias5){
                                                     $query->where('content5', 'LIKE', '%'.$alias5.'%');
                                                 })
+                                                ->groupBy([
+                                                    'content1',
+                                                    'content2',
+                                                    'content3',
+                                                    'content4',
+                                                    'content5',
+                                                ])
                                                 ->latest()
                                                 ->get();
         } catch (Exception $e) {
