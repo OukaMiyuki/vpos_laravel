@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth\Tenant\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use App\Models\Admin;
 use App\Models\Marketing;
 use App\Models\Tenant;
@@ -1054,7 +1055,13 @@ class TenantController extends Controller {
         $id_user = $request->id_user;
         $invoiceAliasSearch = "";
         try {
-            $invoiceAliasSearch = InvoiceField::distinct()
+            $invoiceAliasSearch = InvoiceField::select([
+                                                    DB::raw('DISTINCT(content1)'),
+                                                    DB::raw('DISTINCT(content2)'),
+                                                    DB::raw('DISTINCT(content3)'),
+                                                    DB::raw('DISTINCT(content4)'),
+                                                    DB::raw('DISTINCT(content5)'),
+                                                ])
                                                 ->where('store_identifier', $identifier)
                                                 ->when($alias1, function($query) use ($alias1){
                                                     $query->where('content1', 'LIKE', '%'.$alias1.'%');
@@ -1072,13 +1079,7 @@ class TenantController extends Controller {
                                                     $query->where('content5', 'LIKE', '%'.$alias5.'%');
                                                 })
                                                 ->latest()
-                                                ->get([
-                                                    'content1',
-                                                    'content2',
-                                                    'content3',
-                                                    'content4',
-                                                    'content5',
-                                                ]);
+                                                ->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
