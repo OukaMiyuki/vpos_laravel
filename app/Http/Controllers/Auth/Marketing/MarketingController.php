@@ -227,7 +227,8 @@ class MarketingController extends Controller {
                                                     'withdrawals.id_user',
                                                     'withdrawals.email',
                                                     'withdrawals.tanggal_penarikan',
-                                                    'withdrawals.nominal'
+                                                    'withdrawals.nominal',
+                                                    'withdrawals.created_at',
                                                 ])
                                                 ->with([
                                                     'detailWithdraw' => function($query){

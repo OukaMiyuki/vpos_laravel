@@ -150,6 +150,7 @@ class AdminController extends Controller {
                                         'withdrawals.biaya_admin',
                                         'withdrawals.tanggal_masuk',
                                         'withdrawals.status',
+                                        'withdrawals.created_at',
                                     ])
                                     ->where('email', '!=' , auth()->user()->email)
                                      ->whereDate('tanggal_penarikan', Carbon::now())
