@@ -1117,6 +1117,114 @@ class TenantController extends Controller {
         }
     }
 
+    public function transactionListAliasSearchInvoice(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $alias1 = $request->alias1;
+        $alias2 = $request->alias2;
+        $alias3 = $request->alias3;
+        $alias4 = $request->alias4;
+        $alias5 = $request->alias5;
+        $id_user = $request->id_user;
+        $invoiceAliasSearch = "";
+        try {
+            $invoiceAliasSearch = Invoice::select([
+                                            'invoices.id',
+                                            'invoices.store_identifier',
+                                            'invoices.id_tenant',
+                                            'invoices.id_kasir',
+                                            'invoices.nomor_invoice',
+                                            'invoices.tanggal_transaksi',
+                                            'invoices.tanggal_pelunasan',
+                                            'invoices.jenis_pembayaran',
+                                            'invoices.qris_data',
+                                            'invoices.status_pembayaran',
+                                            'invoices.sub_total',
+                                            'invoices.pajak',
+                                            'invoices.diskon',
+                                            'invoices.kembalian',
+                                            'invoices.mdr',
+                                            'invoices.nominal_mdr',
+                                            'invoices.nominal_terima_bersih',
+                                            'invoices.settlement_status',
+                                            'invoices.created_at',
+                                            'invoices.updated_at',
+                                        ])
+                                        ->with([
+                                            'invoiceField' => function($query){
+                                                $query->select([
+                                                    'invoice_fields.id',
+                                                    'invoice_fields.id_invoice',
+                                                    'invoice_fields.id_kasir',
+                                                    'invoice_fields.store_identifier',
+                                                    'invoice_fields.content1',
+                                                    'invoice_fields.content2',
+                                                    'invoice_fields.content3',
+                                                    'invoice_fields.content4',
+                                                    'invoice_fields.content5',
+                                                ]);
+                                            }
+                                        ])
+                                        ->whereHas(
+                                            'invoiceField', function($query) use ($alias1, $alias2, $alias3, $alias4, $alias5,  $identifier){
+                                                $query->distinct('content1', 'content2', 'content3', 'content4', 'content5')
+                                                    ->where('store_identifier', $identifier)
+                                                    ->when($alias1, function($query) use ($alias1){
+                                                            $query->where('content1', 'LIKE', '%'.$alias1.'%');
+                                                    })
+                                                    ->when($alias2, function($query) use ($alias2){
+                                                            $query->where('content2', 'LIKE', '%'.$alias2.'%');
+                                                    })
+                                                    ->when($alias3, function($query) use ($alias3){
+                                                            $query->where('content3', 'LIKE', '%'.$alias3.'%');
+                                                    })
+                                                    ->when($alias4, function($query) use ($alias4){
+                                                            $query->where('content4', 'LIKE', '%'.$alias4.'%');
+                                                    })
+                                                    ->when($alias5, function($query) use ($alias5){
+                                                            $query->where('content5', 'LIKE', '%'.$alias5.'%');
+                                                    })
+                                                    ->groupBy([
+                                                        'content1',
+                                                        'content2',
+                                                        'content3',
+                                                        'content4',
+                                                        'content5',
+                                                    ]);
+                                            }
+                                        )
+                                        ->where('store_identifier', $identifier)
+                                        ->where('id_tenant', auth()->user()->id)
+                                        ->latest()
+                                        ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+
+        if($invoiceAliasSearch->count() == 0 || $invoiceAliasSearch == ""){
+            return response()->json([
+                'message' => 'Fetch Success',
+                'date-type' => 'Data transaksi tidak ditemukan',
+                'transaction-number' => $invoiceAliasSearch->count(),
+                'transaction-data' => $invoiceAliasSearch,
+                'status' => 200,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success Alias Found',
+                'transaction-number' => $invoiceAliasSearch->count(),
+                'transaction-data' => $invoiceAliasSearch,
+                'status' => 200,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+    }
+
     public function transactionPending() : JsonResponse {
         $identifier = $this->getStoreIdentifier();
         $invoice = "";
@@ -1389,6 +1497,9 @@ class TenantController extends Controller {
                 'tanggal_pelunasan' => Carbon::now(),
                 'jenis_pembayaran' => "Tunai",
                 'qris_data' => NULL,
+                'mdr' => 0,
+                'nominal_mdr' => 0,
+                'nominal_terima_bersih' => 0,
                 'status_pembayaran' => 1
             ]);
             $tunaiWallet = TunaiWallet::where('id_tenant', auth()->user()->id)

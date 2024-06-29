@@ -569,7 +569,7 @@ class AuthController extends Controller {
             $otp = (new Otp)->validate($generateId, $kode);
             if(!$otp->status){
                 return response()->json([
-                    'message' => 'OTP salah atau tidak sesuai! Nomor yang dimasukkan'.$hp,
+                    'message' => 'OTP salah atau tidak sesuai!',
                     'status' => 401,
                     'app-version' => $this->getAppversion()
                 ]);
