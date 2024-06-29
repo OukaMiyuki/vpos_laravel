@@ -726,17 +726,44 @@ class KasirController extends Controller {
         // $id_user = $request->id_user;
         $invoiceAliasSearch = "";
         try {
-           $invoiceAliasSearch = InvoiceField::distinct()
-                                            ->with(['invoice'])
-                                            ->where('store_identifier', auth()->user()->id_store)
-                                            ->where('id_kasir', auth()->user()->id)
-                                            ->where('content1', 'LIKE', '%'.$alias1.'%')
-                                            ->orWhere('content2', 'LIKE', '%'.$alias2.'%')
-                                            ->orWhere('content3', 'LIKE', '%'.$alias3.'%')
-                                            ->orWhere('content4', 'LIKE', '%'.$alias4.'%')
-                                            ->orWhere('content5', 'LIKE', '%'.$alias5.'%')
-                                            ->latest()
-                                            ->get();
+            $invoiceAliasSearch = InvoiceField::select([
+                                                        'content1',
+                                                        'content2',
+                                                        'content3',
+                                                        'content4',
+                                                        'content5',
+                                                    ])
+                                                    ->distinct()
+                                                    ->where('store_identifier', auth()->user()->id_store)
+                                                    ->where('id_kasir', auth()->user()->id)
+                                                    ->when($alias1, function($query) use ($alias1){
+                                                        $query->where('content1', 'LIKE', '%'.$alias1.'%');
+                                                    })
+                                                    ->when($alias2, function($query) use ($alias2){
+                                                        $query->where('content2', 'LIKE', '%'.$alias2.'%');
+                                                    })
+                                                    ->when($alias3, function($query) use ($alias3){
+                                                        $query->where('content3', 'LIKE', '%'.$alias3.'%');
+                                                    })
+                                                    ->when($alias4, function($query) use ($alias4){
+                                                        $query->where('content4', 'LIKE', '%'.$alias4.'%');
+                                                    })
+                                                    ->when($alias5, function($query) use ($alias5){
+                                                        $query->where('content5', 'LIKE', '%'.$alias5.'%');
+                                                    })
+                                                    ->latest()
+                                                    ->get();
+        //    $invoiceAliasSearch = InvoiceField::distinct()
+        //                                     ->with(['invoice'])
+        //                                     ->where('store_identifier', auth()->user()->id_store)
+        //                                     ->where('id_kasir', auth()->user()->id)
+        //                                     ->where('content1', 'LIKE', '%'.$alias1.'%')
+        //                                     ->orWhere('content2', 'LIKE', '%'.$alias2.'%')
+        //                                     ->orWhere('content3', 'LIKE', '%'.$alias3.'%')
+        //                                     ->orWhere('content4', 'LIKE', '%'.$alias4.'%')
+        //                                     ->orWhere('content5', 'LIKE', '%'.$alias5.'%')
+        //                                     ->latest()
+        //                                     ->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
