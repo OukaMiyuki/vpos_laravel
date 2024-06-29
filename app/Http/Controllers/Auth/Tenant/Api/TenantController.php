@@ -1479,6 +1479,17 @@ class TenantController extends Controller {
                                     'withdrawals.biaya_admin',
                                     'withdrawals.status',
                                 ])
+                                ->with([
+                                    'rekening' => function($query){
+                                        $query->select([
+                                            'rekening_withdraws.id',
+                                            'rekening_withdraws.id_penarikan',
+                                            'rekening_withdraws.atas_nama',
+                                            'rekening_withdraws.nama_bank',
+                                            'rekening_withdraws.no_rekening',
+                                        ]);
+                                    }
+                                ])
                                 ->where('id_user', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
                                 ->latest()
