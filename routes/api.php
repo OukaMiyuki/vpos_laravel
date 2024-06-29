@@ -78,6 +78,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:200,1', 'custom
 
     Route::post('/transaction', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionList']);
     Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionListAliasSearch']);
+    Route::post('/transaction-alias-testing', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionListAliasSearch']);
     Route::get('/transaction/pending', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionPending']);
 
 
