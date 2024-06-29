@@ -23,7 +23,7 @@
                 <div class="col-lg-6 col-xl-6">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{route('admin.phone.otp')}}" method="POST">
+                            <form action="{{route('admin.phone.update')}}" method="POST">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-12">
@@ -48,6 +48,32 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label for="password" class="form-label">Password</label>
+                                            <div class="input-group input-group-merge">
+                                                <input required type="password" name="password" id="password" class="form-control" placeholder="Masukkan password akun">
+                                                <div class="input-group-text" data-password="false">
+                                                    <span class="password-eye"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label for="otp" class="form-label">Kode OTP Whatsapp</label>
+                                            <div class="input-group input-group-merge">
+                                                <input required type="text" name="otp" id="otp" class="form-control" placeholder="Masukkan kode OTP Whatsapp">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Update Data</button>
                                 </div>
                             </form>
                         </div>

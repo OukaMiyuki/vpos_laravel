@@ -32,6 +32,7 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileInfoUpdate'])->name('admin.profile.info.update');
     Route::get('settings/phone-number', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'phoneNumber'])->name('admin.phone');
     Route::post('settings/phone-number', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'phoneNumberSendOTP'])->name('admin.phone.otp');
+    Route::post('settings/phone-number/update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'phoneNumberUpdate'])->name('admin.phone.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'password'])->name('admin.password');
     Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:90,1'])->name('admin.settings.whatsappotp');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'passwordUpdate'])->name('admin.password.update');

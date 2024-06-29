@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Admin;
+use App\Models\Marketing;
+use App\Models\Tenant;
+use App\Models\Kasir;
 use App\Models\DetailAdmin;
 use App\Models\Rekening;
 use App\Models\AgregateWallet;
@@ -282,7 +285,7 @@ class ProfileController extends Controller {
         $nohp = $request->no_wa;
         $hp = "";
         $postResponse = "";
-        $otp = (new Otp)->generate(auth()->user()->phone, 'numeric', 6, 5);
+        $otp = (new Otp)->generate($nohp, 'numeric', 6, 5);
         $body = "Berikut adalah kode OTP untuk mengubah nomor Whatsapp : "."*".$otp->token."*"."\n\n\n"."*Harap berhati-hati dan jangan membagikan kode OTP pada pihak manapun!, Admin dan Tim dari Visioner POS tidak akan pernah meminta OTP kepada User!*";
         if(!preg_match("/[^+0-9]/",trim($nohp))){
             if(substr(trim($nohp), 0, 2)=="62"){
@@ -358,6 +361,80 @@ class ProfileController extends Controller {
             }
         }
 
+    }
+
+    public function phoneNumberUpdate(Request $request){
+        DB::connection()->enableQueryLog();
+        $no_lama = auth()->user()->phone;
+        $password = $request->password;
+        $no_wa = $request->no_wa;
+        $kode = $request->otp;
+        $action = "";
+
+        try{
+            $otp = (new Otp)->validate($no_wa, $kode);
+            if(!$otp->status){
+                $notification = array(
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                if(!Hash::check($password, auth::user()->password)){
+                    $notification = array(
+                        'message' => 'Password salah!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+
+                $checkAdminNumber = Admin::select(['phone'])->where('phone', $no_wa)->first();
+                $checkMarketingNumber = Marketing::select(['phone'])->where('phone', $no_wa)->first();
+                $checkTenantNumber = Tenant::select(['phone'])->where('phone', $no_wa)->first();
+                $checkKasirNumber = Kasir::select(['phone'])->where('phone', $no_wa)->first();
+
+                if(!is_null($checkAdminNumber) || !is_null($checkMarketingNumber) || !is_null($checkTenantNumber) || !is_null($checkKasirNumber)){
+                    $notification = array(
+                        'message' => 'Nomor telah terdaftar di sistem kami, harap gunakan nomor lain!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                } else {
+                    if(auth()->user()->access_level == 0){
+                        $action = "Admin Super User : Change Phone Number Success";
+                    } else {
+                        $action = "Administrator : Change Phone Number Success";
+                    }
+                    $date = Carbon::now()->format('d-m-Y H:i:s');
+                    $body = "Nomor Whatsapp akun Visioner anda akan diganti ke nomor ".$no_wa." pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                    $this->sendNotificationToUser($body);
+                    Admin::whereId(auth()->user()->id)->update([
+                        'phone' => $no_wa,
+                    ]);
+                    $body = "Pergantian nomor akun Visioner ke nomor ".$no_wa." telah sukses dilakukan pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                    $this->sendNotificationToUser($body);
+                    $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                    $notification = array(
+                        'message' => 'Nomor Whatsapp berhasil diperbarui!',
+                        'alert-type' => 'success',
+                    );
+                    return redirect()->route('admin.profile')->with($notification);
+                }
+
+            }
+        } catch(Exception $e){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Change Phone Number Error";
+            } else {
+                $action = "Administrator : Change Phone Number Error";
+            }
+            $this->createHistoryUser($action, $e, 0);
+            $notification = array(
+                'message' => 'Nomor Whatsapp Error!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
     }
 
     public function whatsappNotification(){
