@@ -77,7 +77,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:200,1', 'custom
     Route::post('/tarik-dana-qris', [\App\Http\Controllers\Auth\Tenant\Api\AuthController::class, 'tarikDana']);
 
     Route::post('/transaction', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionList']);
-    Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionListAliasSearch']);
+    Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionListAliasSearchtes']);
     Route::get('/transaction/pending', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'transactionPending']);
 
 
