@@ -24,6 +24,9 @@ use App\Models\NobuWithdrawFeeHistory;
 use App\Models\BiayaAdminTransferDana;
 use App\Models\Withdrawal;
 use App\Models\RekeningWithdraw;
+use App\Models\Admin;
+use App\Models\Kasir;
+use App\Models\Tenant;
 use Exception;
 
 class ProfileController extends Controller {
@@ -68,12 +71,12 @@ class ProfileController extends Controller {
         }
     }
 
-    private function sendNotificationToUser($body){
+    private function sendNotificationToUser($body, $phone){
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
         $client = new GuzzleHttpClient();
         $postResponse = "";
-        $noHP = auth()->user()->phone;
+        $noHP = $phone;
         if(!preg_match("/[^+0-9]/",trim($noHP))){
             if(substr(trim($noHP), 0, 2)=="62"){
                 $hp    =trim($noHP);
@@ -227,6 +230,150 @@ class ProfileController extends Controller {
         }
     }
 
+    public function phoneNumber(){
+        return view('marketing.auth.marketing_phone_update');
+    }
+
+    public function phoneNumberSendOTP(Request $request){
+        DB::connection()->enableQueryLog();
+        $action = "";
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $nohp = $request->no_wa;
+        $hp = "";
+        $postResponse = "";
+        $otp = (new Otp)->generate($nohp, 'numeric', 6, 5);
+        $body = "Berikut adalah kode OTP untuk mengubah nomor Whatsapp : "."*".$otp->token."*"."\n\n\n"."*Harap berhati-hati dan jangan membagikan kode OTP pada pihak manapun!, Admin dan Tim dari Visioner POS tidak akan pernah meminta OTP kepada User!*";
+        if(!preg_match("/[^+0-9]/",trim($nohp))){
+            if(substr(trim($nohp), 0, 2)=="62"){
+                $hp    =trim($nohp);
+            }
+            else if(substr(trim($nohp), 0, 1)=="0"){
+                $hp    ="62".substr(trim($nohp), 1);
+            }
+        }
+        $url = 'https://waq.my.id/send-message';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            'api_key' => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            'message' => $body
+        ];
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            $action = "Mitra Aplikasi : Send Whatsapp OTP Change Number Fail";
+            $this->createHistoryUser($action, $ex, 0);
+            $notification = array(
+                'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+
+        if(is_null($postResponse) || empty($postResponse) || $postResponse == NULL || $postResponse == ""){
+            $action = "Mitra Aplikasi : Send Whatsapp OTP Change Number Fail";
+            $this->createHistoryUser(NULL, NULL, $action, "OTP Response NULL", 0);
+            $notification = array(
+                'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification)->withInput();
+        } else {
+            $responseCode = $postResponse->getStatusCode();
+            if($responseCode == 200){
+                $action = "Mitra Aplikasi : Send Whatsapp OTP Change Number Success";
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                $notification = array(
+                    'message' => 'OTP Sukses dikirim!',
+                    'alert-type' => 'success',
+                );
+                return view('marketing.auth.marketing_change_number_form', compact(['nohp']))->with($notification);
+            } else {
+                $action = "Mitra Aplikasi : Send Whatsapp OTP Change Number Fail | Status : ".$responseCode;
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+                $notification = array(
+                    'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            }
+        }
+    }
+
+    public function phoneNumberUpdate(Request $request){
+        DB::connection()->enableQueryLog();
+        $no_lama = auth()->user()->phone;
+        $password = $request->password;
+        $no_wa = $request->no_wa;
+        $kode = $request->otp;
+        $action = "";
+
+        try{
+            $otp = (new Otp)->validate($no_wa, $kode);
+            if(!$otp->status){
+                $notification = array(
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                if(!Hash::check($password, auth::user()->password)){
+                    $notification = array(
+                        'message' => 'Password salah!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+
+                $checkAdminNumber = Admin::select(['phone'])->where('phone', $no_wa)->first();
+                $checkMarketingNumber = Marketing::select(['phone'])->where('phone', $no_wa)->first();
+                $checkTenantNumber = Tenant::select(['phone'])->where('phone', $no_wa)->first();
+                $checkKasirNumber = Kasir::select(['phone'])->where('phone', $no_wa)->first();
+
+                if(!is_null($checkAdminNumber) || !is_null($checkMarketingNumber) || !is_null($checkTenantNumber) || !is_null($checkKasirNumber)){
+                    $notification = array(
+                        'message' => 'Nomor telah terdaftar di sistem kami, harap gunakan nomor lain!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                } else {
+                    $action = "Mitra Aplikasi : Change Phone Number Success";
+                    $date = Carbon::now()->format('d-m-Y H:i:s');
+                    $body = "Nomor Whatsapp akun Visioner anda akan diganti ke nomor ".$no_wa." pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                    $this->sendNotificationToUser($body, $no_lama);
+                    Marketing::whereId(auth()->user()->id)->update([
+                        'phone' => $no_wa,
+                    ]);
+                    $body = "Pergantian nomor akun Visioner ke nomor ".$no_wa." telah sukses dilakukan pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                    $this->sendNotificationToUser($body, $no_wa);
+                    $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                    $notification = array(
+                        'message' => 'Nomor Whatsapp berhasil diperbarui!',
+                        'alert-type' => 'success',
+                    );
+                    return redirect()->route('marketing.profile')->with($notification);
+                }
+
+            }
+        } catch(Exception $e){
+            $action = "Mitra Aplikasi : Change Phone Number Error";
+            $this->createHistoryUser($action, $e, 0);
+            $notification = array(
+                'message' => 'Nomor Whatsapp Error, harap hubungi admin!',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
+
     public function password(){
         return view('marketing.auth.password_update');
     }
@@ -263,7 +410,7 @@ class ProfileController extends Controller {
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                 $date = Carbon::now()->format('d-m-Y H:i:s');
                 $body = "Password anda telah diubah pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                $this->sendNotificationToUser($body);
+                $this->sendNotificationToUser($body, auth()->user()->phone);
                 $notification = array(
                     'message' => 'Password berhasil diperbarui!',
                     'alert-type' => 'success',
@@ -508,7 +655,7 @@ class ProfileController extends Controller {
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                             $date = Carbon::now()->format('d-m-Y H:i:s');
                             $body = "Rekening anda berhasil diupdate pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                            $this->sendNotificationToUser($body);
+                            $this->sendNotificationToUser($body, auth()->user()->phone);
                             $notification = array(
                                 'message' => 'Update nomor rekening berhasil!',
                                 'alert-type' => 'success',
@@ -799,7 +946,7 @@ class ProfileController extends Controller {
                             
                             $date = Carbon::now()->format('d-m-Y H:i:s');
                             $body = "Penarikan saldo sebesar Rp. ".$nominal_penarikan." sukses pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                            $this->sendNotificationToUser($body);
+                            $this->sendNotificationToUser($body, auth()->user()->phone);
                             
                             return $withDraw->id;
                         } else {
@@ -807,7 +954,7 @@ class ProfileController extends Controller {
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
                             $date = Carbon::now()->format('d-m-Y H:i:s');
                             $body = "Penarikan saldo sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                            $this->sendNotificationToUser($body);
+                            $this->sendNotificationToUser($body, auth()->user()->phone);
                             
                             return 0;
                         }
@@ -827,7 +974,7 @@ class ProfileController extends Controller {
                         $this->createHistoryUser($action, $responseMessage, 0);
                         $date = Carbon::now()->format('d-m-Y H:i:s');
                         $body = "Penarikan saldo sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                        $this->sendNotificationToUser($body);
+                        $this->sendNotificationToUser($body, auth()->user()->phone);
                         
                         return 0;
                     }
@@ -836,7 +983,7 @@ class ProfileController extends Controller {
                     $this->createHistoryUser($action, $e, 0);
                     $date = Carbon::now()->format('d-m-Y H:i:s');
                     $body = "Penarikan saldo sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                    $this->sendNotificationToUser($body);
+                    $this->sendNotificationToUser($body, auth()->user()->phone);
                     
                     return 0;
                 }
@@ -846,7 +993,7 @@ class ProfileController extends Controller {
             $this->createHistoryUser($action, $e, 0);
             $date = Carbon::now()->format('d-m-Y H:i:s');
             $body = "Penarikan saldo sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-            $this->sendNotificationToUser($body);
+            $this->sendNotificationToUser($body, auth()->user()->phone);
             
             return 0;
         }

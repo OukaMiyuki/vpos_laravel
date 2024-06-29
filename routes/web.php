@@ -176,6 +176,9 @@ Route::middleware(['auth:marketing', 'auth', 'marketingemailverified', 'throttle
     Route::get('settings', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'marketingSettings'])->name('marketing.settings');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profile'])->name('marketing.profile');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'profileInfoUpdate'])->name('marketing.profile.info.update');
+    Route::get('settings/phone-number', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'phoneNumber'])->name('marketing.phone');
+    Route::post('settings/phone-number', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'phoneNumberSendOTP'])->name('marketing.phone.otp');
+    Route::post('settings/phone-number/update', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'phoneNumberUpdate'])->name('marketing.phone.update');
     Route::get('settings/rekening', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'rekeningSetting'])->name('marketing.rekening.setting');
     Route::post('settings/rekening', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'rekeningSettingUpdate'])->name('marketing.rekening.setting.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Marketing\ProfileController::class, 'password'])->name('marketing.password');
@@ -234,6 +237,9 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
 
     Route::get('settings/profile', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profile'])->name('tenant.profile');
     Route::post('settings/profile/info_update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'profileInfoUpdate'])->name('tenant.profile.info.update');
+    Route::get('settings/phone-number', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'phoneNumber'])->name('tenant.phone');
+    Route::post('settings/phone-number', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'phoneNumberSendOTP'])->name('tenant.phone.otp');
+    Route::post('settings/phone-number/update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'phoneNumberUpdate'])->name('tenant.phone.update');
     Route::get('settings/password', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'password'])->name('tenant.password');
     Route::post('settings/password/update', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'passwordUpdate'])->name('tenant.password.update');
     Route::get('settings/rekening', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'rekeingSetting'])->name('tenant.rekening.setting');

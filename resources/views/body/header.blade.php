@@ -250,23 +250,24 @@
                         <i class="fe-lock"></i>
                         <span>Change Password</span>
                     </a>
-                    <a href="
-                        @auth('admin')
-                            {{route('admin.phone')}}
-                        @endauth
-                        @auth('marketing')
-                            #
-                        @endauth
-                        @auth('tenant')
-                            #
-                        @endauth
-                        @auth('kasir')
-                            #
-                        @endauth
-                    " class="dropdown-item notify-item">
-                        <i class="mdi mdi-card-account-phone-outline"></i>
-                        <span>Change Phone Number</span>
-                    </a>
+                    @auth('admin')
+                        <a href="{{route('admin.phone')}}" class="dropdown-item notify-item">
+                            <i class="mdi mdi-card-account-phone-outline"></i>
+                            <span>Change Phone Number</span>
+                        </a>
+                    @endauth
+                    @auth('marketing')
+                        <a href="{{route('marketing.phone')}}" class="dropdown-item notify-item">
+                            <i class="mdi mdi-card-account-phone-outline"></i>
+                            <span>Change Phone Number</span>
+                        </a>
+                    @endauth
+                    @auth('tenant')
+                        <a href="{{route('tenant.phone')}}" class="dropdown-item notify-item">
+                            <i class="mdi mdi-card-account-phone-outline"></i>
+                            <span>Change Phone Number</span>
+                        </a>
+                    @endauth
                     <a href="
                         @auth('admin')
                             {{ route('admin.setting') }}

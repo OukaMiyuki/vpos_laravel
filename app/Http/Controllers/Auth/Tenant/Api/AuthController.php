@@ -86,12 +86,12 @@ class AuthController extends Controller {
         }
     }
 
-    private function sendNotificationToUser($body){
+    private function sendNotificationToUser($body, $phone){
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
         $client = new GuzzleHttpClient();
         $postResponse = "";
-        $noHP = auth()->user()->phone;
+        $noHP = $phone;
         if(!preg_match("/[^+0-9]/",trim($noHP))){
             if(substr(trim($noHP), 0, 2)=="62"){
                 $hp    =trim($noHP);
@@ -289,9 +289,10 @@ class AuthController extends Controller {
             $sender  = getenv("WHATZAPP_PHONE_NUMBER");
             $client = new GuzzleHttpClient();
             $nohp = auth()->user()->phone;
+            $generateId = "API". $nohp;
             $hp = "";
             $postResponse = "";
-            $otp = (new Otp)->generate(auth()->user()->phone, 'numeric', 6, 5);
+            $otp = (new Otp)->generate($generateId, 'numeric', 6, 5);
             $body = "Berikut adalah kode OTP untuk akun Visioner POS anda : "."*".$otp->token."*"."\n\n\n"."*Harap berhati-hati dan jangan membagikan kode OTP pada pihak manapun!, Admin dan Tim dari Visioner POS tidak akan pernah meminta OTP kepada User!*";
             if(!preg_match("/[^+0-9]/",trim($nohp))){
                 if(substr(trim($nohp), 0, 2)=="62"){
@@ -364,7 +365,9 @@ class AuthController extends Controller {
             ]);
         } else {
             $kode = (int) $request->kode_otp;
-            $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+            $nohp = auth()->user()->phone;
+            $generateId = "API". $nohp;
+            $otp = (new Otp)->validate($generateId, $kode);
             if(!$otp->status){
                 return response()->json([
                     'message' => 'OTP salah atau tidak sesuai!',
@@ -473,6 +476,138 @@ class AuthController extends Controller {
         return response()->json(['message' => 'Update Success', 'status' => 200, 'app-version' => $this->getAppversion()]);
     }
 
+    public function sendOTPUpdateNumber(Request $request) : JsonResponse {
+        DB::connection()->enableQueryLog();
+        $action = "";
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $nohp = $request->no_wa_baru;
+        $generateId = "API".$nohp;
+        $hp = "";
+        $postResponse = "";
+        $otp = (new Otp)->generate($generateId, 'numeric', 6, 5);
+        $body = "Berikut adalah kode OTP untuk mengubah nomor Whatsapp : "."*".$otp->token."*"."\n\n\n"."*Harap berhati-hati dan jangan membagikan kode OTP pada pihak manapun!, Admin dan Tim dari Visioner POS tidak akan pernah meminta OTP kepada User!*";
+        if(!preg_match("/[^+0-9]/",trim($nohp))){
+            if(substr(trim($nohp), 0, 2)=="62"){
+                $hp    =trim($nohp);
+            }
+            else if(substr(trim($nohp), 0, 1)=="0"){
+                $hp    ="62".substr(trim($nohp), 1);
+            }
+        }
+        $url = 'https://waq.my.id/send-message';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            'api_key' => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            'message' => $body
+        ];
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            $action = "Tenant : Send Whatsapp OTP Change Number Fail";
+            $this->createHistoryUser($action, $ex, 0);
+            return response()->json([
+                'message' => 'Gagal mengirim OTP, pastikan nomor anda terdaftar di whatsapp atau hubungi admin!',
+                'status' => 500
+            ]);
+        }
+
+        if(is_null($postResponse) || empty($postResponse) || $postResponse == NULL || $postResponse == ""){
+            $action = "Tenant : Send Whatsapp OTP Change Number Fail";
+            $this->createHistoryUser(NULL, NULL, $action, "OTP Response NULL", 0);
+            return response()->json([
+                'message' => 'Gagal mengirim OTP, pastikan nomor anda terdaftar di whatsapp atau hubungi admin!',
+                'status' => 500
+            ]);
+        } else {
+            $responseCode = $postResponse->getStatusCode();
+            if($responseCode == 200){
+                $action = "Tenant : Send Whatsapp OTP Change Number Success";
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                return response()->json([
+                    'message' => 'OTP Sent!',
+                    'status' => 200
+                ]);
+            } else {
+                $action = "Tenant : Send Whatsapp OTP Change Number Fail | Status : ".$responseCode;
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+                return response()->json([
+                    'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif!',
+                    'API-Response' => $responseCode,
+                    'status' => 500
+                ]);
+            }
+        }
+    }
+
+    public function phoneNumberUpdate(Request $request) : JsonResponse {
+        $no_lama = auth()->user()->phone;
+        $kode = $request->otp;
+        $hp = $request->no_wa_baru;
+        $generateId = "API".$hp;
+        $password = $request->password;
+
+        try{
+            $otp = (new Otp)->validate($generateId, $kode);
+            if(!$otp->status){
+                return response()->json([
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'status' => 401
+                ]);
+            } else {
+                if(!Hash::check($password, auth::user()->password)){
+                    return response()->json([
+                        'message' => 'Pasword tidak sesuai!',
+                        'status' => 401
+                    ]);
+                }
+
+                $checkAdminNumber = Admin::select(['phone'])->where('phone', $hp)->first();
+                $checkMarketingNumber = Marketing::select(['phone'])->where('phone', $hp)->first();
+                $checkTenantNumber = Tenant::select(['phone'])->where('phone', $hp)->first();
+                $checkKasirNumber = Kasir::select(['phone'])->where('phone', $hp)->first();
+
+                if(!is_null($checkAdminNumber) || !is_null($checkMarketingNumber) || !is_null($checkTenantNumber) || !is_null($checkKasirNumber)){
+                    return response()->json([
+                        'message' => 'Nomor telah terdaftar di sistem kami, harap gunakan nomor lain!',
+                        'status' => 400
+                    ]);
+                } else {
+                    $action = "Tenant : Change Phone Number Success";
+                    $date = Carbon::now()->format('d-m-Y H:i:s');
+                    $body = "Nomor Whatsapp akun Visioner anda akan diganti ke nomor ".$hp." pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                    $this->sendNotificationToUser($body, $no_lama);
+                    Tenant::whereId(auth()->user()->id)->update([
+                        'phone' => $hp,
+                    ]);
+                    $body = "Pergantian nomor akun Visioner ke nomor ".$hp." telah sukses dilakukan pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                    $this->sendNotificationToUser($body, $hp);
+                    $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+
+                    return response()->json([
+                        'message' => 'Nomor anda telah sukses diupdate!',
+                        'status' => 200
+                    ]);
+                }
+            }
+        } catch(Exception $e){
+            $action = "Tenant : Change Phone Number Error";
+            $this->createHistoryUser($action, $e, 0);
+            return response()->json([
+                'message' => 'Update nomor gagal, harap hubungi admin!',
+                'status' => 400
+            ]);
+        }
+    }
+
     public function userUpdatePassword(Request $request) : JsonResponse {
         DB::connection()->enableQueryLog();
         $rules = [
@@ -515,7 +650,7 @@ class AuthController extends Controller {
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                 $date = Carbon::now()->format('d-m-Y H:i:s');
                 $body = "Password anda telah diubah pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                $this->sendNotificationToUser($body);
+                $this->sendNotificationToUser($body, auth()->user()->phone);
 
                 return response()->json([
                     'message' => 'Password berhasil diupdate!',
@@ -919,7 +1054,7 @@ class AuthController extends Controller {
                                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                                 $date = Carbon::now()->format('d-m-Y H:i:s');
                                 $body = "Penarikan dana Qris sebesar Rp. ".$nominal_tarik." melalui aplikasi android sukses pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                                $this->sendNotificationToUser($body);
+                                $this->sendNotificationToUser($body, auth()->user()->phone);
                                 return response()->json([
                                     'message' => 'Penarikan Berhasil!',
                                     'data-withdraw' => $withDraw,
@@ -932,7 +1067,7 @@ class AuthController extends Controller {
                                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
                                 $date = Carbon::now()->format('d-m-Y H:i:s');
                                 $body = "Penarikan dana Qris sebesar Rp. ".$nominal_tarik." melalui aplikasi android gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                                $this->sendNotificationToUser($body);
+                                $this->sendNotificationToUser($body, auth()->user()->phone);
                                 return response()->json([
                                     'message' => 'Transaction Error!',
                                     'status' => 500
@@ -954,7 +1089,7 @@ class AuthController extends Controller {
                             $this->createHistoryUser($action, $responseMessage, 0);
                             $date = Carbon::now()->format('d-m-Y H:i:s');
                             $body = "Penarikan dana Qris sebesar Rp. ".$nominal_tarik." melalui aplikasi android gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                            $this->sendNotificationToUser($body);
+                            $this->sendNotificationToUser($body, auth()->user()->phone);
                             return response()->json([
                                 'message' => 'Penarikan gagal, harap hubungi admin!',
                                 'status' => 500
@@ -965,7 +1100,7 @@ class AuthController extends Controller {
                         $this->createHistoryUser($action, $e, 0);
                         $date = Carbon::now()->format('d-m-Y H:i:s');
                         $body = "Penarikan dana Qris sebesar Rp. ".$nominal_tarik." melalui aplikasi android gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                        $this->sendNotificationToUser($body);
+                        $this->sendNotificationToUser($body, auth()->user()->phone);
                         return response()->json([
                             'message' => 'Penarikan gagal, harap hubungi admin!',
                             'error' => $e,

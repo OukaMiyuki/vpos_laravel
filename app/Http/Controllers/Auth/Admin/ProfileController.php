@@ -360,7 +360,6 @@ class ProfileController extends Controller {
                 return redirect()->back()->with($notification);
             }
         }
-
     }
 
     public function phoneNumberUpdate(Request $request){
