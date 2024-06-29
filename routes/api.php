@@ -112,6 +112,7 @@ Route::middleware(['auth:sanctum', 'abilities:kasir', 'throttle:200,1', 'custom.
     Route::get('/get-alias', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'getAlias']);
     Route::post('/transaction', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionList']);
     Route::post('/transaction-alias', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionListAliasSearch']);
+    Route::post('/transaction-alias/search-invoice', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionListAliasSearchInvoice']);
     Route::get('/transaction/pending', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionPending']);
     Route::post('/transaction/pending/cart/add', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionCartAdd']);
     Route::post('/transaction/pending/cart/delete', [\App\Http\Controllers\Auth\Kasir\Api\KasirController::class, 'transactionCartDelete']);
