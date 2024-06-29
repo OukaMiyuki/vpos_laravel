@@ -1072,7 +1072,13 @@ class TenantController extends Controller {
                                                     $query->where('content5', 'LIKE', '%'.$alias5.'%');
                                                 })
                                                 ->latest()
-                                                ->get();
+                                                ->get([
+                                                    'content1',
+                                                    'content2',
+                                                    'content3',
+                                                    'content4',
+                                                    'content5',
+                                                ]);
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Failed to fetch data!',
