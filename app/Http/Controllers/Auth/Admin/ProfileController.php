@@ -72,12 +72,12 @@ class ProfileController extends Controller {
         }
     }
 
-    private function sendNotificationToUser($body){
+    private function sendNotificationToUser($body, $phone){
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
         $client = new GuzzleHttpClient();
         $postResponse = "";
-        $noHP = auth()->user()->phone;
+        $noHP = $phone;
         if(!preg_match("/[^+0-9]/",trim($noHP))){
             if(substr(trim($noHP), 0, 2)=="62"){
                 $hp    =trim($noHP);
@@ -119,7 +119,7 @@ class ProfileController extends Controller {
             if($responseCode != 200){
                 $action = "Send Whatsapp Notification Fail";
                 $this->createHistoryUser($action, $ex, 0);
-            } 
+            }
         }
     }
 
@@ -255,7 +255,7 @@ class ProfileController extends Controller {
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                 $date = Carbon::now()->format('d-m-Y H:i:s');
                 $body = "Password anda telah diubah pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                $this->sendNotificationToUser($body);
+                $this->sendNotificationToUser($body, auth()->user()->phone);
                 $notification = array(
                     'message' => 'Password berhasil diperbarui!',
                     'alert-type' => 'success',
@@ -407,12 +407,12 @@ class ProfileController extends Controller {
                     }
                     $date = Carbon::now()->format('d-m-Y H:i:s');
                     $body = "Nomor Whatsapp akun Visioner anda akan diganti ke nomor ".$no_wa." pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                    $this->sendNotificationToUser($body);
+                    $this->sendNotificationToUser($body, $no_lama);
                     Admin::whereId(auth()->user()->id)->update([
                         'phone' => $no_wa,
                     ]);
                     $body = "Pergantian nomor akun Visioner ke nomor ".$no_wa." telah sukses dilakukan pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                    $this->sendNotificationToUser($body);
+                    $this->sendNotificationToUser($body, $no_wa);
                     $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                     $notification = array(
                         'message' => 'Nomor Whatsapp berhasil diperbarui!',
@@ -578,7 +578,7 @@ class ProfileController extends Controller {
                         ]);
                         $responseCode = $getRek->getStatusCode();
                         $dataRekening = json_decode($getRek->getBody());
-                        if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600"){    
+                        if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600"){
                             RekeningAdmin::create([
                                 'id_user' => auth()->user()->id,
                                 'email' => auth()->user()->email,
@@ -591,7 +591,7 @@ class ProfileController extends Controller {
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                             $date = Carbon::now()->format('d-m-Y H:i:s');
                             $body = "Anda telah sukses menambahkan rekening ". $request->nama_rekening." pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                            $this->sendNotificationToUser($body);
+                            $this->sendNotificationToUser($body, auth()->user()->phone);
                             $notification = array(
                                 'message' => 'Rekening berhasil ditambahkan!',
                                 'alert-type' => 'success',
@@ -651,7 +651,7 @@ class ProfileController extends Controller {
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $dataBankList = "";
-        
+
         $rekClient = new GuzzleHttpClient();
         $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
         try {
@@ -736,7 +736,7 @@ class ProfileController extends Controller {
                         ]);
                         $responseCode = $getRek->getStatusCode();
                         $dataRekening = json_decode($getRek->getBody());
-                        if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600"){    
+                        if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600"){
                             $rekening->update([
                                 'atas_nama' => $dataRekening->beneficiaryAccountName,
                                 'nama_bank' => $nama_bank,
@@ -746,7 +746,7 @@ class ProfileController extends Controller {
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                             $date = Carbon::now()->format('d-m-Y H:i:s');
                             $body = "Rekening untuk ".$nama_rekening." telah diupdate pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                            $this->sendNotificationToUser($body);
+                            $this->sendNotificationToUser($body, auth()->user()->phone);
                             $notification = array(
                                 'message' => 'Update nomor rekening berhasil!',
                                 'alert-type' => 'success',
@@ -862,7 +862,7 @@ class ProfileController extends Controller {
                         );
                         return redirect()->back()->with($notification);
                     }
-                    
+
                     $totalPenarikan = $nominal_tarik+$biayaTransfer;
                     $rekClient = new GuzzleHttpClient();
                     $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
@@ -1001,7 +1001,7 @@ class ProfileController extends Controller {
                             'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                             'status' => 1
                         ]);
- 
+
                         if(!is_null($withDraw) || !empty($withDraw)){
                             RekeningWithdraw::create([
                                 'id_penarikan' => $withDraw->id,
@@ -1053,11 +1053,11 @@ class ProfileController extends Controller {
                             $action = "Admin Super User : Withdraw Success";
 
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
-                            
+
                             $date = Carbon::now()->format('d-m-Y H:i:s');
                             $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." berhasil pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                            $this->sendNotificationToUser($body);
-                            
+                            $this->sendNotificationToUser($body, auth()->user()->phone);
+
                             $notification = array(
                                 'message' => 'Penarikan dana sukses!',
                                 'alert-type' => 'success',
@@ -1076,7 +1076,7 @@ class ProfileController extends Controller {
                             );
                             $date = Carbon::now()->format('d-m-Y H:i:s');
                             $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                            $this->sendNotificationToUser($body);
+                            $this->sendNotificationToUser($body, auth()->user()->phone);
                             return redirect()->route('admin.withdraw')->with($notification);
                         }
                     } else {
@@ -1091,7 +1091,7 @@ class ProfileController extends Controller {
                             'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                             'status' => 0
                         ]);
-                       
+
                         if(auth()->user()->access_level == 0){
                             $action = "Admin Super User : Withdrawal Transaction fail invalid";
                         } else {
@@ -1100,7 +1100,7 @@ class ProfileController extends Controller {
                         $this->createHistoryUser($action, $responseMessage, 0);
                         $date = Carbon::now()->format('d-m-Y H:i:s');
                         $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                        $this->sendNotificationToUser($body);
+                        $this->sendNotificationToUser($body, auth()->user()->phone);
                         $notification = array(
                             'message' => 'Penarikan dana gagal!',
                             'alert-type' => 'error',
@@ -1116,7 +1116,7 @@ class ProfileController extends Controller {
                     $this->createHistoryUser($action, $e, 0);
                     $date = Carbon::now()->format('d-m-Y H:i:s');
                     $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-                    $this->sendNotificationToUser($body);
+                    $this->sendNotificationToUser($body, auth()->user()->phone);
                     $notification = array(
                         'message' => 'Penarikan dana gagal!',
                         'alert-type' => 'error',
@@ -1133,7 +1133,7 @@ class ProfileController extends Controller {
             $this->createHistoryUser($action, $e, 0);
             $date = Carbon::now()->format('d-m-Y H:i:s');
             $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." gagal pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
-            $this->sendNotificationToUser($body);
+            $this->sendNotificationToUser($body, auth()->user()->phone);
             $notification = array(
                 'message' => 'Penarikan dana gagal!',
                 'alert-type' => 'error',
