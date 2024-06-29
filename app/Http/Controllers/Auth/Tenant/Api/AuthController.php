@@ -243,6 +243,7 @@ class AuthController extends Controller {
                 'message' => 'Failed to send Email!',
                 'error-message' => $e->getMessage(),
                 'status' => 500,
+                'app-version' => $this->getAppversion()
             ]);
             exit;
         }
@@ -258,7 +259,8 @@ class AuthController extends Controller {
         if(!empty(auth()->user()->email_verified_at) || !is_null(auth()->user()->email_verified_at) || auth()->user()->email_verified_at != NULL || auth()->user()->email_verified_at != "") {
             return response()->json([
                 'message' => 'Your Email has been verified!',
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             $kode = (int) $request->kode_otp;
@@ -266,7 +268,8 @@ class AuthController extends Controller {
             if(!$otp->status){
                 return response()->json([
                     'message' => 'OTP salah atau tidak sesuai!',
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 $user = Tenant::where('email', auth()->user()->email)->first();
@@ -371,7 +374,8 @@ class AuthController extends Controller {
             if(!$otp->status){
                 return response()->json([
                     'message' => 'OTP salah atau tidak sesuai!',
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 $user = Tenant::find(auth()->user()->id);
@@ -441,6 +445,7 @@ class AuthController extends Controller {
                 'message' => 'Failed to fetch data!',
                 'error-message' => $e->getMessage(),
                 'status' => 500,
+                'app-version' => $this->getAppversion()
             ]);
             exit;
         }
@@ -470,6 +475,7 @@ class AuthController extends Controller {
                 'message' => 'Failed to fetch data!',
                 'error-message' => $e->getMessage(),
                 'status' => 500,
+                'app-version' => $this->getAppversion()
             ]);
             exit;
         }
@@ -516,7 +522,8 @@ class AuthController extends Controller {
             $this->createHistoryUser($action, $ex, 0);
             return response()->json([
                 'message' => 'Gagal mengirim OTP, pastikan nomor anda terdaftar di whatsapp atau hubungi admin!',
-                'status' => 500
+                'status' => 500,
+                'app-version' => $this->getAppversion()
             ]);
         }
 
@@ -525,7 +532,8 @@ class AuthController extends Controller {
             $this->createHistoryUser(NULL, NULL, $action, "OTP Response NULL", 0);
             return response()->json([
                 'message' => 'Gagal mengirim OTP, pastikan nomor anda terdaftar di whatsapp atau hubungi admin!',
-                'status' => 500
+                'status' => 500,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             $responseCode = $postResponse->getStatusCode();
@@ -534,7 +542,8 @@ class AuthController extends Controller {
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                 return response()->json([
                     'message' => 'OTP Sent!',
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 $action = "Tenant : Send Whatsapp OTP Change Number Fail | Status : ".$responseCode;
@@ -542,7 +551,8 @@ class AuthController extends Controller {
                 return response()->json([
                     'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif!',
                     'API-Response' => $responseCode,
-                    'status' => 500
+                    'status' => 500,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         }
@@ -560,13 +570,15 @@ class AuthController extends Controller {
             if(!$otp->status){
                 return response()->json([
                     'message' => 'OTP salah atau tidak sesuai!',
-                    'status' => 401
+                    'status' => 401,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 if(!Hash::check($password, auth::user()->password)){
                     return response()->json([
                         'message' => 'Pasword tidak sesuai!',
-                        'status' => 401
+                        'status' => 401,
+                        'app-version' => $this->getAppversion()
                     ]);
                 }
 
@@ -594,7 +606,8 @@ class AuthController extends Controller {
 
                     return response()->json([
                         'message' => 'Nomor anda telah sukses diupdate!',
-                        'status' => 200
+                        'status' => 200,
+                        'app-version' => $this->getAppversion()
                     ]);
                 }
             }
@@ -603,7 +616,8 @@ class AuthController extends Controller {
             $this->createHistoryUser($action, $e, 0);
             return response()->json([
                 'message' => 'Update nomor gagal, harap hubungi admin!',
-                'status' => 400
+                'status' => 400,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -632,13 +646,15 @@ class AuthController extends Controller {
             if(!$otp->status){
                 return response()->json([
                     'message' => 'OTP salah atau tidak sesuai!',
-                    'status' => 401
+                    'status' => 401,
+                    'app-version' => $this->getAppversion()
                 ]);
             } else {
                 if(!Hash::check($old_password, auth::user()->password)){
                     return response()->json([
                         'message' => 'Password lama tidak sesuai!',
-                        'status' => 401
+                        'status' => 401,
+                        'app-version' => $this->getAppversion()
                     ]);
                 }
 
@@ -654,7 +670,8 @@ class AuthController extends Controller {
 
                 return response()->json([
                     'message' => 'Password berhasil diupdate!',
-                    'status' => 200
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         }
@@ -680,6 +697,7 @@ class AuthController extends Controller {
                 'message' => 'Failed to fetch data!',
                 'error-message' => $e->getMessage(),
                 'status' => 500,
+                'app-version' => $this->getAppversion()
             ]);
             exit;
         }
@@ -701,6 +719,7 @@ class AuthController extends Controller {
                 'message' => 'Failed to fetch data!',
                 'error-message' => $e->getMessage(),
                 'status' => 500,
+                'app-version' => $this->getAppversion()
             ]);
             exit;
         }
@@ -747,7 +766,8 @@ class AuthController extends Controller {
                         'rekening-status' => 'Akun Bank Tidak Terdeteksi, Harap cek kembali nomor rekening dan nama bank yang anda inputkan',
                         'data-bank' => $dataRekening,
                         'data-rekening' => $rek,
-                        'status' => 404
+                        'status' => 404,
+                        'app-version' => $this->getAppversion()
                     ]);
                 }
             } else {
@@ -833,7 +853,8 @@ class AuthController extends Controller {
         if(is_null($rekeningAkun) || empty($rekeningAkun)){
             return response()->json([
                 'message' => 'Data not found!',
-                'status' => 404
+                'status' => 404,
+                'app-version' => $this->getAppversion()
             ]);
         }
 
@@ -876,7 +897,8 @@ class AuthController extends Controller {
                     'rekening-status' => 'Akun Bank Tidak Terdeteksi, Harap cek kembali nomor rekening dan nama bank yang anda inputkan',
                     'data-bank' => $dataRekening,
                     'data-rekening' => $rekeningAkun,
-                    'status' => 404
+                    'status' => 404,
+                    'app-version' => $this->getAppversion()
                 ]);
             }
         } catch (Exception $e) {
@@ -885,7 +907,8 @@ class AuthController extends Controller {
                 'rekening-status' => 'Akun Bank Tidak Terdeteksi, Harap cek kembali nomor rekening dan nama bank yang anda inputkan',
                 'data-bank' => $dataRekening,
                 'data-rekening' => $rekeningAkun,
-                'status' => 404
+                'status' => 404,
+                'app-version' => $this->getAppversion()
             ]);
         }
     }
@@ -938,7 +961,8 @@ class AuthController extends Controller {
         if($saldo_tenant == 0){
             return response()->json([
                 'message' => 'Saldo anda kosong!',
-                'status' => 200
+                'status' => 200,
+                'app-version' => $this->getAppversion()
             ]);
         } else {
             if($nominal_tarik<10000){
@@ -950,7 +974,8 @@ class AuthController extends Controller {
                 if($qrisWallet->saldo<$total_tarik){
                     return response()->json([
                         'message' => 'Saldo anda tidak mencukupi!',
-                        'status' => 200
+                        'status' => 200,
+                        'app-version' => $this->getAppversion()
                     ]);
                 } else {
                     $rekening = Rekening::select(['swift_code', 'no_rekening', 'nama_bank', 'atas_nama', 'id'])
@@ -1092,7 +1117,8 @@ class AuthController extends Controller {
                             $this->sendNotificationToUser($body, auth()->user()->phone);
                             return response()->json([
                                 'message' => 'Penarikan gagal, harap hubungi admin!',
-                                'status' => 500
+                                'status' => 500,
+                                'app-version' => $this->getAppversion()
                             ]);
                         }
                     } catch(Exception $e){
@@ -1104,7 +1130,8 @@ class AuthController extends Controller {
                         return response()->json([
                             'message' => 'Penarikan gagal, harap hubungi admin!',
                             'error' => $e,
-                            'status' => 500
+                            'status' => 500,
+                            'app-version' => $this->getAppversion()
                         ]);
                     }
                 }
