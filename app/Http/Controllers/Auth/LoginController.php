@@ -52,7 +52,7 @@ class LoginController extends Controller {
 
     private function createHistoryUser($user_id,  $user_email, $action, $log, $status){
         $ip = "125.164.244.223";
-        $clientIP = request()->ip();
+        $clientIP = request()->header('X-Forwarded-For');
         $PublicIP = $this->get_client_ip();
         $getLoc = Location::get($PublicIP);
         $lat = $getLoc->latitude;
