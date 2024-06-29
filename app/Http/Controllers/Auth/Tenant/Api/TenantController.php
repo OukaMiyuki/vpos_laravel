@@ -1185,7 +1185,6 @@ class TenantController extends Controller {
                                             }
                                         )
                                         ->where('store_identifier', $identifier)
-                                        ->where('id_tenant', auth()->user()->id)
                                         ->latest()
                                         ->get();
         } catch (Exception $e) {
