@@ -269,6 +269,97 @@ class ProfileController extends Controller {
         }
     }
 
+    public function phoneNumber(){
+        return view('admin.auth.admin_phone_update');
+    }
+
+    public function phoneNumberSendOTP(Request $request){
+        DB::connection()->enableQueryLog();
+        $action = "";
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $nohp = $request->no_wa;
+        $hp = "";
+        $postResponse = "";
+        $otp = (new Otp)->generate(auth()->user()->phone, 'numeric', 6, 5);
+        $body = "Berikut adalah kode OTP untuk mengubah nomor Whatsapp : "."*".$otp->token."*"."\n\n\n"."*Harap berhati-hati dan jangan membagikan kode OTP pada pihak manapun!, Admin dan Tim dari Visioner POS tidak akan pernah meminta OTP kepada User!*";
+        if(!preg_match("/[^+0-9]/",trim($nohp))){
+            if(substr(trim($nohp), 0, 2)=="62"){
+                $hp    =trim($nohp);
+            }
+            else if(substr(trim($nohp), 0, 1)=="0"){
+                $hp    ="62".substr(trim($nohp), 1);
+            }
+        }
+        $url = 'https://waq.my.id/send-message';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            'api_key' => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            'message' => $body
+        ];
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            if(auth()->user()->access_level == 0){
+                $action = "Admin Super User : Send Whatsapp OTP Change Number Fail";
+            } else {
+                $action = "Administrator : Send Whatsapp OTP Change Number Fail";
+            }
+            $this->createHistoryUser($action, $ex, 0);
+            $notification = array(
+                'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
+
+        if(is_null($postResponse) || empty($postResponse) || $postResponse == NULL || $postResponse == ""){
+            $action = "Admin User Send Whatsapp OTP Change Number Fail";
+            $this->createHistoryUser(NULL, NULL, $action, "OTP Response NULL", 0);
+            $notification = array(
+                'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification)->withInput();
+        } else {
+            $responseCode = $postResponse->getStatusCode();
+            if($responseCode == 200){
+                if(auth()->user()->access_level == 0){
+                    $action = "Admin Super User : Send Whatsapp OTP Change Number Success";
+                } else {
+                    $action = "Administrator : Send Whatsapp OTP Change Number Success";
+                }
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                $notification = array(
+                    'message' => 'OTP Sukses dikirim!',
+                    'alert-type' => 'success',
+                );
+                return view('admin.auth.admin_change_number_form', compact(['nohp']))->with($notification);
+            } else {
+                if(auth()->user()->access_level == 0){
+                    $action = "Admin Super User : Send Whatsapp OTP Change Number Fail | Status : ".$responseCode;
+                } else {
+                    $action = "Administrator : Send Whatsapp OTP Change Number Fail | Status : ".$responseCode;
+                }
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 0);
+                $notification = array(
+                    'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            }
+        }
+
+    }
+
     public function whatsappNotification(){
         DB::connection()->enableQueryLog();
         $action = "";

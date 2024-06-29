@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 use App\Models\NobuWithdrawFeeHistory;
 use App\Models\DetailPenarikan;
 use App\Models\Tenant;
@@ -48,6 +49,10 @@ class Withdrawal extends Model {
 
     public function rekAdmin(){
         return $this->belongsTo(RekeningAdmin::class, 'id_rekening', 'id');
+    }
+
+    public function getCreatedAtAttribute() {
+        return Carbon::parse($this->attributes['created_at'])->format('d-m-Y H:i:s');
     }
 
     public static function boot(){

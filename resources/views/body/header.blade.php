@@ -252,7 +252,7 @@
                     </a>
                     <a href="
                         @auth('admin')
-                            #
+                            {{route('admin.phone')}}
                         @endauth
                         @auth('marketing')
                             #
