@@ -641,8 +641,10 @@ class AuthController extends Controller {
             $password = $request->password;
             $old_password = $request->old_password;
             $kode = $request->otp;
+            $phone = auth()->user()->phone;
+            $generateId = "API".$phone;
 
-            $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+            $otp = (new Otp)->validate($generateId, $kode);
             if(!$otp->status){
                 return response()->json([
                     'message' => 'OTP salah atau tidak sesuai!',
