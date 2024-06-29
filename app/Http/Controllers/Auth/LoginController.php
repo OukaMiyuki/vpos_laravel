@@ -54,7 +54,7 @@ class LoginController extends Controller {
         $ip = "125.164.244.223";
         $clientIP = request()->ip();
         $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($clientIP);
+        $getLoc = Location::get($PublicIP);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
