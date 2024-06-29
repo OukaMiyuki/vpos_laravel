@@ -52,8 +52,9 @@ class LoginController extends Controller {
 
     private function createHistoryUser($user_id,  $user_email, $action, $log, $status){
         $ip = "125.164.244.223";
+        $clientIP = request()->ip();
         $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($PublicIP);
+        $getLoc = Location::get($clientIP);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
@@ -64,7 +65,7 @@ class LoginController extends Controller {
         ]);
 
         if(!is_null($history) || !empty($history)) {
-            $history->createHistory($history, $action, $user_location, $PublicIP, $log, $status);
+            $history->createHistory($history, $action, $user_location, $clientIP, $log, $status);
         }
     }
 
