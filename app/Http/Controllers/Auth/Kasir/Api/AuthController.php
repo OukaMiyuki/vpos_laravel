@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Stevebauman\Location\Facades\Location;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Kasir;
 use App\Models\AppVersion;
+use App\Models\History;
 use Illuminate\Http\JsonResponse;
 use Exception;
 // use App\Models\Admin;
@@ -19,6 +22,47 @@ class AuthController extends Controller {
     private function getAppversion(){
         $appVersion = AppVersion::find(1);
         return $appVersion->versi;
+    }
+
+    private function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($ip);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+        }
     }
 
     public function login(Request $request) {
@@ -108,6 +152,44 @@ class AuthController extends Controller {
             'status' => 200,
             'app-version' => $this->getAppversion()
         ]);
+    }
+
+    public function userUpdatePassword(Request $request){
+        DB::connection()->enableQueryLog();
+        $rules = [
+            'password' => 'required|confirmed|min:8',
+            'old_password' => 'required|min:8'
+        ];
+    
+        $customMessages = [
+            'required' => 'Inputan tidak boleh kosong!',
+            'confirmed' => 'Konfimasi password tidak sesuai'
+        ];
+    
+        $validator = $this->validate($request, $rules, $customMessages);
+
+        if($validator){
+            $password = $request->password;
+            $old_password = $request->old_password;
+            if(!Hash::check($old_password, auth::user()->password)){
+                return response()->json([
+                    'message' => 'Password lama tidak sesuai!',
+                    'status' => 401
+                ]);
+            }
+
+            Kasir::whereId(auth()->user()->id)->update([
+                'password' => Hash::make($password),
+            ]);
+
+            $action = "Kasir : Update Password | Using Application";
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+
+            return response()->json([
+                'message' => 'Password berhasil diupdate!',
+                'status' => 200
+            ]);
+        }
     }
 
     public function logout() {

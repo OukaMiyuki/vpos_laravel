@@ -474,26 +474,54 @@ class AuthController extends Controller {
     }
 
     public function userUpdatePassword(Request $request) : JsonResponse {
+        DB::connection()->enableQueryLog();
         $rules = [
             'otp' => 'required|numeric',
             'password' => 'required|confirmed|min:8',
+            'old_password' => 'required|min:8'
         ];
     
         $customMessages = [
             'required' => 'Inputan tidak boleh kosong!',
-            'confirmed' => 'Konformasi password tidak sesuai'
+            'confirmed' => 'Konfirmasi password tidak sesuai'
         ];
     
         $validator = $this->validate($request, $rules, $customMessages);
 
         if($validator){
             $password = $request->password;
-            $otp = $request->password;
-            return response()->json([
-                'message' => 'Walla bener!',
-                'validation' => $validator,
-                'status' => 200
-            ]);
+            $old_password = $request->old_password;
+            $kode = $request->otp;
+
+            $otp = (new Otp)->validate(auth()->user()->phone, $kode);
+            if(!$otp->status){
+                return response()->json([
+                    'message' => 'OTP salah atau tidak sesuai!',
+                    'status' => 401
+                ]);
+            } else {
+                if(!Hash::check($old_password, auth::user()->password)){
+                    return response()->json([
+                        'message' => 'Password lama tidak sesuai!',
+                        'status' => 401
+                    ]);
+                }
+
+                Tenant::whereId(auth()->user()->id)->update([
+                    'password' => Hash::make($password),
+                ]);
+
+                $action = "Tenant : Update Password | Using Application";
+                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                $date = Carbon::now()->format('d-m-Y H:i:s');
+                $body = "Password anda telah diubah pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                $this->sendNotificationToUser($body);
+
+                return response()->json([
+                    'message' => 'Password berhasil diupdate!',
+                    'status' => 200
+                ]);
+            }
         }
     }
 
