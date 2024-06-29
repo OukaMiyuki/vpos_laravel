@@ -1164,26 +1164,26 @@ class TenantController extends Controller {
                                                 ]);
                                             }
                                         ])
-                                        ->whereHas(
-                                            'invoiceField', function($query) use ($alias1, $alias2, $alias3, $alias4, $alias5,  $identifier){
-                                                $query->where('store_identifier', $identifier)
-                                                        ->when($alias1, function($query) use ($alias1){
-                                                                $query->where('content1', 'LIKE', '%'.$alias1.'%');
-                                                        })
-                                                        ->when($alias2, function($query) use ($alias2){
-                                                                $query->where('content2', 'LIKE', '%'.$alias2.'%');
-                                                        })
-                                                        ->when($alias3, function($query) use ($alias3){
-                                                                $query->where('content3', 'LIKE', '%'.$alias3.'%');
-                                                        })
-                                                        ->when($alias4, function($query) use ($alias4){
-                                                                $query->where('content4', 'LIKE', '%'.$alias4.'%');
-                                                        })
-                                                        ->when($alias5, function($query) use ($alias5){
-                                                                $query->where('content5', 'LIKE', '%'.$alias5.'%');
-                                                        });
-                                            }
-                                        )
+                                        // ->whereHas(
+                                        //     'invoiceField', function($query) use ($alias1, $alias2, $alias3, $alias4, $alias5,  $identifier){
+                                        //         $query->where('store_identifier', $identifier)
+                                        //                 ->when($alias1, function($query) use ($alias1){
+                                        //                         $query->where('content1', 'LIKE', '%'.$alias1.'%');
+                                        //                 })
+                                        //                 ->when($alias2, function($query) use ($alias2){
+                                        //                         $query->where('content2', 'LIKE', '%'.$alias2.'%');
+                                        //                 })
+                                        //                 ->when($alias3, function($query) use ($alias3){
+                                        //                         $query->where('content3', 'LIKE', '%'.$alias3.'%');
+                                        //                 })
+                                        //                 ->when($alias4, function($query) use ($alias4){
+                                        //                         $query->where('content4', 'LIKE', '%'.$alias4.'%');
+                                        //                 })
+                                        //                 ->when($alias5, function($query) use ($alias5){
+                                        //                         $query->where('content5', 'LIKE', '%'.$alias5.'%');
+                                        //                 });
+                                        //     }
+                                        // )
                                         ->where('store_identifier', $identifier)
                                         ->latest()
                                         ->get();
