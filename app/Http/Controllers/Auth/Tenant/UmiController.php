@@ -137,8 +137,9 @@ class UmiController extends Controller {
             $filename = 'Formulir Pendaftaran NOBU QRIS (NMID) PT BRAHMA ESATAMA_'.$nama_usaha.'_'.date('dmYHis').'.xlsx';
             $fileSave = $userDocsPath.'/'.$filename;
             try {
-                File::copy($templatePath, $fileSave);
-                //$spreadsheet = IOFactory::load($fileSave);
+                // File::copy($templatePath, $fileSave);
+                Storage::copy($templatePath, $fileSave);
+                $spreadsheet = IOFactory::load($fileSave);
                 // $sheet = $spreadsheet->getActiveSheet();
                 // $sheet1 = $spreadsheet->getSheet(0);
                 // $sheet1->mergeCells('E6:F6');
@@ -194,38 +195,38 @@ class UmiController extends Controller {
                 // $newFilePath = $fileSave;
                 // $writer = new Xlsx($spreadsheet);
                 // $writer->save($newFilePath);
-                UmiRequest::create([
-                    'id_tenant' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'store_identifier' => $store_identifier,
-                    'tanggal_pengajuan' => Carbon::now(),
-                    'file_path' => $filename,
-                ]);
+                // UmiRequest::create([
+                //     'id_tenant' => auth()->user()->id,
+                //     'email' => auth()->user()->email,
+                //     'store_identifier' => $store_identifier,
+                //     'tanggal_pengajuan' => Carbon::now(),
+                //     'file_path' => $filename,
+                // ]);
 
-                $mailData = [
-                    'title' => 'Formulir Pendaftaran UMI',
-                    'body' => 'This is for testing email using smtp.',
-                    'file' => $fileSave,
-                    'storeName' => $nama_usaha,
-                    'jenisUsaha' => $jenis_usaha,
-                    'alamat' => $alamat,
-                    'kabupaten' => $kab_kota,
-                    'kodePos' => $kode_pos
-                ];
+                // $mailData = [
+                //     'title' => 'Formulir Pendaftaran UMI',
+                //     'body' => 'This is for testing email using smtp.',
+                //     'file' => $fileSave,
+                //     'storeName' => $nama_usaha,
+                //     'jenisUsaha' => $jenis_usaha,
+                //     'alamat' => $alamat,
+                //     'kabupaten' => $kab_kota,
+                //     'kodePos' => $kode_pos
+                // ];
 
-                try{
-                    Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
-                } catch(Exception $e){
-                    return $e;
-                }
+                // try{
+                //     Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
+                // } catch(Exception $e){
+                //     return $e;
+                // }
 
-                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+                // $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
-                $notification = array(
-                    'message' => 'Permintaan UMI berhasil diajukan!',
-                    'alert-type' => 'success',
-                );
-                return redirect()->back()->with($notification);
+                // $notification = array(
+                //     'message' => 'Permintaan UMI berhasil diajukan!',
+                //     'alert-type' => 'success',
+                // );
+                // return redirect()->back()->with($notification);
             } catch (Exception $e) {
                 $this->createHistoryUser($action, $e, 0);
                 $notification = array(
