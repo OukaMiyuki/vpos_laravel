@@ -139,7 +139,7 @@ class UmiController extends Controller {
             try {
                 // File::copy($templatePath, $fileSave);
                 Storage::copy($templatePath, $fileSave);
-                $spreadsheet = IOFactory::load($fileSave);
+                //$spreadsheet = IOFactory::load($fileSave);
                 // $sheet = $spreadsheet->getActiveSheet();
                 // $sheet1 = $spreadsheet->getSheet(0);
                 // $sheet1->mergeCells('E6:F6');
