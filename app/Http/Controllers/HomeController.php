@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Models\APKLink;
 
 class HomeController extends Controller {
@@ -15,6 +16,7 @@ class HomeController extends Controller {
 
     public function downloadApk(){
         $apk = APKLink::find(1);
-        return response()->download($apk->apk_link);
+        $path = Storage::path('public/apk/visipos_v0.0.1c.apk');
+        return response()->download($path);
     }
 }
