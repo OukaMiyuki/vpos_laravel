@@ -721,7 +721,7 @@ class PosController extends Controller {
         $imagick->readImage($path);
         $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
         $imagick->writeImages($saveImagePath, true);
-        $image = \Image::make(public_path('invoice/'.$invoice->nomor_invoice.'.jpg'));
+        $image = Image::make(public_path('invoice/'.$invoice->nomor_invoice.'.jpg'));
         $image->crop(200, 200, 100, 100);
         $image->save(public_path('invoice/cropped/'.$invoice->nomor_invoice.'_cropped-image.jpg'), 80);
         return response()->file($saveImagePath);
