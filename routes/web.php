@@ -308,7 +308,7 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
     Route::post('/dashboard/pos/process', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionProcess'])->name('tenant.pos.process');
     Route::get('/dashboard/pos/invoice/{id}', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionInvoice'])->name('tenant.pos.invoice');
     Route::get('/dashboard/pos/invoice/receipt/{id}', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionInvoiceReceipt'])->name('tenant.pos.invoice.receipt');
-    Route::get('/dashboard/pos/invoice/receipt/download', [App\Http\Controllers\Auth\Tenant\PosController::class, 'downloadPdf'])->name('tenant.pos.invoice.receipt.download');
+    Route::post('/dashboard/pos/invoice/receipt/download', [App\Http\Controllers\Auth\Tenant\PosController::class, 'downloadPdf'])->name('tenant.pos.invoice.receipt.download');
     Route::post('/dashboard/pos/invoice/change-payment', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionPendingChangePayment'])->name('tenant.pos.invoice.changePayment');
     Route::post('/dashboard/pos/invoice/save', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionSave'])->name('tenant.pos.invoice.save');
     Route::post('/dashboard/pos/invoice/clear', [App\Http\Controllers\Auth\Tenant\PosController::class, 'cartTransactionClear'])->name('tenant.pos.invoice.clear');
