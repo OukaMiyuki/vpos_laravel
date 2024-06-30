@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Stevebauman\Location\Facades\Location;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\ProductStock;
 use App\Models\ShoppingCart;
 use App\Models\Invoice;
@@ -688,5 +689,16 @@ class PosController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
+    }
+
+    public function downloadPdf($id){
+        $identifier = $this->getStoreIdentifier();
+        $invoice = Invoice::with('shoppingCart', 'invoiceField')
+                            ->where('store_identifier', $identifier)
+                            ->find($id);
+
+        $pdf = Pdf::loadView('pdf', ['invoice' => $invoice]);
+
+        return $pdf->download();
     }
 }
