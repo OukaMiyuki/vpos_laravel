@@ -9,6 +9,7 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 use Stevebauman\Location\Facades\Location;
 use Illuminate\Support\Facades\DB;
 // use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\Facade as PDF;
 use App\Models\ProductStock;
 use App\Models\ShoppingCart;
 use App\Models\Invoice;
@@ -23,7 +24,7 @@ use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
 use App\Models\TenantQrisAccount;
 use Exception;
-use PDF;
+// use PDF;
 
 class PosController extends Controller {
 
