@@ -718,7 +718,7 @@ class PosController extends Controller {
         $imagick = new Imagick();
         $path = Storage::path('public/invoice/'.$invoiceName);
         $imagick->readImage($path);
-        $saveImagePath = public_path('converted.jpg');
+        $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
         $imagick->writeImages($saveImagePath, true);
         return response()->file($saveImagePath);
         //$pdfimage = new \Spatie\PdfToImage\Pdf($pdf);
