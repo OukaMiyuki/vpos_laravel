@@ -2,7 +2,7 @@ onScan.attachTo(document, {
     suffixKeyCodes: [13], // enter-key expected at the end of a scan
     reactToPaste: true, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
     onScan: function(sCode, iQty) { // Alternative to document.addEventListener('scan')
-        alert('Scanned: ' + iQty + 'x ' + sCode);
+        //alert('Scanned: ' + iQty + 'x ' + sCode);
         let barcode = document.getElementById("barcode");
         // $("#nominal").val(sCode);
         // $('#pos').DataTable().search(sCode).draw();
