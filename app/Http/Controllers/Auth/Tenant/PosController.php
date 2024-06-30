@@ -721,9 +721,10 @@ class PosController extends Controller {
         $imagick->readImage($path);
         // $imagick->setImageResolution(12800,800) ; // it change only image density.
 	    // $imagick->resampleImage  (12800,800,imagick::FILTER_UNDEFINED,1);
-        $imagick->Imagick::setImageResolution( 600, 600 );
-        $imagick->resizeImage(595,842,\Imagick::FILTER_CATROM, 1, true);
-        $imagick->setImageFormat('pdf');
+        // $imagick->Imagick::setImageResolution( 600, 600 );
+        // $imagick->resizeImage(595,842,\Imagick::FILTER_CATROM, 1, true);
+        // $imagick->setImageFormat('pdf');
+        $imagick->adaptiveResizeImage(1024, 768); 
         $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
         $imagick->writeImages($saveImagePath, true);
         // $image = Image::make(public_path('invoice/'.$invoice->nomor_invoice.'.jpg'));
