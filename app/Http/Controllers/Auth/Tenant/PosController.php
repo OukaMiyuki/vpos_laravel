@@ -9,7 +9,8 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 use Stevebauman\Location\Facades\Location;
 use Illuminate\Support\Facades\DB;
 // use Barryvdh\DomPDF\Facade\Pdf;
-use Barryvdh\DomPDF\Facade as PDF;
+// use Barryvdh\DomPDF\Facade as PDF;
+use Spatie\LaravelPdf\Facades\Pdf;
 use App\Models\ProductStock;
 use App\Models\ShoppingCart;
 use App\Models\Invoice;
@@ -698,9 +699,11 @@ class PosController extends Controller {
         $invoice = Invoice::with('shoppingCart', 'invoiceField')
                             ->where('store_identifier', $identifier)
                             ->find($id);
+        return Pdf::view('pdf', ['invoice' => $invoice])
+                    ->format('a4')
+                    ->name('your-invoice.pdf');
+        // $pdf = Pdf::loadView('pdf', ['invoice' => $invoice]);
 
-        $pdf = Pdf::loadView('pdf', ['invoice' => $invoice]);
-
-        return $pdf->download();
+        // return $pdf->download();
     }
 }
