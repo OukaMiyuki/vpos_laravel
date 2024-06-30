@@ -712,14 +712,15 @@ class PosController extends Controller {
         //             ->name('your-invoice.pdf');
         $invoiceName = $invoice->nomor_invoice.'.pdf';
         $qrcode = base64_encode(\QrCode::format('svg')->size(200)->errorCorrection('H')->generate($invoice->qris_data));
-        $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode])->save('/public/invoice/'.$invoiceName.'.pdf');
-        $content = $pdf->download()->getOriginalContent();
+        $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode]);
+        Storage::put('public/invoice/'.$invoiceName.'.pdf', $pdf->output());
+        //$content = $pdf->download()->getOriginalContent();
         // Storage::put('public/invoice/'.$invoiceName,$content);
-        $imagick = new Imagick();
-        $imagick->readImage(public_path('invoice/'.$invoiceName));
-        $saveImagePath = public_path('converted.jpg');
-        $imagick->writeImages($saveImagePath, true);
-        return response()->file($saveImagePath);
+        // $imagick = new Imagick();
+        // $imagick->readImage(public_path('invoice/'.$invoiceName));
+        // $saveImagePath = public_path('converted.jpg');
+        // $imagick->writeImages($saveImagePath, true);
+        // return response()->file($saveImagePath);
         //$pdfimage = new \Spatie\PdfToImage\Pdf($pdf);
         // $pdf->save($pathToWhereImageShouldBeStored);
   
