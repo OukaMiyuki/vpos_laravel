@@ -394,7 +394,8 @@ div.qris {
                 @if ($invoice->jenis_pembayaran == "Qris")
                     @if ($invoice->status_pembayaran == 0)
                         <div class="qris">
-                            {!! QrCode::size(200)->generate($invoice->qris_data) !!}
+                            <img src="data:image/png;base64,{{ $qrcode }}">
+                            {{-- {!! QrCode::size(200)->generate($invoice->qris_data) !!} --}}
                         </div>  
                     @endif
                 @endif
