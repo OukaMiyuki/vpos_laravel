@@ -138,7 +138,7 @@ class UmiController extends Controller {
             $fileSave = $userDocsPath.'/'.$filename;
             try {
                 File::copy($templatePath, $fileSave);
-                $spreadsheet = IOFactory::load($fileSave);
+                //$spreadsheet = IOFactory::load($fileSave);
                 // $sheet = $spreadsheet->getActiveSheet();
                 // $sheet1 = $spreadsheet->getSheet(0);
                 // $sheet1->mergeCells('E6:F6');
