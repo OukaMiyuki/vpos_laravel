@@ -25,6 +25,7 @@ use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
 use App\Models\TenantQrisAccount;
 use Exception;
+use Imagick;
 // use PDF;
 
 class PosController extends Controller {
@@ -710,7 +711,13 @@ class PosController extends Controller {
         //             ->name('your-invoice.pdf');
         $qrcode = base64_encode(\QrCode::format('svg')->size(200)->errorCorrection('H')->generate($invoice->qris_data));
         $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode])->setPaper('A8', 'portrait');
-
-        return $pdf->download();
+        $imagick = new Imagick();
+  
+        $imagick->readImage($pdf);
+  
+        // $saveImagePath = public_path('converted.jpg');
+        // $imagick->writeImages($saveImagePath, true);
+        // return $pdf->download();
+        return response()->download($imagick);
     }
 }

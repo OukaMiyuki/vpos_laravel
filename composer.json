@@ -30,6 +30,7 @@
         "rawilk/laravel-printing": "^3.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-pdf": "^1.5",
+        "spatie/pdf-to-image": "^1.2",
         "staudenmeir/eloquent-has-many-deep": "1.18",
         "stevebauman/location": "^7.2",
         "twilio/sdk": "^8.0",
