@@ -213,11 +213,11 @@ class UmiController extends Controller {
                     'kodePos' => $kode_pos
                 ];
 
-                try{
-                    Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
-                } catch(Exception $e){
-                    return $e;
-                }
+                // try{
+                //     Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
+                // } catch(Exception $e){
+                //     return $e;
+                // }
 
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
