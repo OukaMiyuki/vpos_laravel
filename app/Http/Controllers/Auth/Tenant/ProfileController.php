@@ -185,14 +185,14 @@ class ProfileController extends Controller{
                     try{
                         $fileKtp->move($storagePathKto, $filenamektp);
                     } catch(Exception $e){
-                        return $e
+                        return "gakdihapus  ".$e;
                     }
                 } else {
                     try{
                         Storage::delete('public/images/profile/'.$ktpImage);
                         $fileKtp->move($storagePathKto, $filenamektp);
                     } catch(Exception $e){
-                        return $e;
+                        return "dihapus  ".$e;
                     }
                 }
             }
