@@ -23,6 +23,7 @@ Route::middleware(['guest', 'throttle'])->prefix('/')->group( function () {
     Route::post('/login/reset-password/send-otp', [App\Http\Controllers\Auth\LoginController::class, 'resetPasswordSendOTP'])->name('access.reset.password.sendOTP');
     Route::post('/login/reset-password/change-password', [App\Http\Controllers\Auth\LoginController::class, 'resetPasswordOTPVerification'])->name('access.reset.password.OTPVerification');
     Route::post('/login/reset-password/change-password/process', [App\Http\Controllers\Auth\LoginController::class, 'resetPasswordChangePassword'])->name('access.reset.password.process');
+    Route::get('/download/apk', [App\Http\Controllers\HomeController::class, 'downloadApk'])->name('download.apk');
 });
 
 Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( function () {
