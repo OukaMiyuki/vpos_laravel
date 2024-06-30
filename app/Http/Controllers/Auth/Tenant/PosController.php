@@ -709,7 +709,7 @@ class PosController extends Controller {
         //             ->format('a4')
         //             ->name('your-invoice.pdf');
         $qrcode = base64_encode(\QrCode::format('svg')->size(200)->errorCorrection('H')->generate($invoice->qris_data));
-        $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode]);
+        $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode])->setPaper('A8', 'portrait');
 
         return $pdf->download();
     }
