@@ -732,7 +732,7 @@ class TenantController extends Controller {
                     }
                 } catch (Exception $e) {
                     return response()->json([
-                        'message' => 'Failed to find data stock. make sure the id is correct!',
+                        'message' => 'Failed to find data stock. make sure the id is correct! | '.$request->id_stok.' | '.$request->product_name.' | '.$request->qty.' | '.$request->harga,
                         'id_stock' => $request->id_stok,
                         'product_name' => $request->product_name,
                         'qty' => $request->qty,
