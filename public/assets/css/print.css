@@ -138,6 +138,9 @@ h2.itemTitle{
 @media print {
     body { 
         font-size:14px;
+        body { font-family: monospace; }
+        body.struk                 { width: 58mm; text-align: left;}
+        body.struk .sheet          { padding: 2mm; }
         /* font-family: LCD;  */
     }
     /* body { width: 58mm !important;} */

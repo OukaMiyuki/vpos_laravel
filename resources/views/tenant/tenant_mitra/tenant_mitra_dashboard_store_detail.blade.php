@@ -219,18 +219,18 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Tanggal Pengajuan</th>
-                                                        <th>Tanggal Approval</th>
-                                                        <th>Status</th>
+                                                        <th class="text-center">Tanggal Pengajuan</th>
+                                                        <th class="text-center">Tanggal Approval</th>
+                                                        <th class="text-center">Status</th>
                                                         <th>Note</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr>
                                                         <th scope="row">1</th>
-                                                        <td>{{ $umiRequest->tanggal_pengajuan }}</td>
-                                                        <td>{{ $umiRequest->tanggal_approval }}</td>
-                                                        <td>
+                                                        <td class="text-center">{{ $umiRequest->tanggal_pengajuan }}</td>
+                                                        <td class="text-center">{{ $umiRequest->tanggal_approval }}</td>
+                                                        <td class="text-center">
                                                             @if($umiRequest->is_active == 0)
                                                                 <span class="badge bg-soft-warning text-warning">Pending</span>
                                                             @elseif($umiRequest->is_active == 1)
