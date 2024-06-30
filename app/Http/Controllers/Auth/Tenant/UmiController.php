@@ -132,7 +132,7 @@ class UmiController extends Controller {
                 return redirect()->back()->with($notification);
             }
             $imageKTPPath = Storage::path('public/images/profile/'.auth()->user()->detail->ktp_image);
-            $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_QRIS_Nobu_(NMID_Level).xlsx');
+            $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_QRIS_Nobu_(NMID_Level_1).xlsx');
             $userDocsPath = Storage::path('public/docs/umi/user_doc');
             $filename = 'Formulir Pendaftaran NOBU QRIS (NMID) PT BRAHMA ESATAMA_'.$nama_usaha.'_'.date('dmYHis').'.xlsx';
             $fileSave = $userDocsPath.'/'.$filename;
@@ -313,7 +313,7 @@ class UmiController extends Controller {
             $website = $store->website;
 
             $imageKTPPath = Storage::path('public/images/profile/'.$ktp_image);
-            $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_QRIS_Nobu_(NMID_Level).xlsx');
+            $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_QRIS_Nobu_(NMID_Level_1).xlsx');
             $userDocsPath = Storage::path('public/docs/umi/user_doc');
             $filename = 'Formulir Pendaftaran NOBU QRIS (NMID) PT BRAHMA ESATAMA_'.$nama_usaha.'_'.date('dmYHis').'.xlsx';
             $fileSave = $userDocsPath.'/'.$filename;
