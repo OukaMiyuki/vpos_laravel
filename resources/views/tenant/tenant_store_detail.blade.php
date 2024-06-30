@@ -189,7 +189,7 @@
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
                                                         <label for="kantor_toko_fisik" class="form-label">Memiliki Toko Fisik atau Kantor Usaha?</label>
-                                                        <select required class="form-control" name="kantor_toko_fisik" id="kantor_toko_fisik" data-toggle="select2" data-width="100%">
+                                                        <select required class="form-control" name="kantor_toko_fisik" id="kantor_toko_fisik" data-width="100%">
                                                             <option value="">- Pilih -</option>
                                                             <option @if($tenantStore->kantor_toko_fisik == "Ya") selected @endif value="Ya">Ya</option>
                                                             <option @if($tenantStore->kantor_toko_fisik == "Tidak") selected @endif value="Tidak">Tidak</option>
