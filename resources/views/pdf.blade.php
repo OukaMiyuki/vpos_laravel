@@ -13,7 +13,20 @@ body {
     /* font-family: LCD; */
     margin:0;
     padding:1rem;
-    /* width: 58mm; text-align: left; */
+    width: 58mm; text-align: left;
+}
+html, body {
+    height: 100%;
+}
+
+html {
+    display: table;
+    margin: auto;
+}
+
+body {
+    display: table-cell;
+    vertical-align: middle;
 }
 #invoice-POS{
     /* border: 1px solid #ddd; */
