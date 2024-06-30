@@ -13,7 +13,7 @@ body {
     /* font-family: LCD; */
     margin:0;
     padding:1rem;
-    width: 58mm; text-align: left;
+    /* width: 58mm; text-align: left; */
 }
 #invoice-POS{
     /* border: 1px solid #ddd; */
@@ -144,9 +144,9 @@ h2.itemTitle{
 @media print {
     body { 
         font-size:14px;
-        body { font-family: monospace; }
+        /* body { font-family: monospace; }
         body.struk                 { width: 58mm; text-align: left;}
-        body.struk .sheet          { padding: 2mm; }
+        body.struk .sheet          { padding: 2mm; } */
         /* font-family: LCD;  */
     }
     /* body { width: 58mm !important;} */
@@ -170,12 +170,12 @@ h2.itemTitle{
 }
 
 table.payments { width: 100%; margin-bottom: 20px; }
-/* .short {
+.short {
     width: 40%
 }
 .long {
     width: 40%;
-} */
+}
 
 thead.items-thead {
     border-top: double #000000;
