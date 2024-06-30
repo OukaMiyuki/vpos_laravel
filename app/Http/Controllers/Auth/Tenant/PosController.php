@@ -700,9 +700,9 @@ class PosController extends Controller {
                             ->where('store_identifier', $identifier)
                             ->find($id);
         $path = public_path('qrcode/'.time().'.png');
-        $png = \QrCode::format('png')->size(200)->generate($invoice->qris_data);
-        $png = base64_encode($png);
-        return QrCode::size(300)
+        // $png = \QrCode::format('png')->size(200)->generate($invoice->qris_data);
+        // $png = base64_encode($png);
+        return \QrCode::size(200)
                      ->generate($invoice->qris_data, $path);
         // return response()->download($png);
         // return Pdf::view('pdf', ['invoice' => $invoice])
