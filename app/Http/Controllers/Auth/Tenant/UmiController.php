@@ -125,6 +125,7 @@ class UmiController extends Controller {
                 || is_null($kategori_usaha_omset)
                 || is_null(auth()->user()->storeDetail->ktp_image)
             ) {
+                return auth()->user()->storeDetail->ktp_image;
                 $notification = array(
                     'message' => 'Data detail toko belum lengkap, silahkan lengkapi data terlebih dahulu!',
                     'alert-type' => 'warning',
