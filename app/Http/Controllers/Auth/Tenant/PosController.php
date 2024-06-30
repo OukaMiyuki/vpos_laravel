@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Tenant;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use GuzzleHttp\Client as GuzzleHttpClient;
 use Intervention\Image\Facades\Image;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -697,7 +698,9 @@ class PosController extends Controller {
         }
     }
 
-    public function downloadPdf($id){
+    public function downloadPdf(Request $request){
+        $id = $request->id;
+        $no_wa = $request->no_wa;
         $identifier = $this->getStoreIdentifier();
         $invoice = Invoice::with('shoppingCart', 'invoiceField')
                             ->where('store_identifier', $identifier)
@@ -727,10 +730,47 @@ class PosController extends Controller {
         // $imagick->setImageFormat('pdf');
         $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
         $imagick->writeImages($saveImagePath, true);
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $postResponse = "";
+        $noHP = $no_wa;
+        if(!preg_match("/[^+0-9]/",trim($noHP))){
+            if(substr(trim($noHP), 0, 2)=="62"){
+                $hp    =trim($noHP);
+            }
+            else if(substr(trim($noHP), 0, 1)=="0"){
+                $hp    ="62".substr(trim($noHP), 1);
+            }
+        }
+
+        $url = 'https://waq.my.id/send-media';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            "api_key" => $api_key,
+            'sender' => $sender,
+            'number' => $hp,
+            "media_type" => "image",
+            "caption" => "Nota Pembayaran anda",
+            "url" => $saveImagePath
+        ];
+
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            return $ex;
+        }
+        $responseCode = $postResponse->getStatusCode();
+        return $responseCode;
         // $image = Image::make(public_path('invoice/'.$invoice->nomor_invoice.'.jpg'));
         // $image->crop(300, 600, -100, -100);
         // $image->save(public_path('invoice/cropped/'.$invoice->nomor_invoice.'_cropped-image.jpg'), 80);
-        return response()->file($saveImagePath);
+        //return response()->file($saveImagePath);
         //$pdfimage = new \Spatie\PdfToImage\Pdf($pdf);
         // $pdf->save($pathToWhereImageShouldBeStored);
   
