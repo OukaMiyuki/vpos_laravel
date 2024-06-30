@@ -136,104 +136,104 @@ class UmiController extends Controller {
             $userDocsPath = Storage::path('public/docs/umi/user_doc');
             $filename = 'Formulir Pendaftaran NOBU QRIS (NMID) PT BRAHMA ESATAMA_'.$nama_usaha.'_'.date('dmYHis').'.xlsx';
             $fileSave = $userDocsPath.'/'.$filename;
-            try {
-                File::copy($templatePath, $fileSave);
-                $spreadsheet = IOFactory::load($fileSave);
-                // $sheet = $spreadsheet->getActiveSheet();
-                $sheet1 = $spreadsheet->getSheet(0);
-                $sheet1->mergeCells('E6:F6');
-                $sheet1->getCell('E6')->setValue($nama_usaha);
-                $sheet1->mergeCells('E7:F7');
-                $sheet1->getCell('E7')->setValue($nama_usaha);
-                $sheet1->mergeCells('E9:F9');
-                $sheet1->getCell('E9')->setValue($no_npwp);
-                $sheet1->mergeCells('E10:F10');
-                $sheet1->getCell('E10')->setValue($alamat);
-                $sheet1->mergeCells('E11:F11');
-                $sheet1->getCell('E11')->setValue($nama_pemilik);
-                $sheet1->mergeCells('E12:F12');
-                $sheet1->getCell('E12')->setValue($no_hp);
-                $sheet1->mergeCells('E13:F13');
-                $sheet1->getCell('E13')->setValue($email);
+            // try {
+            //     File::copy($templatePath, $fileSave);
+            //     $spreadsheet = IOFactory::load($fileSave);
+            //     // $sheet = $spreadsheet->getActiveSheet();
+            //     $sheet1 = $spreadsheet->getSheet(0);
+            //     $sheet1->mergeCells('E6:F6');
+            //     $sheet1->getCell('E6')->setValue($nama_usaha);
+            //     $sheet1->mergeCells('E7:F7');
+            //     $sheet1->getCell('E7')->setValue($nama_usaha);
+            //     $sheet1->mergeCells('E9:F9');
+            //     $sheet1->getCell('E9')->setValue($no_npwp);
+            //     $sheet1->mergeCells('E10:F10');
+            //     $sheet1->getCell('E10')->setValue($alamat);
+            //     $sheet1->mergeCells('E11:F11');
+            //     $sheet1->getCell('E11')->setValue($nama_pemilik);
+            //     $sheet1->mergeCells('E12:F12');
+            //     $sheet1->getCell('E12')->setValue($no_hp);
+            //     $sheet1->mergeCells('E13:F13');
+            //     $sheet1->getCell('E13')->setValue($email);
 
-                $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
-                $drawing->setName('no_ktp');
-                $drawing->setDescription('No KTP Pemilik Usaha');
-                $drawing->setPath($imageKTPPath);
-                $drawing->setCoordinates('H6');
-                // $drawing->setOffsetX(110);
-                $drawing->getShadow()->setVisible(true);
-                $drawing->getShadow()->setDirection(45);
-                $drawing->setWorksheet($sheet1);
+            //     $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+            //     $drawing->setName('no_ktp');
+            //     $drawing->setDescription('No KTP Pemilik Usaha');
+            //     $drawing->setPath($imageKTPPath);
+            //     $drawing->setCoordinates('H6');
+            //     // $drawing->setOffsetX(110);
+            //     $drawing->getShadow()->setVisible(true);
+            //     $drawing->getShadow()->setDirection(45);
+            //     $drawing->setWorksheet($sheet1);
 
-                $sheet2 = $spreadsheet->getSheet(1);
-                $sheet2->mergeCells('D4:E4');
-                $sheet2->getCell('D4')->setValue($nama_usaha);
-                $sheet2->mergeCells('D5:E5');
-                $sheet2->getCell('D5')->setValue($nama_pemilik);
-                $sheet2->mergeCells('D6:E6');
-                $sheet2->getCell('D6')->setValue($tanggal);
-                $sheet2->getCell('C11')->setValue($nama_pemilik);
-                $sheet2->getCell('D11')->setValue($no_ktp);
-                $sheet2->getCell('E11')->setValue($no_hp);
-                $sheet2->getCell('F11')->setValue($email);
-                $sheet2->getCell('G11')->setValue($nama_usaha);
-                $sheet2->getCell('H11')->setValue($jenis_usaha);
-                $sheet2->getCell('I11')->setValue($nama_jalan);
-                $sheet2->getCell('J11')->setValue($nama_blok);
-                $sheet2->getCell('K11')->setValue($rt);
-                $sheet2->getCell('L11')->setValue($rw);
-                $sheet2->getCell('M11')->setValue($kelurahan_desa);
-                $sheet2->getCell('N11')->setValue($kecamatan);
-                $sheet2->getCell('O11')->setValue($kab_kota);
-                $sheet2->getCell('P11')->setValue($kode_pos);
-                $sheet2->getCell('Q11')->setValue($kantor_toko_fisik);
-                $sheet2->getCell('R11')->setValue($kategori_usaha_omset);
-                $sheet2->getCell('V11')->setValue($website);   
+            //     $sheet2 = $spreadsheet->getSheet(1);
+            //     $sheet2->mergeCells('D4:E4');
+            //     $sheet2->getCell('D4')->setValue($nama_usaha);
+            //     $sheet2->mergeCells('D5:E5');
+            //     $sheet2->getCell('D5')->setValue($nama_pemilik);
+            //     $sheet2->mergeCells('D6:E6');
+            //     $sheet2->getCell('D6')->setValue($tanggal);
+            //     $sheet2->getCell('C11')->setValue($nama_pemilik);
+            //     $sheet2->getCell('D11')->setValue($no_ktp);
+            //     $sheet2->getCell('E11')->setValue($no_hp);
+            //     $sheet2->getCell('F11')->setValue($email);
+            //     $sheet2->getCell('G11')->setValue($nama_usaha);
+            //     $sheet2->getCell('H11')->setValue($jenis_usaha);
+            //     $sheet2->getCell('I11')->setValue($nama_jalan);
+            //     $sheet2->getCell('J11')->setValue($nama_blok);
+            //     $sheet2->getCell('K11')->setValue($rt);
+            //     $sheet2->getCell('L11')->setValue($rw);
+            //     $sheet2->getCell('M11')->setValue($kelurahan_desa);
+            //     $sheet2->getCell('N11')->setValue($kecamatan);
+            //     $sheet2->getCell('O11')->setValue($kab_kota);
+            //     $sheet2->getCell('P11')->setValue($kode_pos);
+            //     $sheet2->getCell('Q11')->setValue($kantor_toko_fisik);
+            //     $sheet2->getCell('R11')->setValue($kategori_usaha_omset);
+            //     $sheet2->getCell('V11')->setValue($website);   
 
-                $newFilePath = $fileSave;
-                $writer = new Xlsx($spreadsheet);
-                $writer->save($newFilePath);
-                UmiRequest::create([
-                    'id_tenant' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'store_identifier' => $store_identifier,
-                    'tanggal_pengajuan' => Carbon::now(),
-                    'file_path' => $filename,
-                ]);
+            //     $newFilePath = $fileSave;
+            //     $writer = new Xlsx($spreadsheet);
+            //     $writer->save($newFilePath);
+            //     UmiRequest::create([
+            //         'id_tenant' => auth()->user()->id,
+            //         'email' => auth()->user()->email,
+            //         'store_identifier' => $store_identifier,
+            //         'tanggal_pengajuan' => Carbon::now(),
+            //         'file_path' => $filename,
+            //     ]);
 
-                $mailData = [
-                    'title' => 'Formulir Pendaftaran UMI',
-                    'body' => 'This is for testing email using smtp.',
-                    'file' => $fileSave,
-                    'storeName' => $nama_usaha,
-                    'jenisUsaha' => $jenis_usaha,
-                    'alamat' => $alamat,
-                    'kabupaten' => $kab_kota,
-                    'kodePos' => $kode_pos
-                ];
+            //     $mailData = [
+            //         'title' => 'Formulir Pendaftaran UMI',
+            //         'body' => 'This is for testing email using smtp.',
+            //         'file' => $fileSave,
+            //         'storeName' => $nama_usaha,
+            //         'jenisUsaha' => $jenis_usaha,
+            //         'alamat' => $alamat,
+            //         'kabupaten' => $kab_kota,
+            //         'kodePos' => $kode_pos
+            //     ];
 
-                // try{
-                //     Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
-                // } catch(Exception $e){
-                //     return $e;
-                // }
+            //     // try{
+            //     //     Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
+            //     // } catch(Exception $e){
+            //     //     return $e;
+            //     // }
 
-                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+            //     $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
-                $notification = array(
-                    'message' => 'Permintaan UMI berhasil diajukan!',
-                    'alert-type' => 'success',
-                );
-                return redirect()->back()->with($notification);
-            } catch (Exception $e) {
-                $this->createHistoryUser($action, $e, 0);
-                $notification = array(
-                    'message' => 'Permintaan UMI gagal, silahkan hubungi admin!',
-                    'alert-type' => 'error',
-                );
-                return redirect()->back()->with($notification);
-            }
+            //     $notification = array(
+            //         'message' => 'Permintaan UMI berhasil diajukan!',
+            //         'alert-type' => 'success',
+            //     );
+            //     return redirect()->back()->with($notification);
+            // } catch (Exception $e) {
+            //     $this->createHistoryUser($action, $e, 0);
+            //     $notification = array(
+            //         'message' => 'Permintaan UMI gagal, silahkan hubungi admin!',
+            //         'alert-type' => 'error',
+            //     );
+            //     return redirect()->back()->with($notification);
+            // }
         } else {
             return redirect()->back();
         }
