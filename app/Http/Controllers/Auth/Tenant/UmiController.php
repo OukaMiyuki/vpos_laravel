@@ -143,7 +143,7 @@ class UmiController extends Controller {
                 //$spreadsheet = IOFactory::load($templatePath);
                 //dd($spreadsheet);
                 //$sheet = $spreadsheet->getActiveSheet();
-                $sheet1 = $spreadsheet->getSheet(0);
+                $sheet1 = $spreadsheet->getSheetByName("Identitas Perusahaan");
                 $sheet1->mergeCells('E6:F6');
                 $sheet1->getCell('E6')->setValue($nama_usaha);
                 $sheet1->mergeCells('E7:F7');
@@ -169,7 +169,7 @@ class UmiController extends Controller {
                 $drawing->getShadow()->setDirection(45);
                 $drawing->setWorksheet($sheet1);
 
-                $sheet2 = $spreadsheet->getSheet(1);
+                $sheet2 = $spreadsheet->getSheetByName("Formulir Pendaftaran NOBU QRIS");
                 $sheet2->mergeCells('D4:E4');
                 $sheet2->getCell('D4')->setValue($nama_usaha);
                 $sheet2->mergeCells('D5:E5');
