@@ -45,8 +45,9 @@ class PaymentQrisConfirm extends Controller {
 
     private function createHistoryUser($action, $log, $status, $user_id, $user_email){
         $ip = "125.164.244.223";
+        $clientIP = request()->header('X-Forwarded-For');
         $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
+        $getLoc = Location::get($PublicIP);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
@@ -56,7 +57,7 @@ class PaymentQrisConfirm extends Controller {
         ]);
 
         if(!is_null($history) || !empty($history)) {
-            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+            $history->createHistory($history, $action, $user_location, $clientIP, $log, $status);
         }
     }
 
