@@ -12,7 +12,7 @@
                 <li><a href="blog.html">Blog</a></li>
                 <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
                 @guest
-                    <li><a class="getstarted scrollto" href="https://drive.usercontent.google.com/download?id=1rMH8ra-b3VOUumuxoGEtgzdcnAgk96jz&export=download&authuser=0&confirm=t&uuid=084aa0f5-296a-4713-b5cb-cfad08557331&at=APZUnTWKcH9tSmm0P_vYzFhFdeDE%3A1719790569702">Download Aplikasi</a></li>
+                    <li><a class="getstarted scrollto" href="https://drive.usercontent.google.com/download?id=1rMH8ra-b3VOUumuxoGEtgzdcnAgk96jz&export=download&authuser=0&confirm=t&uuid=084aa0f5-296a-4713-b5cb-cfad08557331&at=APZUnTWKcH9tSmm0P_vYzFhFdeDE%3A1719790569702" target="_blank">Download Aplikasi</a></li>
                 @endguest
             </ul>
             <i class="bi bi-list mobile-nav-toggle"></i>
