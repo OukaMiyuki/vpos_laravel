@@ -710,13 +710,13 @@ class PosController extends Controller {
         // return Pdf::view('pdf', ['invoice' => $invoice])
         //             ->format('a4')
         //             ->name('your-invoice.pdf');
-        $invoiceName = $invoice->nomor_invoice.'.pdf';
         $qrcode = base64_encode(\QrCode::format('svg')->size(200)->errorCorrection('H')->generate($invoice->qris_data));
-        $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode])->save('/public/invoice/'.$invoiceName.'.pdf');
-        //$content = $pdf->download()->getOriginalContent();
-        // Storage::put('public/invoice/'.$invoiceName,$content);
+        $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode]);
+        $invoiceName = $invoice->nomor_invoice.'.pdf';
+        $content = $pdf->download()->getOriginalContent();
+        Storage::put('public/invoice/'.$invoiceName,$content);
         // $imagick = new Imagick();
-        // $imagick->readImage(public_path('invoice/'.$invoiceName));
+        // $imagick->readImage(public_path('public/invoice/'.$invoiceName));
         // $saveImagePath = public_path('converted.jpg');
         // $imagick->writeImages($saveImagePath, true);
         // return response()->file($saveImagePath);
