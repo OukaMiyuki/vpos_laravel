@@ -104,7 +104,7 @@
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
                                                         <label for="jenis" class="form-label">Jenis Usaha</label>
-                                                        <select required class="form-control" name="jenis" id="jenis" data-width="100%">
+                                                        <select required class="form-control" name="jenis" id="jenis" data-toggle="select2" data-width="100%">
                                                             <option value="">- Pilih Jenis Usaha -</option>
                                                             @foreach (App\Models\JenisUsaha::get() as $jenis_usaha)
                                                                 <option value="{{ $jenis_usaha->jenis_usaha }}"@if ($tenantStore->jenis_usaha == $jenis_usaha->jenis_usaha) selected="selected" @endif>{{ $jenis_usaha->jenis_usaha  }}</option>
