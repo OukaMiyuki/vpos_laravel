@@ -71,7 +71,7 @@ class AuthController extends Controller {
         $user_email = auth()->user()->email;
         $ip = "125.164.244.223";
         $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
+        $getLoc = Location::get($PublicIP);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
@@ -82,7 +82,7 @@ class AuthController extends Controller {
         ]);
 
         if(!is_null($history) || !empty($history)) {
-            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+            $history->createHistory($history, $action, $user_location, $PublicIP, $log, $status);
         }
     }
 
@@ -745,7 +745,7 @@ class AuthController extends Controller {
             if(!empty($rek->no_rekening) || !is_null($rek->no_rekening) || $rek->no_rekening != NULL || $rek->no_rekening != ""){
                 $ip = "36.84.106.3";
                 $PublicIP = $this->get_client_ip();
-                $getLoc = Location::get($ip);
+                $getLoc = Location::get($PublicIP);
                 $lat = $getLoc->latitude;
                 $long = $getLoc->longitude;
                 $rekClient = new GuzzleHttpClient();
@@ -822,7 +822,7 @@ class AuthController extends Controller {
         $client = new GuzzleHttpClient();
         $ip = "36.84.106.3";
         $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
+        $getLoc = Location::get($PublicIP);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $rekClient = new GuzzleHttpClient();
@@ -862,7 +862,7 @@ class AuthController extends Controller {
 
         $ip = "36.84.106.3";
         $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
+        $getLoc = Location::get($PublicIP);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         $rekClient = new GuzzleHttpClient();
@@ -934,7 +934,7 @@ class AuthController extends Controller {
         $client = new GuzzleHttpClient();
         $ip = "125.164.243.227";
         $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
+        $getLoc = Location::get($PublicIP);
         $lat = $getLoc->latitude;
         $long = $getLoc->longitude;
         // $agregate = 350;
@@ -1028,7 +1028,7 @@ class AuthController extends Controller {
                                 'nominal' => $nominal_tarik,
                                 'biaya_admin' => $biayaAdmin,
                                 'tanggal_masuk' => Carbon::now(),
-                                'deteksi_ip_address' => $ip,
+                                'deteksi_ip_address' => $PublicIP,
                                 'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                                 'status' => 1
                             ]);
@@ -1108,7 +1108,7 @@ class AuthController extends Controller {
                                 'nominal' => $nominal_tarik,
                                 'biaya_admin' => $biayaAdmin,
                                 'tanggal_masuk' => Carbon::now(),
-                                'deteksi_ip_address' => $ip,
+                                'deteksi_ip_address' => $PublicIP,
                                 'deteksi_lokasi_penarikan' => "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")",
                                 'status' => 0
                             ]);

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth\Tenant\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Stevebauman\Location\Facades\Location;
+use Illuminate\Support\Facades\DB;
 use App\Models\Admin;
 use App\Models\Marketing;
 use App\Models\Tenant;
@@ -23,6 +25,7 @@ use App\Models\Tax;
 use App\Models\Discount;
 use App\Models\Withdrawal;
 use App\Models\AppVersion;
+use App\Models\History;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -42,6 +45,47 @@ class TenantController extends Controller {
                             ->first();
         $identifier = $store->store_identifier;
         return $identifier;
+    }
+
+    private function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_X_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        } else if (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        } else if (isset($_SERVER['HTTP_FORWARDED'])) {
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        } else if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        } else {
+            $ipaddress = 'UNKNOWN';
+        }
+
+        return $ipaddress;
+    }
+
+    private function createHistoryUser($action, $log, $status){
+        $user_id = auth()->user()->id;
+        $user_email = auth()->user()->email;
+        $ip = "125.164.244.223";
+        $PublicIP = $this->get_client_ip();
+        $getLoc = Location::get($PublicIP);
+        $lat = $getLoc->latitude;
+        $long = $getLoc->longitude;
+        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+
+        $history = History::create([
+            'id_user' => $user_id,
+            'email' => $user_email
+        ]);
+
+        if(!is_null($history) || !empty($history)) {
+            $history->createHistory($history, $action, $user_location, $PublicIP, $log, $status);
+        }
     }
 
     public function storeInfo() : JsonResponse {
@@ -85,6 +129,7 @@ class TenantController extends Controller {
         $kab_kota = $request->kab_kota;
         $kode_pos = $request->kode_pos;
         $catatan_kaki = $request->catatan_kaki;
+        DB::connection()->enableQueryLog();
 
         try {
             $store = StoreDetail::where('id_tenant', auth()->user()->id)
@@ -99,6 +144,8 @@ class TenantController extends Controller {
                 'jenis_usaha' => $jenis_usaha,
                 'catatan_kaki' => $catatan_kaki,
             ]);
+            $action = "Tenant API : Update Store Information";
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             return response()->json([
                 'message' => 'Data has ben updated!',
                 'storeData' => $store,
@@ -290,6 +337,8 @@ class TenantController extends Controller {
 
     public function kasirRegister(Request $request) : JsonResponse {
         $identifier = $this->getStoreIdentifier();
+        DB::connection()->enableQueryLog();
+        $action = "Tenant API : Register New Cashier";
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Admin::class, 'unique:'.Marketing::class, 'unique:'.Tenant::class,  'unique:'.Kasir::class],
@@ -307,13 +356,15 @@ class TenantController extends Controller {
             if(!is_null($kasir)) {
                 $kasir->detailKasirStore($kasir);
             }
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             return response()->json([
                 'message' => 'Data has been added!',
                 'kasir-data' => $kasir,
                 'status' => 200,
                 'app-version' => $this->getAppversion()
             ]);
-        } catch (Exception $e) {
+        } catch (Exception $e) { 
+            $this->createHistoryUser($action, $e, 0);
             return response()->json([
                 'message' => 'Failed to add data!',
                 'error-message' => $e->getMessage(),
@@ -324,6 +375,8 @@ class TenantController extends Controller {
     }
 
     public function kasirActivation(Request $request) : JsonResponse{
+        DB::connection()->enableQueryLog();
+        $action = "Tenant API : Update Kasir Activation";
         try{
             $identifier = $this->getStoreIdentifier();
             $kasir = Kasir::where('id_store', $identifier)->find($request->id_kasir);
@@ -344,7 +397,7 @@ class TenantController extends Controller {
                     'is_active' => 0
                 ]);
             }
-
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             return response()->json([
                 'message' => 'Update Success!',
                 'status' => 200,
@@ -352,6 +405,7 @@ class TenantController extends Controller {
             ]);
 
         } catch(Exception $e){
+            $this->createHistoryUser($action, $e, 0);
             return response()->json([
                 'message' => 'Database Error!',
                 'error-message' => $e->getMessage(),
@@ -786,6 +840,7 @@ class TenantController extends Controller {
     }
 
     public function processCart(Request $request) : JsonResponse {
+        DB::connection()->enableQueryLog();
         $identifier = $this->getStoreIdentifier();
         $subtotal = 0;
         $nominalpajak = 0;
@@ -813,70 +868,81 @@ class TenantController extends Controller {
             $disc = 0;
         }
 
-        $cartContent = ShoppingCart::select(['shopping_carts.id',
-                                                'shopping_carts.id_invoice',
-                                                'shopping_carts.id_product',
-                                                'shopping_carts.product_name',
-                                                'shopping_carts.qty',
-                                                'shopping_carts.harga',
-                                                'shopping_carts.sub_total',
-                                                'shopping_carts.id_tenant',
-                                                ])
-                                ->with(['stock' => function ($query){
-                                    $query->select(['product_stocks.id',
-                                                    'product_stocks.id_batch_product'
-                                    ])
-                                    ->with(['product' => function ($query){
-                                        $query->select(['products.id',
-                                                        'products.photo'
-                                        ])->get();
-                                    }])->get();
-                                }])
-                                ->where('id_tenant', auth()->user()->id)
-                                ->whereNull('id_invoice')
-                                ->latest()
-                                ->get();
-        $subtotal = $cartContent->sum('sub_total');
+        try{
+            $cartContent = ShoppingCart::select(['shopping_carts.id',
+                                                    'shopping_carts.id_invoice',
+                                                    'shopping_carts.id_product',
+                                                    'shopping_carts.product_name',
+                                                    'shopping_carts.qty',
+                                                    'shopping_carts.harga',
+                                                    'shopping_carts.sub_total',
+                                                    'shopping_carts.id_tenant',
+                                                    ])
+                                    ->with(['stock' => function ($query){
+                                        $query->select(['product_stocks.id',
+                                                        'product_stocks.id_batch_product'
+                                        ])
+                                        ->with(['product' => function ($query){
+                                            $query->select(['products.id',
+                                                            'products.photo'
+                                            ])->get();
+                                        }])->get();
+                                    }])
+                                    ->where('id_tenant', auth()->user()->id)
+                                    ->whereNull('id_invoice')
+                                    ->latest()
+                                    ->get();
+            $subtotal = $cartContent->sum('sub_total');
 
-        if($subtotal>=$disc){
-            $nominaldiskon = ($disc/100)*$subtotal;
-        }
+            if($subtotal>=$disc){
+                $nominaldiskon = ($disc/100)*$subtotal;
+            }
 
-        $temptotal = $subtotal-$nominaldiskon;
-        $nominalpajak = ($pajak/100)*$temptotal;
-        $total = $temptotal+$nominalpajak;
+            $temptotal = $subtotal-$nominaldiskon;
+            $nominalpajak = ($pajak/100)*$temptotal;
+            $total = $temptotal+$nominalpajak;
 
-        $invoice = Invoice::create([
-            'store_identifier' => $identifier,
-            'email' => auth()->user()->email,
-            'id_tenant' => auth()->user()->id,
-            'id_kasir' => NULL,
-            'jenis_pembayaran' => "Qris",
-            'status_pembayaran' => 0,
-            'sub_total' => $temptotal,
-            'pajak' => $nominalpajak,
-            'diskon' => $nominaldiskon,
-            'nominal_bayar' => $total,
-            'tanggal_transaksi' => Carbon::now(),
-        ]);
+            $invoice = Invoice::create([
+                'store_identifier' => $identifier,
+                'email' => auth()->user()->email,
+                'id_tenant' => auth()->user()->id,
+                'id_kasir' => NULL,
+                'jenis_pembayaran' => "Qris",
+                'status_pembayaran' => 0,
+                'sub_total' => $temptotal,
+                'pajak' => $nominalpajak,
+                'diskon' => $nominaldiskon,
+                'nominal_bayar' => $total,
+                'tanggal_transaksi' => Carbon::now(),
+            ]);
 
-        foreach($cartContent as $cart){
-            $cart->update([
-                'id_invoice' => $invoice->id
+            foreach($cartContent as $cart){
+                $cart->update([
+                    'id_invoice' => $invoice->id
+                ]);
+            }
+
+            if(!is_null($invoice)) {
+                $invoice->fieldSave($invoice, $identifier, NULL);
+            }
+            $action = "Tenant API : Proses Cart Invoice Success";
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+            return response()->json([
+                'message' => 'Transaction has been processed successfully',
+                'invoice' => $invoice,
+                'cartData' => $cartContent,
+                'status' => 200,
+                'app-version' => $this->getAppversion()
+            ]);
+        } catch (Exception $e){
+            $action = "Tenant API : Proses Cart Invoice Failed";
+            $this->createHistoryUser($action, $e, 0);
+            return response()->json([
+                'message' => 'Create Transaction failed, server error',
+                'status' => 500,
+                'app-version' => $this->getAppversion()
             ]);
         }
-
-        if(!is_null($invoice)) {
-            $invoice->fieldSave($invoice, $identifier, NULL);
-        }
-
-        return response()->json([
-            'message' => 'Transaction has been processed successfully',
-            'invoice' => $invoice,
-            'cartData' => $cartContent,
-            'status' => 200,
-            'app-version' => $this->getAppversion()
-        ]);
 
     }
 
@@ -1328,99 +1394,108 @@ class TenantController extends Controller {
 
     public function transactionPendingUpdate(Request $request) : JsonResponse {
         $identifier = $this->getStoreIdentifier();
-        $invoice = Invoice::with('shoppingCart')
-                            ->where('store_identifier', $identifier)
-                            ->where('id_tenant', auth()->user()->id)
-                            ->find($request->id_invoice);
+        DB::connection()->enableQueryLog();
+        try{
+            $invoice = Invoice::with('shoppingCart')
+                                ->where('store_identifier', $identifier)
+                                ->where('id_tenant', auth()->user()->id)
+                                ->find($request->id_invoice);
 
-        $diskon = Discount::where('store_identifier', $identifier)
-                            ->where('is_active', 1)->first();
-        $disc = 0;
-        $tax = Tax::where('store_identifier', $identifier)
-                    ->where('is_active', 1)->first();
-        $pajak = 0;
-
-        if(!empty($tax)){
-            $pajak = $tax->pajak;
-        } else {
-            $pajak = 0;
-        }
-
-        if(!empty($diskon)){
-            $disc = $diskon->diskon;
-        } else {
+            $diskon = Discount::where('store_identifier', $identifier)
+                                ->where('is_active', 1)->first();
             $disc = 0;
-        }
+            $tax = Tax::where('store_identifier', $identifier)
+                        ->where('is_active', 1)->first();
+            $pajak = 0;
 
-        $subtotal = 0;
-        $nominalpajak = 0;
-        $nominaldiskon = 0;
-        foreach($invoice->shoppingCart as $cart){
-            $subtotal+= $cart->sub_total;
-        }
-        $nominaldiskon = 0;
-        if($subtotal>=$disc){
-            $nominaldiskon = ($disc/100)*$subtotal;
-        }
-        $temptotal = $subtotal-$nominaldiskon;
-        $nominalpajak = ($pajak/100)*$temptotal;
-        $total = $temptotal+$nominalpajak;
+            if(!empty($tax)){
+                $pajak = $tax->pajak;
+            } else {
+                $pajak = 0;
+            }
 
-        $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
-        $qrisAccount = TenantQrisAccount::where('store_identifier', $invoice->store_identifier)->first();
+            if(!empty($diskon)){
+                $disc = $diskon->diskon;
+            } else {
+                $disc = 0;
+            }
 
-        $data = "";
-        $client = new Client();
-        $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
-        if(is_null($qrisAccount) || empty($qrisAccount)){
-            $postResponse = $client->request('POST',  $url, [
-                'form_params' => [
-                    'amount' => $total,
-                    'transactionNo' => $invoice->nomor_invoice,
-                    'pos_id' => "IN01",
-                    'secret_key' => "Vpos71237577"
-                ]
-            ]);
-            $responseCode = $postResponse->getStatusCode();
-            $data = json_decode($postResponse->getBody());
-        } else {
-            $qrisLogin = $qrisAccount->qris_login_user;
-            $qrisPassword = $qrisAccount->qris_password;
-            $qrisMerchantID = $qrisAccount->qris_merchant_id;
-            $qrisStoreID = $qrisAccount->qris_store_id;
+            $subtotal = 0;
+            $nominalpajak = 0;
+            $nominaldiskon = 0;
+            foreach($invoice->shoppingCart as $cart){
+                $subtotal+= $cart->sub_total;
+            }
+            $nominaldiskon = 0;
+            if($subtotal>=$disc){
+                $nominaldiskon = ($disc/100)*$subtotal;
+            }
+            $temptotal = $subtotal-$nominaldiskon;
+            $nominalpajak = ($pajak/100)*$temptotal;
+            $total = $temptotal+$nominalpajak;
 
-            $postResponse = $client->request('POST',  $url, [
-                'form_params' => [
-                    'login' => $qrisLogin,
-                    'password' => $qrisPassword,
-                    'merchantID' => $qrisMerchantID,
-                    'storeID' => $qrisStoreID,
-                    'amount' => $total,
-                    'transactionNo' => $invoice->nomor_invoice,
-                    'pos_id' => "IN01",
-                    'secret_key' => "Vpos71237577"
-                ]
-            ]);
+            $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
+            $qrisAccount = TenantQrisAccount::where('store_identifier', $invoice->store_identifier)->first();
 
-            $responseCode = $postResponse->getStatusCode();
-            $data = json_decode($postResponse->getBody());
-        }
-
-        $invoice->update([
-            'qris_data' => $data->data->data->qrisData,
-            'sub_total' => $temptotal,
-            'pajak' => $nominalpajak,
-            'diskon' => $nominaldiskon,
-            'nominal_bayar' => $total
-        ]);
-
-        if($storeDetail->status_umi == 1){
-            if($invoice->nominal_bayar <= 100000){
-                $invoice->update([
-                    'mdr' => 0,
-                    'nominal_mdr' => 0,
-                    'nominal_terima_bersih' => $invoice->nominal_bayar
+            $data = "";
+            $client = new Client();
+            $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+            if(is_null($qrisAccount) || empty($qrisAccount)){
+                $postResponse = $client->request('POST',  $url, [
+                    'form_params' => [
+                        'amount' => $total,
+                        'transactionNo' => $invoice->nomor_invoice,
+                        'pos_id' => "IN01",
+                        'secret_key' => "Vpos71237577"
+                    ]
                 ]);
+                $responseCode = $postResponse->getStatusCode();
+                $data = json_decode($postResponse->getBody());
+            } else {
+                $qrisLogin = $qrisAccount->qris_login_user;
+                $qrisPassword = $qrisAccount->qris_password;
+                $qrisMerchantID = $qrisAccount->qris_merchant_id;
+                $qrisStoreID = $qrisAccount->qris_store_id;
+
+                $postResponse = $client->request('POST',  $url, [
+                    'form_params' => [
+                        'login' => $qrisLogin,
+                        'password' => $qrisPassword,
+                        'merchantID' => $qrisMerchantID,
+                        'storeID' => $qrisStoreID,
+                        'amount' => $total,
+                        'transactionNo' => $invoice->nomor_invoice,
+                        'pos_id' => "IN01",
+                        'secret_key' => "Vpos71237577"
+                    ]
+                ]);
+
+                $responseCode = $postResponse->getStatusCode();
+                $data = json_decode($postResponse->getBody());
+            }
+
+            $invoice->update([
+                'qris_data' => $data->data->data->qrisData,
+                'sub_total' => $temptotal,
+                'pajak' => $nominalpajak,
+                'diskon' => $nominaldiskon,
+                'nominal_bayar' => $total
+            ]);
+
+            if($storeDetail->status_umi == 1){
+                if($invoice->nominal_bayar <= 100000){
+                    $invoice->update([
+                        'mdr' => 0,
+                        'nominal_mdr' => 0,
+                        'nominal_terima_bersih' => $invoice->nominal_bayar
+                    ]);
+                } else {
+                    $nominal_mdr = $total*0.007;
+                    $invoice->update([
+                        'nominal_mdr' => $nominal_mdr,
+                        'nominal_terima_bersih' => $total-$nominal_mdr
+                    ]);
+                }
             } else {
                 $nominal_mdr = $total*0.007;
                 $invoice->update([
@@ -1428,25 +1503,29 @@ class TenantController extends Controller {
                     'nominal_terima_bersih' => $total-$nominal_mdr
                 ]);
             }
-        } else {
-            $nominal_mdr = $total*0.007;
-            $invoice->update([
-                'nominal_mdr' => $nominal_mdr,
-                'nominal_terima_bersih' => $total-$nominal_mdr
+            $action = "Tenant API : Update Transaction Invoice Success";
+            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+            return response()->json([
+                'message' => 'Transaction Updated',
+                'invoice' => $invoice,
+                'cartData' => $invoice->shoppingCart,
+                'status' => 200,
+                'app-version' => $this->getAppversion()
+            ]);
+        } catch(Exception $e) {
+            $action = "Tenant API : Update Transaction Invoice Failed";
+            $this->createHistoryUser($action, $e, 0);
+            return response()->json([
+                'message' => 'Transaction Update Failed, Server Error',
+                'status' => 500,
+                'app-version' => $this->getAppversion()
             ]);
         }
-
-        return response()->json([
-            'message' => 'Transaction Updated',
-            'invoice' => $invoice,
-            'cartData' => $invoice->shoppingCart,
-            'status' => 200,
-            'app-version' => $this->getAppversion()
-        ]);
     }
 
     public function transactionPendingDelete(Request $request) : JsonResponse {
         $identifier = $this->getStoreIdentifier();
+        DB::connection()->enableQueryLog();
         try {
             $invoice = Invoice::where('status_pembayaran', 0)
                                 ->where('id_tenant', auth()->user()->id)
@@ -1463,6 +1542,8 @@ class TenantController extends Controller {
             }
             $invoice->delete();
         } catch (Exception $e) {
+            $action = "Tenant API : Transaction Pending Delete Failed";
+            $this->createHistoryUser($action, $e, 0);
             return response()->json([
                 'message' => 'Failed to delete data!',
                 'error-message' => $e->getMessage(),
@@ -1470,6 +1551,8 @@ class TenantController extends Controller {
             ]);
             exit;
         }
+        $action = "Tenant API : Transaction Pending Delete Success";
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         return response()->json([
             'message' => 'Transaction deleted',
             'status' => 200,
@@ -1479,6 +1562,7 @@ class TenantController extends Controller {
 
     public function transactionChangePayment(Request $request) : JsonResponse {
         $identifier = $this->getStoreIdentifier();
+        DB::connection()->enableQueryLog();
         $invoice = "";
         try {
             $invoice = Invoice::where('status_pembayaran', 0)
@@ -1503,6 +1587,8 @@ class TenantController extends Controller {
                 'saldo' => $totalSaldo
             ]);
         } catch (Exception $e) {
+            $action = "Tenant API : Change Payment Failed";
+            $this->createHistoryUser($action, $e, 0);
             return response()->json([
                 'message' => 'Failed to update data!',
                 'error-message' => $e->getMessage(),
@@ -1510,6 +1596,8 @@ class TenantController extends Controller {
             ]);
             exit;
         }
+        $action = "Tenant API : Change Payment Success";
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         return response()->json([
             'message' => 'Payment Success',
             'transaction-data' => $invoice,
