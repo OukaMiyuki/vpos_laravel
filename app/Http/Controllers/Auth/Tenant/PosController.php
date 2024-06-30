@@ -699,11 +699,12 @@ class PosController extends Controller {
         $invoice = Invoice::with('shoppingCart', 'invoiceField')
                             ->where('store_identifier', $identifier)
                             ->find($id);
-
+        $path = public_path('qrcode/'.time().'.png');
         $png = \QrCode::format('png')->size(200)->generate($invoice->qris_data);
         $png = base64_encode($png);
-
-        return response()->download($png);
+        return QrCode::size(300)
+                     ->generate($invoice->qris_data, $path);
+        // return response()->download($png);
         // return Pdf::view('pdf', ['invoice' => $invoice])
         //             ->format('a4')
         //             ->name('your-invoice.pdf');
