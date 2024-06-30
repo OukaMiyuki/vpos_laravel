@@ -715,11 +715,12 @@ class PosController extends Controller {
         $invoiceName = $invoice->nomor_invoice.'.pdf';
         $content = $pdf->download()->getOriginalContent();
         Storage::put('public/invoice/'.$invoiceName,$content);
-        // $imagick = new Imagick();
-        // $imagick->readImage(public_path('public/invoice/'.$invoiceName));
-        // $saveImagePath = public_path('converted.jpg');
-        // $imagick->writeImages($saveImagePath, true);
-        // return response()->file($saveImagePath);
+        $imagick = new Imagick();
+        $path = Storage::path('public/invoice/'.$invoiceName);
+        $imagick->readImage($path);
+        $saveImagePath = public_path('converted.jpg');
+        $imagick->writeImages($saveImagePath, true);
+        return response()->file($saveImagePath);
         //$pdfimage = new \Spatie\PdfToImage\Pdf($pdf);
         // $pdf->save($pathToWhereImageShouldBeStored);
   
