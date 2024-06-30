@@ -138,25 +138,22 @@ class UmiController extends Controller {
             $fileSave = $userDocsPath.'/'.$filename;
             try {
                 File::copy($templatePath, $fileSave);
-                $spreadsheet = new Spreadsheet();
-                //Storage::copy($templatePath, $fileSave);
-                //$spreadsheet = IOFactory::load($templatePath);
-                //dd($spreadsheet);
-                //$sheet = $spreadsheet->getActiveSheet();
-                $sheet1 = $spreadsheet->getSheetByName("Identitas Perusahaan");
-                // $sheet1->mergeCells('E6:F6');
+                $spreadsheet = IOFactory::load($fileSave);
+                // $sheet = $spreadsheet->getActiveSheet();
+                $sheet1 = $spreadsheet->getSheet(0);
+                $sheet1->mergeCells('E6:F6');
                 $sheet1->getCell('E6')->setValue($nama_usaha);
-                // $sheet1->mergeCells('E7:F7');
+                $sheet1->mergeCells('E7:F7');
                 $sheet1->getCell('E7')->setValue($nama_usaha);
-                // $sheet1->mergeCells('E9:F9');
+                $sheet1->mergeCells('E9:F9');
                 $sheet1->getCell('E9')->setValue($no_npwp);
-                // $sheet1->mergeCells('E10:F10');
+                $sheet1->mergeCells('E10:F10');
                 $sheet1->getCell('E10')->setValue($alamat);
-                // $sheet1->mergeCells('E11:F11');
+                $sheet1->mergeCells('E11:F11');
                 $sheet1->getCell('E11')->setValue($nama_pemilik);
-                // $sheet1->mergeCells('E12:F12');
+                $sheet1->mergeCells('E12:F12');
                 $sheet1->getCell('E12')->setValue($no_hp);
-                // $sheet1->mergeCells('E13:F13');
+                $sheet1->mergeCells('E13:F13');
                 $sheet1->getCell('E13')->setValue($email);
 
                 $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
@@ -169,12 +166,12 @@ class UmiController extends Controller {
                 $drawing->getShadow()->setDirection(45);
                 $drawing->setWorksheet($sheet1);
 
-                $sheet2 = $spreadsheet->getSheetByName("Formulir Pendaftaran NOBU QRIS");
-                // $sheet2->mergeCells('D4:E4');
+                $sheet2 = $spreadsheet->getSheet(1);
+                $sheet2->mergeCells('D4:E4');
                 $sheet2->getCell('D4')->setValue($nama_usaha);
-                // $sheet2->mergeCells('D5:E5');
+                $sheet2->mergeCells('D5:E5');
                 $sheet2->getCell('D5')->setValue($nama_pemilik);
-                // $sheet2->mergeCells('D6:E6');
+                $sheet2->mergeCells('D6:E6');
                 $sheet2->getCell('D6')->setValue($tanggal);
                 $sheet2->getCell('C11')->setValue($nama_pemilik);
                 $sheet2->getCell('D11')->setValue($no_ktp);
