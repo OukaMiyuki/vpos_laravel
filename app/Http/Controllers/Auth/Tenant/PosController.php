@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth\Tenant;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
@@ -711,16 +712,20 @@ class PosController extends Controller {
         //             ->name('your-invoice.pdf');
         $qrcode = base64_encode(\QrCode::format('svg')->size(200)->errorCorrection('H')->generate($invoice->qris_data));
         $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode])->setPaper('A8', 'portrait');
+        $invoiceName = $invoice->nomor_invoice.'.pdf';
         $content = $pdf->download()->getOriginalContent();
+        Storage::put('public/invoice/'.$invoiceName,$content);
         $imagick = new Imagick();
-  
-        $imagick->readImage($content);
+        $imagick->readImage(public_path('public/invoice/'.$invoiceName));
+        $saveImagePath = public_path('converted.jpg');
+        $imagick->writeImages($saveImagePath, true);
+        return response()->file($saveImagePath);
         //$pdfimage = new \Spatie\PdfToImage\Pdf($pdf);
         // $pdf->save($pathToWhereImageShouldBeStored);
   
         // $saveImagePath = public_path('converted.jpg');
         // $imagick->writeImages($saveImagePath, true);
         // return $pdf->download();
-        return response()->download($imagick);
+        // return response()->download($imagick);
     }
 }
