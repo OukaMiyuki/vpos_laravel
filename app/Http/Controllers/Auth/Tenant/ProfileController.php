@@ -182,10 +182,18 @@ class ProfileController extends Controller{
 
                 $ktpImage = auth()->user()->detail->ktp_image;
                 if(empty($ktpImage)){
-                    $fileKtp->move($storagePathKto, $filenamektp);
+                    try{
+                        $fileKtp->move($storagePathKto, $filenamektp);
+                    } catch(Exception $e){
+                        return $e
+                    }
                 } else {
-                    Storage::delete('public/images/profile/'.$ktpImage);
-                    $fileKtp->move($storagePathKto, $filenamektp);
+                    try{
+                        Storage::delete('public/images/profile/'.$ktpImage);
+                        $fileKtp->move($storagePathKto, $filenamektp);
+                    } catch(Exception $e){
+                        return $e;
+                    }
                 }
             }
 
