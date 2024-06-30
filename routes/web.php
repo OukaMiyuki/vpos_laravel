@@ -255,17 +255,16 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
 Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsNotMitra'])->prefix('/tenant/mitra')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'index'])->name('tenant.mitra.dashboard');
 
-    Route::get('/dashboard/store', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeDashboard'])->name('tenant.mitra.dashboard.toko');
-    Route::get('/dashboard/store/list', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeList'])->name('tenant.mitra.dashboard.toko.list');
-    Route::get('/dashboard/store/create', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeCreate'])->name('tenant.mitra.dashboard.toko.create');
-    Route::post('/dashboard/store/create', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeRegister'])->name('tenant.mitra.dashboard.toko.register');
-    Route::get('/dashboard/store/edit/{id}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeEdit'])->name('tenant.mitra.dashboard.toko.edit');
-    Route::post('/dashboard/store/update', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeUpdate'])->name('tenant.mitra.dashboard.toko.update');
-    Route::get('/dashboard/store/detail/{id}/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeDetail'])->name('tenant.mitra.dashboard.toko.detail');
-    Route::get('/dashboard/store/invoice/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeInvoiceList'])->name('tenant.mitra.dashboard.toko.invoice');
-    Route::post('/dashboard/store/request_umi', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'requestUmi'])->name('tenant.mitra.dashboard.toko.request.umi');
-    Route::post('/dashboard/store/request_umi/resend', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'requestUmiResend'])->name('tenant.mitra.dashboard.toko.request.umi.resend');
-    Route::get('/dashboard/store/request_umi', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'umiRequestList'])->name('tenant.mitra.dashboard.toko.request.umi.list');
+    Route::get('/dashboard/merchant', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeDashboard'])->name('tenant.mitra.dashboard.toko');
+    Route::get('/dashboard/merchant/list', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeList'])->name('tenant.mitra.dashboard.toko.list');
+    Route::get('/dashboard/merchant/create', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeCreate'])->name('tenant.mitra.dashboard.toko.create');
+    Route::post('/dashboard/merchant/create', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeRegister'])->name('tenant.mitra.dashboard.toko.register');
+    Route::get('/dashboard/merchant/edit/{id}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeEdit'])->name('tenant.mitra.dashboard.toko.edit');
+    Route::post('/dashboard/merchant/update', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeUpdate'])->name('tenant.mitra.dashboard.toko.update');
+    Route::get('/dashboard/merchant/detail/{id}/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeDetail'])->name('tenant.mitra.dashboard.toko.detail');
+    Route::get('/dashboard/merchant/invoice/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeInvoiceList'])->name('tenant.mitra.dashboard.toko.invoice');
+    Route::post('/dashboard/merchant/request_umi', [App\Http\Controllers\Auth\Tenant\UmiController::class, 'requestUmiMitra'])->name('tenant.mitra.dashboard.toko.request.umi');
+    Route::get('/dashboard/merchant/request_umi', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'umiRequestList'])->name('tenant.mitra.dashboard.toko.request.umi.list');
     Route::get('/dashboard/transaction/', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationDashboard'])->name('tenant.mitra.dashboard.transaction');
     Route::get('/dashboard/transaction/list', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationAll'])->name('tenant.mitra.dashboard.transaction.all_transaction');
     Route::get('/dashboard/transaction/today', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationAllToday'])->name('tenant.mitra.dashboard.transaction.all_today_transaction');
@@ -290,9 +289,8 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
 });
 
 Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsMitra'])->prefix('tenant')->group( function () {
-    Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestForm'])->name('tenant.request.umi');
-    Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');
-    Route::post('request/umi/resend', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'umiRequestProcessResend'])->name('tenant.request.umi.resend');
+    Route::get('request/umi', [App\Http\Controllers\Auth\Tenant\UmiController::class, 'umiRequestForm'])->name('tenant.request.umi');
+    Route::post('request/umi', [App\Http\Controllers\Auth\Tenant\UmiController::class, 'umiRequestProcess'])->name('tenant.request.umi.send');
 
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'index'])->name('tenant.dashboard');
     Route::get('/dashboard/kasir', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'tenantKasirDashboard'])->name('tenant.kasir');

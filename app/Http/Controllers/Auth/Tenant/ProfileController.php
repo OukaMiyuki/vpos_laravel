@@ -137,7 +137,9 @@ class ProfileController extends Controller{
                                                     'detail_tenants.tanggal_lahir',
                                                     'detail_tenants.jenis_kelamin',
                                                     'detail_tenants.alamat',
-                                                    'detail_tenants.photo'])
+                                                    'detail_tenants.photo',
+                                                    'detail_tenants.nama_perusahaan',
+                                                    'detail_tenants.ktp_image'])
                                             ->where('detail_tenants.id_tenant', auth()->user()->id)
                                             ->where('detail_tenants.email', auth()->user()->email)
                                             ->first();
@@ -170,6 +172,22 @@ class ProfileController extends Controller{
             $account = Tenant::where('id', auth()->user()->id)
                                 ->where('email', auth()->user()->email)
                                 ->first();
+            $filenamektp = auth()->user()->detail->ktp_image;
+            if($request->hasFile('ktp-image')){
+                $fileKtp = $request->file('ktp-image');
+                $nama = auth()->user()->name;
+                $storagePathKto = Storage::path('public/images/profile');
+                $extKtp = $fileKtp->getClientOriginalExtension();
+                $filenamektp = $nama.'-'.time().'.'.$extKtp;
+
+                $ktpImage = auth()->user()->detail->ktp_image;
+                if(empty($ktpImage)){
+                    $fileKtp->move($storagePathKto, $filenamektp);
+                } else {
+                    Storage::delete('public/images/profile/'.$ktpImage);
+                    $fileKtp->move($storagePathKto, $filenamektp);
+                }
+            }
 
             if($request->hasFile('photo')){
                 $file = $request->file('photo');
@@ -198,29 +216,58 @@ class ProfileController extends Controller{
                     }
                 }
 
-                $profileInfo->update([
-                    'no_ktp' => $request->no_ktp,
-                    'tempat_lahir' => $request->tempat_lahir,
-                    'tanggal_lahir' => $request->tanggal_lahir,
-                    'jenis_kelamin' => $request->jenis_kelamin,
-                    'alamat' => $request->alamat,
-                    'photo' => $filename,
-                    'updated_at' => Carbon::now()
-                ]);
+                if(auth()->user()->id_inv_code == 0){
+                    $profileInfo->update([
+                        'no_ktp' => $request->no_ktp,
+                        'tempat_lahir' => $request->tempat_lahir,
+                        'tanggal_lahir' => $request->tanggal_lahir,
+                        'jenis_kelamin' => $request->jenis_kelamin,
+                        'alamat' => $request->alamat,
+                        'photo' => $filename,
+                        'nama_perusahaan' => $request->nama_perusahaan,
+                        'updated_at' => Carbon::now(),
+                        'ktp_image' => $filenamektp
+                    ]);
+                } else {
+                    $profileInfo->update([
+                        'no_ktp' => $request->no_ktp,
+                        'tempat_lahir' => $request->tempat_lahir,
+                        'tanggal_lahir' => $request->tanggal_lahir,
+                        'jenis_kelamin' => $request->jenis_kelamin,
+                        'alamat' => $request->alamat,
+                        'photo' => $filename,
+                        'updated_at' => Carbon::now(),
+                        'ktp_image' => $filenamektp
+                    ]);
+                }
 
                 $account->update([
                     'name' => $request->name
                 ]);
 
             } else {
-                $profileInfo->update([
-                    'no_ktp' => $request->no_ktp,
-                    'tempat_lahir' => $request->tempat_lahir,
-                    'tanggal_lahir' => $request->tanggal_lahir,
-                    'jenis_kelamin' => $request->jenis_kelamin,
-                    'alamat' => $request->alamat,
-                    'updated_at' => Carbon::now()
-                ]);
+                if(auth()->user()->id_inv_code == 0){
+                    $profileInfo->update([
+                        'no_ktp' => $request->no_ktp,
+                        'tempat_lahir' => $request->tempat_lahir,
+                        'tanggal_lahir' => $request->tanggal_lahir,
+                        'jenis_kelamin' => $request->jenis_kelamin,
+                        'nama_perusahaan' => $request->nama_perusahaan,
+                        'alamat' => $request->alamat,
+                        'updated_at' => Carbon::now(),
+                        'ktp_image' => $filenamektp
+                    ]);
+                } else {
+                    $profileInfo->update([
+                        'no_ktp' => $request->no_ktp,
+                        'tempat_lahir' => $request->tempat_lahir,
+                        'tanggal_lahir' => $request->tanggal_lahir,
+                        'jenis_kelamin' => $request->jenis_kelamin,
+                        'alamat' => $request->alamat,
+                        'updated_at' => Carbon::now(),
+                        'ktp_image' => $filenamektp
+                    ]);
+                }
 
                 $account->update([
                     'name' => $request->name
@@ -497,6 +544,19 @@ class ProfileController extends Controller{
                 return redirect()->back()->with($notification);
             }
 
+            // $fileKtp = $request->file('ktp-image');
+            // $nama = auth()->user()->name;
+            // $storagePathKto = Storage::path('public/images/profile');
+            // $extKtp = $fileKtp->getClientOriginalExtension();
+            // $filenamektp = $nama.'-'.time().'.'.$extKtp;
+
+            // if(empty($tenantStore->ktp_image)){
+            //     $fileKtp->move($storagePathKto, $filenamektp);
+            // } else {
+            //     Storage::delete('public/images/profile/'.$tenantStore->ktp_image);
+            //     $fileKtp->move($storagePathKto, $filenamektp);
+            // }
+
             if($request->hasFile('photo')){
                 $file = $request->file('photo');
                 $namaFile = $request->nama;
@@ -517,23 +577,43 @@ class ProfileController extends Controller{
 
                 $tenantStore->update([
                     'name' => $request->name,
+                    'no_npwp' => $request->no_npwp,
                     'alamat' => $request->alamat,
+                    'nama_jalan' => $request->nama_jalan,
+                    'nama_blok' => $request->nama_blok,
+                    'rt' => $request->rt,
+                    'rw' => $request->rw,
+                    'kelurahan_desa' => $request->kelurahan_desa,
+                    'kecamatan' => $request->kecamatan,
                     'kabupaten' => $request->kabupaten,
                     'kode_pos' => $request->kode_pos,
                     'no_telp_toko' => $request->no_telp,
                     'jenis_usaha' => $request->jenis,
+                    'kantor_toko_fisik' => $request->kantor_toko_fisik,
+                    'kategori_usaha_omset' => $request->kategori_usaha_omset,
                     'catatan_kaki' => $request->catatan,
-                    'photo' => $filename
+                    'website' => $request->website,
+                    'photo' => $filename,
                 ]);
             } else {
                 $tenantStore->update([
                     'name' => $request->name,
+                    'no_npwp' => $request->no_npwp,
                     'alamat' => $request->alamat,
+                    'nama_jalan' => $request->nama_jalan,
+                    'nama_blok' => $request->nama_blok,
+                    'rt' => $request->rt,
+                    'rw' => $request->rw,
+                    'kelurahan_desa' => $request->kelurahan_desa,
+                    'kecamatan' => $request->kecamatan,
                     'kabupaten' => $request->kabupaten,
                     'kode_pos' => $request->kode_pos,
                     'no_telp_toko' => $request->no_telp,
                     'jenis_usaha' => $request->jenis,
+                    'kantor_toko_fisik' => $request->kantor_toko_fisik,
+                    'kategori_usaha_omset' => $request->kategori_usaha_omset,
                     'catatan_kaki' => $request->catatan,
+                    'website' => $request->website,
                 ]);
             }
 
@@ -1079,123 +1159,6 @@ class ProfileController extends Controller{
 
             return 0;
         }
-    }
-
-    public function umiRequestForm(){
-        $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->first();
-        if(empty($umiRequest)){
-            $umiRequest = "Empty";
-        }
-        return view('tenant.tenant_umi_request', compact('umiRequest'));
-    }
-
-    public function umiRequestProcess(Request $request){
-        $action = "Tenant : Store UMI Request";
-        $umiRequest = UmiRequest::where('id_tenant', auth()->user()->id)
-                                ->where('email', auth()->user()->email)
-                                ->where('store_identifier', $request->store_identifier)
-                                ->first();
-        if(empty($umiRequest) || is_null($umiRequest) || $umiRequest == ""){
-            $tanggal = date("j F Y", strtotime(date('Y-m-d')));
-            $nama_pemilik = $request->nama_pemilik;
-            $no_ktp = $request->no_ktp;
-            $no_hp = $request->no_hp;
-            $email = $request->email;
-            $nama_usaha = $request->nama_usaha;
-            $jenis_usaha = $request->jenis_usaha;
-            $alamat = $request->alamat;
-            $kab_kota = $request->kab_kota;
-            $kode_pos = $request->kode_pos;
-            if(empty($nama_usaha)
-                || is_null($nama_usaha)
-                || $nama_usaha == ""
-                || empty($jenis_usaha)
-                || is_null($jenis_usaha)
-                || $jenis_usaha == ""
-                || empty($alamat)
-                || is_null($alamat)
-                || $alamat == ""
-                || empty($kab_kota)
-                || is_null($kab_kota)
-                || $kab_kota == ""
-                || empty($kode_pos)
-                || is_null($kode_pos)
-                || $kode_pos == ""
-            ) {
-                $notification = array(
-                    'message' => 'Data detail toko belum lengkap, silahkan lengkapi data terlebih dahulu!',
-                    'alert-type' => 'warning',
-                );
-                return redirect()->back()->with($notification);
-            }
-            $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_NOBU_QRIS_(NMID).xlsx');
-            $userDocsPath = Storage::path('public/docs/umi/user_doc');
-            $filename = 'Formulir Pendaftaran NOBU QRIS (NMID) PT BRAHMA ESATAMA_'.$nama_usaha.'_'.date('dmYHis').'.xlsx';
-            $fileSave = $userDocsPath.'/'.$filename;
-            try {
-                File::copy($templatePath, $fileSave);
-                $spreadsheet = IOFactory::load($fileSave);
-                $sheet = $spreadsheet->getActiveSheet();
-                $sheet->setCellValue('D6', $tanggal);
-                $sheet->setCellValue('C10', $nama_pemilik);
-                $sheet->setCellValue('D10', $no_ktp);
-                $sheet->setCellValue('E10', $no_hp);
-                $sheet->setCellValue('F10', $email);
-                $sheet->setCellValue('G10', $nama_usaha);
-                $sheet->setCellValue('H10', $jenis_usaha);
-                $sheet->setCellValue('I10', $alamat);
-                $sheet->setCellValue('J10', $kab_kota);
-                $sheet->setCellValue('K10', $kode_pos);
-                $sheet->setCellValue('L10', 'Ya');
-                $sheet->setCellValue('M10', 'UMI - Penjualan/Tahun: < 2M');
-                $sheet->setCellValue('N10', 'Booth (Dinamis & Statis)');
-                $sheet->setCellValue('O10', '0,00%');
-                $sheet->setCellValue('P10', 'Ya');
-                $sheet->setCellValue('Q10', '');
-                $newFilePath = $fileSave;
-                $writer = new Xlsx($spreadsheet);
-                $writer->save($newFilePath);
-                UmiRequest::create([
-                    'id_tenant' => auth()->user()->id,
-                    'email' => auth()->user()->email,
-                    'store_identifier' => $request->store_identifier,
-                    'tanggal_pengajuan' => Carbon::now(),
-                    'file_path' => $filename
-                ]);
-
-                $mailData = [
-                    'title' => 'Formulir Pendaftaran UMI',
-                    'body' => 'This is for testing email using smtp.',
-                    'file' => $fileSave
-                ];
-
-                Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
-
-                $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
-
-                $notification = array(
-                    'message' => 'Permintaan UMI berhasil diajukan!',
-                    'alert-type' => 'success',
-                );
-                return redirect()->back()->with($notification);
-            } catch (Exception $e) {
-                $this->createHistoryUser($action, $e, 0);
-
-                $notification = array(
-                    'message' => 'Permintaan UMI gagal, silahkan hubungi admin!',
-                    'alert-type' => 'error',
-                );
-                return redirect()->back()->with($notification);
-            }
-        } else {
-            return redirect()->back();
-        }
-    }
-
-    public function umiRequestProcessResend(Request $request){
-        return "Walla";
     }
 
     public function whatsappNotification(){

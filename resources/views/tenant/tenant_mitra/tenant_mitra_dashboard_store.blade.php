@@ -10,7 +10,7 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Store</li>
+                                <li class="breadcrumb-item active">Merchant</li>
                             </ol>
                         </div>
                         <h4 class="page-title">Dashboard Merchant</h4>
@@ -21,7 +21,7 @@
                 <div class="col-xl-3 col-md-3">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="header-title mb-0">Store List</h4>
+                            <h4 class="header-title mb-0">Merchant List</h4>
                             <div id="cardCollpase1" class="collapse show">
                                 <div class="text-center pt-3">
                                     <div class="row text-center">

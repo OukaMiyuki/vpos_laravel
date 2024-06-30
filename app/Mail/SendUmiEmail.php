@@ -41,6 +41,13 @@ class SendUmiEmail extends Mailable {
     public function content(): Content {
         return new Content(
             view: 'tenant.auth.umiRequest',
+            with: [
+                'storeName' => $this->mailData['storeName'],
+                'jenisUsaha' => $this->mailData['jenisUsaha'],
+                'alamat' => $this->mailData['alamat'],
+                'kabupaten' => $this->mailData['kabupaten'],
+                'kodePos' => $this->mailData['kodePos'],
+            ],
         );
     }
 

@@ -62,24 +62,108 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
-                                                <label for="alamat" class="form-label">Alamat Merchant</label>
+                                                <label for="alamat" class="form-label">Alamat Lengkap Merchant</label>
                                                 <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $store->alamat !!}</textarea>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="nama_jalan" class="form-label">Nama Jalan</label>
+                                                <input type="text" class="form-control" name="nama_jalan" id="nama_jalan" required value="{{$store->nama_jalan}}" placeholder="Masukkan nama jalan">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="nama_blok" class="form-label">Nama Blok / Tempat Usaha (Opsional)</label>
+                                                <input type="text" class="form-control" name="nama_blok" id="nama_blok" required value="{{$store->nama_blok}}" placeholder="Masukkan nama blok">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="rt" class="form-label">RT.</label>
+                                                <input type="text" class="form-control" name="rt" id="rt" required value="{{$store->rt}}" placeholder="Masukkan nomor RT">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="rw" class="form-label">RW.</label>
+                                                <input type="text" class="form-control" name="rw" id="rw" required value="{{$store->rw}}" placeholder="Masukkan nomor RW">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="kelurahan_desa" class="form-label">Kelurahan/Desa</label>
+                                                <input type="text" class="form-control" name="kelurahan_desa" id="kelurahan_desa" required value="{{$store->kelurahan_desa}}" placeholder="Masukkan nama kelurahan atau desa">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="kecamatan" class="form-label">Kecamatan</label>
+                                                <input type="text" class="form-control" name="kecamatan" id="kecamatan" required value="{{$store->kecamatan}}" placeholder="Masukkan nama kecamatan">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="kabupaten" class="form-label">Kabupaten/Kota</label>
-                                                <input type="text" class="form-control" name="kabupaten" id="kabupaten" required value="{{ $store->kabupaten }}" placeholder="Masukkan kabupaten atau kota">
+                                                <input type="text" class="form-control" name="kabupaten" id="kabupaten" required value="{{$store->kabupaten}}" placeholder="Masukkan nama kabupaten atau kota">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
-                                                <label for="kode_pos" class="form-label">Kode Pos Merchant</label>
-                                                <input type="text" class="form-control" name="kode_pos" id="kode_pos" required value="{{ $store->kode_pos }}" placeholder="Masukkan kode pos">
+                                                <label for="kode_pos" class="form-label">Kode Pos Toko</label>
+                                                <input type="text" class="form-control" name="kode_pos" id="kode_pos" required value="{{$store->kode_pos}}" placeholder="Masukkan kode pos">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="no_npwp" class="form-label">NPWP (Opsional)</label>
+                                                <input type="text" class="form-control" name="no_npwp" id="no_npwp" value="{{$store->no_npwp}}" placeholder="Masukkan nomor NPWP">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="kantor_toko_fisik" class="form-label">Memiliki Toko Fisik atau Kantor Usaha?</label>
+                                                <select required class="form-control" name="kantor_toko_fisik" id="kantor_toko_fisik" data-width="100%">
+                                                    <option value="">- Pilih -</option>
+                                                    <option @if($store->kantor_toko_fisik == "Ya") selected @endif value="Ya">Ya</option>
+                                                    <option @if($store->kantor_toko_fisik == "Tidak") selected @endif value="Tidak">Tidak</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="kategori_usaha_omset" class="form-label">Kategori Usaha Berdasarkan Omzet</label>
+                                                <select required class="form-control" name="kategori_usaha_omset" id="jenis-omset" data-width="100%">
+                                                    <option value="">- Pilih -</option>
+                                                    <option @if($store->kategori_usaha_omset == "UMI - Penjualan/Tahun: < 2M") selected @endif value="UMI - Penjualan/Tahun: < 2M">UMI - Penjualan/Tahun: < 2M</option>
+                                                    <option @if($store->kategori_usaha_omset == "UKE - Penjualan/Tahun: >2M-15M") selected @endif value="UKE - Penjualan/Tahun: >2M-15M">UKE - Penjualan/Tahun: >2M-15M</option>
+                                                    <option @if($store->kategori_usaha_omset == "UME - Penjualan/Tahun: >15M-50M") selected @endif value="UME - Penjualan/Tahun: >15M-50M">UME - Penjualan/Tahun: >15M-50M</option>
+                                                    <option @if($store->kategori_usaha_omset == "UBE - Penjualan/Tahun: >50M") selected @endif value="UBE - Penjualan/Tahun: >50M">"UBE - Penjualan/Tahun: >50M</option>
+                                                    <option @if($store->kategori_usaha_omset == "URE - Donasi, Organisasi Sosial, dsb") selected @endif value="URE - Donasi, Organisasi Sosial, dsb">URE - Donasi, Organisasi Sosial, dsb</option>
+                                                    <option @if($store->kategori_usaha_omset == "PSO - Pelayanan Sosial/Bantuan Sosial") selected @endif value="PSO - Pelayanan Sosial/Bantuan Sosial">PSO - Pelayanan Sosial/Bantuan Sosial</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="website" class="form-label">Website (Opsional)</label>
+                                                <input type="text" class="form-control" name="website" id="website" value="{{$store->website}}" placeholder="Masukkan alamat website usaha jika ada">
                                             </div>
                                         </div>
                                     </div>

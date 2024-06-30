@@ -7,6 +7,14 @@ $(document).ready(function(){
         reader.readAsDataURL(e.target.files['0']);
     });
 
+    $('#ktp-image').change(function(e){
+        var reader = new FileReader();
+        reader.onload = function(e){
+            $('#showImageKtp').attr('src', e.target.result);
+        }
+        reader.readAsDataURL(e.target.files['0']);
+    });
+
     $('#swift_code').on('change',function(){
         if($(this).val() != "default"){
             $('#nama_bank').val($( "#swift_code option:selected" ).text());

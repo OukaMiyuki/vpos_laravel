@@ -62,7 +62,7 @@
                                 </li>
                                 <li class="nav-item">
                                     <a href="#aboutme" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
-                                        Request Umi
+                                        Request Qris & UMI
                                     </a>
                                 </li>
                             </ul>
@@ -75,7 +75,7 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="name" class="form-label">Nama Merchant</label>
-                                                    <input type="text" class="form-control" readonly name="name" id="name" required value="{{ $store->name }}" placeholder="Masukkan nama Merchant">
+                                                    <input type="text" class="form-control" name="name" id="name" required value="{{$store->name}}" readonly placeholder="Masukkan nama toko">
                                                 </div>
                                             </div>
                                         </div>
@@ -83,7 +83,7 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="no_telp" class="form-label">No. Telp. Merchant</label>
-                                                    <input type="text" class="form-control" readonly name="no_telp" id="no_telp" required value="{{ $store->no_telp_toko }}" placeholder="Masukkan nomor telepon Merchant">
+                                                    <input type="text" class="form-control" readonly name="no_telp" id="no_telp" required value="{{$store->no_telp_toko}}" placeholder="Masukkan nomor telepon toko">
                                                 </div>
                                             </div>
                                         </div>
@@ -91,38 +91,110 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="jenis" class="form-label">Jenis Usaha</label>
-                                                    <input type="text" class="form-control" readonly name="jenis" id="jenis" required value="{{ $store->jenis_usaha }}" placeholder="Masukkan jenis usaha">
+                                                    <input type="text" class="form-control" name="jenis_usaha" id="jenis_usaha" required value="{{$store->jenis_usaha}}" readonly placeholder="Masukkan jenis usaha">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="alamat" class="form-label">Alamat Merchant</label>
-                                                    <textarea placeholder="Masukkan alamat Merchant" readonly class="form-control" id="alamat" name="alamat" rows="5" spellcheck="false" required>{!! $store->alamat !!}</textarea>
+                                                    <label for="alamat" class="form-label">Alamat Lengkap Merchant</label>
+                                                    <textarea placeholder="Masukkan alamat anda" class="form-control" id="alamat" readonly name="alamat" rows="5" spellcheck="false" required>{!!$store->alamat!!}</textarea>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-12">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="nama_jalan" class="form-label">Nama Jalan</label>
+                                                    <input type="text" class="form-control" name="nama_jalan" id="nama_jalan" required value="{{$store->nama_jalan}}" readonly placeholder="Masukkan nama jalan">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="nama_blok" class="form-label">Nama Blok / Tempat Usaha (Opsional)</label>
+                                                    <input type="text" class="form-control" name="nama_blok" id="nama_blok" required value="{{$store->nama_blok}}" readonly placeholder="Masukkan nama blok">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="rt" class="form-label">RT.</label>
+                                                    <input type="text" class="form-control" name="rt" id="rt" required value="{{$store->rt}}" readonly placeholder="Masukkan nomor RT">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="rw" class="form-label">RW.</label>
+                                                    <input type="text" class="form-control" name="rw" id="rw" required value="{{$store->rw}}" readonly placeholder="Masukkan nomor RW">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="kelurahan_desa" class="form-label">Kelurahan/Desa</label>
+                                                    <input type="text" readonly class="form-control" name="kelurahan_desa" id="kelurahan_desa" required value="{{$store->kelurahan_desa}}" placeholder="Masukkan nama kelurahan atau desa">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="kecamatan" class="form-label">Kecamatan</label>
+                                                    <input type="text" class="form-control" name="kecamatan" id="kecamatan" required value="{{$store->kecamatan}}" readonly placeholder="Masukkan nama kecamatan">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="kabupaten" class="form-label">Kabupaten/Kota</label>
-                                                    <input type="text" class="form-control" name="kabupaten" id="kabupaten" readonlyrequired value="{{ $store->kabupaten }}" placeholder="Masukkan kabupaten atau kota">
+                                                    <input type="text" class="form-control" name="kabupaten" id="kabupaten" required value="{{$store->kabupaten}}" readonly placeholder="Masukkan nama kabupaten atau kota">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="kode_pos" class="form-label">Kode Pos Merchant</label>
-                                                    <input type="text" class="form-control" name="kode_pos" id="kode_pos" readonly required value="{{ $store->kode_pos }}" placeholder="Masukkan kode pos">
+                                                    <label for="kode_pos" class="form-label">Kode Pos Toko</label>
+                                                    <input type="text" class="form-control" name="kode_pos" id="kode_pos" required value="{{$store->kode_pos}}" readonly placeholder="Masukkan kode pos">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label for="no_npwp" class="form-label">NPWP (Opsional)</label>
+                                                    <input type="text" class="form-control" name="no_npwp" id="no_npwp" value="{{$store->no_npwp}}" readonly placeholder="Masukkan nomor NPWP">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label for="kantor_toko_fisik" class="form-label">Memiliki Toko Fisik atau Kantor Usaha?</label>
+                                                    <input type="text" class="form-control" name="kantor_toko_fisik" id="kantor_toko_fisik" readonly value="{{$store->kantor_toko_fisik}}" placeholder="Masukkan status toko fisik">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label for="kategori_usaha_omset" class="form-label">Kategori Usaha Berdasarkan Omzet</label>
+                                                    <input type="text" class="form-control" name="kategori_usaha_omset" id="kategori_usaha_omset" readonly value="{{$store->kategori_usaha_omset}}" placeholder="Masukkan jenis omset">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label for="website" class="form-label">Website (Opsional)</label>
+                                                    <input type="text" class="form-control" name="website" id="website" value="{{$store->website}}" readonly placeholder="Masukkan alamat website usaha jika ada">
                                                 </div>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                                 <div class="tab-pane" id="aboutme">
-                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Pengajuan UMI</h5>
+                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Pengajuan Qris ID & UMI</h5>
                                     @if ($umiRequest == "Empty")
                                         <p class="sub-header">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                                         <form method="post" action="{{ route('tenant.mitra.dashboard.toko.request.umi') }}" enctype="multipart/form-data">
@@ -151,7 +223,6 @@
                                                         <th>Tanggal Approval</th>
                                                         <th>Status</th>
                                                         <th>Note</th>
-                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -169,20 +240,6 @@
                                                             @endif
                                                         </td>
                                                         <td>{{ $umiRequest->note }}</td>
-                                                        <td>
-                                                            @if ($umiRequest->is_active == 2)
-                                                                <form method="post" action="{{ route('tenant.mitra.dashboard.toko.request.umi.resend') }}" enctype="multipart/form-data">
-                                                                    @csrf
-                                                                    <input type="hidden" readonly class="d-none" name="id" id="id" value="{{ auth()->user()->storeDetail->id }}">
-                                                                    <input type="hidden" readonly class="d-none" name="store_identifier" id="store_identifier" value="{{ auth()->user()->storeDetail->store_identifier }}">
-                                                                    <div class="row">
-                                                                        <div class="text-center">
-                                                                            <button title="Ajukan Umi Ulang" type="submit" class="btn btn-info rounded-pill waves-effect waves-light">Ajukan Ulang</button>
-                                                                        </div>
-                                                                    </div>
-                                                                </form>
-                                                            @endif
-                                                        </td>
                                                     </tr>
                                                 </tbody>
                                             </table>

@@ -41,7 +41,7 @@ class Tenant extends Authenticatable implements MustVerifyEmail {
         'phone_number_verified_at',
         'password',
         'id_inv_code',
-        'is_active'
+        'is_active',
     ];
 
     protected $hidden = [

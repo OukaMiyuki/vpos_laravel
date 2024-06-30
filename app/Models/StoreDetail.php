@@ -26,6 +26,7 @@ class StoreDetail extends Model {
         'id_tenant',
         'email',
         'name',
+        'no_npwp',
         'alamat',
         'kabupaten',
         'kode_pos',
@@ -33,7 +34,17 @@ class StoreDetail extends Model {
         'jenis_usaha',
         'status_umi',
         'catatan_kaki',
-        'photo'
+        'photo',
+        'ktp_image',
+        'nama_jalan',
+        'nama_blok',
+        'rt',
+        'rw',
+        'kelurahan_desa',
+        'kecamatan',
+        'kantor_toko_fisik',
+        'kategori_usaha_omset',
+        'website'
     ];
 
     public function tenant(){

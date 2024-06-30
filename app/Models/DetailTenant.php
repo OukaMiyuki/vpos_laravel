@@ -16,7 +16,9 @@ class DetailTenant extends Model {
         'tanggal_lahir',
         'jenis_kelamin',
         'alamat',
-        'photo'
+        'photo',
+        'nama_perusahaan',
+        'ktp_image'
     ];
     
     public function tenant(){

@@ -20,29 +20,42 @@
             <!-- end page title -->
             <div class="row">
                 <div class="col-lg-4 col-xl-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <img src="{{ !empty($profilTenant->detail->photo) ? Storage::url('images/profile/'.$profilTenant->detail->photo) : asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
-                            <h4 class="mb-0">
-                                {{ $profilTenant->name }}
-                            </h4>
-                            <p class="text-muted">
-                                @if (auth()->user()->id_inv_code == 0)
-                                    Mitra Bisnis
-                                @else
-                                    Tenant
-                                @endif
-                            </p>
-                            @if($profilTenant->is_active == 1)
-                                <button type="button" class="btn btn-success btn-xs waves-effect mb-2 waves-light">Aktif</button>
-                            @elseif($profilTenant->is_active == 0)
-                                <button type="button" class="btn btn-warning btn-xs waves-effect mb-2 waves-light">Belum diaktifkan</button>
-                            @endif
-                            <div class="text-start mt-3">
-                                <p class="text-muted mb-2 font-13"><strong>Mobile :</strong><span class="ms-2">{{ $profilTenant->phone }}</span></p>
-                                <p class="text-muted mb-2 font-13"><strong>Email :</strong> <span class="ms-2">{{ $profilTenant->email }}</span></p>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <img src="{{ !empty($profilTenant->detail->photo) ? Storage::url('images/profile/'.$profilTenant->detail->photo) : asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                                    <h4 class="mb-0">
+                                        {{ $profilTenant->name }}
+                                    </h4>
+                                    <p class="text-muted">
+                                        @if (auth()->user()->id_inv_code == 0)
+                                            Mitra Bisnis
+                                        @else
+                                            Tenant
+                                        @endif
+                                    </p>
+                                    @if($profilTenant->is_active == 1)
+                                        <button type="button" class="btn btn-success btn-xs waves-effect mb-2 waves-light">Aktif</button>
+                                    @elseif($profilTenant->is_active == 0)
+                                        <button type="button" class="btn btn-warning btn-xs waves-effect mb-2 waves-light">Belum diaktifkan</button>
+                                    @endif
+                                    <div class="text-start mt-3">
+                                        <p class="text-muted mb-2 font-13"><strong>Mobile :</strong><span class="ms-2">{{ $profilTenant->phone }}</span></p>
+                                        <p class="text-muted mb-2 font-13"><strong>Email :</strong> <span class="ms-2">{{ $profilTenant->email }}</span></p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        @if (!is_null($profilTenant->detail->ktp_image) || !empty($profilTenant->detail->ktp_image) || $profilTenant->detail->ktp_image != NULL || $profilTenant->detail->ktp_image != "")
+                            <div class="col-md-12">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <img src="{{ !empty($profilTenant->detail->ktp_image) ? Storage::url('images/profile/'.$profilTenant->detail->ktp_image) : asset('assets/images/blank_profile.png') }}" class="img-thumbnail" width="300" alt="profile-image">
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <!-- end col-->
@@ -139,6 +152,16 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            @if (auth()->user()->id_inv_code == 0)
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="mb-3">
+                                                            <label for="nama_perusahaan" class="form-label">Nama Perusahaan</label>
+                                                            <input type="text" class="form-control" name="nama_perusahaan" id="nama_perusahaan" required value="{{$profilTenant->detail->nama_perusahaan}}" placeholder="Masukkan nama perusahaan">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
@@ -183,16 +206,36 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class="mb-3">
-                                                        <label for="photo" class="form-label">Upload Foto Profil</label>
-                                                        <input type="file" id="image" class="form-control" name="photo" accept="image/*">
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label for="photo" class="form-label">Upload Foto Profil</label>
+                                                                <input type="file" id="image" class="form-control" name="photo" accept="image/*">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label for="example-fileinput" class="form-label"></label>
+                                                                <img id="showImage" src="{{ asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-12">
-                                                    <div class="mb-3">
-                                                        <label for="example-fileinput" class="form-label"></label>
-                                                        <img id="showImage" src="{{ asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label for="photo" class="form-label">Upload Foto KTP</label>
+                                                                <input type="file" id="ktp-image" required class="form-control" name="ktp-image" accept="image/*">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="mb-3">
+                                                                <label for="example-fileinput" class="form-label"></label>
+                                                                <img id="showImageKtp" src="{{ asset('assets/images/blank_profile.png') }}" class="rounded-circle avatar-lg img-thumbnail" alt="ktp-image">
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
