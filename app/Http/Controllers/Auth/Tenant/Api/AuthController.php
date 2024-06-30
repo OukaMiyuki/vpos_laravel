@@ -1080,7 +1080,7 @@ class AuthController extends Controller {
                                 $action = "Tenant : Withdrawal Process Success | Using Application";
                                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                                 $date = Carbon::now()->format('d-m-Y H:i:s');
-                                $body = "Penarikan dana Qris sebesar Rp. ".$nominal_tarik." melalui aplikasi android sukses pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                                $body = "Penarikan dana Qris sebesar *Rp. ".$nominal_tarik."* melalui aplikasi android ke rekening bank *".$rekening->nama_bank."* atas nama *".$rekening->atas_nama."* ke rekenung tujuan *".$rekening->no_rekening."* sukses pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
                                 $this->sendNotificationToUser($body, auth()->user()->phone);
                                 return response()->json([
                                     'message' => 'Penarikan Berhasil!',

@@ -1054,7 +1054,7 @@ class ProfileController extends Controller {
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
                             $date = Carbon::now()->format('d-m-Y H:i:s');
-                            $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar Rp. ".$nominal_penarikan." berhasil pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $body = "Penarikan dana saldo ".$jenis_tarik ." sebesar *Rp. ".$nominal_penarikan."* ke Rekening bank *".$rekening->nama_bank."* atas nama *".$rekening->atas_nama."* ke rekening tujuan *".$rekening->no_rekening."* berhasil pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
                             $this->sendNotificationToUser($body, auth()->user()->phone);
 
                             $notification = array(

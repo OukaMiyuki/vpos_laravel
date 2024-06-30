@@ -1003,7 +1003,7 @@ class ProfileController extends Controller{
 
                             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
                             $date = Carbon::now()->format('d-m-Y H:i:s');
-                            $body = "Penarikan dana Qris sebesar Rp. ".$nominal_penarikan." sukses pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
+                            $body = "Penarikan dana Qris sebesar *Rp. ".$nominal_tarik."* ke rekening bank *".$rekeningTenant->nama_bank."* atas nama *".$rekeningTenant->atas_nama."* ke rekenung tujuan *".$rekeningTenant->no_rekening."* sukses pada : ".$date.". Jika anda merasa ini adalah aktivitas mencurigakan, segera hubungi Admin untuk tindakan lebih lanjut!.";
                             $this->sendNotificationToUser($body);
 
                             return $withDraw->id;
