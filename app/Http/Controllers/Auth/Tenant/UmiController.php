@@ -137,9 +137,9 @@ class UmiController extends Controller {
             $filename = 'Formulir Pendaftaran NOBU QRIS (NMID) PT BRAHMA ESATAMA_'.$nama_usaha.'_'.date('dmYHis').'.xlsx';
             $fileSave = $userDocsPath.'/'.$filename;
             try {
-                // File::copy($templatePath, $fileSave);
-                // $spreadsheet = IOFactory::load($fileSave);
-                // // $sheet = $spreadsheet->getActiveSheet();
+                File::copy($templatePath, $fileSave);
+                $spreadsheet = IOFactory::load($fileSave);
+                // $sheet = $spreadsheet->getActiveSheet();
                 // $sheet1 = $spreadsheet->getSheet(0);
                 // $sheet1->mergeCells('E6:F6');
                 // $sheet1->getCell('E6')->setValue($nama_usaha);
@@ -194,13 +194,13 @@ class UmiController extends Controller {
                 // $newFilePath = $fileSave;
                 // $writer = new Xlsx($spreadsheet);
                 // $writer->save($newFilePath);
-                // UmiRequest::create([
-                //     'id_tenant' => auth()->user()->id,
-                //     'email' => auth()->user()->email,
-                //     'store_identifier' => $store_identifier,
-                //     'tanggal_pengajuan' => Carbon::now(),
-                //     'file_path' => $filename,
-                // ]);
+                UmiRequest::create([
+                    'id_tenant' => auth()->user()->id,
+                    'email' => auth()->user()->email,
+                    'store_identifier' => $store_identifier,
+                    'tanggal_pengajuan' => Carbon::now(),
+                    'file_path' => $filename,
+                ]);
 
                 $mailData = [
                     'title' => 'Formulir Pendaftaran UMI',
