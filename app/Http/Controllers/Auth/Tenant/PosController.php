@@ -744,18 +744,24 @@ class PosController extends Controller {
             }
         }
 
-        $url = 'https://waq.my.id/send-media';
+        $url = 'https://waq.my.id/send-message';
         $headers = [
             'Content-Type' => 'application/json',
         ];
         $data = [
-            "api_key" => $api_key,
-            'sender' => '6285179950178',
+            'api_key' => $api_key,
+            'sender' => $sender,
             'number' => $hp,
-            "media_type" => "image",
-            "caption" => "Nota Pembayaran anda",
-            "url" => $saveImagePath
+            'message' => $saveImagePath
         ];
+        // $data = [
+        //     "api_key" => $api_key,
+        //     'sender' => $sender,
+        //     'number' => $hp,
+        //     "media_type" => "image",
+        //     "caption" => "Nota Pembayaran anda",
+        //     "url" => $saveImagePath
+        // ];
 
         try {
             $postResponse = $client->post($url, [
