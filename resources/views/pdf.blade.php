@@ -170,12 +170,12 @@ h2.itemTitle{
 }
 
 table.payments { width: 100%; margin-bottom: 20px; }
-.short {
+/* .short {
     width: 40%
 }
 .long {
     width: 40%;
-}
+} */
 
 thead.items-thead {
     border-top: double #000000;
@@ -310,7 +310,7 @@ div.qris {
                                                     ->where('is_active', 1)
                                                     ->first();
                     @endphp
-                    <table class="payments">
+                    <table class="payments" style="width:100%;">
                         <colgroup>
                             <col class="short" />
                             <col span="2" class="long" />
