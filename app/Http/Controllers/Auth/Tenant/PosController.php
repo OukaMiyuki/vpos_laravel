@@ -719,11 +719,13 @@ class PosController extends Controller {
         $imagick = new Imagick();
         $path = Storage::path('public/invoice/'.$invoiceName);
         $imagick->readImage($path);
+        // $imagick->setImageResolution(12800,800) ; // it change only image density.
+	    // $imagick->resampleImage  (12800,800,imagick::FILTER_UNDEFINED,1);
         $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
         $imagick->writeImages($saveImagePath, true);
-        $image = Image::make(public_path('invoice/'.$invoice->nomor_invoice.'.jpg'));
-        $image->crop(200, 200, 100, 100);
-        $image->save(public_path('invoice/cropped/'.$invoice->nomor_invoice.'_cropped-image.jpg'), 80);
+        // $image = Image::make(public_path('invoice/'.$invoice->nomor_invoice.'.jpg'));
+        // $image->crop(300, 600, -100, -100);
+        // $image->save(public_path('invoice/cropped/'.$invoice->nomor_invoice.'_cropped-image.jpg'), 80);
         return response()->file($saveImagePath);
         //$pdfimage = new \Spatie\PdfToImage\Pdf($pdf);
         // $pdf->save($pathToWhereImageShouldBeStored);
