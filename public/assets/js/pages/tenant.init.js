@@ -58,6 +58,11 @@ $(document).ready(function(){
         $("#show #category").val(nama);
     });
 
+    $(document).on("click", "#kirimWaButton", function() {
+        var id = $(this).data('id');
+        $("#kirimWa #id").val(id);
+    });
+
     $(document).on("click", "#editbatch", function() {
         var id = $(this).data('id');
         var kode = $(this).data('kode');

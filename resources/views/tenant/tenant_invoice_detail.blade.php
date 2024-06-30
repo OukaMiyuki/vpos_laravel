@@ -265,8 +265,8 @@
 
                             <div class="mt-4 mb-1">
                                 <div class="text-end d-print-none">
-                                    <a href="{{route('tenant.pos.invoice.receipt', ['id' => $invoice->id])}}" class="btn btn-primary waves-effect waves-light" target="_blank"><i class="mdi mdi-printer me-1"></i> Print Nota</a>
-                                    <a href="{{route('tenant.pos.invoice.receipt.download', ['id' => $invoice->id])}}" class="btn btn-primary waves-effect waves-light" target="_blank"><i class="mdi mdi-printer me-1"></i> Download Nota</a>
+                                    <a href="{{route('tenant.pos.invoice.receipt', ['id' => $invoice->id])}}" class="btn btn-primary waves-effect waves-light" target="_blank"><i class="mdi mdi-printer me-1"></i> Print Nota</a>&nbsp;&nbsp;
+                                    <a href="" href="" id="kirimWaButton" data-id="{{ $invoice->id }}" data-bs-toggle="modal" data-bs-target="#kirimWaModal" class="btn btn-primary waves-effect waves-light" target="_blank"><i class="mdi mdi-printer me-1"></i> Kirim Nota</a>
                                     @if (($invoice->jenis_pembayaran == "Qris") && (!empty($invoice->qris_data)) && ($invoice->status_pembayaran == 0))
                                         &nbsp;&nbsp;<a href=""  data-bs-toggle="modal" data-bs-target="#lihatqris" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Lihat Qris</a>
                                         <div class="modal fade" id="lihatqris" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -361,7 +361,36 @@
                 </div> <!-- end col -->
             </div>
             <!-- end row -->
+            <div class="modal fade" id="kirimWaModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Kirim Nota ke Whatsapp</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form class="px-3" action="{{ route('tenant.supplier.insert') }}" method="post">
+                            @csrf
+                            <div class="modal-body" id="kirimWa">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label for="nama_supplier" class="form-label">Nomor Whatsapp</label>
+                                            <input type="text" class="form-control" name="id" id="id" required value="">
+                                            <input type="text" class="form-control" name="no_wa" id="no_wa" required value="" placeholder="Masukkan nomor whatsapp penerima">
+                                        </div>
+                                    </div>
+                                    <!-- end col -->
+                                </div>
 
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Kirim</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </x-tenant-layout>
