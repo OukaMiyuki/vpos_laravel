@@ -711,7 +711,7 @@ class PosController extends Controller {
         // return Pdf::view('pdf', ['invoice' => $invoice])
         //             ->format('a4')
         //             ->name('your-invoice.pdf');
-        $qrcode = base64_encode(\QrCode::format('svg')->size(200)->errorCorrection('H')->generate($invoice->qris_data));
+        $qrcode = base64_encode(\QrCode::format('svg')->size(500)->errorCorrection('H')->generate($invoice->qris_data));
         $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode]);
         $invoiceName = $invoice->nomor_invoice.'.pdf';
         $content = $pdf->download()->getOriginalContent();
@@ -721,6 +721,9 @@ class PosController extends Controller {
         $imagick->readImage($path);
         // $imagick->setImageResolution(12800,800) ; // it change only image density.
 	    // $imagick->resampleImage  (12800,800,imagick::FILTER_UNDEFINED,1);
+        $imagick->Imagick::setImageResolution( 600, 600 );
+        $imagick->resizeImage(595,842,\Imagick::FILTER_CATROM, 1, true);
+        $imagick->setImageFormat('pdf');
         $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
         $imagick->writeImages($saveImagePath, true);
         // $image = Image::make(public_path('invoice/'.$invoice->nomor_invoice.'.jpg'));
