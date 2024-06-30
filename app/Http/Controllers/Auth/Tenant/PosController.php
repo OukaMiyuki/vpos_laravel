@@ -751,6 +751,9 @@ class PosController extends Controller {
         $data = [
             'api_key' => $api_key,
             'sender' => $sender,
+            "media_type" => "image",
+            "caption" => "Nota Pembayaran anda",
+            "url" => $saveImagePath,
             'number' => $hp,
             'message' => $saveImagePath
         ];
