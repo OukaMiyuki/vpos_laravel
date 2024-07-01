@@ -730,44 +730,44 @@ class PosController extends Controller {
         // $imagick->setImageFormat('pdf');
         $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
         $imagick->writeImages($saveImagePath, true);
-        return $saveImagePat;
-        $api_key    = getenv("WHATZAPP_API_KEY");
-        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
-        $client = new GuzzleHttpClient();
-        $postResponse = "";
-        $noHP = $no_wa;
-        if(!preg_match("/[^+0-9]/",trim($noHP))){
-            if(substr(trim($noHP), 0, 2)=="62"){
-                $hp    =trim($noHP);
-            }
-            else if(substr(trim($noHP), 0, 1)=="0"){
-                $hp    ="62".substr(trim($noHP), 1);
-            }
-        }
+        return $saveImagePath;
+        // $api_key    = getenv("WHATZAPP_API_KEY");
+        // $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        // $client = new GuzzleHttpClient();
+        // $postResponse = "";
+        // $noHP = $no_wa;
+        // if(!preg_match("/[^+0-9]/",trim($noHP))){
+        //     if(substr(trim($noHP), 0, 2)=="62"){
+        //         $hp    =trim($noHP);
+        //     }
+        //     else if(substr(trim($noHP), 0, 1)=="0"){
+        //         $hp    ="62".substr(trim($noHP), 1);
+        //     }
+        // }
 
-        $url = 'https://waq.my.id/send-media';
-        $headers = [
-            'Content-Type' => 'application/json',
-        ];
-        $data = [
-            "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
-            'sender' => "085179950178",
-            'number' => "6285156719832",
-            "media_type" => "image",
-            "caption" => "Nota Pembayaran anda",
-            "url" => 
-        ];
+        // $url = 'https://waq.my.id/send-media';
+        // $headers = [
+        //     'Content-Type' => 'application/json',
+        // ];
+        // $data = [
+        //     "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
+        //     'sender' => "085179950178",
+        //     'number' => "6285156719832",
+        //     "media_type" => "image",
+        //     "caption" => "Nota Pembayaran anda",
+        //     "url" => 
+        // ];
 
-        try {
-            $postResponse = $client->post($url, [
-                'headers' => $headers,
-                'json' => $data,
-            ]);
-        } catch(Exception $ex){
-            return $ex;
-        }
-        $responseCode = $postResponse->getStatusCode();
-        return $responseCode;
+        // try {
+        //     $postResponse = $client->post($url, [
+        //         'headers' => $headers,
+        //         'json' => $data,
+        //     ]);
+        // } catch(Exception $ex){
+        //     return $ex;
+        // }
+        // $responseCode = $postResponse->getStatusCode();
+        // return $responseCode;
         // $image = Image::make(public_path('invoice/'.$invoice->nomor_invoice.'.jpg'));
         // $image->crop(300, 600, -100, -100);
         // $image->save(public_path('invoice/cropped/'.$invoice->nomor_invoice.'_cropped-image.jpg'), 80);
