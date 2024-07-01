@@ -728,7 +728,7 @@ class PosController extends Controller {
         // $imagick->Imagick::setImageResolution( 600, 600 );
         // $imagick->resizeImage(595,842,\Imagick::FILTER_CATROM, 1, true);
         // $imagick->setImageFormat('pdf');
-        $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
+        $saveImagePath = Storage::path('public/invoice/'.$invoice->nomor_invoice.'.jpg');
         $imagick->writeImages($saveImagePath, true);
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
@@ -754,7 +754,7 @@ class PosController extends Controller {
             'number' => "6285156719832",
             "media_type" => "image",
             "caption" => "Nota Pembayaran anda",
-            "url" => $saveImagePath
+            "url" => Storage::url('invoice/'.$invoice->nomor_invoice.'.jpg')
         ];
 
         try {
