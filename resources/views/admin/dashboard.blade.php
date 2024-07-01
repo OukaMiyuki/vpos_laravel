@@ -186,7 +186,7 @@
                                                 </td>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $mitra->name }}</td>
-                                                <td>{{ $mitra->detail->jenis_kelamin }}</td>
+                                                <td>@if(!is_null($mitra->detail->jenis_kelamin)) {{$mitra->detail->jenis_kelamin}} @else testing @endif</td>
                                                 <td>{{ $mitra->email }}</td>
                                                 <td>
                                                     @if($mitra->is_active == 0)
