@@ -744,14 +744,14 @@ class PosController extends Controller {
             }
         }
 
-        $url = 'https://waq.my.id/send-message';
+        $url = 'https://waq.my.id/send-media';
         $headers = [
             'Content-Type' => 'application/json',
         ];
         $data = [
             "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
-            'sender' => "085179950178",
-            'number' => "085156719832",
+            'sender' => "6285179950178",
+            'number' => "6285156719832",
             "media_type" => "image",
             "caption" => "Nota Pembayaran anda",
             "url" => "https://static.vecteezy.com/system/resources/thumbnails/024/553/676/small/skull-wearing-crown-logo-skull-king-sticker-pastel-cute-colors-generative-ai-png.png"
