@@ -754,7 +754,7 @@ class PosController extends Controller {
             'number' => "6285156719832",
             "media_type" => "image",
             "caption" => "Nota Pembayaran anda",
-            "url" => "https://static.vecteezy.com/system/resources/thumbnails/024/553/676/small/skull-wearing-crown-logo-skull-king-sticker-pastel-cute-colors-generative-ai-png.png"
+            "url" => $saveImagePath
         ];
 
         try {
