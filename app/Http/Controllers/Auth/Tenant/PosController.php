@@ -735,6 +735,7 @@ class PosController extends Controller {
         $client = new GuzzleHttpClient();
         $postResponse = "";
         $noHP = $no_wa;
+        $hp = "";
         if(!preg_match("/[^+0-9]/",trim($noHP))){
             if(substr(trim($noHP), 0, 2)=="62"){
                 $hp    =trim($noHP);
@@ -751,7 +752,7 @@ class PosController extends Controller {
         $data = [
             "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
             'sender' => "085179950178",
-            'number' => "6285156719832",
+            'number' => $hp,
             "media_type" => "image",
             "caption" => "Nota Pembayaran anda",
             "url" => "https://visipos.id/public/invoice/".$invoice->nomor_invoice.".jpg"
