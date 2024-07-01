@@ -767,7 +767,20 @@ class PosController extends Controller {
             return $ex;
         }
         $responseCode = $postResponse->getStatusCode();
-        return $responseCode;
+        if($responseCode == 200){
+            $notification = array(
+                'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            $notification = array(
+                'message' => 'Nota gagal dikirim!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+        // return $responseCode;
         // $image = Image::make(public_path('invoice/'.$invoice->nomor_invoice.'.jpg'));
         // $image->crop(300, 600, -100, -100);
         // $image->save(public_path('invoice/cropped/'.$invoice->nomor_invoice.'_cropped-image.jpg'), 80);
