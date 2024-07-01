@@ -730,6 +730,7 @@ class PosController extends Controller {
         // $imagick->setImageFormat('pdf');
         $saveImagePath = Storage::path('public/invoice/'.$invoice->nomor_invoice.'.jpg');
         $imagick->writeImages($saveImagePath, true);
+        return response()->file($saveImagePath);
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
         $client = new GuzzleHttpClient();
