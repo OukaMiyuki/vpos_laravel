@@ -85,7 +85,7 @@
                             <br>
                             <div class="row">
                                 <div class="text-center d-grid">
-                                    <form id="resend-code" method="POST" action="{{ route('marketing.verification.send') }}">
+                                    <form id="resend-code" method="POST" action="{{ route('tenant.verification.send') }}">
                                         @csrf
                                         <button class="btn btn-primary w-100" type="submit"> Kirim Ulang Kode </button>
                                     </form>
@@ -98,7 +98,7 @@
                     <div class="row mt-3">
                         <div class="col-12 text-center">
                             <p><a href="javascript:{}" onclick="document.getElementById('logout').submit();" class="text-white-50 ms-1">Logout Akun</a></p>
-                            <form id="logout" method="POST" action="{{ route('marketing.logout') }}">
+                            <form id="logout" method="POST" action="{{ route('tenant.logout') }}">
                                 @csrf
                             </form>
                         </div>

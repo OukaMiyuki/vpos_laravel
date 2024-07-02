@@ -102,9 +102,19 @@
                                                 <td><strong>{{ $userType }}</strong></td>
                                             </tr>
                                             <tr>
+                                                <td><strong>Nama Bank</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $withdraw->rekening->nama_bank }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Atas Nama</strong></td>
+                                                <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
+                                                <td>{{ $withdraw->rekening->atas_nama }}</td>
+                                            </tr>
+                                            <tr>
                                                 <td><strong>No. Rekening</strong></td>
                                                 <td><strong>&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;</strong></td>
-                                                <td>{{ $rekening->no_rekening }}</td>
+                                                <td>{{ $withdraw->rekening->no_rekening }}</td>
                                             </tr>
                                         </table>
                                     </address>

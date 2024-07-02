@@ -102,7 +102,6 @@
         <!-- App js -->
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
         <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
-
         <script>
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"

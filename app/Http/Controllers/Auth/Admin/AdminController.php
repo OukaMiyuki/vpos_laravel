@@ -463,6 +463,15 @@ class AdminController extends Controller {
                                             ]);
                                         }
                                     ]);
+                                },
+                                'rekening' => function ($query) {
+                                    $query->select([
+                                        'rekening_withdraws.id',
+                                        'rekening_withdraws.id_penarikan',
+                                        'rekening_withdraws.atas_nama',
+                                        'rekening_withdraws.nama_bank',
+                                        'rekening_withdraws.no_rekening',
+                                    ]);
                                 }
                             ])
                             ->where('email', '!=', 'adminsu@visipos.id')
@@ -474,7 +483,6 @@ class AdminController extends Controller {
             );
             return redirect()->route('admin.dashboard.menu.userWithdrawals')->with($notification);
         }
-        $rekening = Rekening::where('email', $withdraw->email)->first();
         $user = "";
         $userType = "";
         $user = Marketing::select(['marketings.id', 'marketings.email', 'marketings.name', 'marketings.phone', 'marketings.is_active'])->where('email', $withdraw->email)->first();
@@ -488,7 +496,7 @@ class AdminController extends Controller {
             }
         }
 
-        return view('admin.admin_user_withdraw_invoice', compact(['withdraw', 'user', 'userType', 'rekening']));
+        return view('admin.admin_user_withdraw_invoice', compact(['withdraw', 'user', 'userType']));
     }
 
     public function adminMenuUserUmiRequest(Request $request){
