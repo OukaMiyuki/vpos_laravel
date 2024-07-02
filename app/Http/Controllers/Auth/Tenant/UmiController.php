@@ -131,7 +131,7 @@ class UmiController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             }
-            dd(auth()->user()->detail->ktp_image);
+
             $imageKTPPath = Storage::path('public/images/profile/'.auth()->user()->detail->ktp_image);
             $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_QRIS_Nobu_(NMID_Level_1).xlsx');
             $userDocsPath = Storage::path('public/docs/umi/user_doc');
@@ -343,7 +343,7 @@ class UmiController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             }
-
+            return auth()->user()->detail->ktp_image;
             $imageKTPPath = Storage::path('public/images/profile/'.$ktp_image);
             $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_QRIS_Nobu_(NMID_Level_1).xlsx');
             $userDocsPath = Storage::path('public/docs/umi/user_doc');
