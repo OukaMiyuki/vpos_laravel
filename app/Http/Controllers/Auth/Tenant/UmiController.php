@@ -124,6 +124,8 @@ class UmiController extends Controller {
                 || is_null($kantor_toko_fisik)
                 || is_null($kategori_usaha_omset)
                 || is_null(auth()->user()->detail->ktp_image)
+                || auth()->user()->detail->ktp_image == ""
+                || auth()->user()->detail->ktp_image == NULL
             ) {
                 $notification = array(
                     'message' => 'Data detail toko atau informasi user belum lengkap, silahkan lengkapi data terlebih dahulu!',
@@ -336,6 +338,8 @@ class UmiController extends Controller {
             || is_null($kantor_toko_fisik)
             || is_null($kategori_usaha_omset)
             || is_null(auth()->user()->detail->ktp_image)
+            || auth()->user()->detail->ktp_image == ""
+            || auth()->user()->detail->ktp_image == NULL
             ) {
                 $notification = array(
                     'message' => 'Data detail merchant atau informasi user belum lengkap, silahkan lengkapi data terlebih dahulu!',
@@ -343,7 +347,7 @@ class UmiController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             }
-            return auth()->user()->detail->ktp_image;
+
             $imageKTPPath = Storage::path('public/images/profile/'.$ktp_image);
             $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_QRIS_Nobu_(NMID_Level_1).xlsx');
             $userDocsPath = Storage::path('public/docs/umi/user_doc');
