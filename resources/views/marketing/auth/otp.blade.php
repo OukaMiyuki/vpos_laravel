@@ -18,12 +18,35 @@
     <!-- Head js -->
     <script src="{{ asset('assets/js/head.js') }}"></script>
     <link href="{{ asset('assets/libs/toastr/build/toastr.min.css') }}" rel="stylesheet" type="text/css" />
+    <style>
+        .inputs input{
+            width: 100% !important;
+            height:40px
+        }
+        @media screen and (max-device-width: 480px)  and (orientation: portrait) {
+            #otp{
+                width: 100% auto;
+            }
+            .inputs input{
+                width: 40px !important;
+                min-width: 0 !important;
+                max-width:100%;
+                height:40px
+            }
+        }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button{
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            margin: 0
+        }
+    </style>
 </head>
 <body class="authentication-bg authentication-bg-pattern">
     <div class="account-pages mt-5 mb-5">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-9 col-lg-8 col-xl-6">
+                <div class="col-md-5 col-lg-5 col-xl-5">
                     <div class="card bg-pattern">
                         <div class="card-body">
                             <div class="text-center w-75 m-auto">
@@ -43,37 +66,17 @@
                             </div>
                             <form action="{{ route('marketing.verification.verify') }}" method="POST">
                                 @csrf
-                                <div class="row" id="otp">
-                                    <div class="col-md-2">
-                                        <div class="mb-3">
-                                            <input required type="text" class="masukan text-center form-control" name="first" id="first" maxlength="1"/>
-                                        </div>
+                                <div class="row">
+                                    <div id="otp" class="inputs w-100 d-flex flex-row justify-content-center mb-3"> 
+                                        <input name="first" class="m-1 text-center form-control rounded" type="text" id="first" maxlength="1" /> 
+                                        <input name="second" class="m-1 text-center form-control rounded" type="text" id="second" maxlength="1" />
+                                        <input name="third" class="m-1 text-center form-control rounded" type="text" id="third" maxlength="1" />
+                                        <input name="fourth" class="m-1 text-center form-control rounded" type="text" id="fourth" maxlength="1" /> 
+                                        <input name="fifth" class="m-1 text-center form-control rounded" type="text" id="fifth" maxlength="1" /> 
+                                        <input name="sixth" class="m-1 text-center form-control rounded" type="text" id="sixth" maxlength="1" />
                                     </div>
-                                    <div class="col-md-2">
-                                        <div class="mb-3">
-                                            <input required type="text" class="masukan text-center form-control" name="second" id="second" maxlength="1"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="mb-3">
-                                            <input required type="text" class="masukan text-center form-control" name="third" id="third" maxlength="1"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="mb-3">
-                                            <input required type="text" class="masukan text-center form-control" name="fourth" id="fourth" maxlength="1"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="mb-3">
-                                            <input required type="text" class="masukan text-center form-control" name="fifth" id="fifth" maxlength="1"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="mb-3">
-                                            <input required type="text" class="masukan text-center form-control" name="sixth" id="sixth" maxlength="1"/>
-                                        </div>
-                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="text-center d-grid">
                                         <button class="btn btn-success" type="submit"> Konfirmasi </button>
                                     </div>
@@ -147,28 +150,29 @@
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function(event) {
             function OTPInput() {
-                const inputs = document.getElementsByClassName('masukan');
-                for (let i = 0; i < inputs.length; i++) { 
+                const inputs = document.querySelectorAll('#otp > *[id]');
+                for (let i = 0; i < inputs.length; i++) {
                     inputs[i].addEventListener('keydown', function(event) {
-                         if (event.key==="Backspace" ) { 
-                            inputs[i].value='' ; 
-                            if (i !==0) inputs[i - 1].focus(); 
-                        } else { 
-                            if (i===inputs.length - 1 && inputs[i].value !=='' ) { 
-                                return true; 
-                            } else if (event.keyCode> 47 && event.keyCode < 58) { 
-                                inputs[i].value=event.key;
-                                 if (i !==inputs.length - 1) 
-                                    inputs[i + 1].focus(); event.preventDefault(); 
-                            } else if (event.keyCode> 64 && event.keyCode < 91) { 
-                                inputs[i].value=String.fromCharCode(event.keyCode); 
-                                if (i !==inputs.length - 1) 
-                                    inputs[i + 1].focus(); event.preventDefault(); 
-                            } 
-                        } 
-                    }); 
-                } 
-            } OTPInput(); 
+                        if (event.key === "Backspace") {
+                            inputs[i].value = '';
+                            if (i !== 0) inputs[i - 1].focus();
+                        } else {
+                            if (i === inputs.length - 1 && inputs[i].value !== '') {
+                                return true;
+                            } else if (event.keyCode > 47 && event.keyCode < 58) {
+                                inputs[i].value = event.key;
+                                if (i !== inputs.length - 1) inputs[i + 1].focus();
+                                event.preventDefault();
+                            } else if (event.keyCode > 64 && event.keyCode < 91) {
+                                inputs[i].value = String.fromCharCode(event.keyCode);
+                                if (i !== inputs.length - 1) inputs[i + 1].focus();
+                                event.preventDefault();
+                            }
+                        }
+                    });
+                }
+            }
+            OTPInput();
         });
     </script>
 </body>

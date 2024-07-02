@@ -97,14 +97,18 @@
                                                 <div class="mb-3">
                                                     <label for="no_wa" class="form-label">Nomor Whatsapp</label>
                                                     <div class="row">
-                                                        <div class="col-8">
-                                                            <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ $profilMarketing->phone }}" placeholder="Masukkan nomor Whatsapp"> 
+                                                        <div class="col-sm-12 col-xs-12 col-md-8 col-lg-9 col-xl-9">
+                                                            <div class="mb-3">
+                                                                <input readonly type="text" class="form-control" name="no_wa" id="no_wa" required value="{{ $profilMarketing->phone }}" placeholder="Masukkan nomor Whatsapp"> 
+                                                            </div>
                                                         </div>
-                                                        <div class="col-4">
-                                                            <form method="post" action="{{ route('marketing.settings.whatsappotp') }}">
-                                                                @csrf
-                                                                <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-email-outline"></i> Kirim Kode OTP</button>
-                                                            </form>
+                                                        <div class="col-sm-12 col-xs-12 col-md-4 col-lg-3 col-xl-3">
+                                                            <div class="mb-3">
+                                                                <form method="post" action="{{ route('marketing.settings.whatsappotp') }}">
+                                                                    @csrf
+                                                                    <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-email-outline"></i> Kirim Kode OTP</button>
+                                                                </form>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -120,8 +124,12 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="text-end">
-                                                <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Verifikasi Kode OTP</button>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <button type="submit" class="btn btn-success waves-effect waves-light mt-2 w-100"><i class="mdi mdi-content-save"></i> Verifikasi Kode OTP</button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </form>
                                     @else
