@@ -116,7 +116,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
-                                                <label for="kode_pos" class="form-label">Kode Pos Toko</label>
+                                                <label for="kode_pos" class="form-label">Kode Pos Merchant</label>
                                                 <input type="text" class="form-control" name="kode_pos" id="kode_pos" required value="" placeholder="Masukkan kode pos">
                                             </div>
                                         </div>
@@ -172,7 +172,7 @@
                                                     <div class="mb-3">
                                                         <label for="photo" class="form-label">Upload Logo Merchant (Opsional)</label>
                                                         <input type="file" id="image" class="form-control" name="photo" accept="image/*">
-                                                        <small id="emailHelp" class="form-text text-muted">Logo toko tidak wajib diisi atau boleh dikosongi</small>
+                                                        <small id="emailHelp" class="form-text text-muted">Logo merchant tidak wajib diisi atau boleh dikosongi</small>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12">
