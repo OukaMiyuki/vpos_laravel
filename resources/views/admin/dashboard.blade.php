@@ -36,7 +36,7 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $marketingCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Mitra Aplikasi</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{route('admin.dashboard.marketing.list')}}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -59,7 +59,7 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $mitraBisnis }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Mitra Bisnis</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{route('admin.dashboard.mitraBisnis.list')}}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -82,7 +82,7 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1""><span data-plugin="counterup">{{ $mitraTenant }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Mitra Tenant</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
+                                        <a href="{{route('admin.dashboard.mitraTenant.list')}}" class="btn btn-blue btn-sm ms-2">
                                             <i class="mdi mdi-eye"></i>
                                         </a>
                                     </div>
@@ -107,9 +107,6 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1">Rp. <span data-plugin="counterup">@money($totalWithdrawToday)</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Insentif Withdraw Hari Ini</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
-                                        <i class="mdi mdi-eye"></i>
-                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -130,9 +127,6 @@
                                     <div class="text-end">
                                         <h3 class="text-dark mt-1"><span data-plugin="counterup">{{ $withdrawCount }}</span></h3>
                                         <p class="text-muted mb-1 text-truncate">Total Withdraw</p>
-                                        <a href="" class="btn btn-blue btn-sm ms-2">
-                                        <i class="mdi mdi-eye"></i>
-                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -175,19 +169,18 @@
                                         @foreach ($marketing as $mitra)
                                             <tr>
                                                 <td>
-                                                    <a href="" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>&nbsp;&nbsp;
+                                                    <a href="{{route('admin.dashboard.marketing.profile', ['id' => $mitra->id])}}" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>&nbsp;&nbsp;
                                                     @if($mitra->is_active == 0)
-                                                        <a href="" class="btn btn-xs btn-warning"><i class="mdi mdi-check-all"></i></a>
+                                                        <a href="{{route('admin.dashboard.marketing.account.activation', ['id' => $mitra->id])}}" class="btn btn-xs btn-warning"><i class="mdi mdi-check-all"></i></a>
                                                     @elseif($mitra->is_active == 1)
-                                                        <a href="" class="btn btn-xs btn-danger"><i class="mdi mdi-power"></i></a>
+                                                        <a href="{{route('admin.dashboard.marketing.account.activation', ['id' => $mitra->id])}}" class="btn btn-xs btn-danger"><i class="mdi mdi-power"></i></a>
                                                     @elseif($mitra->is_active == 2)
-                                                        <a href="" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
+                                                        <a href="{{route('admin.dashboard.marketing.account.activation', ['id' => $mitra->id])}}" class="btn btn-xs btn-success"><i class="mdi mdi-power"></i></a>
                                                     @endif
                                                 </td>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $mitra->name }}</td>
                                                 <td>@if(!is_null($mitra->detail->jenis_kelamin)) {{$mitra->detail->jenis_kelamin}} @endif</td>
-                                                <td>testing</td>
                                                 <td>{{ $mitra->email }}</td>
                                                 <td>
                                                     @if($mitra->is_active == 0)
@@ -198,7 +191,7 @@
                                                         <span class="badge bg-soft-danger text-danger">Non Aktif</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ \Carbon\Carbon::parse($mitra->created_at)->format('d-m-Y') }}</td>
+                                                <td>{{\Carbon\Carbon::parse($mitra->created_at)->format('d-m-Y')}}</td>
                                             </tr>
                                             @endforeach
                                     </tbody>
