@@ -126,7 +126,7 @@ class UmiController extends Controller {
                 || is_null(auth()->user()->detail->ktp_image)
             ) {
                 $notification = array(
-                    'message' => 'Data detail toko belum lengkap, silahkan lengkapi data terlebih dahulu!',
+                    'message' => 'Data detail toko atau informasi user belum lengkap, silahkan lengkapi data terlebih dahulu!',
                     'alert-type' => 'warning',
                 );
                 return redirect()->back()->with($notification);
@@ -214,7 +214,7 @@ class UmiController extends Controller {
                 ];
 
                 try{
-                    Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
+                    Mail::to('faydil.hamzah@nobubank.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
                 } catch(Exception $e){
                     return $e;
                 }
@@ -312,6 +312,37 @@ class UmiController extends Controller {
             $kategori_usaha_omset = $store->kategori_usaha_omset;
             $website = $store->website;
 
+            if(empty($nama_usaha)
+            || is_null($nama_usaha)
+            || $nama_usaha == ""
+            || empty($jenis_usaha)
+            || is_null($jenis_usaha)
+            || $jenis_usaha == ""
+            || empty($alamat)
+            || is_null($alamat)
+            || $alamat == ""
+            || empty($kab_kota)
+            || is_null($kab_kota)
+            || $kab_kota == ""
+            || empty($kode_pos)
+            || is_null($kode_pos)
+            || $kode_pos == ""
+            || is_null($nama_jalan)
+            || is_null($rt)
+            || is_null($rw)
+            || is_null($kelurahan_desa)
+            || is_null($kecamatan)
+            || is_null($kantor_toko_fisik)
+            || is_null($kategori_usaha_omset)
+            || is_null(auth()->user()->detail->ktp_image)
+            ) {
+                $notification = array(
+                    'message' => 'Data detail merchant atau informasi user belum lengkap, silahkan lengkapi data terlebih dahulu!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+
             $imageKTPPath = Storage::path('public/images/profile/'.$ktp_image);
             $templatePath = Storage::path('public/docs/umi/template/Formulir_Pendaftaran_QRIS_Nobu_(NMID_Level_1).xlsx');
             $userDocsPath = Storage::path('public/docs/umi/user_doc');
@@ -393,7 +424,7 @@ class UmiController extends Controller {
                     'kodePos' => $kode_pos
                 ];
 
-                Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $store_identifier));
+                Mail::to('faydil.hamzah@nobubank.com')->send(new SendUmiEmail($mailData, $store_identifier));
 
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
