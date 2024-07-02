@@ -214,7 +214,7 @@ class UmiController extends Controller {
                 ];
 
                 try{
-                    Mail::to('faydil.hamzah@nobubank.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
+                    Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
                 } catch(Exception $e){
                     return $e;
                 }
@@ -393,7 +393,7 @@ class UmiController extends Controller {
                     'kodePos' => $kode_pos
                 ];
 
-                Mail::to('faydil.hamzah@nobubank.com')->send(new SendUmiEmail($mailData, $store_identifier));
+                Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $store_identifier));
 
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
