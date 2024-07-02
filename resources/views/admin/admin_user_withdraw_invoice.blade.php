@@ -143,8 +143,8 @@
                                                     <td>{{ $no+=1 }}</td>
                                                     <td>{{ $withdraw->invoice_pemarikan }}</td>
                                                     <td>{{ $user->email }}</td>
-                                                    <td>{{ $withdraw->nominal }}</td></td>
-                                                    <td>{{ $withdraw->biaya_admin }}</td>
+                                                    <td>@money($withdraw->nominal)</td></td>
+                                                    <td>@money($withdraw->biaya_admin)</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -171,7 +171,7 @@
                                     <div class="float-end">
                                         @if ($userType == "Mitra Tenant")
                                             @foreach ($withdraw->detailWithdraw as $dtwd)
-                                                <p><b>{{$dtwd->insentif->jenis_insentif}} (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{ $dtwd->nominal }}</span></p>
+                                                <p><b>{{$dtwd->insentif->jenis_insentif}} (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; @money($dtwd->nominal)</span></p>
                                             @endforeach
                                         @elseif($userType == "Mitra Bisnis" || $userType == "Mitra Aplikasi")
                                             @php
@@ -179,7 +179,7 @@
                                             @endphp
                                             @foreach ($withdraw->detailWithdraw as $dtwd)
                                                 @if($dtwd->id_insentif != 5 && $dtwd->id_insentif != 3)
-                                                    <p><b>{{$dtwd->insentif->jenis_insentif}} (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{ $dtwd->nominal }}</span></p>
+                                                    <p><b>{{$dtwd->insentif->jenis_insentif}} (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; @money($dtwd->nominal)</span></p>
                                                 @endif
                                                 @if ($dtwd->id_insentif == 5 || $dtwd->id_insentif == 3)
                                                     @php
@@ -187,9 +187,9 @@
                                                     @endphp
                                                 @endif
                                             @endforeach
-                                            <p><b>Insentif Admin (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; {{$nominalAdmin }}</span></p>
+                                            <p><b>Insentif Admin (Rp.) :</b> <span class="float-end"> &nbsp;&nbsp;&nbsp; @money($nominalAdmin)</span></p>
                                         @endif
-                                        <h3><b>Total (Rp.): </b> <span class="float-end">{{ $withdraw->nominal+$withdraw->biaya_admin }}</span></h3>
+                                        <h3><b>Total (Rp.): </b> <span class="float-end">@money($withdraw->nominal+$withdraw->biaya_admin)</span></h3>
                                     </div>
                                     <div class="clearfix"></div>
                                 </div> <!-- end col -->
