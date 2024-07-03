@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
+use Illuminate\Support\Str;
 
 class VerifyCsrfToken extends Middleware {
     /**
@@ -15,12 +16,16 @@ class VerifyCsrfToken extends Middleware {
     ];
 
     protected function tokensMatch($request) {
-        $tokensMatch = parent::tokensMatch($request);
-
-        if ($tokensMatch) {
-            $request->session()->regenerateToken();
+        $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
+    
+        if (!$token && $header = $request->header('X-XSRF-TOKEN')) {
+            $token = $this->encrypter->decrypt($header);
         }
-
+    
+        $tokensMatch = $request->session()->token();
+    
+        if($tokensMatch == $token) $request->session()->regenerateToken();
+    
         return $tokensMatch;
     }
 }

@@ -36,6 +36,7 @@ use App\Models\DetailMarketing;
 use App\Models\DetailTenant;
 use App\Models\DetailKasir;
 use App\Models\SettlementHstory;
+use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class TenantController extends Controller {
