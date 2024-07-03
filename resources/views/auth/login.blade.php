@@ -69,7 +69,7 @@
                                         </div>
                                     </div>
                                     <div class="text-center d-grid">
-                                        <button class="btn btn-primary" type="submit"> Log In </button>
+                                        <button id="login" class="btn btn-primary" type="submit"> Log In </button>
                                     </div>
                                 </form>
                             </div>
@@ -102,6 +102,24 @@
         <!-- App js -->
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
         <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
+        <script>
+            var form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                var submittedClass = 'js-submitted';
+                if (
+                    this.classList && this.classList.contains(submittedClass)
+                    || new RegExp('(^| )' + submittedClass + '( |$)', 'gi').test(this.className)
+                ) {
+                    e.preventDefault();
+                } else {
+                    if (this.classList) {
+                        this.classList.add(submittedClass);
+                    } else {
+                        this.className += ' ' + submittedClass;
+                    }
+                }
+            }, false);
+        </script>
         <script>
             @if(Session::has('message'))
                 var type = "{{ Session::get('alert-type','info') }}"

@@ -194,16 +194,96 @@
                                     </form>
                                 </div>
                                 <div class="tab-pane" id="aboutme">
-                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Pengajuan Qris ID & UMI</h5>
+                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Pengajuan Qris Merchant ID & UMI</h5>
                                     @if ($umiRequest == "Empty")
-                                        <p class="sub-header">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                        <p class="sub-header">
+                                            <div class="col-xl-12">
+                                                <div class="accordion custom-accordion" id="custom-accordion-one">
+                                                    <div class="card mb-0">
+                                                        <div class="card-header" id="headingNine">
+                                                            <h5 class="m-0 position-relative">
+                                                                <a class="custom-accordion-title text-reset d-block" data-bs-toggle="collapse" href="#collapseNine" aria-expanded="true" aria-controls="collapseNine">
+                                                                    Q. Apa itu pendaftaran QRIS Merchant dan UMI? <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                                                </a>
+                                                            </h5>
+                                                        </div>
+                
+                                                        <div id="collapseNine" class="collapse show" aria-labelledby="headingFour" data-bs-parent="#custom-accordion-one">
+                                                            <div class="card-body">
+                                                                Kami memberikan fasilitas bagi pengguna Mitra Bisnis untuk dapat memiliki akun Qris dengan nama merchant yang dimiliki oleh mitra bisnis.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card mb-0">
+                                                        <div class="card-header" id="headingFive">
+                                                            <h5 class="m-0 position-relative">
+                                                                <a class="custom-accordion-title text-reset collapsed d-block" data-bs-toggle="collapse" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                                                    Q. Apa keuntungan melakukan request akun Qris? <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                                                </a>
+                                                            </h5>
+                                                        </div>
+                                                        <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-bs-parent="#custom-accordion-one">
+                                                            <div class="card-body">
+                                                                Dengan melakukan pendaftaran Qris Merchant, pengguna akan mendapatkan akun QRIS dengan nama sesuai dengan merchant saat melakukan pembayaran, sehingga memudahkan pelanggan untuk mengenali dan mengidentifikasi transaksi yang dilakukan. 
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card mb-0">
+                                                        <div class="card-header" id="headingSix">
+                                                            <h5 class="m-0 position-relative">
+                                                                <a class="custom-accordion-title text-reset collapsed d-block" data-bs-toggle="collapse" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                                                    Q. Apakah wajib melakukan pendaftaran Qris Merchant? <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                                                </a>
+                                                            </h5>
+                                                        </div>
+                                                        <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-bs-parent="#custom-accordion-one">
+                                                            <div class="card-body">
+                                                                Pendaftaran ini bersifat tidak wajib, pengguna tetap bisa melakukan transaksi maupun request pembayatan Qris melalui API. Namun secara default nama yang tertera saat pembayaran Qris akan menggunakan Merchant Name dari Visioner.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card mb-0">
+                                                        <div class="card-header" id="headingSeven">
+                                                            <h5 class="m-0 position-relative">
+                                                                <a class="custom-accordion-title text-reset collapsed d-block" data-bs-toggle="collapse" href="#collapseSeven"  aria-expanded="false" aria-controls="collapseSeven">
+                                                                    Q. Apa bedanya Qris Reguler dan Qris UMI? <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                                                </a>
+                                                            </h5>
+                                                        </div>
+                                                        <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven" data-bs-parent="#custom-accordion-one">
+                                                            <div class="card-body">
+                                                                QRIS Reguler dan QRIS UMI memiliki perbedaan yang signifikan dalam tujuan dan penggunaannya. QRIS Reguler dirancang untuk mendukung berbagai jenis usaha, baik besar maupun kecil, dan terbuka untuk semua merchant seperti toko retail dan restoran, dengan transaksi yang cocok untuk berbagai jumlah nominal serta fitur lengkap seperti integrasi dengan berbagai aplikasi pembayaran dan dukungan multi-bank. Sebaliknya, QRIS UMI (Usaha Mikro Indonesia) khusus ditujukan untuk pedagang kecil, usaha rumahan, dan UMKM, ideal untuk transaksi dengan nominal kecil dan menawarkan biaya yang lebih terjangkau serta proses pendaftaran yang lebih sederhana, sehingga sangat mendukung pertumbuhan usaha mikro di Indonesia.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card mb-0">
+                                                        <div class="card-header" id="headingEight">
+                                                            <h5 class="m-0 position-relative">
+                                                                <a class="custom-accordion-title text-reset collapsed d-block"
+                                                                    data-bs-toggle="collapse" href="#collapseEight"
+                                                                    aria-expanded="false" aria-controls="collapseEight">
+                                                                    Q. Bagaimana caranya melakukan pendaftaran Qris Merchant? <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                                                </a>
+                                                            </h5>
+                                                        </div>
+                                                        <div id="collapseEight" class="collapse"
+                                                            aria-labelledby="headingEight"
+                                                            data-bs-parent="#custom-accordion-one">
+                                                            <div class="card-body">
+                                                                Pendaftaran akun Qris Merchant dapat dilakukan pada masiing-masing merchant list dengan melakukan <strong>klik pada tombol detail merchant</strong>, lalu masuk ke tab <strong>Request Qris & UMI</strong> kemudian klik tombol <strong>Ajukan Request</strong>. Setelah itu permintaan anda akan diproses oleh pihak bank dengan estimasi maksimal 7 hari kerja. Pengguna Mitra Bisnis akan otomatis mendapatkan notifikasi melalui Whatsapp jika akun anda siap untuk digunakan.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p>
                                         <form method="post" action="{{ route('tenant.mitra.dashboard.toko.request.umi') }}" enctype="multipart/form-data">
                                             @csrf
                                             <input type="hidden" readonly class="d-none" name="id" id="id" value="{{ $store->id }}">
                                             <input type="hidden" readonly class="d-none" name="store_identifier" id="store_identifier" value="{{ $store->store_identifier }}">
                                             <div class="row">
                                                 <div class="text-end">
-                                                    <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Ajukan Umi</button>
+                                                    <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Ajukan Request</button>
                                                 </div>
                                             </div>
                                         </form>

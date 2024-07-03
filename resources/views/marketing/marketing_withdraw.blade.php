@@ -104,53 +104,102 @@
                     </div>
                     <!-- end card-->
                 </div>
-                @if (!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "")
-                    @if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != "")
-                        @if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600")
-                            <div class="col-lg-6 col-xl-6">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h4 class="header-title">Informasi Rekening</h4>
-                                        <p class="sub-header">
-                                            Pastikan nama pemilik rekening, muncul dan sesuai!
-                                        </p>
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered border-primary mb-0">
-                                                <thead>
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>Nama Bank</th>
-                                                        <th>Atas Nama</th>
-                                                        <th>Nomor Rekening</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <th scope="row">1</th>
-                                                        <th>{{ $rekening->nama_bank }}</th>
-                                                        <td>{{ $dataRekening->beneficiaryAccountName }}</td>
-                                                        <td>{{ $dataRekening->beneficiaryAccountNo }}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div> 
+                <div class="col-lg-6 col-xl-6">
+                    <div class="row">
+                        <div class="col-lg-12 col-xl-12">
+                            @if (!empty(auth()->user()->phone_number_verified_at) || !is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at != NULL || auth()->user()->phone_number_verified_at != "")
+                                @if(!empty($rekening->no_rekening) || !is_null($rekening->no_rekening) || $rekening->no_rekening != NULL || $rekening->no_rekening != "")
+                                    @if ($dataRekening->responseCode == 2001600 ||$dataRekening->responseCode == "2001600")
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h4 class="header-title">Informasi Rekening</h4>
+                                                <p class="sub-header">
+                                                    Pastikan nama pemilik rekening, muncul dan sesuai!
+                                                </p>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered border-primary mb-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Nama Bank</th>
+                                                                <th>Atas Nama</th>
+                                                                <th>Nomor Rekening</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">1</th>
+                                                                <th>{{ $rekening->nama_bank }}</th>
+                                                                <td>{{ $dataRekening->beneficiaryAccountName }}</td>
+                                                                <td>{{ $dataRekening->beneficiaryAccountNo }}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div> 
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h4 class="header-title">Informasi Rekening</h4>
+                                                <p class="sub-header text-danger">
+                                                    Data rekening yang anda masukkan salah!, silahkan cek kembali data rekening anda!
+                                                </p>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endif
+                            @endif
+                        </div>
+                        <div class="col-lg-12 col-xl-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="header-title">Syarat dan ketentuan</h4>
+                                    <br>
+                                    <div class="col-xl-12">
+                                        <div class="accordion custom-accordion" id="custom-accordion-one">
+                                            <div class="card mb-0">
+                                                <div class="card-header" id="headingNine">
+                                                    <h5 class="m-0 position-relative">
+                                                        <a class="custom-accordion-title text-reset d-block" data-bs-toggle="collapse" href="#collapseNine" aria-expanded="true" aria-controls="collapseNine">
+                                                            Withdrawal Disclaimer <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                                        </a>
+                                                    </h5>
+                                                </div>
+        
+                                                <div id="collapseNine" class="collapse show" aria-labelledby="headingFour" data-bs-parent="#custom-accordion-one">
+                                                    <div class="card-body">
+                                                        Dalam melakukan transfer dana dan Qris, kami bekerjasama dengan Bank Swasta Nasional yakni <strong>Bank Nationalnobu</strong> yang berizin dan diawasi oleh <strong>OJK</strong> dan merupakan peserta penjaminan LPS. 
+                                                        <br>
+                                                        <br>
+                                                        Pengguna wajib melakukan <strong>verifikasi data diri</strong> atau KYC (Know Your Customer) untuk menghindari tindakan pencucian dana hasil kejahatan sekaligus untuk memastikan fitur ini tidak disalah gunakan.
+                                                        <br>
+                                                        <br>
+                                                        Demi keamanan, kami akan mewajibkan pengguna untuk memasukkan <strong>kode OTP</strong> yang dikirim melalui nomor Whatsapp, pastikan nomor anda aktif dan telah diverifikasi melalui aplikasi Whatsapp.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card mb-0">
+                                                <div class="card-header" id="headingFive">
+                                                    <h5 class="m-0 position-relative">
+                                                        <a class="custom-accordion-title text-reset collapsed d-block" data-bs-toggle="collapse" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                                            Ketentuan biaya transfer bank <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                                        </a>
+                                                    </h5>
+                                                </div>
+                                                <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-bs-parent="#custom-accordion-one">
+                                                    <div class="card-body">
+                                                        Kami menetapkan biaya penarikan dana sebesar <strong>Rp. 1.500</strong> untuk setiap penarikan ke semua bank.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        @else
-                            <div class="col-lg-5 col-xl-5">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h4 class="header-title">Informasi Rekening</h4>
-                                        <p class="sub-header text-danger">
-                                            Data rekening yang anda masukkan salah!, silahkan cek kembali data rekening anda!
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    @endif
-                @endif
+                        </div>
+                    </div>
+                </div>
                 <!-- end col -->
             </div>
             <!-- end row-->
