@@ -118,7 +118,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
-                                                <label for="kode_pos" class="form-label">Kode Pos Toko</label>
+                                                <label for="kode_pos" class="form-label">Kode Pos Kantor Merchant</label>
                                                 <input type="text" class="form-control" name="kode_pos" id="kode_pos" required value="{{$store->kode_pos}}" placeholder="Masukkan kode pos">
                                             </div>
                                         </div>

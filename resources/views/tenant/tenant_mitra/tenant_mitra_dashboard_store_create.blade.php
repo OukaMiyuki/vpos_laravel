@@ -32,7 +32,7 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="name" class="form-label">Nama Merchant</label>
-                                                <input type="text" class="form-control" name="name" id="name" required value="" placeholder="Masukkan nama toko">
+                                                <input type="text" class="form-control" name="name" id="name" required value="" placeholder="Masukkan nama merchant">
                                             </div>
                                         </div>
                                     </div>
@@ -40,7 +40,7 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="no_telp" class="form-label">No. Telp. Merchant</label>
-                                                <input type="text" class="form-control" name="no_telp" id="no_telp" required value="" placeholder="Masukkan nomor telepon toko">
+                                                <input type="text" class="form-control" name="no_telp" id="no_telp" required value="" placeholder="Masukkan nomor telepon kantor merchant">
                                             </div>
                                         </div>
                                     </div>

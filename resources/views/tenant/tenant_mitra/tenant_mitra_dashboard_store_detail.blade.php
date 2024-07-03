@@ -75,7 +75,7 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="name" class="form-label">Nama Merchant</label>
-                                                    <input type="text" class="form-control" name="name" id="name" required value="{{$store->name}}" readonly placeholder="Masukkan nama toko">
+                                                    <input type="text" class="form-control" name="name" id="name" required value="{{$store->name}}" readonly placeholder="Masukkan nama merchant">
                                                 </div>
                                             </div>
                                         </div>
@@ -83,7 +83,7 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="no_telp" class="form-label">No. Telp. Merchant</label>
-                                                    <input type="text" class="form-control" readonly name="no_telp" id="no_telp" required value="{{$store->no_telp_toko}}" placeholder="Masukkan nomor telepon toko">
+                                                    <input type="text" class="form-control" readonly name="no_telp" id="no_telp" required value="{{$store->no_telp_toko}}" placeholder="Masukkan nomor telepon kantor merchant">
                                                 </div>
                                             </div>
                                         </div>
@@ -154,7 +154,7 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="kode_pos" class="form-label">Kode Pos Toko</label>
+                                                    <label for="kode_pos" class="form-label">Kode Pos Kantor Merchant</label>
                                                     <input type="text" class="form-control" name="kode_pos" id="kode_pos" required value="{{$store->kode_pos}}" readonly placeholder="Masukkan kode pos">
                                                 </div>
                                             </div>
@@ -171,7 +171,7 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="kantor_toko_fisik" class="form-label">Memiliki Toko Fisik atau Kantor Usaha?</label>
-                                                    <input type="text" class="form-control" name="kantor_toko_fisik" id="kantor_toko_fisik" readonly value="{{$store->kantor_toko_fisik}}" placeholder="Masukkan status toko fisik">
+                                                    <input type="text" class="form-control" name="kantor_toko_fisik" id="kantor_toko_fisik" readonly value="{{$store->kantor_toko_fisik}}" placeholder="Masukkan status kantor fisik">
                                                 </div>
                                             </div>
                                         </div>
@@ -210,7 +210,7 @@
                 
                                                         <div id="collapseNine" class="collapse show" aria-labelledby="headingFour" data-bs-parent="#custom-accordion-one">
                                                             <div class="card-body">
-                                                                Kami memberikan fasilitas bagi pengguna Mitra Bisnis untuk dapat memiliki akun Qris dengan nama merchant yang dimiliki oleh mitra bisnis.
+                                                                Kami memberikan fasilitas bagi pengguna <strong>Mitra Bisnis untuk dapat memiliki akun Qris</strong> dengan nama merchant yang dimiliki oleh Mitra Bisnis.
                                                             </div>
                                                         </div>
                                                     </div>
@@ -224,7 +224,7 @@
                                                         </div>
                                                         <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-bs-parent="#custom-accordion-one">
                                                             <div class="card-body">
-                                                                Dengan melakukan pendaftaran Qris Merchant, pengguna akan mendapatkan akun QRIS dengan nama sesuai dengan merchant saat melakukan pembayaran, sehingga memudahkan pelanggan untuk mengenali dan mengidentifikasi transaksi yang dilakukan. 
+                                                                Dengan melakukan pendaftaran Qris Merchant, pengguna akan mendapatkan <strong>akun QRIS dengan nama sesuai dengan merchant</strong> saat melakukan pembayaran, sehingga <strong>memudahkan pelanggan untuk mengenali dan mengidentifikasi transaksi</strong> yang dilakukan. 
                                                             </div>
                                                         </div>
                                                     </div>
@@ -238,7 +238,7 @@
                                                         </div>
                                                         <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-bs-parent="#custom-accordion-one">
                                                             <div class="card-body">
-                                                                Pendaftaran ini bersifat tidak wajib, pengguna tetap bisa melakukan transaksi maupun request pembayatan Qris melalui API. Namun secara default nama yang tertera saat pembayaran Qris akan menggunakan Merchant Name dari Visioner.
+                                                                Pendaftaran ini bersifat <strong>tidak wajib</strong>, pengguna tetap bisa melakukan transaksi maupun request pembayatan Qris melalui API. Namun secara default <strong>nama yang tertera saat pembayaran Qris akan menggunakan Merchant Name dari Visioner</strong>.
                                                             </div>
                                                         </div>
                                                     </div>
@@ -252,7 +252,7 @@
                                                         </div>
                                                         <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven" data-bs-parent="#custom-accordion-one">
                                                             <div class="card-body">
-                                                                QRIS Reguler dan QRIS UMI memiliki perbedaan yang signifikan dalam tujuan dan penggunaannya. QRIS Reguler dirancang untuk mendukung berbagai jenis usaha, baik besar maupun kecil, dan terbuka untuk semua merchant seperti toko retail dan restoran, dengan transaksi yang cocok untuk berbagai jumlah nominal serta fitur lengkap seperti integrasi dengan berbagai aplikasi pembayaran dan dukungan multi-bank. Sebaliknya, QRIS UMI (Usaha Mikro Indonesia) khusus ditujukan untuk pedagang kecil, usaha rumahan, dan UMKM, ideal untuk transaksi dengan nominal kecil dan menawarkan biaya yang lebih terjangkau serta proses pendaftaran yang lebih sederhana, sehingga sangat mendukung pertumbuhan usaha mikro di Indonesia.
+                                                                <strong>QRIS Reguler</strong> dan <strong>QRIS UMI</strong> memiliki perbedaan yang signifikan dalam tujuan dan penggunaannya. <strong>QRIS Reguler dirancang untuk mendukung berbagai jenis usaha, baik besar maupun kecil, dan terbuka untuk semua merchant</strong> seperti toko retail dan restoran, dengan transaksi yang cocok untuk berbagai jumlah nominal serta fitur lengkap seperti integrasi dengan berbagai aplikasi pembayaran dan dukungan multi-bank. Sebaliknya, <strong>QRIS UMI (Usaha Mikro Indonesia) khusus ditujukan untuk pedagang kecil, usaha rumahan, dan UMKM, ideal untuk transaksi dengan nominal kecil</strong> dan menawarkan biaya yang lebih terjangkau serta proses pendaftaran yang lebih sederhana, sehingga sangat mendukung pertumbuhan usaha mikro di Indonesia.
                                                             </div>
                                                         </div>
                                                     </div>
