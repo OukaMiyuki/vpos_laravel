@@ -197,6 +197,7 @@
                                     <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Pengajuan Qris Merchant ID & UMI</h5>
                                     @if ($umiRequest == "Empty")
                                         <p class="sub-header">
+                                            <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Syarat dan Ketentuan pendaftaran QRIS</h5>
                                             <div class="col-xl-12">
                                                 <div class="accordion custom-accordion" id="custom-accordion-one">
                                                     <div class="card mb-0">

@@ -132,8 +132,8 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="code" class="form-label">Kode</label>
-                            <input class="form-control" type="text" id="code" name="code" required="" placeholder="Masukkan kode undangan">
+                            <label for="inv_code" class="form-label">Kode</label>
+                            <input class="form-control" type="text" id="inv_code" name="inv_code" required="" placeholder="Masukkan kode undangan">
                             <small id="emailHelp" class="form-text text-muted">Kode maksimal 5 karakter, terdiri dari huruf & angka | Contoh : DENY5</small>
                         </div>
                         <div class="mb-3">

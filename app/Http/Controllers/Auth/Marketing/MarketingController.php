@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Stevebauman\Location\Facades\Location;
+use Illuminate\Support\Facades\Validator;
 use Twilio\Rest\Client;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -169,25 +170,40 @@ class MarketingController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
+        
 
-        $inv_code = Str::upper($request->code);
-        $code_check = InvitationCode::where('inv_code', $inv_code)->first();
+        // $inv_code = Str::upper($request->code);
+        $validator = Validator::make($request->all(), [
+            'inv_code' => 'required|unique:invitation_codes|max:5'
+        ]);
 
-        if(!is_null($code_check) || !empty($code_check)){
+        // dd($validator);
+
+        if ($validator->fails()) {
             $notification = array(
                 'message' => 'Kode telah didaftarkan, silahkan buat kode lain!',
                 'alert-type' => 'warning',
             );
 
-            return redirect()->back()->with($notification);
-        }
+            return redirect()->route('marketing.dashboard.invitationcode')->with($notification);
+        } 
+        // $code_check = InvitationCode::where('inv_code', $inv_code)->first();
+
+        // if(!is_null($code_check) || !empty($code_check)){
+        //     $notification = array(
+        //         'message' => 'Kode telah didaftarkan, silahkan buat kode lain!',
+        //         'alert-type' => 'warning',
+        //     );
+
+        //     return redirect()->back()->with($notification);
+        // }
 
         InvitationCode::create([
             'id_marketing' => auth()->user()->id,
             'holder' => $request->holder,
-            'inv_code' => $inv_code
+            'inv_code' => $request->inv_code
         ]);
-        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+        //$this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Kode telah dibuat!',
             'alert-type' => 'success',

@@ -49,3 +49,14 @@ function formatRupiah(angka, prefix) {
     rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
     return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
 }
+
+$(function() { 
+    $('#inv_code').keyup(function() { 
+        this.value = this.value.toLocaleUpperCase(); 
+    }); 
+}); 
+
+$(document).ready(function() {
+    $("#inv_code").attr('maxlength','5');
+    $("#inv_code").attr('minlength','5');
+});
