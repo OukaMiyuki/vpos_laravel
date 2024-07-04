@@ -57,7 +57,7 @@
                                                         <span class="badge bg-soft-success text-success">Settlement Sukses</span>
                                                     @endif
                                                 </td>
-                                                <td>{{$stk->note}}</td>        
+                                                <td>{{$stl->note}}</td>        
                                             </tr>
                                         @endforeach
                                     </tbody>
