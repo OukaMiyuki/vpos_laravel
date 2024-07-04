@@ -404,7 +404,7 @@ div.qris {
                         </tbody>
                     </table>
                 </div>
-                @if ($invoice->jenis_pembayaran == "Qris")
+                @if ($invoice->jenis_pembayaran == "Qris" || is_null($invoice->qris_data) || !empty($invoice->qris_data) || $invoice->qris_data != "" || $invoice->qris_data != NULL)
                     @if ($invoice->status_pembayaran == 0)
                         <div class="qris">
                             <img src="data:image/png;base64,{{ $qrcode }}">
