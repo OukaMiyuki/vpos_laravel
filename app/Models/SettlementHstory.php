@@ -16,7 +16,7 @@ class SettlementHstory extends Model {
     }
 
     public function settlement(){
-        return $this->belongsTo(Tenant::class, 'id_settlement', 'id');
+        return $this->belongsTo(Settlement::class, 'id_settlement', 'id');
     }
 
 }
