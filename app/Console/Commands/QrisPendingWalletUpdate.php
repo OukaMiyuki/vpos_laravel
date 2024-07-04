@@ -42,6 +42,16 @@ class QrisPendingWalletUpdate extends Command {
         $settlementNote = "Settlement ".Carbon::now()->format('d-m-Y');
         $settlementDate = SettlementDateSetting::latest()->get();
         $dateCollection = 0;
+        $today = new Carbon();
+        $saturday = false;
+        $sunday = false;
+        if($today->dayOfWeek == Carbon::SATURDAY){
+            $saturday = true;
+            $sunday = false;
+        } else if($today->dayOfWeek == Carbon::SUNDAY){
+            $saturday = false;
+            $sunday = true;
+        }
         foreach($settlementDate as $settlement){
             $startDate = date('Y-m-d', strtotime($settlement->stat_date));
             $endDate = date('Y-m-d', strtotime($settlement->end_date));
@@ -50,7 +60,7 @@ class QrisPendingWalletUpdate extends Command {
             }
         }
         //echo $dateCollection;
-        if($dateCollection != 0){
+        if($dateCollection != 0 || $saturday ||  $sunday){
             $code = "PD-STL";
             $dateCode = $code.Carbon::now()->format('dmY');
             $tenantinvoice = Tenant::with([
