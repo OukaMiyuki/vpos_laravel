@@ -715,7 +715,7 @@ class PosController extends Controller {
         //             ->format('a4')
         //             ->name('your-invoice.pdf');
         $qrcode = "";
-        if($invoice->jenis_pembayaran == "Qris" || is_null($invoice->qris_data) || !empty($invoice->qris_data) || $invoice->qris_data != "" || $invoice->qris_data != NULL){
+        if($invoice->jenis_pembayaran == "Qris"){
             $qrcode = base64_encode(\QrCode::format('svg')->size(500)->errorCorrection('H')->generate($invoice->qris_data));
         }
         $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode]);
