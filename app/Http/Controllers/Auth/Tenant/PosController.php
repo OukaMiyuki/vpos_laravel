@@ -721,7 +721,8 @@ class PosController extends Controller {
             \File::makeDirectory(public_path($path));
         }
         if($invoice->jenis_pembayaran == "Qris"){
-            $file_path = $path .$invoice->nomor_invoice.time() . '.png';
+            // $file_path = $path .$invoice->nomor_invoice.time() . '.png';
+            $file_path = $path.$invoice->nomor_invoice.'.png';
             $image = \QrCode::format('png')
                             // ->merge('img/t.jpg', 0.1, true)
                             ->size(500)->errorCorrection('H')
