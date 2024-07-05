@@ -814,7 +814,7 @@ class PosController extends Controller {
         $responseCode = $postResponse->getStatusCode();
         $postImageResponse = "";
         $responseCodeImage = "";
-        if($invoice->status_pembayaran == 0){
+        if($invoice->status_pembayaran == 0 && $invoice->status_pembbayaran == 0){
             $dataImage = [
                 "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
                 'sender' => "085179950178",
@@ -837,23 +837,40 @@ class PosController extends Controller {
                 );
                 return redirect()->back()->with($notification);
             }
-        }
-        $responseCodeImage = $postImageResponse->getStatusCode();
+            $responseCodeImage = $postImageResponse->getStatusCode();
 
-        if($responseCode == 200 && $responseCodeImage == 200){
-            // dd($postResponse);
-            $notification = array(
-                'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
+            if($responseCode == 200 && $responseCodeImage == 200){
+                // dd($postResponse);
+                $notification = array(
+                    'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $notification = array(
+                    'message' => 'Nota gagal dikirim!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
         } else {
-            $notification = array(
-                'message' => 'Nota gagal dikirim!',
-                'alert-type' => 'warning',
-            );
-            return redirect()->back()->with($notification);
+            if($responseCode == 200){
+                // dd($postResponse);
+                $notification = array(
+                    'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $notification = array(
+                    'message' => 'Nota gagal dikirim!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
         }
+
+       
         // ini pelu
 
         // return $responseCode;
