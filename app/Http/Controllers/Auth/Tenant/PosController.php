@@ -793,7 +793,7 @@ class PosController extends Controller {
             "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
             'sender' => "085179950178",
             'number' => $hp,
-            "media_type" => "image",
+            "media_type" => "document",
             "caption" => "Nota Pembayaran anda",
             "url" => 'https://visipos.id/storage/invoice/VP05072024101926000005468.pdf'
         ];
