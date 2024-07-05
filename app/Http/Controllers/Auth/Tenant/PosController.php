@@ -705,7 +705,7 @@ class PosController extends Controller {
         $invoice = Invoice::with('shoppingCart', 'invoiceField')
                             ->where('store_identifier', $identifier)
                             ->find($id);
-        $path = public_path('qrcode/'.time().'.png');
+        //$path = public_path('qrcode/'.$invoice->nomor_invoice.time().'.png');
         // $png = \QrCode::format('png')->size(200)->generate($invoice->qris_data);
         // $png = base64_encode($png);
         // return \QrCode::size(200)
@@ -714,79 +714,102 @@ class PosController extends Controller {
         // return Pdf::view('pdf', ['invoice' => $invoice])
         //             ->format('a4')
         //             ->name('your-invoice.pdf');
-        $qrcode = "";
-        if($invoice->jenis_pembayaran == "Qris"){
-            $qrcode = base64_encode(\QrCode::format('svg')->size(500)->errorCorrection('H')->generate($invoice->qris_data));
+        
+        $path = 'qrcode/';
+
+        if(!\File::exists(public_path($path))) {
+            \File::makeDirectory(public_path($path));
         }
-        $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode]);
-        $invoiceName = $invoice->nomor_invoice.'.pdf';
-        $content = $pdf->download()->getOriginalContent();
-        Storage::put('public/invoice/'.$invoiceName,$content);
-        $imagick = new Imagick();
-        $imagick->setResolution(300,300);
-        $path = Storage::path('public/invoice/'.$invoiceName);
-        $imagick->readImage($path);
+        if($invoice->jenis_pembayaran == "Qris"){
+            $file_path = $path .$invoice->nomor_invoice.time() . '.png';
+            $image = \QrCode::format('png')
+                            ->merge('img/t.jpg', 0.1, true)
+                            ->size(500)->errorCorrection('H')
+                            ->generate($invoice->qris_data, $file_path);
+        }
+
+        return redirect()->back();
+
+        // ini perlu
+        // $qrcode = "";
+        // if($invoice->jenis_pembayaran == "Qris"){
+        //     $qrcode = base64_encode(\QrCode::format('svg')->size(500)->errorCorrection('H')->generate($invoice->qris_data));
+        // }
+        // $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode]);
+        // $invoiceName = $invoice->nomor_invoice.'.pdf';
+        // $content = $pdf->download()->getOriginalContent();
+        // Storage::put('public/invoice/'.$invoiceName,$content);
+        // $imagick = new Imagick();
+        // $imagick->setResolution(300,300);
+        // $path = Storage::path('public/invoice/'.$invoiceName);
+        // $imagick->readImage($path);
+        // iniperlu
+
         // $imagick->setImageResolution(12800,800) ; // it change only image density.
 	    // $imagick->resampleImage  (12800,800,imagick::FILTER_UNDEFINED,1);
         // $imagick->Imagick::setImageResolution( 600, 600 );
         // $imagick->resizeImage(595,842,\Imagick::FILTER_CATROM, 1, true);
         // $imagick->setImageFormat('pdf');
-        $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
-        $imagick->writeImages($saveImagePath, true);
-        $api_key    = getenv("WHATZAPP_API_KEY");
-        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
-        $client = new GuzzleHttpClient();
-        $postResponse = "";
-        $noHP = $no_wa;
-        $hp = "";
-        if(!preg_match("/[^+0-9]/",trim($noHP))){
-            if(substr(trim($noHP), 0, 2)=="62"){
-                $hp    =trim($noHP);
-            }
-            else if(substr(trim($noHP), 0, 1)=="0"){
-                $hp    ="62".substr(trim($noHP), 1);
-            }
-        }
 
-        $url = 'https://waq.my.id/send-media';
-        $headers = [
-            'Content-Type' => 'application/json',
-        ];
-        $data = [
-            "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
-            'sender' => "085179950178",
-            'number' => $hp,
-            "media_type" => "image",
-            "caption" => "Nota Pembayaran anda",
-            "url" => "https://visipos.id/public/invoice/".$invoice->nomor_invoice.".jpg"
-        ];
+        // ini perlu
+        // $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
+        // $imagick->writeImages($saveImagePath, true);
+        // $api_key    = getenv("WHATZAPP_API_KEY");
+        // $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        // $client = new GuzzleHttpClient();
+        // $postResponse = "";
+        // $noHP = $no_wa;
+        // $hp = "";
+        // if(!preg_match("/[^+0-9]/",trim($noHP))){
+        //     if(substr(trim($noHP), 0, 2)=="62"){
+        //         $hp    =trim($noHP);
+        //     }
+        //     else if(substr(trim($noHP), 0, 1)=="0"){
+        //         $hp    ="62".substr(trim($noHP), 1);
+        //     }
+        // }
 
-        try {
-            $postResponse = $client->post($url, [
-                'headers' => $headers,
-                'json' => $data,
-            ]);
-        } catch(Exception $ex){
-            $notification = array(
-                'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
-                'alert-type' => 'warning',
-            );
-            return redirect()->back()->with($notification);
-        }
-        $responseCode = $postResponse->getStatusCode();
-        if($responseCode == 200){
-            $notification = array(
-                'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
-        } else {
-            $notification = array(
-                'message' => 'Nota gagal dikirim!',
-                'alert-type' => 'warning',
-            );
-            return redirect()->back()->with($notification);
-        }
+        // $url = 'https://waq.my.id/send-media';
+        // $headers = [
+        //     'Content-Type' => 'application/json',
+        // ];
+        // $data = [
+        //     "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
+        //     'sender' => "085179950178",
+        //     'number' => $hp,
+        //     "media_type" => "image",
+        //     "caption" => "Nota Pembayaran anda",
+        //     "url" => "https://visipos.id/public/invoice/".$invoice->nomor_invoice.".jpg"
+        // ];
+
+        // try {
+        //     $postResponse = $client->post($url, [
+        //         'headers' => $headers,
+        //         'json' => $data,
+        //     ]);
+        // } catch(Exception $ex){
+        //     $notification = array(
+        //         'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
+        //         'alert-type' => 'warning',
+        //     );
+        //     return redirect()->back()->with($notification);
+        // }
+        // $responseCode = $postResponse->getStatusCode();
+        // if($responseCode == 200){
+        //     $notification = array(
+        //         'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
+        //         'alert-type' => 'success',
+        //     );
+        //     return redirect()->back()->with($notification);
+        // } else {
+        //     $notification = array(
+        //         'message' => 'Nota gagal dikirim!',
+        //         'alert-type' => 'warning',
+        //     );
+        //     return redirect()->back()->with($notification);
+        // }
+        // ini pelu
+
         // return $responseCode;
         // $image = Image::make(public_path('invoice/'.$invoice->nomor_invoice.'.jpg'));
         // $image->crop(300, 600, -100, -100);
