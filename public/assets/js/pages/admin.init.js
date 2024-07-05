@@ -175,7 +175,7 @@ $(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            "url": 'https://visipos.id/admin/dashboard/mitra-bisnis/transaction',
+            "url": 'https://visipos.id/admin/dashboard/user/transaction',
             "type": "GET",
             data : function(data){
                 data.from_date = $('#daterange_transaction').data('daterangepicker').startDate.format('YYYY-MM-DD');
