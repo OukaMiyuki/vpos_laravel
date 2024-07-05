@@ -119,7 +119,8 @@ class LoginController extends Controller {
             $user = Admin::select([
                                 'admins.id',
                                 'admins.email',
-                                'admins.phone'
+                                'admins.phone',
+                                'admins.access_level'
                             ])
                             ->where('email', $login_email)
                             ->first();
