@@ -804,7 +804,6 @@ class PosController extends Controller {
                 'json' => $data,
             ]);
         } catch(Exception $ex){
-            return $ex;
             $notification = array(
                 'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
                 'alert-type' => 'warning',
@@ -830,7 +829,6 @@ class PosController extends Controller {
                     'json' => $dataImage,
                 ]);
             } catch(Exception $ex){
-                return $ex;
                 $notification = array(
                     'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
                     'alert-type' => 'warning',
