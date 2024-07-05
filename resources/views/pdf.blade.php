@@ -218,7 +218,7 @@
                 {{-- <img src="logo.png"> --}}
             </div>
             <div id="company">
-                <h2 class="name">{{$storeTenant->name}}</h2>
+                <h2 class="name"><strong>{{$storeTenant->name}}</strong></h2>
                 <div>{{$storeTenant->alamat}}</div>
                 <div>{{$storeTenant->no_telp_toko}}</div>
                 {{-- <div><a href="mailto:company@example.com">company@example.com</a></div> --}}
@@ -257,7 +257,7 @@
                         <th class="desc">ITEM BELANJA</th>
                         <th class="unit">HARGA (Rp.)</th>
                         <th class="qty">QUANTITY</th>
-                        <th class="total">TOTAL</th>
+                        <th class="total">TOTAL (Rp.)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -272,7 +272,7 @@
                             </td>
                             <td class="unit">@money($cart->harga)</td>
                             <td class="qty">{{$cart->qty}}</td>
-                            <td class="total">{{$cart->sub_total}}</td>
+                            <td class="total">@money($cart->sub_total)</td>
                         </tr>
                     @endforeach
                 </tbody>
