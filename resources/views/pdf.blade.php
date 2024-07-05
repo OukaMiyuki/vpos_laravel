@@ -83,7 +83,7 @@
 
             #invoice h1 {
                 color: #f76e05 !important;
-                font-size: 1.5em !important;
+                font-size: 1.35em !important;
                 line-height: 1em;
                 font-weight: normal;
                 margin: 0 0 10px 0;
@@ -292,12 +292,12 @@
                     </tr>
                     <tr>
                         <td colspan="2"></td>
-                        <td colspan="2">Disc. (@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</td>
+                        <td colspan="2">DISC. (@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</td>
                         <td>@money($invoice->diskon)</td>
                     </tr>
                     <tr>
                         <td colspan="2"></td>
-                        <td colspan="2">Pajak (@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</td>
+                        <td colspan="2">PAJAK (@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</td>
                         <td>@money($invoice->pajak)</td>
                     </tr>
                     <tr>
@@ -323,13 +323,17 @@
                 </tfoot>
             </table>
             <div id="thanks">Terima Kasih!</div>
-            <div id="notices">
-                <div>Scan di sini untuk membayar pesanan anda:</div>
-                <!-- <div class="notice">A finance charge of 1.5% will be made on unpaid balances after 30 days.</div> -->
-				<div class="notice">
-					<img width="200" src="{{public_path('qrcode/'.$invoice->nomor_invoice.'.png')}}">
-				</div>
-            </div>
+            @if ($invoice->jenis_pembayaran == "Qris" || is_null($invoice->qris_data) || !empty($invoice->qris_data) || $invoice->qris_data != "" || $invoice->qris_data != NULL)
+                @if ($invoice->status_pembayaran == 0)
+                    <div id="notices">
+                        <div>Scan di sini untuk membayar pesanan anda:</div>
+                        <!-- <div class="notice">A finance charge of 1.5% will be made on unpaid balances after 30 days.</div> -->
+                        <div class="notice">
+                            <img width="200" src="https://visipos.id/public/qrcode/{{$invoice->nomor_invoice}}.png">
+                        </div>
+                    </div>
+                @endif
+            @endif
         </main>
         <footer>
             Invoice was created on a computer and is valid without the signature and seal.
