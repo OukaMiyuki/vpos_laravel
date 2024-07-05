@@ -245,7 +245,7 @@
                     @endif
                 </div>
                 <div id="invoice">
-                    <h1>INVOICE : {{$unvoice->nomor_invoice}}</h1>
+                    <h1>INVOICE : {{$invoice->nomor_invoice}}</h1>
                     <div class="date">Tanggal Transaksi: {{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</div>
                     <div class="date">Tanggal Pembayaran: 30/06/2014</div>
                 </div>
