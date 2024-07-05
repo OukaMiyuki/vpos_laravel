@@ -738,6 +738,8 @@ class PosController extends Controller {
         $invoiceName = $invoice->nomor_invoice.'.pdf';
         $content = $pdf->download()->getOriginalContent();
         Storage::put('public/invoice/'.$invoiceName,$content);
+        $path = Storage::path('public/invoice/'.$invoiceName);
+        dd($path);
         // $pdftext = file_get_contents(storage_path('app/public/invoice/'.$invoice->nomor_invoice.'.pdf'));
         // $num = preg_match_all("/\/Page\W/", $pdftext, $dummy);
         // $imagick = new Imagick();
