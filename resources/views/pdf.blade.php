@@ -209,7 +209,11 @@
     <body>
         <header class="clearfix">
             <div id="logo">
-                <img src="logo.png">
+                @php
+                    $storeTenant = App\Models\StoreDetail::where('store_identifier', $invoice->store_identifier)->first();
+                @endphp
+                <img src="{{ !empty($storeTenant->photo) ? Storage::url('images/profile/'.$storeTenant->photo) : asset('assets/images/logo/Logo2.png') }}">
+                {{-- <img src="logo.png"> --}}
             </div>
             <div id="company">
                 <h2 class="name">Company Name</h2>
@@ -298,7 +302,7 @@
                 <div>Scan di sini untuk membayar pesanan anda:</div>
                 <!-- <div class="notice">A finance charge of 1.5% will be made on unpaid balances after 30 days.</div> -->
 				<div class="notice">
-					<img width="200" src="qr.jpg">
+					<img width="200" src="{{public_path('qrcode/'.$invoice->nomor_invoice.'.png')}}">
 				</div>
             </div>
         </main>
