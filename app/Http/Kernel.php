@@ -79,5 +79,6 @@ class Kernel extends HttpKernel
         'isTenantIsNotMitra' => \App\Http\Middleware\IsTenantIsNotMitra::class,
         'isTenantIsMitra' => \App\Http\Middleware\IsTenantIsMitra::class,
         'isKasirStoreActive' => \App\Http\Middleware\IsKasirStoreActive::class,
+        'isAdminSuper' => \App\Http\Middleware\IsAdminSuper::class,
     ];
 }

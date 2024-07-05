@@ -43,15 +43,15 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::post('logout', [App\Http\Controllers\Auth\LoginController::class, 'destroy'])->name('admin.logout');
     Route::get('/dashboard', [App\Http\Controllers\Auth\Admin\AdminController::class, 'index'])->name('admin.dashboard');
 
-    Route::get('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningList'])->name('admin.rekening.setting');
-    Route::get('settings/rekening/add', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningListAdd'])->name('admin.rekening.setting.add');
-    Route::post('settings/rekening/add', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningListInsert'])->name('admin.rekening.setting.insert');
-    Route::get('settings/rekening/edit/{id}', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningListEdit'])->name('admin.rekening.setting.edit');
-    Route::post('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningSettingUpdate'])->name('admin.rekening.setting.update');
+    Route::get('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningList'])->name('admin.rekening.setting')->middleware(['isAdminSuper']);
+    Route::get('settings/rekening/add', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningListAdd'])->name('admin.rekening.setting.add')->middleware(['isAdminSuper']);
+    Route::post('settings/rekening/add', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningListInsert'])->name('admin.rekening.setting.insert')->middleware(['isAdminSuper']);
+    Route::get('settings/rekening/edit/{id}', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningListEdit'])->name('admin.rekening.setting.edit')->middleware(['isAdminSuper']);
+    Route::post('settings/rekening', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'rekeningSettingUpdate'])->name('admin.rekening.setting.update')->middleware(['isAdminSuper']);
 
-    Route::get('settings/withdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdraw'])->name('admin.withdraw');
-    Route::post('settings/withdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdrawTarik'])->name('admin.withdraw.tarik');
-    Route::post('settings/withdraw/process', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdrawTarikProcess'])->name('admin.withdraw.tarik.process');
+    Route::get('settings/withdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdraw'])->name('admin.withdraw')->middleware(['isAdminSuper']);
+    Route::post('settings/withdraw', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdrawTarik'])->name('admin.withdraw.tarik')->middleware(['isAdminSuper']);
+    Route::post('settings/withdraw/process', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminWithdrawTarikProcess'])->name('admin.withdraw.tarik.process')->middleware(['isAdminSuper']);
 
     Route::get('/dashboard/admin', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuDashboard'])->name('admin.dashboard.menu');
     Route::get('/dashboard/user/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTransaction'])->name('admin.dashboard.menu.userTransaction');
@@ -73,14 +73,14 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::get('/dashboard/administrator/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminActivation'])->name('admin.dashboard.administrator.activation');
     Route::get('/dashboard/administrator/detail/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDetail'])->name('admin.dashboard.administrator.detail');
 
-    Route::get('dashboard/saldo', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldo'])->name('admin.dashboard.saldo');
-    Route::get('dashboard/saldo/qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoQris'])->name('admin.dashboard.saldo.qris');
-    Route::get('dashboard/saldo/agregate', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregate'])->name('admin.dashboard.saldo.agregate');
-    Route::get('dashboard/saldo/agregate-aplikasi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregateAplikasi'])->name('admin.dashboard.saldo.agregate.aplikasi');
-    Route::get('dashboard/saldo/agregate-transfer', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregateTransfer'])->name('admin.dashboard.saldo.agregate.transfer');
-    Route::get('dashboard/saldo/data-history-cashback', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoCashback'])->name('admin.dashboard.saldo.cashback');
-    Route::get('dashboard/saldo/data-history-cashback-settlement-pending', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoCashbackPending'])->name('admin.dashboard.saldo.cashback.settlement');
-    Route::get('dashboard/saldo/data-bank-fee-transfer', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardNobuFeeTransfer'])->name('admin.dashboard.saldo.nobu.fee.transfer');
+    Route::get('dashboard/saldo', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldo'])->name('admin.dashboard.saldo')->middleware(['isAdminSuper']);
+    Route::get('dashboard/saldo/qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoQris'])->name('admin.dashboard.saldo.qris')->middleware(['isAdminSuper']);
+    Route::get('dashboard/saldo/agregate', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregate'])->name('admin.dashboard.saldo.agregate')->middleware(['isAdminSuper']);
+    Route::get('dashboard/saldo/agregate-aplikasi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregateAplikasi'])->name('admin.dashboard.saldo.agregate.aplikasi')->middleware(['isAdminSuper']);
+    Route::get('dashboard/saldo/agregate-transfer', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoAgregateTransfer'])->name('admin.dashboard.saldo.agregate.transfer')->middleware(['isAdminSuper']);
+    Route::get('dashboard/saldo/data-history-cashback', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoCashback'])->name('admin.dashboard.saldo.cashback')->middleware(['isAdminSuper']);
+    Route::get('dashboard/saldo/data-history-cashback-settlement-pending', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoCashbackPending'])->name('admin.dashboard.saldo.cashback.settlement')->middleware(['isAdminSuper']);
+    Route::get('dashboard/saldo/data-bank-fee-transfer', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardNobuFeeTransfer'])->name('admin.dashboard.saldo.nobu.fee.transfer')->middleware(['isAdminSuper']);
 
     Route::get('dashboard/mitra-aplikasi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketing'])->name('admin.dashboard.marketing');
     Route::get('dashboard/mitra-aplikasi/list', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMarketingList'])->name('admin.dashboard.marketing.list');
@@ -120,16 +120,16 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::get('dashboard/mitra-tenant/transaction', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantTransactionList'])->name('admin.dashboard.mitraTenant.transaction.list');
     Route::get('dashboard/mitra-tenant/withdrawals', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraTenantWithdrawalList'])->name('admin.dashboard.mitraTenant.withdraw.list');
 
-    Route::get('dashboard/finance', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinance'])->name('admin.dashboard.finance');
-    Route::get('dashboard/finance/withdraw-invoice/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinanceInvoice'])->name('admin.dashboard.finance.withdraw.invoice');
-    Route::get('dashboard/finance/insentif', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingList'])->name('admin.dashboard.finance.insentif.list');
-    Route::post('dashboard/finance/insentif', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingInsert'])->name('admin.dashboard.finance.insentif.insert');
-    Route::post('dashboard/finance/insentif/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingUpdate'])->name('admin.dashboard.finance.insentif.update');
-    Route::get('dashboard/finance/insentif/delete/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingDelete'])->name('admin.dashboard.finance.insentif.delete');
-    Route::get('dashboard/finance/settlement', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingList'])->name('admin.dashboard.finance.settlement.list');
-    Route::post('dashboard/finance/settlement', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingListInsert'])->name('admin.dashboard.finance.settlement.insert');
-    Route::get('dashboard/finance/settlement/delete/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementDelete'])->name('admin.dashboard.finance.settlement.delete');
-    Route::post('dashboard/finance/settlement/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingListUpdate'])->name('admin.dashboard.finance.settlement.update');
+    Route::get('dashboard/finance', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinance'])->name('admin.dashboard.finance')->middleware(['isAdminSuper']);
+    Route::get('dashboard/finance/withdraw-invoice/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardFinanceInvoice'])->name('admin.dashboard.finance.withdraw.invoice')->middleware(['isAdminSuper']);
+    Route::get('dashboard/finance/insentif', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingList'])->name('admin.dashboard.finance.insentif.list')->middleware(['isAdminSuper']);
+    Route::post('dashboard/finance/insentif', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingInsert'])->name('admin.dashboard.finance.insentif.insert')->middleware(['isAdminSuper']);
+    Route::post('dashboard/finance/insentif/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingUpdate'])->name('admin.dashboard.finance.insentif.update')->middleware(['isAdminSuper']);
+    Route::get('dashboard/finance/insentif/delete/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardInsentifSettingDelete'])->name('admin.dashboard.finance.insentif.delete')->middleware(['isAdminSuper']);
+    Route::get('dashboard/finance/settlement', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingList'])->name('admin.dashboard.finance.settlement.list')->middleware(['isAdminSuper']);
+    Route::post('dashboard/finance/settlement', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingListInsert'])->name('admin.dashboard.finance.settlement.insert')->middleware(['isAdminSuper']);
+    Route::get('dashboard/finance/settlement/delete/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementDelete'])->name('admin.dashboard.finance.settlement.delete')->middleware(['isAdminSuper']);
+    Route::post('dashboard/finance/settlement/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementSettingListUpdate'])->name('admin.dashboard.finance.settlement.update')->middleware(['isAdminSuper']);
     Route::get('dashboard/finance/settlement/pending', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementPending'])->name('admin.dashboard.finance.settlement.pending');
     Route::get('dashboard/finance/settlement/history', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementHistory'])->name('admin.dashboard.finance.settlement.history');
     Route::get('dashboard/finance/settlement/history/{id}/{code}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSettlementHistoryDetail'])->name('admin.dashboard.finance.settlement.history.detail');
@@ -147,7 +147,7 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
 
 
 
-    Route::post('dashboard/mitra-bisnis/transaction/testing', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisTransactionListTesting'])->name('admin.dashboard.mitraBisnis.transactionList.testingWoi');
+    // Route::post('dashboard/mitra-bisnis/transaction/testing', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardMitraBisnisTransactionListTesting'])->name('admin.dashboard.mitraBisnis.transactionList.testingWoi');
 });
 
 
