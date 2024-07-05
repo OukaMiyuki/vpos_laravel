@@ -25,9 +25,8 @@
 
             body {
                 position: relative;
-                padding: 5px !important;
-                width: 21cm;
-                height: 29.7cm;
+                /* width: 21cm;
+                height: 29.7cm; */
                 margin: 0 auto;
                 color: #555555;
                 background: #FFFFFF;
@@ -210,7 +209,7 @@
         </style>
     </head>
     <body>
-        <header class="clearfix" style="padding-right: 30px;">
+        <header class="clearfix">
             <div id="logo">
                 @php
                     $storeTenant = App\Models\StoreDetail::where('store_identifier', $invoice->store_identifier)->first();
