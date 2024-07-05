@@ -795,7 +795,7 @@ class PosController extends Controller {
             'number' => $hp,
             "media_type" => "document",
             "caption" => "Nota Pembayaran anda",
-            "url" => 'https://visipos.id/storage/invoice/VP05072024101926000005468.pdf'
+            "url" => 'https://visipos.id/storage/invoice/'.$invoice->nomor_invoice.'.pdf'
         ];
 
         try {
