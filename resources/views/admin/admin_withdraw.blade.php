@@ -157,7 +157,7 @@
                                                     </div>
                                                     <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-bs-parent="#custom-accordion-one">
                                                         <div class="card-body">
-                                                            Kami menetapkan biaya penarikan dana sebesar <strong>Rp. 1.500</strong> untuk setiap penarikan ke semua bank.
+                                                            Kami menetapkan biaya penarikan dana sebesar <strong>Rp. 300</strong> untuk setiap penarikan ke semua bank.
                                                         </div>
                                                     </div>
                                                 </div>
