@@ -724,8 +724,7 @@ class PosController extends Controller {
             // $file_path = $path .$invoice->nomor_invoice.time() . '.png';
             $file_path = $path.$invoice->nomor_invoice.'.png';
             $image = \QrCode::format('png')
-                            // ->merge('img/t.jpg', 0.1, true)
-                            ->size(500)->errorCorrection('H')
+                            ->size(800)->errorCorrection('H')
                             ->generate($invoice->qris_data, $file_path);
         }
 
