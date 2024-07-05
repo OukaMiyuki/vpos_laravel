@@ -210,7 +210,7 @@
         </style>
     </head>
     <body>
-        <header class="clearfix">
+        <header class="clearfix" style="padding-right: 30px;">
             <div id="logo">
                 @php
                     $storeTenant = App\Models\StoreDetail::where('store_identifier', $invoice->store_identifier)->first();
