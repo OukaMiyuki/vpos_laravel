@@ -5,8 +5,8 @@
         <title>Invoice Transaksi {{$invoice->nomor_invoice}}</title>
         <link rel="stylesheet" href="style.css" media="all" />
         <style>
-            @page { margin: 0px; }
-            body { margin: 0px; }
+            @page { margin: 0px; margin-right: 1rem !important; }
+            body { margin: 0px; margin-right: 1rem !important; }
             @font-face {
                 font-family: SourceSansPro;
                 src: url(SourceSansPro-Regular.ttf);
