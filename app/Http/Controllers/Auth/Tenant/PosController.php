@@ -812,7 +812,35 @@ class PosController extends Controller {
             return redirect()->back()->with($notification);
         }
         $responseCode = $postResponse->getStatusCode();
-        if($responseCode == 200){
+        $postImageResponse = "";
+        $responseCodeImage = "";
+        if($invoice->status_pembayaran == 0){
+            $dataImage = [
+                "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
+                'sender' => "085179950178",
+                'number' => $hp,
+                "media_type" => "document",
+                "caption" => "Scan QR Code berikut untuk melakukan pembayaran.",
+                "url" => 'https://visipos.id/public/qrcode/'.$invoice->nomor_invoice.'.png'
+            ];
+
+            try {
+                $postImageResponse = $client->post($url, [
+                    'headers' => $headers,
+                    'json' => $dataImage,
+                ]);
+            } catch(Exception $ex){
+                return $ex;
+                $notification = array(
+                    'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+        }
+        $responseCodeImage = $postImageResponse->getStatusCode();
+
+        if($responseCode == 200 && $responseCodeImage == 200){
             // dd($postResponse);
             $notification = array(
                 'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
