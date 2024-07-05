@@ -162,7 +162,7 @@
                             </ul>
                         </div>
                     </li>
-                    @if(auth()->uesr()->access_level == 0)
+                    @if(auth()->user()->access_level == 0)
                         <li>
                             <a href="#sidebarCrm" data-bs-toggle="collapse">
                                 <i class="mdi mdi-account-box-multiple"></i>
