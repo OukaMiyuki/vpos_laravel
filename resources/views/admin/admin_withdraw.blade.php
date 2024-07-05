@@ -30,6 +30,11 @@
                                         Tarik Saldo Admin
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="#syarat" data-bs-toggle="tab" aria-expanded="false" class="nav-link">
+                                        Syarat dan Kententuan
+                                    </a>
+                                </li>
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane show active" id="qris">
@@ -116,6 +121,49 @@
                                             <button disabled id="tarikDanaButton" type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Tarik</button>
                                         </div>
                                     </form>
+                                </div>
+                                <div class="tab-pane" id="syarat">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="accordion custom-accordion" id="custom-accordion-one">
+                                                <div class="card mb-0">
+                                                    <div class="card-header" id="headingNine">
+                                                        <h5 class="m-0 position-relative">
+                                                            <a class="custom-accordion-title text-reset d-block" data-bs-toggle="collapse" href="#collapseNine" aria-expanded="true" aria-controls="collapseNine">
+                                                                Withdrawal Disclaimer <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                                            </a>
+                                                        </h5>
+                                                    </div>
+            
+                                                    <div id="collapseNine" class="collapse show" aria-labelledby="headingFour" data-bs-parent="#custom-accordion-one">
+                                                        <div class="card-body">
+                                                            Dalam melakukan transfer dana dan Qris, kami bekerjasama dengan Bank Swasta Nasional yakni <strong>Bank Nationalnobu</strong> yang berizin dan diawasi oleh <strong>OJK</strong> dan merupakan peserta penjaminan LPS. 
+                                                            <br>
+                                                            <br>
+                                                            Pengguna wajib melakukan <strong>verifikasi data diri</strong> atau KYC (Know Your Customer) untuk menghindari tindakan pencucian dana hasil kejahatan sekaligus untuk memastikan fitur ini tidak disalah gunakan.
+                                                            <br>
+                                                            <br>
+                                                            Demi keamanan, kami akan mewajibkan pengguna untuk memasukkan <strong>kode OTP</strong> yang dikirim melalui nomor Whatsapp, pastikan nomor anda aktif dan telah diverifikasi melalui aplikasi Whatsapp.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card mb-0">
+                                                    <div class="card-header" id="headingFive">
+                                                        <h5 class="m-0 position-relative">
+                                                            <a class="custom-accordion-title text-reset collapsed d-block" data-bs-toggle="collapse" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                                                Ketentuan biaya transfer bank <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                                            </a>
+                                                        </h5>
+                                                    </div>
+                                                    <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-bs-parent="#custom-accordion-one">
+                                                        <div class="card-body">
+                                                            Kami menetapkan biaya penarikan dana sebesar <strong>Rp. 1.500</strong> untuk setiap penarikan ke semua bank.
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <!-- end tab-content -->
