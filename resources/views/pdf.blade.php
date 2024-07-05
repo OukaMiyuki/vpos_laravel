@@ -83,7 +83,7 @@
 
             #invoice h1 {
                 color: #f76e05 !important;
-                font-size: 1em !important;
+                font-size: 1.5em !important;
                 line-height: 1em;
                 font-weight: normal;
                 margin: 0 0 10px 0;
@@ -169,7 +169,7 @@
                 border-top: none;
             }
 
-            table tfoot tr:nth-child(3) td {
+            table tfoot tr:nth-child(4) td {
                 color: #f76e05 !important;
                 font-size: 1.4em;
                 /* border-top: 1px solid #f76e05 !important; */
@@ -292,17 +292,17 @@
                     </tr>
                     <tr>
                         <td colspan="2"></td>
-                        <td colspan="2">Disc.(@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</td>
+                        <td colspan="2">Disc. (@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</td>
                         <td>@money($invoice->diskon)</td>
                     </tr>
                     <tr>
                         <td colspan="2"></td>
-                        <td colspan="2">Pajak(@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</td>
+                        <td colspan="2">Pajak (@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</td>
                         <td>@money($invoice->pajak)</td>
                     </tr>
                     <tr>
                         <td colspan="2"></td>
-                        <td colspan="2">GRAND TOTAL</td>
+                        <td colspan="2">GRAND TOTAL (Rp.)</td>
                         @php
                             $total = $invoice->sub_total+$invoice->pajak;
                         @endphp
