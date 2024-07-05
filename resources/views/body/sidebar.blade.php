@@ -162,20 +162,22 @@
                             </ul>
                         </div>
                     </li>
-                    <li>
-                        <a href="#sidebarCrm" data-bs-toggle="collapse">
-                            <i class="mdi mdi-account-box-multiple"></i>
-                            <span> Administrator </span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="collapse" id="sidebarCrm">
-                            <ul class="nav-second-level">
-                                <li>
-                                    <a href="{{ route('admin.dashboard.administrator.list') }}">Account</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                    @if(auth()->uesr()->access_level == 0)
+                        <li>
+                            <a href="#sidebarCrm" data-bs-toggle="collapse">
+                                <i class="mdi mdi-account-box-multiple"></i>
+                                <span> Administrator </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="sidebarCrm">
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.administrator.list') }}">Account</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    @endif
                 @endauth
                 @auth('tenant')
                     @if (auth()->user()->id_inv_code != 0)
@@ -240,41 +242,43 @@
                     </li>
                 @endauth
                 @auth('admin')
-                    <li>
-                        <a href="#saldo-admin" data-bs-toggle="collapse">
-                            <i class="mdi mdi-wallet"></i>
-                            <span> Saldo </span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="collapse" id="saldo-admin">
-                            <ul class="nav-second-level">
-                                <li>
-                                    <a href="{{ route('admin.dashboard.saldo') }}">Dashboard</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.dashboard.saldo.qris') }}">Saldo Qris</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.dashboard.saldo.agregate') }}">Saldo Agregate</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.dashboard.saldo.agregate.aplikasi') }}">Saldo Agregate Aplikasi</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.dashboard.saldo.agregate.transfer') }}">Saldo Agregate Transfer</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.dashboard.saldo.cashback') }}">History Cashback Transaksi</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.dashboard.saldo.cashback.settlement') }}">History Cashback Pending Settlement</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.dashboard.saldo.nobu.fee.transfer') }}">History Bank Fee Transfer</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                    @if (auth()->user()->access_level == 0)
+                        <li>
+                            <a href="#saldo-admin" data-bs-toggle="collapse">
+                                <i class="mdi mdi-wallet"></i>
+                                <span> Saldo </span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <div class="collapse" id="saldo-admin">
+                                <ul class="nav-second-level">
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.saldo') }}">Dashboard</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.saldo.qris') }}">Saldo Qris</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.saldo.agregate') }}">Saldo Agregate</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.saldo.agregate.aplikasi') }}">Saldo Agregate Aplikasi</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.saldo.agregate.transfer') }}">Saldo Agregate Transfer</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.saldo.cashback') }}">History Cashback Transaksi</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.saldo.cashback.settlement') }}">History Cashback Pending Settlement</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.saldo.nobu.fee.transfer') }}">History Bank Fee Transfer</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    @endif
                     <li>
                         <a href="#marketing" data-bs-toggle="collapse">
                             <i class="mdi mdi-account-tie-voice"></i>
@@ -373,15 +377,17 @@
                         </a>
                         <div class="collapse" id="finance">
                             <ul class="nav-second-level">
-                                <li>
-                                    <a href="{{ route('admin.dashboard.finance') }}">History Saldo</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.dashboard.finance.insentif.list') }}">Insentive Setting</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.dashboard.finance.settlement.list') }}">Settlement Setting</a>
-                                </li>
+                                @if(auth()->user()->access_level == 0)
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.finance') }}">History Saldo</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.finance.insentif.list') }}">Insentive Setting</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.dashboard.finance.settlement.list') }}">Settlement Setting</a>
+                                    </li>
+                                @endif
                                 <li>
                                     <a href="{{ route('admin.dashboard.finance.settlement.pending') }}">Settlement Pending</a>
                                 </li>

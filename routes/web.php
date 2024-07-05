@@ -67,11 +67,11 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::post('/dashboard/user/tenant-qris/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTenantQrisUpdate'])->name('admin.dashboard.menu.userTenantQris.update');
     Route::get('/dashboard/user/tenant-qris/delete/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTenantQrisDelete'])->name('admin.dashboard.menu.userTenantQris.delete');
 
-    Route::get('/dashboard/administrator', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminList'])->name('admin.dashboard.administrator.list');
-    Route::get('/dashboard/administrator/register', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminCreate'])->name('admin.dashboard.administrator.create');
-    Route::post('/dashboard/administrator/register', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminRegister'])->name('admin.dashboard.administrator.register');
-    Route::get('/dashboard/administrator/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminActivation'])->name('admin.dashboard.administrator.activation');
-    Route::get('/dashboard/administrator/detail/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDetail'])->name('admin.dashboard.administrator.detail');
+    Route::get('/dashboard/administrator', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminList'])->name('admin.dashboard.administrator.list')->middleware(['isAdminSuper']);
+    Route::get('/dashboard/administrator/register', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminCreate'])->name('admin.dashboard.administrator.create')->middleware(['isAdminSuper']);
+    Route::post('/dashboard/administrator/register', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminRegister'])->name('admin.dashboard.administrator.register')->middleware(['isAdminSuper']);
+    Route::get('/dashboard/administrator/activation/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminActivation'])->name('admin.dashboard.administrator.activation')->middleware(['isAdminSuper']);
+    Route::get('/dashboard/administrator/detail/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDetail'])->name('admin.dashboard.administrator.detail')->middleware(['isAdminSuper']);
 
     Route::get('dashboard/saldo', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldo'])->name('admin.dashboard.saldo')->middleware(['isAdminSuper']);
     Route::get('dashboard/saldo/qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminDashboardSaldoQris'])->name('admin.dashboard.saldo.qris')->middleware(['isAdminSuper']);
