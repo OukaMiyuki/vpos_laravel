@@ -239,12 +239,12 @@
                                                     <td>{{ $no+=1 }}</td>
                                                     <td>{{ $wd->invoice_pemarikan }}</td>
                                                     <td class="text-center">{{\Carbon\Carbon::parse($wd->tanggal_penarikan)->format('d-m-Y') }} {{\Carbon\Carbon::parse($wd->created_at)->format('H:i:s') }}</td>
-                                                    <td class="text-center">{{ $wd->nominal }}</td>
+                                                    <td class="text-center">@money($wd->nominal)</td>
                                                     <td class="text-center">
                                                         @if ($wd->status == 0)
                                                             0
                                                         @else
-                                                            {{$insentif->nominal}}
+                                                            @money($insentif->nominal)
                                                         @endif
                                                     </td>
                                                     <td>

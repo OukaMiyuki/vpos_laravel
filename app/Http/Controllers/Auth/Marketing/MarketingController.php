@@ -203,7 +203,7 @@ class MarketingController extends Controller {
             'holder' => $request->holder,
             'inv_code' => $request->inv_code
         ]);
-        //$this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
             'message' => 'Kode telah dibuat!',
             'alert-type' => 'success',
