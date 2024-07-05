@@ -738,8 +738,8 @@ class PosController extends Controller {
         $invoiceName = $invoice->nomor_invoice.'.pdf';
         $content = $pdf->download()->getOriginalContent();
         Storage::put('public/invoice/'.$invoiceName,$content);
-        $path = Storage::path('public/invoice/'.$invoiceName);
-        dd($path);
+        $pathPdf = Storage::path('public/invoice/'.$invoiceName);
+        // dd($path);
         // $pdftext = file_get_contents(storage_path('app/public/invoice/'.$invoice->nomor_invoice.'.pdf'));
         // $num = preg_match_all("/\/Page\W/", $pdftext, $dummy);
         // $imagick = new Imagick();
@@ -770,61 +770,61 @@ class PosController extends Controller {
         // $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
         // $imagick->writeImages($saveImagePath, true);
         // dari sini
-        // $api_key    = getenv("WHATZAPP_API_KEY");
-        // $sender  = getenv("WHATZAPP_PHONE_NUMBER");
-        // $client = new GuzzleHttpClient();
-        // $postResponse = "";
-        // $noHP = $no_wa;
-        // $hp = "";
-        // if(!preg_match("/[^+0-9]/",trim($noHP))){
-        //     if(substr(trim($noHP), 0, 2)=="62"){
-        //         $hp    =trim($noHP);
-        //     }
-        //     else if(substr(trim($noHP), 0, 1)=="0"){
-        //         $hp    ="62".substr(trim($noHP), 1);
-        //     }
-        // }
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $postResponse = "";
+        $noHP = $no_wa;
+        $hp = "";
+        if(!preg_match("/[^+0-9]/",trim($noHP))){
+            if(substr(trim($noHP), 0, 2)=="62"){
+                $hp    =trim($noHP);
+            }
+            else if(substr(trim($noHP), 0, 1)=="0"){
+                $hp    ="62".substr(trim($noHP), 1);
+            }
+        }
 
-        // $url = 'https://waq.my.id/send-media';
-        // $headers = [
-        //     'Content-Type' => 'application/json',
-        // ];
-        // $data = [
-        //     "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
-        //     'sender' => "085179950178",
-        //     'number' => $hp,
-        //     "media_type" => "image",
-        //     "caption" => "Nota Pembayaran anda",
-        //     "url" => "https://visipos.id/storage/invoice/".$invoice->nomor_invoice.".pdf"
-        // ];
+        $url = 'https://waq.my.id/send-media';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
+            'sender' => "085179950178",
+            'number' => $hp,
+            "media_type" => "image",
+            "caption" => "Nota Pembayaran anda",
+            "url" => Storage::url($pathPdf)
+        ];
 
-        // try {
-        //     $postResponse = $client->post($url, [
-        //         'headers' => $headers,
-        //         'json' => $data,
-        //     ]);
-        // } catch(Exception $ex){
-        //     $notification = array(
-        //         'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
-        //         'alert-type' => 'warning',
-        //     );
-        //     return redirect()->back()->with($notification);
-        // }
-        // $responseCode = $postResponse->getStatusCode();
-        // if($responseCode == 200){
-        //     dd($postResponse);
-        //     // $notification = array(
-        //     //     'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
-        //     //     'alert-type' => 'success',
-        //     // );
-        //     // return redirect()->back()->with($notification);
-        // } else {
-        //     $notification = array(
-        //         'message' => 'Nota gagal dikirim!',
-        //         'alert-type' => 'warning',
-        //     );
-        //     return redirect()->back()->with($notification);
-        // }
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            $notification = array(
+                'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+        $responseCode = $postResponse->getStatusCode();
+        if($responseCode == 200){
+            // dd($postResponse);
+            $notification = array(
+                'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } else {
+            $notification = array(
+                'message' => 'Nota gagal dikirim!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
         // ini pelu
 
         // return $responseCode;
