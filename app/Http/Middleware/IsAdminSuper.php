@@ -14,7 +14,7 @@ class IsAdminSuper {
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response {
-        if(auth()->user()->access_level == 0){
+        if(auth()->user()->access_level == 1){
             $notification = array(
                 'message' => 'Anda tidak mempunyai hak akses untuk masuk ke halaman tersebut!',
                 'alert-type' => 'warning',
