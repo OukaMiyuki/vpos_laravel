@@ -795,18 +795,18 @@ class PosController extends Controller {
         }
         $responseCode = $postResponse->getStatusCode();
         if($responseCode == 200){
-            $notification = array(
-                'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
-        } else {
             dd($postResponse);
             // $notification = array(
-            //     'message' => 'Nota gagal dikirim!',
-            //     'alert-type' => 'warning',
+            //     'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
+            //     'alert-type' => 'success',
             // );
             // return redirect()->back()->with($notification);
+        } else {
+            $notification = array(
+                'message' => 'Nota gagal dikirim!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
         }
         // ini pelu
 
