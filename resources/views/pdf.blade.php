@@ -247,7 +247,8 @@
                 <div id="invoice">
                     <h1>INVOICE : {{$invoice->nomor_invoice}}</h1>
                     <div class="date">Tanggal Transaksi: {{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</div>
-                    <div class="date">Tanggal Pembayaran: {{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}</div>
+                    <div class="date">Tanggal Pembayaran: @if(!is_null($invoice->tanggal_pelunasan) || !empty($invoice->tanggal_pelunasan)){{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}@endif</div>
+                    <div class="date">Status Pembayaran: @if($invoice->status_pembayaran == 0)<strong>Belum Bayar</strong>@else<strong>Terbayar</strong>@endif</div>
                 </div>
             </div>
             <table border="0" cellspacing="0" cellpadding="0">
