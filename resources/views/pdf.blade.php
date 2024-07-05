@@ -212,7 +212,7 @@
                 @php
                     $storeTenant = App\Models\StoreDetail::where('store_identifier', $invoice->store_identifier)->first();
                 @endphp
-                <img src="{{ asset('assets/images/logo/Logo2.png') }}">
+                <img src="{{ asset('assets/images/blank_profile.png') }}">
                 {{-- <img src="logo.png"> --}}
             </div>
             <div id="company">
