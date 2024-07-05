@@ -83,7 +83,7 @@
 
             #invoice h1 {
                 color: #f76e05 !important;
-                font-size: 2.4em;
+                font-size: 1em !important;
                 line-height: 1em;
                 font-weight: normal;
                 margin: 0 0 10px 0;
@@ -169,7 +169,7 @@
                 border-top: none;
             }
 
-            table tfoot tr:last-child td {
+            table tfoot tr:nth-child(3) td {
                 color: #f76e05 !important;
                 font-size: 1.4em;
                 /* border-top: 1px solid #f76e05 !important; */
@@ -247,67 +247,79 @@
                 <div id="invoice">
                     <h1>INVOICE : {{$invoice->nomor_invoice}}</h1>
                     <div class="date">Tanggal Transaksi: {{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</div>
-                    <div class="date">Tanggal Pembayaran: 30/06/2014</div>
+                    <div class="date">Tanggal Pembayaran: {{\Carbon\Carbon::parse($invoice->tanggal_pelunasan)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->updated_at)->format('H:i:s')}}</div>
                 </div>
             </div>
             <table border="0" cellspacing="0" cellpadding="0">
                 <thead>
                     <tr>
                         <th class="no">#</th>
-                        <th class="desc">DESCRIPTION</th>
-                        <th class="unit">UNIT PRICE</th>
+                        <th class="desc">ITEM BELANJA</th>
+                        <th class="unit">HARGA (Rp.)</th>
                         <th class="qty">QUANTITY</th>
                         <th class="total">TOTAL</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="no">01</td>
-                        <td class="desc">
-                            <h3>Website Design</h3>
-                            Creating a recognizable design solution based on the company's existing visual identity
-                        </td>
-                        <td class="unit">$40.00</td>
-                        <td class="qty">30</td>
-                        <td class="total">$1,200.00</td>
-                    </tr>
-                    <tr>
-                        <td class="no">02</td>
-                        <td class="desc">
-                            <h3>Website Development</h3>
-                            Developing a Content Management System-based Website
-                        </td>
-                        <td class="unit">$40.00</td>
-                        <td class="qty">80</td>
-                        <td class="total">$3,200.00</td>
-                    </tr>
-                    <tr>
-                        <td class="no">03</td>
-                        <td class="desc">
-                            <h3>Search Engines Optimization</h3>
-                            Optimize the site for search engines (SEO)
-                        </td>
-                        <td class="unit">$40.00</td>
-                        <td class="qty">20</td>
-                        <td class="total">$800.00</td>
-                    </tr>
+                    @php
+                        $no=0;
+                    @endphp
+                    @foreach ($invoice->shoppingCart as $cart)
+                        <tr>
+                            <td class="no">{{$no+=1}}</td>
+                            <td class="desc">
+                                <h3>{{ $cart->product_name }}</h3>
+                            </td>
+                            <td class="unit">@money($cart->harga)</td>
+                            <td class="qty">{{$cart->qty}}</td>
+                            <td class="total">{{$cart->sub_total}}</td>
+                        </tr>
+                    @endforeach
                 </tbody>
+                @php
+                    $diskon = App\Models\Discount::where('store_identifier', $storeTenant->store_identifier)
+                                                    ->where('is_active', 1)
+                                                    ->first();
+                    $pajak =  App\Models\Tax::where('store_identifier', $storeTenant->store_identifier)
+                                                ->where('is_active', 1)
+                                                ->first();
+                @endphp
                 <tfoot>
                     <tr>
                         <td colspan="2"></td>
-                        <td colspan="2">SUBTOTAL</td>
-                        <td>$5,200.00</td>
+                        <td colspan="2">SUBTOTAL (Rp.)</td>
+                        <td>@money($invoice->sub_total)</td>
                     </tr>
                     <tr>
                         <td colspan="2"></td>
-                        <td colspan="2">TAX 25%</td>
-                        <td>$1,300.00</td>
+                        <td colspan="2">Disc.(@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</td>
+                        <td>@money($invoice->diskon)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td colspan="2">Pajak(@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</td>
+                        <td>@money($invoice->pajak)</td>
                     </tr>
                     <tr>
                         <td colspan="2"></td>
                         <td colspan="2">GRAND TOTAL</td>
-                        <td>$6,500.00</td>
+                        @php
+                            $total = $invoice->sub_total+$invoice->pajak;
+                        @endphp
+                        <td>@money($total)</td>
                     </tr>
+                    @if ($invoice->jenis_pembayaran = "Tunai")
+                        <tr>
+                            <td colspan="2"></td>
+                            <td colspan="2">NOMINAL BAYAR (Rp.)</td>
+                            <td>@money($invoice->nominal_bayar)</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td colspan="2">KEMBALIAN (Rp.)</td>
+                            <td>@money($invoice->kembalian)</td>
+                        </tr>
+                    @endif
                 </tfoot>
             </table>
             <div id="thanks">Terima Kasih!</div>
