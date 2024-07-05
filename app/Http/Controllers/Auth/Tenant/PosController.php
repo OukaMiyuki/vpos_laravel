@@ -838,6 +838,12 @@ class PosController extends Controller {
             $responseCodeImage = $postImageResponse->getStatusCode();
 
             if($responseCode == 200 && $responseCodeImage == 200){
+                if(Storage::exists('public/invoice/'.$invoice->nomor_invoice.'.pdf')) {
+                    Storage::delete('public/invoice/'.$invoice->nomor_invoice.'.pdf');
+                }
+                if(\File::exists(public_path($path.$invoice->nomor_invoice.'.png'))){
+                    \File::delete(public_path($path.$invoice->nomor_invoice.'.png'));
+                }
                 // dd($postResponse);
                 $notification = array(
                     'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
@@ -853,6 +859,9 @@ class PosController extends Controller {
             }
         } else {
             if($responseCode == 200){
+                if(Storage::exists('public/invoice/'.$invoice->nomor_invoice.'.pdf')) {
+                    Storage::delete('public/invoice/'.$invoice->nomor_invoice.'.pdf');
+                }
                 // dd($postResponse);
                 $notification = array(
                     'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
