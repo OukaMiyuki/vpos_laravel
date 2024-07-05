@@ -741,7 +741,7 @@ class PosController extends Controller {
         $pdftext = file_get_contents(storage_path('app/public/invoice/'.$invoice->nomor_invoice.'.pdf'));
         $num = preg_match_all("/\/Page\W/", $pdftext, $dummy);
         $imagick = new Imagick();
-        for($indexNumber = 0; $indexNumber<=$num; $indexNumber+=1){
+        for($indexNumber = 0; $indexNumber<$num; $indexNumber+=1){
             $path = Storage::path('public/invoice/'.$invoiceName);
             $imagick->readImage($path[$indexNumber]);
             $imagick->setResolution(300,300);
