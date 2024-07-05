@@ -801,11 +801,12 @@ class PosController extends Controller {
             );
             return redirect()->back()->with($notification);
         } else {
-            $notification = array(
-                'message' => 'Nota gagal dikirim!',
-                'alert-type' => 'warning',
-            );
-            return redirect()->back()->with($notification);
+            dd($postResponse);
+            // $notification = array(
+            //     'message' => 'Nota gagal dikirim!',
+            //     'alert-type' => 'warning',
+            // );
+            // return redirect()->back()->with($notification);
         }
         // ini pelu
 
