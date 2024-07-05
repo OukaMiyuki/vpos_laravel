@@ -1,422 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        {{-- <link href="{{ asset('assets/css/print.css') }}" rel="stylesheet" type="text/css" /> --}}
+        <meta charset="utf-8">
+        <title>Invoice Transaksi {{$invoice->nomor_invoice}}</title>
+        <link rel="stylesheet" href="style.css" media="all" />
         <style>
-            /* @font-face {
-    font-family: 'LCD';
-    src: url('../fonts/LCD Solid 1.12.woff') format('woff'),
-         url('../fonts/LCD Solid 1.12.ttf') format('truetype');
-}  */
-body {
-    font-size:14px;
-    /* font-family: LCD; */
-    margin:0;
-    padding:1rem;
-    /* width: 58mm; text-align: left; */
-}
-html, body {
-    height: 100%;
-}
+            @font-face {
+                font-family: SourceSansPro;
+                src: url(SourceSansPro-Regular.ttf);
+            }
 
-html {
-    display: table;
-    margin: auto;
-}
+            .clearfix:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
 
-body {
-    display: table-cell;
-    vertical-align: middle;
-}
-#invoice-POS{
-    /* border: 1px solid #ddd; */
-    /* padding: 1rem; */
-    margin: 0 auto;
-    width: 100%;
-    /* page-break-after:always; */
-    background: #FFF;
-}
-#invoice-POS ::selection {
-    background: #f31544;
-    color: #FFF;
-}
-#invoice-POS ::moz-selection {
-    background: #f31544;
-    color: #FFF;
-}
-#invoice-POS h1 {
-    font-size: 1.5em;
-    color: #000000 !important;
-}
-#invoice-POS h2.storeTitle {
-    font-size: 1em;
-}
-#invoice-POS h3 {
-    font-size: 0.9em;
-    font-weight: 600;
-    line-height: 0.8em;
-}
-#invoice-POS p.customer {
-    font-size: .7em;
-    color: #000000 !important; 
-    line-height: 0em;
-    font-weight: 800;
-}
-#invoice-POS #legalcopy p {
-    font-size: .7em;
-    color: #000000 !important;
-    font-weight: 700 !important;
-    line-height: 1.2em;
-    text-align: center;
-}
-#invoice-POS #top, #invoice-POS #mid, #invoice-POS #bot {
-    border-bottom: 1px solid #EEE;
-}
-#invoice-POS #top {
-    min-height: 100px;
-}
-#invoice-POS #mid {
-    min-height: 80px;
-}
-#invoice-POS #bot {
-    min-height: 50px !important;
-}
-#invoice-POS #top .logo {
-    height: 50px;
-    width: 50px;
-    background: url() no-repeat;
-    background-size: 50px 50px;
-}
-#invoice-POS .info {
-    display: block;
-    margin-left: 0;
-}
-#invoice-POS .title {
-    float: right;
-}
-#invoice-POS .title p {
-    text-align: right;
-}
-#invoice-POS table {
-    width: 100%;
-    border-collapse: collapse;
-}
-#invoice-POS .tabletitle {
-    font-size: .48em;
-    background: #EEE;
-    font-weight: 700;
-}
-#invoice-POS tr.pembayaran {
-    line-height: .1em !important;
-    font-size: .45em !important;
-}
-#invoice-POS tr.pembayaran h2 {
-    font-weight: 700;
-}
-#invoice-POS td.payment, #invoice-POS td.sub-total {
-    text-align: right;
-}
-#invoice-POS td.qty {
-    text-align: center;
-}
-#invoice-POS .service {
-    border-bottom: 1px solid #EEE;
-}
-#invoice-POS .item {
-    text-align: left !important;
-    width: 24mm;
-}
-#invoice-POS .itemtext {
-    font-size: .65em;
-    font-weight: 600;
-}
-#invoice-POS #legalcopy {
-    margin-top: 5mm;
-}
-h2.storeTitle {
-    font-weight: 700 !important;
-}
-p.storeAddress {
-    font-size: .78em !important; 
-    font-weight: 600 !important;
-}
-p.customerTitle {
-    font-weight: 600 !important;
-}
-table.customerInfo {
-    margin-bottom: 1em; 
-    font-weight: 700 !important;
-}
-h2.itemTitle{
-    font-weight: 700 !important;
-}
-.tabletitle th.sub-total {
-    text-align: right !important;
-    width: 120px;
-}
-@media print {
-    body { 
-        font-size:14px;
-        /* body { font-family: monospace; }
-        body.struk                 { width: 58mm; text-align: left;}
-        body.struk .sheet          { padding: 2mm; } */
-        /* font-family: LCD;  */
-    }
-    /* body { width: 58mm !important;} */
-    /* body {
-        visibility: hidden;
-    }
-    #invoice-POS {
-        width: 44mm;
-        visibility: visible;
-        position: absolute;
-        left: 0;
-        top: 0;
-    } */
-    /* #print-button {
-        display: none;
-    } */
-    /* body.struk .sheet          { padding: 2mm; }
-    .txt-left { text-align: left;}
-    .txt-center { text-align: center;}
-    .txt-right { text-align: right;} */
-}
+            a {
+                color: #0087C3;
+                text-decoration: none;
+            }
 
-table.payments { width: 100%; margin-bottom: 20px; }
-.short {
-    width: 40%
-}
-.long {
-    width: 40%;
-}
+            body {
+                position: relative;
+                width: 21cm;
+                height: 29.7cm;
+                margin: 0 auto;
+                color: #555555;
+                background: #FFFFFF;
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                font-family: SourceSansPro;
+            }
 
-thead.items-thead {
-    border-top: double #000000;
-    border-bottom: double #000000;
-}
+            header {
+                padding: 10px 0;
+                margin-bottom: 20\px;
+                border-bottom: 1px solid #AAAAAA;
+            }
 
-tbody.items-tbody{
-    border-bottom: double #000000;
-}
+            #logo {
+                float: left;
+                margin-top: 8px;
+            }
 
-div.qris {
-    text-align: center;
-}
+            #logo img {
+                height: 70px;
+            }
+
+            #company {
+                float: right;
+                text-align: right;
+            }
+
+
+            #details {
+                margin-bottom: 50px;
+            }
+
+            #client {
+                padding-left: 6px;
+                border-left: 6px solid #f76e05 !important;
+                float: left;
+            }
+
+            #client .to {
+                color: #777777;
+            }
+
+            h2.name {
+                font-size: 1.4em;
+                font-weight: normal;
+                margin: 0;
+            }
+
+            #invoice {
+                float: right;
+                text-align: right;
+            }
+
+            #invoice h1 {
+                color: #f76e05 !important;
+                font-size: 2.4em;
+                line-height: 1em;
+                font-weight: normal;
+                margin: 0 0 10px 0;
+            }
+
+            #invoice .date {
+                font-size: 1.1em;
+                color: #777777;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border-spacing: 0;
+                margin-bottom: 10px;
+            }
+
+            table th,
+            table td {
+                padding: 20px;
+                background: #EEEEEE;
+                text-align: center;
+                border-bottom: 1px solid #FFFFFF;
+            }
+
+            table th {
+                white-space: nowrap;
+                font-weight: normal;
+            }
+
+            table td {
+                text-align: right;
+            }
+
+            table td h3 {
+                color: #f76e05 !important;
+                font-size: 1.2em;
+                font-weight: normal;
+                margin: 0 0 0.2em 0;
+            }
+
+            table .no {
+                color: #FFFFFF;
+                font-size: 1.6em;
+                background: #FD9A5F !important;
+            }
+
+            table .desc {
+                text-align: left;
+            }
+
+            table .unit {
+                background: #DDDDDD;
+            }
+
+            table .qty {}
+
+            table .total {
+                background: #FD9A5F !important;
+                color: #FFFFFF;
+            }
+
+            table td.unit,
+            table td.qty,
+            table td.total {
+                font-size: 1.2em;
+            }
+
+            table tbody tr:last-child td {
+            border: none;
+            }
+
+            table tfoot td {
+                padding: 10px 20px;
+                background: #FFFFFF;
+                border-bottom: none;
+                font-size: 1.2em;
+                white-space: nowrap;
+                border-top: 1px solid #AAAAAA;
+            }
+
+            table tfoot tr:first-child td {
+                border-top: none;
+            }
+
+            table tfoot tr:last-child td {
+                color: #f76e05 !important;
+                font-size: 1.4em;
+                /* border-top: 1px solid #f76e05 !important; */
+            }
+
+            table tfoot tr td:first-child {
+                border: none;
+            }
+
+            #thanks {
+                font-size: 2em;
+                margin-bottom: 20px;
+            }
+
+            #notices {
+                /* float: right; */
+                padding-left: 6px;
+                border-left: 6px solid #f76e05 !important;
+            }
+
+            #notices .notice {
+                margin-top: 20px;
+                font-size: 1.2em;
+            }
+
+            footer {
+                color: #777777;
+                margin-top: 20px;
+                width: 100%;
+                height: 30px;
+                /* position: absolute; */
+                bottom: 0;
+                border-top: 1px solid #AAAAAA;
+                padding: 8px 0;
+                text-align: center;
+            }
         </style>
     </head>
-    <body class="struk">
-        {{-- <div id="print-button">
-			<button class="w3-button w3-light-green">Print</button></button>
-		</div> --}}
-        <div id="invoice-POS">
-            <center id="top">
-                <div class="logo"></div>
-                @php
-                    $store = App\Models\StoreDetail::where('id_tenant', auth()->user()->id)
-                                                ->where('email', auth()->user()->email)
-                                                ->first();
-                @endphp
-                <div class="info">
-                    <h2 class="storeTitle">{{ $store->name }}</h2>
-					<p  class="storeAddress">{{ $store->alamat }}</p>
+    <body>
+        <header class="clearfix">
+            <div id="logo">
+                <img src="logo.png">
+            </div>
+            <div id="company">
+                <h2 class="name">Company Name</h2>
+                <div>455 Foggy Heights, AZ 85004, US</div>
+                <div>(602) 519-0450</div>
+                <div><a href="mailto:company@example.com">company@example.com</a></div>
+            </div>
+            </div>
+        </header>
+        <main>
+            <div id="details" class="clearfix">
+                <div id="client">
+                    <div class="to">INVOICE TO:</div>
+                    <h2 class="name">John Doe</h2>
+                    <div class="address">796 Silver Harbour, TX 79273, US</div>
+                    <div class="email"><a href="mailto:john@example.com">john@example.com</a></div>
                 </div>
-            </center>
-            @php
-                $field = App\Models\TenantField::where('store_identifier', $store->store_identifier)->first();
-            @endphp
-            @if(!empty($field->id))
-                @if ( !empty($invoice->invoiceField->content1) || !empty($invoice->invoiceField->content2) || !empty($invoice->invoiceField->content3) || !empty($invoice->invoiceField->content4) || !empty($invoice->invoiceField->content5))
-                    <div id="mid">
-                        <div class="info">
-                            <h3 class="customerTitle">Customer Info</h3>
-                            <table class="customerInfo">
-                                @if (!empty($invoice->invoiceField->content1))
-                                    <tr class="custom-field">
-                                        <td width="35%"><p class="customer">{{ $field->baris1 }}</p></td>
-                                        <td width="5%"><p class="customer">:</p></td>
-                                        <td width="60%"><p class="customer">{{ $invoice->invoiceField->content1 }}</p></td>
-                                    </tr>
-                                @endif
-                                @if (!empty($invoice->invoiceField->content2))
-                                    <tr class="custom-field">
-                                        <td width="35%"><p class="customer">{{ $field->baris2 }}</p></td>
-                                        <td width="5%"><p class="customer">:</p></td>
-                                        <td width="60%"><p class="customer">{{ $invoice->invoiceField->content2 }}</p></td>
-                                    </tr>
-                                @endif
-                                @if (!empty($invoice->invoiceField->content3))
-                                    <tr class="custom-field">
-                                        <td width="35%"><p class="customer">{{ $field->baris3 }}</p></td>
-                                        <td width="5%"><p class="customer">:</p></td>
-                                        <td width="60%"><p class="customer">{{ $invoice->invoiceField->content3 }}</p></td>
-                                    </tr>
-                                @endif
-                                @if (!empty($invoice->invoiceField->content4))
-                                    <tr class="custom-field">
-                                        <td width="35%"><p class="customer">{{ $field->baris4 }}</p></td>
-                                        <td width="5%"><p class="customer">:</p></td>
-                                        <td width="60%"><p class="customer">{{ $invoice->invoiceField->content4 }}</p></td>
-                                    </tr>
-                                @endif
-                                @if (!empty($invoice->invoiceField->content5))
-                                    <tr class="custom-field">
-                                        <td width="35%"><p class="customer">{{ $field->baris5 }}</p></td>
-                                        <td width="5%"><p class="customer">:</p></td>
-                                        <td width="60%"><p class="customer">{{ $invoice->invoiceField->content5 }}</p></td>
-                                    </tr>
-                                @endif
-                            </table>
-                        </div>
-                    </div>
-                @else
-                    <br>
-                    <br>
-                @endif
-            @else
-                <br>
-                <br>
-            @endif
-            <!--End Invoice Mid-->
-            <div id="bot">
-                <div id="table">
-                    <table class="items-table">
-                        <thead class="items-thead">
-                            <tr class="tabletitle">
-                                <th class="item">
-                                    <h2 class="itemTitle">Item</h2>
-                                </th>
-                                <th class="Hours qty">
-                                    <h2 class="itemTitle">Qty</h2>
-                                </th>
-                                <th class="Rate sub-total" width="120">
-                                    <h2 class="itemTitle">Sub Total</h2>
-                                </th>
-                            </tr>
-                        </thead>
-                        @php
-                            $total=0;
-                        @endphp
-                        @foreach ($invoice->shoppingCart as $cart)
-                        <tbody class="items-tbody">
-                            <tr class="service">
-                                <td class="tableitem">
-                                    <p class="itemtext">{{ $cart->product_name }}</p>
-                                </td>
-                                <td class="tableitem qty">
-                                    <p class="itemtext">{{ $cart->qty }}</p>
-                                </td>
-                                <td class="tableitem sub-total">
-                                    <p class="itemtext">{{ $cart->sub_total }}</p>
-                                </td>
-                            </tr>
-                            @php
-                                $total+=$cart->sub_total;
-                            @endphp
-                        </tbody>
-                        @endforeach
-                    </table>
-                    @php
-                        $diskon = App\Models\Discount::where('store_identifier', $store->store_identifier)
-                                                        ->where('is_active', 1)
-                                                        ->first();
-                        $pajak =  App\Models\Tax::where('store_identifier', $store->store_identifier)
-                                                    ->where('is_active', 1)
-                                                    ->first();
-                    @endphp
-                    <table class="payments" style="width:100%;">
-                        <colgroup>
-                            <col class="short" />
-                            <col span="2" class="long" />
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="tabletitle pembayaran">
-                                <td></td>
-                                <td class="Rate">
-                                    <h2>Sub Total</h2>
-                                </td>
-                                <td class="payment">
-                                    <h2>{{ $total }}</h2>
-                                </td>
-                            </tr>
-                            <tr class="tabletitle pembayaran">
-                                <td></td>
-                                <td class="Rate">
-                                    <h2>Disc.(@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</h2>
-                                </td>
-                                <td class="payment">
-                                    <h2>{{$invoice->diskon}}</h2>
-                                </td>
-                            </tr>
-                            <tr class="tabletitle pembayaran">
-                                <td></td>
-                                <td class="Rate">
-                                    <h2>Total</h2>
-                                </td>
-                                <td class="payment">
-                                    <h2>{{ $invoice->sub_total }}</h2>
-                                </td>
-                            </tr>
-                            <tr class="tabletitle pembayaran">
-                                <td></td>
-                                <td class="Rate">
-                                    <h2>Pajak(@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</h2>
-                                </td>
-                                <td class="payment">
-                                    <h2>{{$invoice->pajak}}</h2>
-                                </td>
-                            </tr>
-                            <tr class="tabletitle pembayaran">
-                                <td></td>
-                                <td class="Rate">
-                                    <h2>Pembayaran</h2>
-                                </td>
-                                <td class="payment">
-                                    <h2>{{ $invoice->jenis_pembayaran}}</h2>
-                                </td>
-                            </tr>
-                            <tr class="tabletitle pembayaran">
-                                <td></td>
-                                <td class="Rate">
-                                    <h2>Bayar</h2>
-                                </td>
-                                <td class="payment">
-                                    <h2>{{ $invoice->nominal_bayar }}</h2>
-                                </td>
-                            </tr>
-                            @if ($invoice->jenis_pembayaran == "Tunai")
-                                <tr class="tabletitle pembayaran">
-                                    <td></td>
-                                    <td class="Rate">
-                                        <h2>Kembalian</h2>
-                                    </td>
-                                    <td class="payment">
-                                        <h2>{{ $invoice->kembalian }}</h2>
-                                    </td>
-                                </tr>
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
-                @if ($invoice->jenis_pembayaran == "Qris" || is_null($invoice->qris_data) || !empty($invoice->qris_data) || $invoice->qris_data != "" || $invoice->qris_data != NULL)
-                    @if ($invoice->status_pembayaran == 0)
-                        <div class="qris">
-                            <img src="data:image/png;base64,{{ $qrcode }}">
-                            {{-- {!! QrCode::size(200)->generate($invoice->qris_data) !!} --}}
-                        </div>  
-                    @endif
-                @endif
-                <div id="legalcopy">
-                    <p class="legal"><strong>Terima Kasih atas kunjungan anda!</strong>  Harap simpan baik baik bukti pembayaran ini, untuk keperluan garansi dan lain sebagainya. </p>
+                <div id="invoice">
+                    <h1>INVOICE 3-2-1</h1>
+                    <div class="date">Date of Invoice: 01/06/2014</div>
+                    <div class="date">Due Date: 30/06/2014</div>
                 </div>
             </div>
-        </div>
-        {{-- <script src="{{ asset('assets/js/pos.js') }}"></script> --}}
+            <table border="0" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th class="no">#</th>
+                        <th class="desc">DESCRIPTION</th>
+                        <th class="unit">UNIT PRICE</th>
+                        <th class="qty">QUANTITY</th>
+                        <th class="total">TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="no">01</td>
+                        <td class="desc">
+                            <h3>Website Design</h3>
+                            Creating a recognizable design solution based on the company's existing visual identity
+                        </td>
+                        <td class="unit">$40.00</td>
+                        <td class="qty">30</td>
+                        <td class="total">$1,200.00</td>
+                    </tr>
+                    <tr>
+                        <td class="no">02</td>
+                        <td class="desc">
+                            <h3>Website Development</h3>
+                            Developing a Content Management System-based Website
+                        </td>
+                        <td class="unit">$40.00</td>
+                        <td class="qty">80</td>
+                        <td class="total">$3,200.00</td>
+                    </tr>
+                    <tr>
+                        <td class="no">03</td>
+                        <td class="desc">
+                            <h3>Search Engines Optimization</h3>
+                            Optimize the site for search engines (SEO)
+                        </td>
+                        <td class="unit">$40.00</td>
+                        <td class="qty">20</td>
+                        <td class="total">$800.00</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td colspan="2">SUBTOTAL</td>
+                        <td>$5,200.00</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td colspan="2">TAX 25%</td>
+                        <td>$1,300.00</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td colspan="2">GRAND TOTAL</td>
+                        <td>$6,500.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div id="thanks">Terima Kasih!</div>
+            <div id="notices">
+                <div>Scan di sini untuk membayar pesanan anda:</div>
+                <!-- <div class="notice">A finance charge of 1.5% will be made on unpaid balances after 30 days.</div> -->
+				<div class="notice">
+					<img width="200" src="qr.jpg">
+				</div>
+            </div>
+        </main>
+        <footer>
+            Invoice was created on a computer and is valid without the signature and seal.
+        </footer>
     </body>
 </html>

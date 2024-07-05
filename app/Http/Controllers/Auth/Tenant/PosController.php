@@ -721,24 +721,23 @@ class PosController extends Controller {
             \File::makeDirectory(public_path($path));
         }
         if($invoice->jenis_pembayaran == "Qris"){
-            // $file_path = $path .$invoice->nomor_invoice.time() . '.png';
             $file_path = $path.$invoice->nomor_invoice.'.png';
             $image = \QrCode::format('png')
                             ->size(800)->errorCorrection('H')
                             ->generate($invoice->qris_data, $file_path);
         }
 
-        return redirect()->back();
+        // return redirect()->back();
 
         // ini perlu
         // $qrcode = "";
         // if($invoice->jenis_pembayaran == "Qris"){
         //     $qrcode = base64_encode(\QrCode::format('svg')->size(500)->errorCorrection('H')->generate($invoice->qris_data));
         // }
-        // $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode' => $qrcode]);
-        // $invoiceName = $invoice->nomor_invoice.'.pdf';
-        // $content = $pdf->download()->getOriginalContent();
-        // Storage::put('public/invoice/'.$invoiceName,$content);
+        $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode-invoice' => $invoice->nomor_invoice]);
+        $invoiceName = $invoice->nomor_invoice.'.pdf';
+        $content = $pdf->download()->getOriginalContent();
+        Storage::put('public/invoice/'.$invoiceName,$content);
         // $imagick = new Imagick();
         // $imagick->setResolution(300,300);
         // $path = Storage::path('public/invoice/'.$invoiceName);
