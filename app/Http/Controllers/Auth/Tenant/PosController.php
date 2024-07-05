@@ -742,10 +742,10 @@ class PosController extends Controller {
         $num = preg_match_all("/\/Page\W/", $pdftext, $dummy);
         $imagick = new Imagick();
         for($indexNumber = 0; $indexNumber<$num; $indexNumber+=1){
-            $path = Storage::path('public/invoice/'.$invoiceName);
-            $imagick->readImage($path[$indexNumber]);
+            // $path = Storage::path('public/invoice/'.$invoiceName);
+            $imagick->readImage('https://visipos.id/storage/invoice/'.$invoice->nomor_invoice.'.pdf['.$indexNumber.']');
             $imagick->setResolution(300,300);
-            $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
+            $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'-'.$indexNumber.'.jpg');
             $imagick->writeImages($saveImagePath, true);
         }
         // return $num;
