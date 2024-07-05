@@ -308,7 +308,7 @@
                         @endphp
                         <td>@money($total)</td>
                     </tr>
-                    @if ($invoice->jenis_pembayaran = "Tunai")
+                    @if ($invoice->jenis_pembayaran == "Tunai")
                         <tr>
                             <td colspan="2"></td>
                             <td colspan="2">NOMINAL BAYAR (Rp.)</td>
