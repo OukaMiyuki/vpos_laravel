@@ -23,6 +23,7 @@
 
             body {
                 position: relative;
+                padding: 30px !important;
                 width: 21cm;
                 height: 29.7cm;
                 margin: 0 auto;
