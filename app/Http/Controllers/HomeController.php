@@ -17,6 +17,10 @@ class HomeController extends Controller {
     public function downloadApk(){
         $apk = APKLink::find(1);
         $path = Storage::path('public/apk/'.$apk->apk_link);
-        return response()->download($path);
+        $headers = [
+            'Content-Type' => 'application/vnd.android.package-archive',
+            'Content-Disposition' => 'attachment; filename='.'"'.$apk->apk_link.'"'.'',
+        ];
+        return response()->download($path, $apk->apk_link, $headers);
     }
 }
