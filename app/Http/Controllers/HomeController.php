@@ -21,9 +21,6 @@ class HomeController extends Controller {
             'Content-Type' => 'application/vnd.android.package-archive',
             'Content-Disposition' => 'attachment; filename='.'"'.$apk->apk_link.'"'.'',
         ];
-        return response()->download($path, [
-            'Content-Type'=>'application/vnd.android.package-archive',
-            'Content-Disposition'=> 'attachment; filename="android.apk"',
-        ]);
+        return response()->download($path, $apk->apk_link, $headers);
     }
 }
