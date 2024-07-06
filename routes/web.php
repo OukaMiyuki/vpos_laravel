@@ -136,6 +136,8 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
 
     Route::get('dashboard/application/app-version', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardAppVersion'])->name('admin.dashboard.application.appversion');
     Route::post('dashboard/application/app-version', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardAppVersionUpdate'])->name('admin.dashboard.application.appversion.update');
+    Route::post('dashboard/application/app', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardAppUpdate'])->name('admin.dashboard.application.app.update');
+    Route::get('/download/apk', [App\Http\Controllers\HomeController::class, 'downloadApk'])->name('admin.download.apk');
 
     Route::get('dashboard/history', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistory'])->name('admin.dashboard.history');
     Route::get('dashboard/history/user-login', [App\Http\Controllers\Auth\Admin\AccessController::class, 'adminDashboardHistoryUserLogin'])->name('admin.dashboard.history.user.login');

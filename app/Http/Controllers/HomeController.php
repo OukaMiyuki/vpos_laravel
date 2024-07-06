@@ -16,7 +16,7 @@ class HomeController extends Controller {
 
     public function downloadApk(){
         $apk = APKLink::find(1);
-        $path = Storage::path('public/apk/visipos_v0.0.1c.apk');
+        $path = Storage::path('public/apk/'.$apk->apk_link);
         return response()->download($path);
     }
 }

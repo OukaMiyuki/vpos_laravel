@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Yajra\Datatables\Datatables;
 use App\Models\History;
 use App\Models\Tenant;
@@ -12,11 +13,13 @@ use App\Models\Kasir;
 use App\Models\AppVersion;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
+use App\Models\APKLink;
 
 class AccessController extends Controller {
     public function adminDashboardAppVersion(){
         $appversion = AppVersion::find(1);
-        return view('admin.admin_dashboard_application_appversion', compact('appversion'));
+        $app = APKLink::find(1);
+        return view('admin.admin_dashboard_application_appversion', compact('appversion', 'app'));
     }
 
     public function adminDashboardAppVersionUpdate(Request $request){
@@ -24,6 +27,51 @@ class AccessController extends Controller {
         $appversion->update([
             'versi' => $request->versi
         ]);
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+        return redirect()->route('admin.dashboard.application.appversion')->with($notification);
+    }
+
+    public function adminDashboardAppUpdate(Request $request){
+        $app = APKLink::find(1);
+
+        if(!is_null($app->apk_link) || !empty($app->apk_link)){
+            Storage::delete('public/apk/'.$app->apk_link);
+        }
+
+        $file = $request->file('app');
+        $namaFile = $file->getClientOriginalName();
+        $storagePath = Storage::path('public/apk');
+        // $ext = $file->getClientOriginalExtension();
+        // $filename = $namaFile.$ext;
+        $file->move($storagePath, $namaFile);
+        $pathFile = $storagePath.'/'.$namaFile;
+        $size = \File::size($pathFile);
+        if ($size >= 1073741824) {
+            $size = number_format($size / 1073741824, 2) . ' GB';
+        }
+        elseif ($size >= 1048576) {
+            $size = number_format($size / 1048576, 2) . ' MB';
+        }
+        elseif ($size >= 1024) {
+            $size = number_format($size / 1024, 2) . ' KB';
+        }
+        elseif ($size > 1) {
+            $size = $size . ' bytes';
+        }
+        elseif ($size == 1) {
+            $size = $size . ' byte';
+        }
+        else {
+            $size = '0 bytes';
+        }
+        $app->update([
+            'file_size' => $size,
+            'apk_link' => $namaFile
+        ]);
+
         $notification = array(
             'message' => 'Data berhasil diupdate!',
             'alert-type' => 'success',
