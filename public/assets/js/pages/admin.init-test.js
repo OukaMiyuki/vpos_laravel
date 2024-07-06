@@ -182,6 +182,7 @@ $(function () {
                 data.to_date = $('#daterange_transaction').data('daterangepicker').endDate.format('YYYY-MM-DD');
             }
         },
+        // test
         // ajax: {
         //     "url": 'http://localhost:8000/admin/dashboard/user/transaction',
         //     "type": "GET",
