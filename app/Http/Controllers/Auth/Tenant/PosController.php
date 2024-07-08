@@ -770,13 +770,13 @@ class PosController extends Controller {
         // dd($path);
         // $pdftext = file_get_contents(storage_path('app/public/invoice/'.$invoice->nomor_invoice.'.pdf'));
         // $num = preg_match_all("/\/Page\W/", $pdftext, $dummy);
-        $imagick = new Imagick();
+       $imagick = new Imagick();
         // for($indexNumber = 0; $indexNumber<$num; $indexNumber+=1){
         //     // $path = Storage::path('public/invoice/'.$invoiceName);
-        $imagick->readImage('https://visipos.id/storage/invoice/'.$invoice->nomor_invoice.'.pdf');
-        $imagick->setResolution(300,300);
-        $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
-        $imagick->writeImages($saveImagePath, true);
+        // $imagick->readImage('https://visipos.id/storage/invoice/'.$invoice->nomor_invoice.'.pdf');
+        // $imagick->setResolution(300,300);
+        // $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
+        // $imagick->writeImages($saveImagePath, true);
         // }
         // return $num;
         // $imagick = new Imagick();
@@ -785,18 +785,18 @@ class PosController extends Controller {
         // foreach($num as $index){
 
         // }
-        // $imagick->readImage($path);
+        $imagick->readImage($pathPdf);
         // iniperlu
 
-        // $imagick->setImageResolution(12800,800) ; // it change only image density.
-	    // $imagick->resampleImage  (12800,800,imagick::FILTER_UNDEFINED,1);
+        $imagick->setImageResolution(12800,800) ; // it change only image density.
+	    $imagick->resampleImage  (12800,800,imagick::FILTER_UNDEFINED,1);
         // $imagick->Imagick::setImageResolution( 600, 600 );
         // $imagick->resizeImage(595,842,\Imagick::FILTER_CATROM, 1, true);
         // $imagick->setImageFormat('pdf');
 
         // ini perlu
-        // $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
-        // $imagick->writeImages($saveImagePath, true);
+        $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
+        $imagick->writeImages($saveImagePath, true);
         // dari sini
         $api_key    = getenv("WHATZAPP_API_KEY");
         $sender  = getenv("WHATZAPP_PHONE_NUMBER");
