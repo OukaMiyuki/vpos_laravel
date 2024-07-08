@@ -204,11 +204,12 @@ class Invoice extends Model {
             $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
             $invoice_code = "VP";
             $time=time();
-            $date = date('dmYHis');
+            // $date = date('dmYHis');
+            $date = date('dmY');
             $index_number = Invoice::max('id') + 1;
             // $index_number = $model->id + 1;
             // $index_number = (int) $model->id;
-            $generate_nomor_invoice = $invoice_code.$date.str_pad($index_number, 9, '0', STR_PAD_LEFT);
+            $generate_nomor_invoice = $invoice_code.$date.str_pad($index_number, 15, '0', STR_PAD_LEFT);
             // $generate_nomor_invoice = $date.str_pad($index_number, 9, '0', STR_PAD_LEFT);
             if(is_null($model->qris_data) || empty($model->qris_data) || $model->qris_data == NULL){
                 $model->nomor_invoice = $generate_nomor_invoice;
