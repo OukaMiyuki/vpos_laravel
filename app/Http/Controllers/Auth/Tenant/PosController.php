@@ -770,13 +770,13 @@ class PosController extends Controller {
         // dd($path);
         // $pdftext = file_get_contents(storage_path('app/public/invoice/'.$invoice->nomor_invoice.'.pdf'));
         // $num = preg_match_all("/\/Page\W/", $pdftext, $dummy);
-        // $imagick = new Imagick();
+        $imagick = new Imagick();
         // for($indexNumber = 0; $indexNumber<$num; $indexNumber+=1){
         //     // $path = Storage::path('public/invoice/'.$invoiceName);
-        //     $imagick->readImage('https://visipos.id/storage/invoice/'.$invoice->nomor_invoice.'.pdf['.$indexNumber.']');
-        //     $imagick->setResolution(300,300);
-        //     $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.$indexNumber.'.jpg');
-        //     $imagick->writeImages($saveImagePath, true);
+        $imagick->readImage('https://visipos.id/storage/invoice/'.$invoice->nomor_invoice.'.pdf');
+        $imagick->setResolution(300,300);
+        $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
+        $imagick->writeImages($saveImagePath, true);
         // }
         // return $num;
         // $imagick = new Imagick();
