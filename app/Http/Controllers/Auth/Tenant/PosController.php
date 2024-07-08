@@ -771,6 +771,7 @@ class PosController extends Controller {
         // $pdftext = file_get_contents(storage_path('app/public/invoice/'.$invoice->nomor_invoice.'.pdf'));
         // $num = preg_match_all("/\/Page\W/", $pdftext, $dummy);
        $imagick = new Imagick();
+       $imagick->setResolution(300,300);
         // for($indexNumber = 0; $indexNumber<$num; $indexNumber+=1){
         //     // $path = Storage::path('public/invoice/'.$invoiceName);
         // $imagick->readImage('https://visipos.id/storage/invoice/'.$invoice->nomor_invoice.'.pdf');
@@ -788,8 +789,8 @@ class PosController extends Controller {
         $imagick->readImage($pathPdf);
         // iniperlu
 
-        $imagick->setImageResolution(12800,800) ; // it change only image density.
-	    $imagick->resampleImage  (12800,800,imagick::FILTER_UNDEFINED,1);
+        // $imagick->setImageResolution(12800,800) ; // it change only image density.
+	    // $imagick->resampleImage  (12800,800,imagick::FILTER_UNDEFINED,1);
         // $imagick->Imagick::setImageResolution( 600, 600 );
         // $imagick->resizeImage(595,842,\Imagick::FILTER_CATROM, 1, true);
         // $imagick->setImageFormat('pdf');
