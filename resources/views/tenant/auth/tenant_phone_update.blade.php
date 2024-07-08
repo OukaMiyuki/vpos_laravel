@@ -34,7 +34,7 @@
                                                     <input type="text" class="form-control" name="no_wa" id="no_wa" required value="" placeholder="Masukkan nomor Whatsapp baru">
                                                 </div>
                                                 <div class="col-4">
-                                                    <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-email-outline"></i> Kirim Kode OTP</button>
+                                                    <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-whatsapp"></i> Kirim Kode OTP</button>
                                                 </div>
                                             </div>
                                         </div>

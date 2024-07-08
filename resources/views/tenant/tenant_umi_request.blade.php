@@ -205,7 +205,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="text-end">
-                                                        <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Ajukan Qris ID</button>
+                                                        <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-email-outline"></i> Ajukan Qris ID</button>
                                                     </div>
                                                 </form>
                                             @else

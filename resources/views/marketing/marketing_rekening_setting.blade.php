@@ -75,7 +75,7 @@
                                     </form>
                                     <form action="{{ route('marketing.settings.whatsappotp') }}" method="POST" id="sendOtp">@csrf</form>
                                     <div class="text-end">
-                                        <button type="submit" form="sendOtp" onclick="!this.form && document.getElementById('sendOtp').submit()" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-email-outline"></i> Kirim OTP Whatsapp</button>&nbsp;
+                                        <button type="submit" form="sendOtp" onclick="!this.form && document.getElementById('sendOtp').submit()" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-whatsapp"></i> Kirim OTP Whatsapp</button>&nbsp;
                                         <button type="submit" form="submitRekening" onclick="!this.form && document.getElementById('submitRekening').submit()" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>
                                     </div>
                                 @endif

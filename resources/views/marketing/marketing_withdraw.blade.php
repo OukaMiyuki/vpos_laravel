@@ -44,7 +44,7 @@
                                                     <div class="col-4">
                                                         <form method="post" action="{{ route('marketing.settings.whatsappotp') }}">
                                                             @csrf
-                                                            <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-email-outline"></i> Kirim Kode OTP</button>
+                                                            <button type="submit" class="w-100 btn btn-success waves-effect waves-light"><i class="mdi mdi-whatsapp"></i> Kirim Kode OTP</button>
                                                         </form>
                                                     </div>
                                                 </div>
