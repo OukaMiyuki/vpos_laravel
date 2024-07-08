@@ -770,8 +770,8 @@ class PosController extends Controller {
         // dd($path);
         // $pdftext = file_get_contents(storage_path('app/public/invoice/'.$invoice->nomor_invoice.'.pdf'));
         // $num = preg_match_all("/\/Page\W/", $pdftext, $dummy);
-       $imagick = new Imagick();
-       $imagick->setResolution(350,350);
+        $imagick = new Imagick();
+        $imagick->setResolution(350,350);
         // for($indexNumber = 0; $indexNumber<$num; $indexNumber+=1){
         //     // $path = Storage::path('public/invoice/'.$invoiceName);
         // $imagick->readImage('https://visipos.id/storage/invoice/'.$invoice->nomor_invoice.'.pdf');
@@ -796,7 +796,8 @@ class PosController extends Controller {
         // $imagick->setImageFormat('pdf');
 
         // ini perlu
-        $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
+        // $saveImagePath = public_path('invoice/'.$invoice->nomor_invoice.'.jpg');
+        $saveImagePath = Storage::path('public/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg');
         $imagick->writeImages($saveImagePath, true);
         // dari sini
         $api_key    = getenv("WHATZAPP_API_KEY");
