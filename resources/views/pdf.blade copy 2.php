@@ -103,7 +103,7 @@
 
             table th,
             table td {
-                padding: 5px !important;
+                padding: 20px;
                 background: #EEEEEE;
                 text-align: center;
                 border-bottom: 1px solid #FFFFFF;
