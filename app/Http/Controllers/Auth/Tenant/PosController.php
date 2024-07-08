@@ -875,8 +875,9 @@ class PosController extends Controller {
                 return redirect()->back()->with($notification);
             }
             if($responseCode == 200 && $responseCodeImage == 200){
-                if(Storage::exists('public/invoice/'.$invoice->nomor_invoice.'.pdf')) {
+                if(Storage::exists('public/invoice/'.$invoice->nomor_invoice.'.pdf') || Storage::exists('public/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg')) {
                     Storage::delete('public/invoice/'.$invoice->nomor_invoice.'.pdf');
+                    Storage::delete('public/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg');
                 }
                 if(\File::exists(public_path($path.$invoice->nomor_invoice.'.png'))){
                     \File::delete(public_path($path.$invoice->nomor_invoice.'.png'));
@@ -903,8 +904,9 @@ class PosController extends Controller {
                 return redirect()->back()->with($notification);
             }
             if($responseCode == 200){
-                if(Storage::exists('public/invoice/'.$invoice->nomor_invoice.'.pdf')) {
+                if(Storage::exists('public/invoice/'.$invoice->nomor_invoice.'.pdf') || Storage::exists('public/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg')) {
                     Storage::delete('public/invoice/'.$invoice->nomor_invoice.'.pdf');
+                    Storage::delete('public/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg');
                 }
                 // dd($postResponse);
                 $notification = array(
