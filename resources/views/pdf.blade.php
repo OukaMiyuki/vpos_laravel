@@ -331,7 +331,7 @@
                         <div>Scan di sini untuk membayar pesanan anda:</div>
                         <!-- <div class="notice">A finance charge of 1.5% will be made on unpaid balances after 30 days.</div> -->
                         <div class="notice">
-                            <img width="120" src="https://visipos.id/public/qrcode/{{$invoice->nomor_invoice}}.png">
+                            <img width="120`" src="https://visipos.id/public/qrcode/{{$invoice->nomor_invoice}}.png">
                         </div>
                     </div>
                 @endif
