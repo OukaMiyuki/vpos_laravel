@@ -1,12 +1,12 @@
-/* @font-face {
+@font-face {
     font-family: 'LCD';
     src: url('../fonts/LCD Solid 1.12.woff') format('woff'),
          url('../fonts/LCD Solid 1.12.ttf') format('truetype');
-}  */
-@font-face {
+} 
+/* @font-face {
     font-family: 'LCD';
     src: url('../fonts/Merchant Copy.ttf') format('truetype');
-} 
+}  */
 body {
     font-size:14px;
     /* font-family: LCD; */
