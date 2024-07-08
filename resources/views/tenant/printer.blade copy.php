@@ -3,7 +3,7 @@
     <head>
         <link href="{{ asset('assets/css/print.css') }}" rel="stylesheet" type="text/css" />
     </head>
-    <body>
+    <body class="struk">
         {{-- <div id="print-button">
 			<button class="w3-button w3-light-green">Print</button></button>
 		</div> --}}
