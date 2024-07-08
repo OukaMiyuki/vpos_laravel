@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link href="{{ asset('assets/css/print.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/css/printpos.css') }}" rel="stylesheet" type="text/css" />
     </head>
     <body>
         {{-- <div id="print-button">
