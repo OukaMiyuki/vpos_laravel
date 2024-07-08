@@ -206,6 +206,6 @@
                 </div>
             </div>
         </div>
-        {{-- <script src="{{ asset('assets/js/pos.js') }}"></script> --}}
+        <script src="{{ asset('assets/js/pos.js') }}"></script>
     </body>
 </html>
