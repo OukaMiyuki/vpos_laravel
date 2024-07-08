@@ -409,6 +409,7 @@ Route::middleware(['auth:kasir', 'auth', 'throttle', 'isKasirActive', 'isKasirSt
     Route::post('/dashboard/transaction/pending/process', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionPendingProcess'])->name('kasir.pos.transaction.pending.process');
     Route::post('/dashboard/transaction/pending/change-payment', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'cartTransactionPendingChangePayment'])->name('kasir.pos.transaction.pending.changePayment');
 
+    Route::post('/dashboard/pos/invoice/receipt/download', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'downloadPdf'])->name('kasir.pos.invoice.receipt.download');
     Route::get('/dashboard/transaction/pending/payment', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionPendingPayment'])->name('kasir.transaction.pending.payment');
     Route::get('/dashboard/transaction/finish', [App\Http\Controllers\Auth\Kasir\KasirController::class, 'transactionFinish'])->name('kasir.transaction.finish');
 

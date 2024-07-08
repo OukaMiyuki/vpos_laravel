@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Auth\Kasir;
 
 use App\Http\Controllers\Controller;
+use GuzzleHttp\Client as GuzzleHttpClient;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
@@ -22,6 +25,7 @@ use Mike42\Escpos\Printer;
 use App\Models\TenantQrisAccount;
 use App\Models\History;
 use Exception;
+use Imagick;
 
 class KasirController extends Controller {
     private function get_client_ip() {
@@ -802,6 +806,193 @@ class KasirController extends Controller {
                             ->latest()
                             ->get();
         return view('kasir.kasir_invoice_finish', compact('invoice'));
+    }
+
+    public function downloadPdf(Request $request){
+        $id = $request->id;
+        $no_wa = $request->no_wa;
+        $invoice = Invoice::with('shoppingCart', 'invoiceField')
+                            ->where('store_identifier', auth()->user()->id_store)
+                            ->where('id_kasir', auth()->user()->id)
+                            ->where('id_tenant', auth()->user()->store->id_tenant)
+                            ->find($id);
+        if(is_null($invoice) || empty($invoice)){
+            $notification = array(
+                'message' => 'Invoice tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+        
+        $path = 'qrcode/';
+
+        if(!\File::exists(public_path($path))) {
+            \File::makeDirectory(public_path($path));
+        }
+        if($invoice->jenis_pembayaran == "Qris"){
+            $file_path = $path.$invoice->nomor_invoice.'.png';
+            try{
+                $image = \QrCode::format('png')
+                                ->size(800)->errorCorrection('H')
+                                ->generate($invoice->qris_data, $file_path);
+            } catch(Exception $e){
+                $action = "Kasir : Send Qris to Whatsapp | Error - Image generaton error";
+                $this->createHistoryUser($action, $e, 0);
+                $notification = array(
+                    'message' => 'Pembuatan gambar Qris gagal!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+        }
+        try{
+            $pdf = Pdf::loadView('pdf', ['invoice' => $invoice, 'qrcode-invoice' => $invoice->nomor_invoice])->set_option('isHtml5ParserEnabled', true);;
+            $invoiceName = $invoice->nomor_invoice.'.pdf';
+            $content = $pdf->download()->getOriginalContent();
+            Storage::put('public/invoice/'.$invoiceName,$content);
+            $pathPdf = Storage::path('public/invoice/'.$invoiceName);
+            $imagick = new Imagick();
+            $imagick->setResolution(200,200);
+            $imagick->readImage($pathPdf);
+            $saveImagePath = Storage::path('public/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg');
+            $imagick->writeImages($saveImagePath, true);
+        } catch(Exception $e){
+            $action = "Kasir : Send Invoice to Whatsapp | Error - PDF or IMage Convertion Fail";
+            $this->createHistoryUser($action, $e, 0);
+            $notification = array(
+                'message' => 'Pembuatan laporan nota gagal!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+        $api_key    = getenv("WHATZAPP_API_KEY");
+        $sender  = getenv("WHATZAPP_PHONE_NUMBER");
+        $client = new GuzzleHttpClient();
+        $postResponse = "";
+        $noHP = $no_wa;
+        $hp = "";
+        if(!preg_match("/[^+0-9]/",trim($noHP))){
+            if(substr(trim($noHP), 0, 2)=="62"){
+                $hp    =trim($noHP);
+            }
+            else if(substr(trim($noHP), 0, 1)=="0"){
+                $hp    ="62".substr(trim($noHP), 1);
+            }
+        }
+        $statusNotaBelanja = "";
+        if($invoice->status_pembayaran == 0 && $invoice->status_pembbayaran == 0){
+            $statusNotaBelanja = "Berikut nota pembayaran anda, harap lakukan scan pada barcode untuk membayar menggunakan Qris";
+        } else {
+            $statusNotaBelanja = "Berikut nota belaja anda.";
+        }
+        $url = 'https://waq.my.id/send-media';
+        $headers = [
+            'Content-Type' => 'application/json',
+        ];
+        $data = [
+            "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
+            'sender' => "085179950178",
+            'number' => $hp,
+            // "media_type" => "document",
+            "media_type" => "image",
+            "caption" => $statusNotaBelanja,
+            // "url" => 'https://visipos.id/storage/invoice/'.$invoice->nomor_invoice.'.pdf'
+            "url" => 'https://visipos.id/storage/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg'
+        ];
+
+        try {
+            $postResponse = $client->post($url, [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+        } catch(Exception $ex){
+            $notification = array(
+                'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+        $responseCode = $postResponse->getStatusCode();
+        $postImageResponse = "";
+        $responseCodeImage = "";
+        if($invoice->status_pembayaran == 0 && $invoice->status_pembbayaran == 0){
+            $dataImage = [
+                "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
+                'sender' => "085179950178",
+                'number' => $hp,
+                "media_type" => "image",
+                "caption" => "Scan QR Code berikut untuk melakukan pembayaran.",
+                "url" => 'https://visipos.id/public/qrcode/'.$invoice->nomor_invoice.'.png'
+            ];
+
+            try {
+                $postImageResponse = $client->post($url, [
+                    'headers' => $headers,
+                    'json' => $dataImage,
+                ]);
+            } catch(Exception $ex){
+                $notification = array(
+                    'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+            $responseCodeImage = $postImageResponse->getStatusCode();
+            if(is_null($responseCode) || empty($responseCode) || is_null($responseCodeImage) || empty($responseCodeImage)){
+                $notification = array(
+                    'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+            if($responseCode == 200 && $responseCodeImage == 200){
+                if(Storage::exists('public/invoice/'.$invoice->nomor_invoice.'.pdf') || Storage::exists('public/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg')) {
+                    Storage::delete('public/invoice/'.$invoice->nomor_invoice.'.pdf');
+                    Storage::delete('public/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg');
+                }
+                if(\File::exists(public_path($path.$invoice->nomor_invoice.'.png'))){
+                    \File::delete(public_path($path.$invoice->nomor_invoice.'.png'));
+                }
+                // dd($postResponse);
+                $notification = array(
+                    'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $notification = array(
+                    'message' => 'Nota gagal dikirim!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+        } else {
+            if(is_null($responseCode) || empty($responseCode)){
+                $notification = array(
+                    'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+            if($responseCode == 200){
+                if(Storage::exists('public/invoice/'.$invoice->nomor_invoice.'.pdf') || Storage::exists('public/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg')) {
+                    Storage::delete('public/invoice/'.$invoice->nomor_invoice.'.pdf');
+                    Storage::delete('public/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg');
+                }
+                // dd($postResponse);
+                $notification = array(
+                    'message' => 'Nota telah sukses dikirim ke nomor Whatsapp!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $notification = array(
+                    'message' => 'Nota gagal dikirim!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+        }
     }
 
     public function testPrint(){

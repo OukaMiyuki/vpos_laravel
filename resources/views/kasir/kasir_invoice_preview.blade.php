@@ -365,14 +365,14 @@
                     <h5 class="modal-title" id="staticBackdropLabel">Kirim Nota ke Whatsapp</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form class="px-3" action="{{ route('tenant.pos.invoice.receipt.download') }}" method="post">
+                <form class="px-3" action="{{ route('kasir.pos.invoice.receipt.download') }}" method="post">
                     @csrf
                     <div class="modal-body" id="kirimWa">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
                                     <label for="nama_supplier" class="form-label">Nomor Whatsapp</label>
-                                    <input type="text" class="form-control" name="id" id="id" required value="{{$invoice->id}}">
+                                    <input type="hidden" class="d-none" name="id" id="id" required value="{{$invoice->id}}">
                                     <input type="text" class="form-control" name="no_wa" id="no_wa" required value="" placeholder="Masukkan nomor whatsapp penerima">
                                 </div>
                             </div>
