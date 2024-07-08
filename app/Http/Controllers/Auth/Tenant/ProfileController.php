@@ -127,6 +127,37 @@ class ProfileController extends Controller{
         return view('tenant.tenant_settings');
     }
 
+    public function helpSupport(){
+        if(auth()->user()->id_inv_code != 0){
+            $kontakMarketing = InvitationCode::select([
+                                                'invitation_codes.id',
+                                                'invitation_codes.id_marketing',
+                                                'invitation_codes.inv_code',
+                                                'invitation_codes.holder',
+                                            ])
+                                            ->with([
+                                                'marketing' => function($query){
+                                                    $query->select([
+                                                        'marketings.id',
+                                                        'marketings.name',
+                                                        'marketings.phone'
+                                                    ]);
+                                                }
+                                            ])
+                                            ->find(auth()->user()->id_inv_code);
+            $marketingPhone = "";
+            if(!preg_match("/[^+0-9]/",trim($kontakMarketing->marketing->phone))){
+                if(substr(trim($kontakMarketing->marketing->phone), 0, 2)=="62"){
+                    $marketingPhone    =trim($kontakMarketing->marketing->phone);
+                }
+                else if(substr(trim($kontakMarketing->marketing->phone), 0, 1)=="0"){
+                    $marketingPhone    ="62".substr(trim($kontakMarketing->marketing->phone), 1);
+                }
+            }
+            return view('tenant.tenant_help', compact('kontakMarketing', 'marketingPhone'));
+        }
+    }
+
     public function profile(){
         $profilTenant = Tenant::select(['tenants.id', 'tenants.name', 'tenants.email', 'tenants.phone', 'tenants.is_active', 'tenants.phone_number_verified_at', 'tenants.email_verified_at'])
                                 ->with(['detail' => function($query){

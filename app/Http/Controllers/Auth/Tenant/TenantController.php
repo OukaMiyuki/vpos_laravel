@@ -1608,9 +1608,9 @@ class TenantController extends Controller {
                             ->with(['kasir' => function($query){
                                 $query->select(['kasirs.id', 'kasirs.name']);
                             }])
-                            ->where('status_pembayaran', 1)
-                            ->where('invoices.jenis_pembayaran', 'Qris');
-        $sumTotalPenghasilan = floor($invoice->sum('nominal_terima_bersih'));
+                            ->where('status_pembayaran', 1);
+                            // ->where('invoices.jenis_pembayaran', 'Qris');
+        $sumTotalPenghasilan = floor($invoice->sum('sub_total', '+', 'pajak'));
         $invoice = $invoice->latest()->take(10)->get();
         return view('tenant.tenant_pemasukan', compact(['invoice', 'sumTotalPenghasilan']));
     }

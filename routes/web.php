@@ -234,6 +234,7 @@ Route::middleware(['auth:tenant', 'auth', 'throttle'])->prefix('tenant')->group(
 });
 
 Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'isTenantActive'])->prefix('tenant')->group( function () {
+    Route::get('/help', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'helpSupport'])->name('tenant.help');
     Route::get('settings', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'tenantSettings'])->name('tenant.settings');
     Route::post('settings/request/send-whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappNotification'])->middleware(['throttle:90,1'])->name('tenant.settings.whatsappotp');
     Route::post('settings/validate/whatsapp-otp', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'whatsappOTPSubmit'])->name('tenant.settings.whatsappotp.validate');
