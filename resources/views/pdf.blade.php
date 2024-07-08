@@ -120,14 +120,15 @@
 
             table td h3 {
                 color: #f76e05 !important;
-                font-size: 10px !important;
+                font-size: 12px !important;
                 font-weight: normal;
                 margin: 0 0 0.2em 0;
             }
 
             table .no {
+                text-align: center;
                 color: #FFFFFF;
-                font-size: 10px !important;
+                font-size: 12px !important;
                 background: #FD9A5F !important;
             }
 
@@ -149,7 +150,7 @@
             table td.unit,
             table td.qty,
             table td.total {
-                font-size: 10px !important;
+                font-size: 12px !important;
             }
 
             table tbody tr:last-child td {
@@ -160,7 +161,7 @@
                 padding: 10px 20px;
                 background: #FFFFFF;
                 border-bottom: none;
-                font-size: 10px !important;
+                font-size: 12px !important;
                 white-space: nowrap;
                 border-top: 1px solid #AAAAAA;
             }
@@ -171,7 +172,7 @@
 
             table tfoot tr:nth-child(4) td {
                 color: #f76e05 !important;
-                font-size: 10px !important;
+                font-size: 12px !important;
                 /* border-top: 1px solid #f76e05 !important; */
             }
 
