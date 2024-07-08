@@ -288,23 +288,23 @@
                 @endphp
                 <tfoot>
                     <tr>
-                        <td colspan="2"></td>
-                        <td colspan="2">SUBTOTAL (Rp.)</td>
+                        <td colspan="3"></td>
+                        <td>SUBTOTAL (Rp.)</td>
                         <td>@money($invoice->sub_total)</td>
                     </tr>
                     <tr>
-                        <td colspan="2"></td>
-                        <td colspan="2">DISC. (@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</td>
+                        <td colspan="3"></td>
+                        <td>DISC. (@if(!empty($diskon->diskon)){{$diskon->diskon}}%@endif)</td>
                         <td>@money($invoice->diskon)</td>
                     </tr>
                     <tr>
-                        <td colspan="2"></td>
-                        <td colspan="2">PAJAK (@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</td>
+                        <td colspan="3"></td>
+                        <td>PAJAK (@if(!empty($pajak->pajak)){{$pajak->pajak}}%@endif)</td>
                         <td>@money($invoice->pajak)</td>
                     </tr>
                     <tr>
-                        <td colspan="2"></td>
-                        <td colspan="2">GRAND TOTAL (Rp.)</td>
+                        <td colspan="3"></td>
+                        <td>GRAND TOTAL (Rp.)</td>
                         @php
                             $total = $invoice->sub_total+$invoice->pajak;
                         @endphp
@@ -312,13 +312,13 @@
                     </tr>
                     @if ($invoice->jenis_pembayaran == "Tunai")
                         <tr>
-                            <td colspan="2"></td>
-                            <td colspan="2">NOMINAL BAYAR (Rp.)</td>
+                            <td colspan="3"></td>
+                            <td>NOMINAL BAYAR (Rp.)</td>
                             <td>@money($invoice->nominal_bayar)</td>
                         </tr>
                         <tr>
-                            <td colspan="2"></td>
-                            <td colspan="2">KEMBALIAN (Rp.)</td>
+                            <td colspan="3"></td>
+                            <td>KEMBALIAN (Rp.)</td>
                             <td>@money($invoice->kembalian)</td>
                         </tr>
                     @endif
