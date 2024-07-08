@@ -3,18 +3,18 @@
     src: url('../fonts/LCD Solid 1.12.woff') format('woff'),
          url('../fonts/LCD Solid 1.12.ttf') format('truetype');
 }  */
-/* @font-face {
+@font-face {
     font-family: 'merchant';
     src: url('../fonts/Merchant Copy.ttf') format('truetype');
-}  */
-@font-face {
+} 
+/* @font-face {
     font-family: 'BankFont';
     src: url('../fonts/F25 Bank Printer/F25 Bank Printer.woff') format('woff'),
          url('../fonts/F25 Bank Printer/F25 Bank Printer.ttf') format('truetype');
-} 
+}  */
 body {
     font-size:14px;
-    font-family: BankFont;
+    font-family: merchant;
     margin:0;
     padding:1rem;
 }
