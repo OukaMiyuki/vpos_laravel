@@ -255,7 +255,8 @@
 
                             <div class="mt-4 mb-1">
                                 <div class="text-end d-print-none">
-                                    <a href="{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}" class="btn btn-primary waves-effect waves-light" target="_blank"><i class="mdi mdi-printer me-1"></i> Print Nota</a>
+                                    <a href="{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}" class="btn btn-primary waves-effect waves-light" target="_blank"><i class="mdi mdi-printer me-1"></i> Print Nota</a>&nbsp;&nbsp;
+                                    <a href="" data-bs-toggle="modal" data-bs-target="#kirimWaModal" class="btn btn-primary waves-effect waves-light" target="_blank"><i class="mdi mdi-printer me-1"></i> Kirim Nota</a>
                                     {{-- <a href="" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a> --}}
                                     {{-- <a href="" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow','height=500,width=255,left=100,top=100,resizable=no,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a> --}}
                                     {{-- <a id="printNota" nonce="{{ csp_nonce() }}" onclick="window.open('{{route('kasir.pos.transaction.invoice.receipt', ['id' => $invoice->id])}}','popUpWindow','resizable=no,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');" class="btn btn-primary waves-effect waves-light"><i class="mdi mdi-printer me-1"></i> Print Nota</a>&nbsp;&nbsp; --}}
@@ -355,6 +356,36 @@
             </div>
             <!-- end row -->
 
+        </div>
+    </div>
+    <div class="modal fade" id="kirimWaModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Kirim Nota ke Whatsapp</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="px-3" action="{{ route('tenant.pos.invoice.receipt.download') }}" method="post">
+                    @csrf
+                    <div class="modal-body" id="kirimWa">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="nama_supplier" class="form-label">Nomor Whatsapp</label>
+                                    <input type="text" class="form-control" name="id" id="id" required value="{{$invoice->id}}">
+                                    <input type="text" class="form-control" name="no_wa" id="no_wa" required value="" placeholder="Masukkan nomor whatsapp penerima">
+                                </div>
+                            </div>
+                            <!-- end col -->
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Kirim</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </x-kasir-layout>

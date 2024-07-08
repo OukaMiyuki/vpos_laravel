@@ -35,6 +35,11 @@ $(document).ready(function(){
         $("#show #keterangan").val(keterangan);
     });
 
+    $(document).on("click", "#kirimWaButton", function() {
+        var id = $(this).data('id');
+        $("#kirimWa #id").val(id);
+    });
+
     $(document).on("click", "#editkategori", function() {
         var id = $(this).data('id');
         var nama = $(this).data('nama');

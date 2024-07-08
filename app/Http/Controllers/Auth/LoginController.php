@@ -154,7 +154,8 @@ class LoginController extends Controller {
             $user = Tenant::select([
                                     'tenants.id',
                                     'tenants.email',
-                                    'tenants.phone'
+                                    'tenants.phone',
+                                    'tenants.id_inv_code',
                                 ])
                                 ->where('email', $login_email)
                                 ->first();
