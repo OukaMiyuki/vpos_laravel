@@ -176,7 +176,7 @@
                 /* border-top: 1px solid #f76e05 !important; */
             }
 
-            table tfoot tr td:first-child, table tfoot tr td:nth-child(1) {
+            table tfoot tr td:first-child {
                 border: none;
             }
 
