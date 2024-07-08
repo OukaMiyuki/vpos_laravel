@@ -214,6 +214,12 @@ class PosController extends Controller {
                     $invoice->storeCart($invoice);
                     $invoice->fieldSave($invoice, $identifier, NULL);
                     $invoice->updateTunaiWallet($total);
+                } else {
+                    $notification = array(
+                        'message' => 'Gagal membuat transaksi, harap hubungi Admin!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
                 }
             } else if($request->jenisPembayaran == "Qris"){
                 $invoice = Invoice::create([
@@ -233,6 +239,12 @@ class PosController extends Controller {
                 if(!is_null($invoice)) {
                     $invoice->storeCart($invoice);
                     $invoice->fieldSave($invoice, $identifier, NULL);
+                } else {
+                    $notification = array(
+                        'message' => 'Gagal membuat transaksi, harap hubungi Admin!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
                 }
             }
             $action = "Tenant : Create Transaction | ".$invoice->nomor_invoice;
@@ -357,6 +369,12 @@ class PosController extends Controller {
                 $invoice->storeCart($invoice);
                 $invoice->customerIdentifier($invoice);
                 session()->forget('cart');
+            } else {
+                $notification = array(
+                    'message' => 'Gagal membuat transaksi, harap hubungi Admin!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
             }
             $action = "Tenant : Create Transaction Save | ".$invoice->nomor_invoice;
             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
@@ -378,7 +396,6 @@ class PosController extends Controller {
 
     public function cartTransactionClear(Request $request){
         session()->forget('cart');
-
         $notification = array(
             'message' => 'Transaction cleared!',
             'alert-type' => 'success',
@@ -399,7 +416,6 @@ class PosController extends Controller {
                 'message' => 'Transaksi tidak ditemukan!',
                 'alert-type' => 'warning',
             );
-
             return redirect()->route('tenant.transaction.list.pending')->with($notification);
         }
 
@@ -621,6 +637,12 @@ class PosController extends Controller {
                 if(!is_null($invoice)) {
                     $invoice->fieldSave($invoice, $identifier, NULL);
                     $invoice->updateTunaiWallet($total);
+                } else {
+                    $notification = array(
+                        'message' => 'Gagal membuat transaksi, harap hubungi Admin!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
                 }
             } else if($request->jenisPembayaran == "Qris"){
                 $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
@@ -653,6 +675,12 @@ class PosController extends Controller {
 
                     if(!is_null($invoice)) {
                         $invoice->fieldSave($invoice, $identifier, NULL);
+                    } else {
+                        $notification = array(
+                            'message' => 'Gagal membuat transaksi, harap hubungi Admin!',
+                            'alert-type' => 'warning',
+                        );
+                        return redirect()->back()->with($notification);
                     }
 
                     if($storeDetail->status_umi == 1){
@@ -836,7 +864,13 @@ class PosController extends Controller {
                 return redirect()->back()->with($notification);
             }
             $responseCodeImage = $postImageResponse->getStatusCode();
-
+            if(is_null($responseCode) || empty($responseCode) || is_null($responseCodeImage) || empty($responseCodeImage)){
+                $notification = array(
+                    'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
             if($responseCode == 200 && $responseCodeImage == 200){
                 if(Storage::exists('public/invoice/'.$invoice->nomor_invoice.'.pdf')) {
                     Storage::delete('public/invoice/'.$invoice->nomor_invoice.'.pdf');
@@ -858,6 +892,13 @@ class PosController extends Controller {
                 return redirect()->back()->with($notification);
             }
         } else {
+            if(is_null($responseCode) || empty($responseCode)){
+                $notification = array(
+                    'message' => 'Nota gagal dikirim!, pastikan nomor whatsapp sesuai dan benar!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
             if($responseCode == 200){
                 if(Storage::exists('public/invoice/'.$invoice->nomor_invoice.'.pdf')) {
                     Storage::delete('public/invoice/'.$invoice->nomor_invoice.'.pdf');

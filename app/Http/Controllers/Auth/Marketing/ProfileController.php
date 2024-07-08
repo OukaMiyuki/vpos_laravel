@@ -288,6 +288,13 @@ class ProfileController extends Controller {
             return redirect()->back()->with($notification)->withInput();
         } else {
             $responseCode = $postResponse->getStatusCode();
+            if(is_null($responseCode) || empty($responseCode)){
+                $notification = array(
+                    'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification)->withInput();
+            }
             if($responseCode == 200){
                 $action = "Mitra Aplikasi : Send Whatsapp OTP Change Number Success";
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
@@ -517,6 +524,13 @@ class ProfileController extends Controller {
             return redirect()->back()->with($notification);
         }
         $responseCode = $postResponse->getStatusCode();
+        if(is_null($postResponse) || empty($postResponse) || is_null($responseCode) || empty($responseCode)){
+            $notification = array(
+                'message' => 'OTP Gagal dikirim! Pastikan nomor Whatsapp anda benar dan aktif! ',
+                'alert-type' => 'error',
+            );
+            return redirect()->back()->with($notification);
+        }
         if($responseCode == 200){
             $action = "Mitra Aplikasi : Send Whatsapp OTP Success";
             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);

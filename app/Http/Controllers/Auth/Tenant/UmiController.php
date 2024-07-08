@@ -219,20 +219,26 @@ class UmiController extends Controller {
                 try{
                     Mail::to('faydil.hamzah@nobubank.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
                 } catch(Exception $e){
-                    return $e;
+                    $action = "Tenant request UMI Fail";
+                    $this->createHistoryUser($action, $e, 0);
+                    $notification = array(
+                        'message' => 'Gagal mengajukan Qris akun, harap hubungi Admin!',
+                        'alert-type' => 'success',
+                    );
+                    return redirect()->back()->with($notification);
                 }
 
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
                 $notification = array(
-                    'message' => 'Permintaan UMI berhasil diajukan!',
+                    'message' => 'Permintaan Qris akun berhasil diajukan!',
                     'alert-type' => 'success',
                 );
                 return redirect()->back()->with($notification);
             } catch (Exception $e) {
                 $this->createHistoryUser($action, $e, 0);
                 $notification = array(
-                    'message' => 'Permintaan UMI gagal, silahkan hubungi admin!',
+                    'message' => 'Permintaan Qris akun gagal, silahkan hubungi admin!',
                     'alert-type' => 'error',
                 );
                 return redirect()->back()->with($notification);
@@ -316,30 +322,30 @@ class UmiController extends Controller {
             $website = $store->website;
 
             if(empty($nama_usaha)
-            || is_null($nama_usaha)
-            || $nama_usaha == ""
-            || empty($jenis_usaha)
-            || is_null($jenis_usaha)
-            || $jenis_usaha == ""
-            || empty($alamat)
-            || is_null($alamat)
-            || $alamat == ""
-            || empty($kab_kota)
-            || is_null($kab_kota)
-            || $kab_kota == ""
-            || empty($kode_pos)
-            || is_null($kode_pos)
-            || $kode_pos == ""
-            || is_null($nama_jalan)
-            || is_null($rt)
-            || is_null($rw)
-            || is_null($kelurahan_desa)
-            || is_null($kecamatan)
-            || is_null($kantor_toko_fisik)
-            || is_null($kategori_usaha_omset)
-            || is_null(auth()->user()->detail->ktp_image)
-            || auth()->user()->detail->ktp_image == ""
-            || auth()->user()->detail->ktp_image == NULL
+                || is_null($nama_usaha)
+                || $nama_usaha == ""
+                || empty($jenis_usaha)
+                || is_null($jenis_usaha)
+                || $jenis_usaha == ""
+                || empty($alamat)
+                || is_null($alamat)
+                || $alamat == ""
+                || empty($kab_kota)
+                || is_null($kab_kota)
+                || $kab_kota == ""
+                || empty($kode_pos)
+                || is_null($kode_pos)
+                || $kode_pos == ""
+                || is_null($nama_jalan)
+                || is_null($rt)
+                || is_null($rw)
+                || is_null($kelurahan_desa)
+                || is_null($kecamatan)
+                || is_null($kantor_toko_fisik)
+                || is_null($kategori_usaha_omset)
+                || is_null(auth()->user()->detail->ktp_image)
+                || auth()->user()->detail->ktp_image == ""
+                || auth()->user()->detail->ktp_image == NULL
             ) {
                 $notification = array(
                     'message' => 'Data detail merchant atau informasi user belum lengkap, silahkan lengkapi data terlebih dahulu!',
@@ -434,15 +440,14 @@ class UmiController extends Controller {
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
                 $notification = array(
-                    'message' => 'Permintaan UMI berhasil diajukan!',
+                    'message' => 'Permintaan Qris akun berhasil diajukan!',
                     'alert-type' => 'success',
                 );
                 return redirect()->back()->with($notification);
             } catch (Exception $e) {
-                return $e;
                 $this->createHistoryUser($action, $e, 0);
                 $notification = array(
-                    'message' => 'Pengajuan Umi gagal, harap hubungi admin!',
+                    'message' => 'Pengajuan Qris akun gagal, harap hubungi admin!',
                     'alert-type' => 'error',
                 );
                 return redirect()->back()->with($notification);

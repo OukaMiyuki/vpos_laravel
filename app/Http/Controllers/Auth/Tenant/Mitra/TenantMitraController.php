@@ -782,10 +782,6 @@ class TenantMitraController extends Controller {
         return view('tenant.tenant_mitra.tenant_finance_settlement', compact('SettlementHstory'));
     }
 
-    public function historyPenarikan(){
-        
-    }
-
     public function pemasukanQrisPending(){
         $invoice = Invoice::select(['invoices.id',
                                             'invoices.store_identifier',

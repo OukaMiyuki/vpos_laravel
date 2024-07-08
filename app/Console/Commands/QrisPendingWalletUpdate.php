@@ -46,9 +46,11 @@ class QrisPendingWalletUpdate extends Command {
         $saturday = false;
         $sunday = false;
         if($today->dayOfWeek == Carbon::SATURDAY){
+            echo "Today is Saturday";
             $saturday = true;
             $sunday = false;
         } else if($today->dayOfWeek == Carbon::SUNDAY){
+            echo "Todat is Sunday";
             $saturday = false;
             $sunday = true;
         }

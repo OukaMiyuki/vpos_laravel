@@ -773,7 +773,11 @@ class TenantController extends Controller {
             try {
                 $file->move($storagePath, $filename);
             } catch (\Exception $e) {
-                return $e->getMessage();
+                $notification = array(
+                    'message' => 'Gagal memasukkan produk gambar, harap hubungi Admin!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->route('tenant.product.batch.list')->with($notification);
             }
 
             Product::create([
@@ -871,7 +875,12 @@ class TenantController extends Controller {
                     try {
                         $file->move($storagePath, $filename);
                     } catch (\Exception $e) {
-                        return $e->getMessage();
+                        // return $e->getMessage();
+                        $notification = array(
+                            'message' => 'Gagal mengupdate gambar, harap hubungi Admin!',
+                            'alert-type' => 'success',
+                        );
+                        return redirect()->route('tenant.product.batch.list')->with($notification);
                     }
                 } else {
                     Storage::delete('public/images/product/'.$product->photo);
