@@ -1,8 +1,8 @@
-/* @font-face {
+@font-face {
     font-family: 'LCD';
     src: url('../fonts/LCD Solid 1.12.woff') format('woff'),
          url('../fonts/LCD Solid 1.12.ttf') format('truetype');
-}  */
+} 
 /* @font-face {
     font-family: 'merchant';
     src: url('../fonts/Merchant Copy.ttf') format('truetype');
@@ -12,7 +12,7 @@
     src: url('../fonts/F25 Bank Printer/F25 Bank Printer.woff') format('woff'),
          url('../fonts/F25 Bank Printer/F25 Bank Printer.ttf') format('truetype');
 }  */
-@font-face {
+/* @font-face {
     font-family: "F25 Bank Printer";
     src: url("https://db.onlinewebfonts.com/t/6e0719809c1f8f917ee75311f9013184.eot");
     src: url("https://db.onlinewebfonts.com/t/6e0719809c1f8f917ee75311f9013184.eot?#iefix")format("embedded-opentype"),
@@ -20,11 +20,10 @@
     url("https://db.onlinewebfonts.com/t/6e0719809c1f8f917ee75311f9013184.woff")format("woff"),
     url("https://db.onlinewebfonts.com/t/6e0719809c1f8f917ee75311f9013184.ttf")format("truetype"),
     url("https://db.onlinewebfonts.com/t/6e0719809c1f8f917ee75311f9013184.svg#F25 Bank Printer")format("svg");
-}
+} */
 body {
-    font-size:14px;
-    font-family: F25 Bank Printer;
-    font-weight 300;
+    font-size:16px;
+    font-family: LCD;
     margin:0;
     padding:1rem;
 }
