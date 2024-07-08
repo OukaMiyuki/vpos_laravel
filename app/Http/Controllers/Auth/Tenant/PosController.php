@@ -810,7 +810,8 @@ class PosController extends Controller {
             "api_key" => "apLiCx2p1xJNbi9fWrZFxSLeE1dJ2t",
             'sender' => "085179950178",
             'number' => $hp,
-            "media_type" => "document",
+            // "media_type" => "document",
+            "media_type" => "image",
             "caption" => $statusNotaBelanja,
             // "url" => 'https://visipos.id/storage/invoice/'.$invoice->nomor_invoice.'.pdf'
             "url" => 'https://visipos.id/storage/invoice/generate_image/'.$invoice->nomor_invoice.'.jpg'
