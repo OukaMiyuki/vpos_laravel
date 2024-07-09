@@ -393,6 +393,167 @@ $(function () {
     });
 });
 
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_transaction_list_qris_pending_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_transaction_list_qris_pending_tenant').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_transaction_list_qris_pending_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_transaction.draw();
+    });
+
+    var table_user_transaction = $('.tenant-transaction-list-qris-pending').DataTable({
+        processing: true,
+        serverSide: true,
+        // ajax: {
+        //     "url": 'https://visipos.id/tenant/dashboard/transaction/list/pending-payment',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_transaction_list_qris_pending_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_transaction_list_qris_pending_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        ajax: {
+            "url": 'http://localhost:8000/tenant/dashboard/transaction/list/pending-payment',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_transaction_list_qris_pending_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_transaction_list_qris_pending_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+            {data: 'nomor_invoice', name: 'nomor_invoice'},
+            {data: 'kasir', name: 'kasir'},
+            {data: 'tanggal_transaksi', name: 'tanggal_transaksi'},
+            {data: 'tanggal_pembayaran', name: 'tanggal_pembayaran'},
+            {data: 'jenis_pembayaran', name: 'jenis_pembayaran'},
+            {data: 'status_pembayaran', name: 'status_pembayaran'},
+            {data: 'transaksi_oleh', name: 'transaksi_oleh'},
+            {data: 'status_transaksi', name: 'status_transaksi'},
+            {data: 'sub_total', name: 'sub_total'},
+            {data: 'pajak', name: 'pajak'},
+            {data: 'diskon', name: 'diskon'},
+            {data: 'nominal_bayar', name: 'nominal_bayar'},
+            {data: 'mdr', name: 'mdr'},
+            {data: 'nominal_mdr', name: 'nominal_mdr'},
+            {data: 'nominal_terima_bersih', name: 'nominal_terima_bersih'},
+        ],
+        // columnDefs: [
+        //     { className: 'text-center', targets: [4,5] },
+        // ],
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_transaction_list_qris_finish_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_transaction_list_qris_finish_tenant').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_transaction_list_qris_finish_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_transaction.draw();
+    });
+
+    var table_user_transaction = $('.tenant-transaction-list-qris-finish').DataTable({
+        processing: true,
+        serverSide: true,
+        // ajax: {
+        //     "url": 'https://visipos.id/tenant/dashboard/pemasukan/qris',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_transaction_list_qris_finish_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_transaction_list_qris_finish_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        ajax: {
+            "url": 'http://localhost:8000/tenant/dashboard/pemasukan/qris',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_transaction_list_qris_finish_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_transaction_list_qris_finish_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+            {data: 'nomor_invoice', name: 'nomor_invoice'},
+            {data: 'kasir', name: 'kasir'},
+            {data: 'tanggal_transaksi', name: 'tanggal_transaksi'},
+            {data: 'tanggal_pembayaran', name: 'tanggal_pembayaran'},
+            {data: 'jenis_pembayaran', name: 'jenis_pembayaran'},
+            {data: 'status_pembayaran', name: 'status_pembayaran'},
+            {data: 'transaksi_oleh', name: 'transaksi_oleh'},
+            {data: 'status_transaksi', name: 'status_transaksi'},
+            {data: 'sub_total', name: 'sub_total'},
+            {data: 'pajak', name: 'pajak'},
+            {data: 'diskon', name: 'diskon'},
+            {data: 'nominal_bayar', name: 'nominal_bayar'},
+            {data: 'mdr', name: 'mdr'},
+            {data: 'nominal_mdr', name: 'nominal_mdr'},
+            {data: 'nominal_terima_bersih', name: 'nominal_terima_bersih'},
+        ],
+        // columnDefs: [
+        //     { className: 'text-center', targets: [4,5] },
+        // ],
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_settlement_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_settlement_tenant').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_settlement_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_transaction.draw();
+    });
+
+    var table_user_transaction = $('.tenant-settlement-list').DataTable({
+        processing: true,
+        serverSide: true,
+        // ajax: {
+        //     "url": 'https://visipos.id/tenant/dashboard/finance/saldo/settlement',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_settlement_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_settlement_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        ajax: {
+            "url": 'http://localhost:8000/tenant/dashboard/finance/saldo/settlement',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_settlement_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_settlement_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'nomor_settlement', name: 'nomor_settlement'},
+            {data: 'periode_settlement', name: 'periode_settlement'},
+            {data: 'nominal_settlement', name: 'nominal_settlement'},
+            {data: 'status', name: 'status'},
+            {data: 'note', name: 'note'},
+            {data: 'periode_transaksi', name: 'periode_transaksi'},
+        ],
+        // columnDefs: [
+        //     { className: 'text-center', targets: [4,5] },
+        // ],
+    });
+});
+
 $(document).ready(function() {
     $("#basic-table").DataTable({
         language: {

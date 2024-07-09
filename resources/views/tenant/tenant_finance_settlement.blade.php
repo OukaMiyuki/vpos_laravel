@@ -30,8 +30,21 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Data History Settlement</h4>
+                            <div class="row">
+                                <div class="col-6">
+
+                                </div>
+                                <div class="col-6 text-end">
+                                    <div id="daterange_settlement_tenant" class="float-end" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%; text-align:center">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span>
+                                        <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="basic-datatable" class="table tenant-settlement-list dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -40,10 +53,11 @@
                                             <th>Nominal Settlement (Rp.)</th>
                                             <th class="text-center">Status</th>
                                             <th>Note</th>
+                                            <th>Periode Transaksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach($SettlementHstory as $stl)
                                             <tr>
                                                 <td>{{$no+=1}}</td>
@@ -57,9 +71,9 @@
                                                         <span class="badge bg-soft-success text-success">Settlement Sukses</span>
                                                     @endif
                                                 </td>
-                                                <td>{{$stl->note}}</td>        
+                                                <td>{{$stl->note}}</td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>

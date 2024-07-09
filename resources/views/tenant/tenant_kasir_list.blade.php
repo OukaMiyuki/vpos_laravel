@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Semua Kasir&nbsp;&nbsp;&nbsp;<button data-bs-toggle="modal" data-bs-target="#staticBackdrop" title="Tambah kode baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan kasir baru</button></h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="scroll-horizontal-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>

@@ -1748,31 +1748,42 @@ class TenantController extends Controller {
                                    return $status_transaksi;
                                })
                                ->editColumn('sub_total', function($data) {
-                                   return $data->sub_total;
+                                    $price = floor($data->sub_total);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
                                })
                                ->editColumn('pajak', function($data) {
-                                    return $data->pajak;
+                                    $price = floor($data->pajak);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
                                 })
                                 ->editColumn('diskon', function($data) {
-                                    return $data->diskon;
+                                    $price = floor($data->diskon);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
                                 })
                                ->editColumn('nominal_bayar', function($data) {
-                                   return $data->nominal_bayar;
-                               })
-                               ->editColumn('nominal_bayar', function($data) {
-                                   return $data->nominal_bayar;
+                                    $price = floor($data->nominal_bayar);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
                                })
                                ->editColumn('kembalian', function($data) {
-                                   return $data->kembalian;
+                                    $price = floor($data->kembalian);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
                                })
                                ->editColumn('mdr', function($data) {
                                     return $data->mdr;
                                 })
                                 ->editColumn('nominal_mdr', function($data) {
-                                    return $data->nominal_mdr;
+                                    $price = floor($data->nominal_mdr);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
                                 })
                                 ->editColumn('nominal_terima_bersih', function($data) {
-                                    return $data->nominal_terima_bersih;
+                                    $price = floor($data->nominal_terima_bersih);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
                                 })
                                ->rawColumns(['action', 'status_transaksi', 'status_pembayaran'])
                                ->make(true);
@@ -1883,12 +1894,13 @@ class TenantController extends Controller {
         return view('tenant.tenant_transaction_list_pending', compact('invoice'));
     }
 
-    public function transactionListPendingPayment(){
-        $identifier = $this->getStoreIdentifier();
-        $invoice = Invoice::where('store_identifier', $identifier)
-                        ->where('jenis_pembayaran', "Qris")
-                        ->where('status_pembayaran', 0)
-                        ->select([
+    public function transactionListPendingPayment(Request $request){
+        if ($request->ajax()) {
+            $identifier = $this->getStoreIdentifier();
+            $data = Invoice::where('store_identifier', $identifier)
+                            ->where('jenis_pembayaran', "Qris")
+                            ->where('status_pembayaran', 0)
+                            ->select([
                                     'invoices.id',
                                     'invoices.id_kasir',
                                     'invoices.nomor_invoice',
@@ -1904,13 +1916,116 @@ class TenantController extends Controller {
                                     'invoices.mdr',
                                     'invoices.nominal_mdr',
                                     'invoices.nominal_terima_bersih',
-                                ])
-                        ->with(['kasir' => function($query){
-                            $query->select(['kasirs.id', 'kasirs.name']);
-                        }])
-                        ->latest()
-                        ->get();
-        return view('tenant.tenant_transaction_list_pending_payment', compact('invoice'));
+                            ])
+                            ->with(['kasir' => function($query){
+                                $query->select(['kasirs.id', 'kasirs.name']);
+                            }])
+                            ->latest()
+                            ->get();
+
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->where('tanggal_transaksi', '>=', $request->from_date)->where('tanggal_transaksi', '<=', $request->to_date);
+            }
+
+           return Datatables::of($data)
+                               ->addIndexColumn()
+                                ->addColumn('action', function($row){
+                                    $actionBtn = '<a href="/tenant/dashboard/transaction/list/invoice/'.$row->id.'" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>';
+                                    return $actionBtn;
+                                })
+                               ->editColumn('nomor_invoice', function($data) {
+                                   return $data->nomor_invoice;
+                               })
+                               ->editColumn('kasir', function($data) {
+                                   if(empty($data->kasir->name ) || is_null($data->kasir->name) || $data->kasir->name == NULL || $data->kasir->name == ""){
+                                       return "Transaksi Oleh Tenant";
+                                   } else {
+                                       return $data->kasir->name;
+                                   }
+                               })
+                               ->editColumn('tanggal_transaksi', function($data) {
+                                   $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
+                                   $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                   $dateTimeTransaksi = $date." ".$time;
+                                   return $dateTimeTransaksi;
+                               })
+                               ->editColumn('tanggal_pembayaran', function($data) {
+                                   if(!is_null($data->tanggal_pelunasan) || !empty($data->tanggal_pelunasan)){
+                                       $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
+                                       $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
+                                       $dateTimePembayaran = $date." ".$time;
+                                       return $dateTimePembayaran;
+                                   } else {
+                                       return "";
+                                   }
+                               })
+                               ->editColumn('jenis_pembayaran', function($data) {
+                                   return $data->jenis_pembayaran;
+                               })
+                               ->editColumn('status_pembayaran', function($data) {
+                                    return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
+                                })
+                               ->editColumn('transaksi_oleh', function($data) {
+                                   if (empty($data->kasir->name ) || is_null($data->kasir->name) || $data->kasir->name == NULL || $data->kasir->name == ""){
+                                       return "Tenant";
+                                   }
+                                   return "Kasir";
+                               })
+                               ->editColumn('status_transaksi', function($data) {
+                                   $status_transaksi = "";
+                                   if (!empty($data->jenis_pembayaran) || !is_null($data->jenis_pembayaran) || $data->jenis_pembayaran != ""){
+                                       if($data->status_pembayaran == 0){
+                                           $status_transaksi = '<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>';
+                                       } else if($data->status_pembayaran == 1){
+                                           $status_transaksi = '<span class="badge bg-soft-success text-success">Selesai</span>';
+                                       }
+                                   } else{
+                                       $status_transaksi = '<span class="badge bg-soft-danger text-danger">Belum Diproses</span>';
+                                   }
+                                   return $status_transaksi;
+                               })
+                               ->editColumn('sub_total', function($data) {
+                                    $price = floor($data->sub_total);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                               })
+                               ->editColumn('pajak', function($data) {
+                                    $price = floor($data->pajak);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                                })
+                                ->editColumn('diskon', function($data) {
+                                    $price = floor($data->diskon);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                                })
+                               ->editColumn('nominal_bayar', function($data) {
+                                    $price = floor($data->nominal_bayar);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                               })
+                               ->editColumn('kembalian', function($data) {
+                                    $price = floor($data->kembalian);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                               })
+                               ->editColumn('mdr', function($data) {
+                                    return $data->mdr;
+                                })
+                                ->editColumn('nominal_mdr', function($data) {
+                                    $price = floor($data->nominal_mdr);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                                })
+                                ->editColumn('nominal_terima_bersih', function($data) {
+                                    $price = floor($data->nominal_terima_bersih);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                                })
+                               ->rawColumns(['action', 'status_transaksi', 'status_pembayaran'])
+                               ->make(true);
+        }
+        return view('tenant.tenant_transaction_list_pending_payment');
     }
 
     public function pemasukan(){
@@ -1943,35 +2058,138 @@ class TenantController extends Controller {
         return view('tenant.tenant_pemasukan', compact(['invoice', 'sumTotalPenghasilan']));
     }
 
-    public function pemasukanQrisAll(){
-        $identifier = $this->getStoreIdentifier();
-        $invoice = Invoice::where('store_identifier', $identifier)
+    public function pemasukanQrisAll(Request $request){
+        if ($request->ajax()) {
+            $identifier = $this->getStoreIdentifier();
+            $data = Invoice::where('store_identifier', $identifier)
+                            ->where('status_pembayaran', 1)
+                            ->where('invoices.jenis_pembayaran', 'Qris')
                             ->select([
-                                'invoices.id',
-                                'invoices.id_kasir',
-                                'invoices.nomor_invoice',
-                                'invoices.tanggal_transaksi',
-                                'invoices.tanggal_pelunasan',
-                                'invoices.jenis_pembayaran',
-                                'invoices.status_pembayaran',
-                                'invoices.sub_total',
-                                'invoices.pajak',
-                                'invoices.diskon',
-                                'invoices.nominal_bayar',
-                                'invoices.kembalian',
-                                'invoices.mdr',
-                                'invoices.nominal_mdr',
-                                'invoices.nominal_terima_bersih',
+                                    'invoices.id',
+                                    'invoices.id_kasir',
+                                    'invoices.nomor_invoice',
+                                    'invoices.tanggal_transaksi',
+                                    'invoices.tanggal_pelunasan',
+                                    'invoices.jenis_pembayaran',
+                                    'invoices.status_pembayaran',
+                                    'invoices.sub_total',
+                                    'invoices.pajak',
+                                    'invoices.diskon',
+                                    'invoices.nominal_bayar',
+                                    'invoices.kembalian',
+                                    'invoices.mdr',
+                                    'invoices.nominal_mdr',
+                                    'invoices.nominal_terima_bersih',
                             ])
                             ->with(['kasir' => function($query){
                                 $query->select(['kasirs.id', 'kasirs.name']);
                             }])
-                            ->where('status_pembayaran', 1)
-                            ->where('invoices.jenis_pembayaran', 'Qris')
                             ->latest()
                             ->get();
 
-        return view('tenant.tenant_pemasukan_qris', compact('invoice'));
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->where('tanggal_transaksi', '>=', $request->from_date)->where('tanggal_transaksi', '<=', $request->to_date);
+            }
+
+           return Datatables::of($data)
+                               ->addIndexColumn()
+                                ->addColumn('action', function($row){
+                                    $actionBtn = '<a href="/tenant/dashboard/transaction/list/invoice/'.$row->id.'" class="btn btn-xs btn-info"><i class="mdi mdi-eye"></i></a>';
+                                    return $actionBtn;
+                                })
+                               ->editColumn('nomor_invoice', function($data) {
+                                   return $data->nomor_invoice;
+                               })
+                               ->editColumn('kasir', function($data) {
+                                   if(empty($data->kasir->name ) || is_null($data->kasir->name) || $data->kasir->name == NULL || $data->kasir->name == ""){
+                                       return "Transaksi Oleh Tenant";
+                                   } else {
+                                       return $data->kasir->name;
+                                   }
+                               })
+                               ->editColumn('tanggal_transaksi', function($data) {
+                                   $date = \Carbon\Carbon::parse($data->tanggal_transaksi)->format('d-m-Y');
+                                   $time = \Carbon\Carbon::parse($data->created_at)->format('H:i:s');
+                                   $dateTimeTransaksi = $date." ".$time;
+                                   return $dateTimeTransaksi;
+                               })
+                               ->editColumn('tanggal_pembayaran', function($data) {
+                                   if(!is_null($data->tanggal_pelunasan) || !empty($data->tanggal_pelunasan)){
+                                       $date = \Carbon\Carbon::parse($data->tanggal_pelunasan)->format('d-m-Y');
+                                       $time = \Carbon\Carbon::parse($data->updated_at)->format('H:i:s');
+                                       $dateTimePembayaran = $date." ".$time;
+                                       return $dateTimePembayaran;
+                                   } else {
+                                       return "";
+                                   }
+                               })
+                               ->editColumn('jenis_pembayaran', function($data) {
+                                   return $data->jenis_pembayaran;
+                               })
+                               ->editColumn('status_pembayaran', function($data) {
+                                    return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
+                                })
+                               ->editColumn('transaksi_oleh', function($data) {
+                                   if (empty($data->kasir->name ) || is_null($data->kasir->name) || $data->kasir->name == NULL || $data->kasir->name == ""){
+                                       return "Tenant";
+                                   }
+                                   return "Kasir";
+                               })
+                               ->editColumn('status_transaksi', function($data) {
+                                   $status_transaksi = "";
+                                   if (!empty($data->jenis_pembayaran) || !is_null($data->jenis_pembayaran) || $data->jenis_pembayaran != ""){
+                                       if($data->status_pembayaran == 0){
+                                           $status_transaksi = '<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>';
+                                       } else if($data->status_pembayaran == 1){
+                                           $status_transaksi = '<span class="badge bg-soft-success text-success">Selesai</span>';
+                                       }
+                                   } else{
+                                       $status_transaksi = '<span class="badge bg-soft-danger text-danger">Belum Diproses</span>';
+                                   }
+                                   return $status_transaksi;
+                               })
+                               ->editColumn('sub_total', function($data) {
+                                    $price = floor($data->sub_total);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                               })
+                               ->editColumn('pajak', function($data) {
+                                    $price = floor($data->pajak);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                                })
+                                ->editColumn('diskon', function($data) {
+                                    $price = floor($data->diskon);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                                })
+                               ->editColumn('nominal_bayar', function($data) {
+                                    $price = floor($data->nominal_bayar);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                               })
+                               ->editColumn('kembalian', function($data) {
+                                    $price = floor($data->kembalian);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                               })
+                               ->editColumn('mdr', function($data) {
+                                    return $data->mdr;
+                                })
+                                ->editColumn('nominal_mdr', function($data) {
+                                    $price = floor($data->nominal_mdr);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                                })
+                                ->editColumn('nominal_terima_bersih', function($data) {
+                                    $price = floor($data->nominal_terima_bersih);
+                                    $hasil_rupiah = number_format($price,2,',','.');
+                                    return $hasil_rupiah;
+                                })
+                               ->rawColumns(['action', 'status_transaksi', 'status_pembayaran'])
+                               ->make(true);
+        }
+        return view('tenant.tenant_pemasukan_qris');
     }
 
     public function transactionInvoiceView($id){
@@ -2150,30 +2368,71 @@ class TenantController extends Controller {
         return view('tenant.tenant_finnance_pemasukan_qris_today', compact('invoice'));
     }
 
-    public function settlement(){
-        $SettlementHstory = SettlementHstory::select([
-                                            'settlement_hstories.id',
-                                            'settlement_hstories.id_user',
-                                            'settlement_hstories.id_settlement',
-                                            'settlement_hstories.settlement_time_stamp',
-                                            'settlement_hstories.nominal_settle',
-                                            'settlement_hstories.status',
-                                            'settlement_hstories.note',
-                                        ])
-                                        ->with([
-                                            'settlement' => function($query){
-                                                $query->select([
-                                                    'settlements.id',
-                                                    'settlements.nomor_settlement'
-                                                ]);
-                                            }
-                                        ])
-                                        ->where('id_user', auth()->user()->id)
-                                        ->where('email', auth()->user()->email)
-                                        ->where('nominal_settle', '!=', 0)
-                                        ->latest()
-                                        ->get();
-        return view('tenant.tenant_finance_settlement', compact('SettlementHstory'));
+    public function settlement(Request $request){
+        if ($request->ajax()) {
+            $data = SettlementHstory::select([
+                                                'settlement_hstories.id',
+                                                'settlement_hstories.id_user',
+                                                'settlement_hstories.id_settlement',
+                                                'settlement_hstories.settlement_time_stamp',
+                                                'settlement_hstories.nominal_settle',
+                                                'settlement_hstories.status',
+                                                'settlement_hstories.note',
+                                                'settlement_hstories.periode_transaksi',
+                                            ])
+                                            ->with([
+                                                'settlement' => function($query){
+                                                    $query->select([
+                                                        'settlements.id',
+                                                        'settlements.nomor_settlement'
+                                                    ]);
+                                                }
+                                            ])
+                                            ->where('id_user', auth()->user()->id)
+                                            ->where('email', auth()->user()->email)
+                                            ->where('nominal_settle', '!=', 0)
+                                            ->latest()
+                                            ->get();
+
+            if($request->filled('from_date') && $request->filled('to_date')) {
+                $data = $data->where('settlement_time_stamp', '>=', $request->from_date)->where('settlement_time_stamp', '<=', $request->to_date);
+            }
+
+           return Datatables::of($data)
+                               ->addIndexColumn()
+                               ->editColumn('nomor_settlement', function($data) {
+                                   return $data->settlement->nomor_settlement;
+                               })
+                               ->editColumn('periode_settlement', function($data) {
+                                   $date = \Carbon\Carbon::parse($data->settlement_time_stamp)->format('d-m-Y H:i:s');
+                                   return $date;
+                               })
+                               ->editColumn('nominal_settlement', function($data) {
+                                   return $data->nominal_settle;
+                               })
+                               ->editColumn('status_pembayaran', function($data) {
+                                    return (($data->status_pembayaran == 1)?'<span class="badge bg-soft-success text-success">Selesai</span>':'<span class="badge bg-soft-warning text-warning">Pending Pembayaran</span>');
+                                })
+                               ->editColumn('status', function($data) {
+                                   $status = "";
+                                    if($data->status == 0){
+                                        $status = '<span class="badge bg-soft-danger text-danger">Settlement Gagal</span>';
+                                    } else if($data->status == 1){
+                                        $status = '<span class="badge bg-soft-success text-success">Settlement Sukses</span>';
+                                    }
+                                   return $status;
+                               })
+                               ->editColumn('note', function($data) {
+                                    return $data->note;
+                                })
+                                ->editColumn('periode_transaksi', function($data) {
+                                    $date = \Carbon\Carbon::parse($data->periode_transaksi)->format('d-m-Y');
+                                    return $date;
+                                })
+                               ->rawColumns(['status'])
+                               ->make(true);
+        }
+        return view('tenant.tenant_finance_settlement');
     }
 
     public function pemasukanQris(){

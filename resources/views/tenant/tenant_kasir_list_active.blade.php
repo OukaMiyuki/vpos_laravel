@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Kasir Aktif</h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="scroll-horizontal-datatable" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>

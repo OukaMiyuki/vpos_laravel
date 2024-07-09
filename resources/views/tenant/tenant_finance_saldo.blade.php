@@ -116,7 +116,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Pemasukan Qris Hari Ini (Pembayaran Qris Sukses)</h4>
                             <div class="table-responsive">
-                                <table id="basic-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="basic-table" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>

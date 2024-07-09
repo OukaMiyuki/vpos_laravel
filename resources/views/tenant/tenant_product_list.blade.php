@@ -30,7 +30,7 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Product List&nbsp;&nbsp;&nbsp;<a href="{{ route('tenant.product.batch.add') }}"><button title="Tambah barang baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan produk baru</button></a></h4>
-                        
+
                                 <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
                                     <thead>
                                         <tr>
@@ -71,7 +71,7 @@
                                         @endforeach
                                     </tbody>
                                 </table>
-                           
+
                         </div>
                     </div>
                 </div>

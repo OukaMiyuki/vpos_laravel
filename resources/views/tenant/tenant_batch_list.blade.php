@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Batch List&nbsp;&nbsp;&nbsp;<button data-bs-toggle="modal" data-bs-target="#staticBackdrop" title="Tambah kode baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambah Batch Baru</button></h4>
                             <div class="table-responsive">
-                                <table id="selection-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="basic-table" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th width="20">No.</th>
