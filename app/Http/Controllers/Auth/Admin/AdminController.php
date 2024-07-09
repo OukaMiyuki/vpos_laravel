@@ -3657,6 +3657,7 @@ class AdminController extends Controller {
                                                             'settlement_hstories.nominal_settle',
                                                             'settlement_hstories.nominal_insentif_cashback',
                                                             'settlement_hstories.status',
+                                                            'settlement_hstories.periode_transaksi',
                                                             'settlement_hstories.note',
                                                         ])
                                                         ->with([

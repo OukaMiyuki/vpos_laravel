@@ -53,6 +53,7 @@
                                                     <th class="text-center">Tanggal Settlement</th>
                                                     <th class="text-center">Nominal Settlement (Rp.)</th>
                                                     <th class="text-center">Nominal Insentif Cashback (Rp.)</th>
+                                                    <th class="text-center">Periode Transaksi</th>
                                                     <th class="text-center">Status</th>
                                                     <th>Note</th>
                                                 </tr>
@@ -69,6 +70,7 @@
                                                         <td class="text-center">{{\Carbon\Carbon::parse($stl->settlement_time_stamp)->format('d-m-Y H:i:s')}}</td>
                                                         <td>@currency($stl->nominal_settle)</td>
                                                         <td>@currency($stl->nominal_insentif_cashback)</td>
+                                                        <td class="text-center">{{\Carbon\Carbon::parse($stl->periode_transaksi)->format('d-m-Y')}}</td>
                                                         <td>
                                                             @if ($stl->status == 0)
                                                                 <span class="badge bg-soft-warning text-danger">Settlement Gagal</span>
