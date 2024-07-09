@@ -79,7 +79,7 @@ class QrisPendingWalletUpdate extends Command {
                     HistoryCashbackPending::create([
                         'id_invoice' => $invoice->id,
                         'nominal_terima_mdr' => $insentif_cashbackFloor,
-                        'periode_transaksi' => Carbon::now()
+                        'periode_transaksi' => Carbon::yesterday()
                     ]);
                     Invoice::find($invoice->id)->update([
                         'settlement_status' => 1
@@ -231,7 +231,8 @@ class QrisPendingWalletUpdate extends Command {
                     foreach($historySettleCashback as $cashbackHistory){
                         HistoryCashbackAdmin::create([
                             'id_invoice' => $cashbackHistory->id_invoice,
-                            'nominal_terima_mdr' => $cashbackHistory->nominal_terima_mdr
+                            'nominal_terima_mdr' => $cashbackHistory->nominal_terima_mdr,
+                            'periode_transaksi' => $cashbackHistory->periode_transaksi,
                         ]);
                         $cashbackHistory->update([
                             'settlement_status' => 1
