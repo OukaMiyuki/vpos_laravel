@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Transaction Pending List</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-datatable" class="table nowrap w-100">
+                                <table id="scroll-horizontal-table" class="table nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th class="text-center">No.</th>

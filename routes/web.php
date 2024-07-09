@@ -348,6 +348,7 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
     Route::get('/dashboard/toko/stock/barcode/{id}', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'productStockBarcode'])->name('tenant.product.stock.barcode.show');
 
     Route::get('/dashboard/transaction', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionList'])->name('tenant.transaction');
+    Route::get('/dashboard/transaction/list', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListAll'])->name('tenant.transaction.list');
     Route::get('/dashboard/transaction/tunai', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListTunai'])->name('tenant.transaction.list.tunai');
     Route::get('/dashboard/transaction/qris', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListQris'])->name('tenant.transaction.list.qris');
     Route::get('/dashboard/transaction/list/pending', [App\Http\Controllers\Auth\Tenant\TenantController::class, 'transactionListPending'])->name('tenant.transaction.list.pending');

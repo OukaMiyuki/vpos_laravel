@@ -118,9 +118,9 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar Semua Transaksi</h4>
+                            <h4 class="header-title mb-3">Daftar Transaksi Terbaru</h4>
                             <div class="table-responsive">
-                                <table id="basic-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="basic-table" class="table dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>

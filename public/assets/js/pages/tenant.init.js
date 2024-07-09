@@ -79,7 +79,7 @@ $(document).ready(function(){
 
     $(function(){
         var dtToday = new Date();
-        
+
         var month = dtToday.getMonth() + 1;
         var day = dtToday.getDate();
         var year = dtToday.getFullYear();
@@ -87,7 +87,7 @@ $(document).ready(function(){
             month = '0' + month.toString();
         if(day < 10)
             day = '0' + day.toString();
-        
+
         var maxDate = year + '-' + month + '-' + day;
         $('#t_beli').attr('max', maxDate);
     });
@@ -218,5 +218,246 @@ $(document).ready(function() {
                 }
             });
         }
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_transaction_tunai_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_transaction_tunai_tenant').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_transaction_tunai_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_transaction.draw();
+    });
+
+    var table_user_transaction = $('.tenant-transaction-tunai').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/tenant/dashboard/transaction/tunai',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_transaction_tunai_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_transaction_tunai_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/tenant/dashboard/transaction/tunai',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_transaction_tunai_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_transaction_tunai_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+            {data: 'nomor_invoice', name: 'nomor_invoice'},
+            {data: 'kasir', name: 'kasir'},
+            {data: 'tanggal_transaksi', name: 'tanggal_transaksi'},
+            {data: 'tanggal_pembayaran', name: 'tanggal_pembayaran'},
+            {data: 'jenis_pembayaran', name: 'jenis_pembayaran'},
+            {data: 'transaksi_oleh', name: 'transaksi_oleh'},
+            {data: 'status_transaksi', name: 'status_transaksi'},
+            {data: 'status_pembayaran', name: 'status_pembayaran'},
+            {data: 'sub_total', name: 'sub_total'},
+            {data: 'pajak', name: 'pajak'},
+            {data: 'diskon', name: 'diskon'},
+            {data: 'nilai_transaksi', name: 'nilai_transaksi'},
+            {data: 'nominal_bayar', name: 'nominal_bayar'},
+            {data: 'kembalian', name: 'kembalian'},
+        ],
+        // columnDefs: [
+        //     { className: 'text-center', targets: [4,5] },
+        // ],
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_transaction_list_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_transaction_list_tenant').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_transaction_list_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_transaction.draw();
+    });
+
+    var table_user_transaction = $('.tenant-transaction-list-all').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/tenant/dashboard/transaction/list',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_transaction_list_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_transaction_list_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/tenant/dashboard/transaction/list',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_transaction_list_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_transaction_list_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+            {data: 'nomor_invoice', name: 'nomor_invoice'},
+            {data: 'kasir', name: 'kasir'},
+            {data: 'tanggal_transaksi', name: 'tanggal_transaksi'},
+            {data: 'tanggal_pembayaran', name: 'tanggal_pembayaran'},
+            {data: 'jenis_pembayaran', name: 'jenis_pembayaran'},
+            {data: 'status_pembayaran', name: 'status_pembayaran'},
+            {data: 'transaksi_oleh', name: 'transaksi_oleh'},
+            {data: 'status_transaksi', name: 'status_transaksi'},
+            {data: 'sub_total', name: 'sub_total'},
+            {data: 'pajak', name: 'pajak'},
+            {data: 'diskon', name: 'diskon'},
+            {data: 'nilai_transaksi', name: 'nilai_transaksi'},
+            {data: 'nominal_bayar', name: 'nominal_bayar'},
+            {data: 'kembalian', name: 'kembalian'},
+            {data: 'mdr', name: 'mdr'},
+            {data: 'nominal_mdr', name: 'nominal_mdr'},
+            {data: 'nominal_terima_bersih', name: 'nominal_terima_bersih'},
+        ],
+        // columnDefs: [
+        //     { className: 'text-center', targets: [4,5] },
+        // ],
+    });
+});
+
+$(function () {
+    var start_date = moment().subtract(1, 'M');
+    var end_date = moment();
+    $('#daterange_transaction_list_qris_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+    $('#daterange_transaction_list_qris_tenant').daterangepicker({
+        startDate : start_date,
+        endDate : end_date
+    }, function(start_date, end_date){
+        $('#daterange_transaction_list_qris_tenant span').html(start_date.format('MMMM D, YYYY') + ' - ' + end_date.format('MMMM D, YYYY'));
+
+        table_user_transaction.draw();
+    });
+
+    var table_user_transaction = $('.tenant-transaction-list-qris').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            "url": 'https://visipos.id/tenant/dashboard/transaction/qris',
+            "type": "GET",
+            data : function(data){
+                data.from_date = $('#daterange_transaction_list_qris_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+                data.to_date = $('#daterange_transaction_list_qris_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+            }
+        },
+        // ajax: {
+        //     "url": 'http://localhost:8000/tenant/dashboard/transaction/qris',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_transaction_list_qris_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_transaction_list_qris_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
+        columns: [
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'action', name: 'action', orderable: false, searchable: false},
+            {data: 'nomor_invoice', name: 'nomor_invoice'},
+            {data: 'kasir', name: 'kasir'},
+            {data: 'tanggal_transaksi', name: 'tanggal_transaksi'},
+            {data: 'tanggal_pembayaran', name: 'tanggal_pembayaran'},
+            {data: 'jenis_pembayaran', name: 'jenis_pembayaran'},
+            {data: 'status_pembayaran', name: 'status_pembayaran'},
+            {data: 'transaksi_oleh', name: 'transaksi_oleh'},
+            {data: 'status_transaksi', name: 'status_transaksi'},
+            {data: 'sub_total', name: 'sub_total'},
+            {data: 'pajak', name: 'pajak'},
+            {data: 'diskon', name: 'diskon'},
+            {data: 'nominal_bayar', name: 'nominal_bayar'},
+            {data: 'mdr', name: 'mdr'},
+            {data: 'nominal_mdr', name: 'nominal_mdr'},
+            {data: 'nominal_terima_bersih', name: 'nominal_terima_bersih'},
+        ],
+        // columnDefs: [
+        //     { className: 'text-center', targets: [4,5] },
+        // ],
+    });
+});
+
+$(document).ready(function() {
+    $("#basic-table").DataTable({
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+
+    // $("#selection-datatable").DataTable({
+    //     select: {
+    //         style: "multi"
+    //     },
+    //     language: {
+    //         paginate: {
+    //             previous: "<i class='mdi mdi-chevron-left'>",
+    //             next: "<i class='mdi mdi-chevron-right'>"
+    //         }
+    //     },
+    //     drawCallback: function() {
+    //         $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+    //     }
+    // });
+
+    $("#scroll-horizontal-table").DataTable({
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+    $("#scroll-horizontal-datatable").DataTable({
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        }
+    });
+    $("#pos").DataTable({
+        scrollX: !0,
+        language: {
+            paginate: {
+                previous: "<i class='mdi mdi-chevron-left'>",
+                next: "<i class='mdi mdi-chevron-right'>"
+            }
+        },
+        drawCallback: function() {
+            $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
+        },
+    });
+    $('#pos_filter label input').on( 'focus', function () {
+        this.setAttribute( 'id', 'search-input-table' );
     });
 });

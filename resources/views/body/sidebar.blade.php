@@ -538,6 +538,9 @@
                                         <a href="{{ route('tenant.transaction') }}">Dashboard Transaksi</a>
                                     </li>
                                     <li>
+                                        <a href="{{ route('tenant.transaction.list') }}">Semua Transaksi</a>
+                                    </li>
+                                    <li>
                                         <a href="{{ route('tenant.transaction.list.tunai') }}">Transaksi Tunai</a>
                                     </li>
                                     <li>

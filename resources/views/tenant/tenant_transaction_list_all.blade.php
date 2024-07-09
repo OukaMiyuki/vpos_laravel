@@ -9,11 +9,10 @@
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.dashboard') }}">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="{{ route('tenant.transaction') }}">Transaction</a></li>
-                                <li class="breadcrumb-item active">Transaksi Qris</li>
+                                <li class="breadcrumb-item active">Semua Transaksi</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Transaksi Qris</h4>
+                        <h4 class="page-title">Data Semua Transaksi</h4>
                     </div>
                 </div>
             </div>
@@ -29,21 +28,22 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar Transaksi Qris</h4>
+                            <h4 class="header-title mb-3">Daftar Semua Transaksi Terbaru</h4>
                             <div class="row">
                                 <div class="col-6">
 
                                 </div>
                                 <div class="col-6 text-end">
-                                    <div id="daterange_transaction_list_qris_tenant" class="float-end" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%; text-align:center">
+                                    <div id="daterange_transaction_list_tenant" class="float-end" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%; text-align:center">
                                         <i class="fa fa-calendar"></i>&nbsp;
                                         <span></span>
                                         <i class="fa fa-caret-down"></i>
                                     </div>
                                 </div>
                             </div>
+                            <br>
                             <div class="table-responsive">
-                                <table id="basic-datatable" class="table tenant-transaction-list-qris dt-responsive nowrap w-100">
+                                <table id="basic-datatable" class="table tenant-transaction-list-all dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -59,7 +59,9 @@
                                             <th class="text-center">Sub Total (Rp.)</th>
                                             <th class="text-center">Pajak (Rp.)</th>
                                             <th class="text-center">Diskon (Rp.)</th>
-                                            <th class="text-center">Nominal Bayar Qris (Rp.)</th>
+                                            <th class="text-center">Nilai Transaksi (Rp.)</th>
+                                            <th class="text-center">Nominal Bayar (Rp.)</th>
+                                            <th class="text-center">Kembalian (Rp.)</th>
                                             <th class="text-center">MDR (%)</th>
                                             <th class="text-center">Nominal MDR (Rp.)</th>
                                             <th class="text-center">Nominal Terima Bersih Qris (Rp.)</th>

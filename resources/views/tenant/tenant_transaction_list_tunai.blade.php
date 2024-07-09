@@ -30,8 +30,21 @@
                                 </div>
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Transakdi Tunai</h4>
+                            <div class="row">
+                                <div class="col-6">
+
+                                </div>
+                                <div class="col-6 text-end">
+                                    <div id="daterange_transaction_tunai_tenant" class="float-end" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 50%; text-align:center">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span>
+                                        <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
                             <div class="table-responsive">
-                                <table id="basic-datatable" class="table dt-responsive nowrap w-100">
+                                <table id="basic-datatable" class="table tenant-transaction-tunai dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -47,12 +60,13 @@
                                             <th class="text-center">Sub Total (Rp.)</th>
                                             <th class="text-center">Pajak (Rp.)</th>
                                             <th class="text-center">Diskon (Rp.)</th>
+                                            <th class="text-center">Nilai Transaksi (Rp.)</th>
                                             <th class="text-center">Nominal Bayar (Rp.)</th>
                                             <th class="text-center">Kembalian (Rp.)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $no=0; @endphp
+                                        {{-- @php $no=0; @endphp
                                         @foreach($invoice as $invoice)
                                             <tr>
                                                 <td>{{$no+=1}}</td>
@@ -109,7 +123,7 @@
                                                     @endif
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>

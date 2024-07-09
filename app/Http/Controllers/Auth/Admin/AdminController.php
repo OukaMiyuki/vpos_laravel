@@ -238,7 +238,7 @@ class AdminController extends Controller {
                                     ])
                                     ->latest()
                                     ->get();
-            
+
             if($request->filled('from_date') && $request->filled('to_date')) {
                 //$data = $data->whereBetween('created_at', [$request->from_date, $request->to_date]);
                 $data = $data->where('tanggal_transaksi', '>=', $request->from_date)->where('tanggal_transaksi', '<=', $request->to_date);
@@ -359,16 +359,25 @@ class AdminController extends Controller {
                                     })
                                     ->rawColumns(['status'])
                                     ->editColumn('nominal_bayar', function($data) {
-                                        return $data->nominal_bayar;
+                                        $admin = floor($data->nominal_bayar);
+                                        $hasil_rupiah = "Rp " . number_format($admin,2,',','.');
+                                        return $hasil_rupiah;
+                                        // return $data->nominal_bayar;
                                     })
                                     ->editColumn('mdr', function($data) {
                                         return $data->mdr;
                                     })
                                     ->editColumn('nominal_mdr', function($data) {
-                                        return $data->nominal_mdr;
+                                        $admin = floor($data->nominal_mdr);
+                                        $hasil_rupiah = "Rp " . number_format($admin,2,',','.');
+                                        return $hasil_rupiah;
+                                        //return $data->nominal_mdr;
                                     })
                                     ->editColumn('nominal_terima_bersih', function($data) {
-                                        return $data->nominal_terima_bersih;
+                                        $admin = floor($data->nominal_terima_bersih);
+                                        $hasil_rupiah = "Rp " . number_format($admin,2,',','.');
+                                        return $hasil_rupiah;
+                                        //return $data->nominal_terima_bersih;
                                     })
                                     ->make(true);
         }
@@ -1656,7 +1665,7 @@ class AdminController extends Controller {
                                 ->whereHas('marketing')
                                 ->latest()
                                 ->get();
-            
+
             if($request->filled('from_date') && $request->filled('to_date')) {
                 $data = $data->where('tanggal_penarikan', '>=', $request->from_date)->where('tanggal_penarikan', '<=', $request->to_date);
             }
@@ -1967,7 +1976,7 @@ class AdminController extends Controller {
                                             return '<span class="badge bg-soft-danger text-danger">Non Aktif</span>';
                                         } else if($data->is_active == 1){
                                             return '<span class="badge bg-soft-success text-success">Aktif</span>';
-                                        } 
+                                        }
                                     })
                                     ->editColumn('status_umi', function($data) {
                                         if ($data->status_umi == 0){
@@ -1997,13 +2006,13 @@ class AdminController extends Controller {
                                             $action = '<a href="/admin/dashboard/mitra-bisnis/merchant/activation/'.$data->id.'/'.$data->store_identifier.'"><button title="Aktifkan Merchant" type="button" class="btn btn-xs btn-success waves-effect waves-light"><span class="mdi mdi-power"></span></button></a>';
                                         } else if($data->is_active == 1){
                                             $action = '<a href="/admin/dashboard/mitra-bisnis/merchant/activation/'.$data->id.'/'.$data->store_identifier.'"><button title="Nonaktifkan Merchant" type="button" class="btn btn-xs btn-danger waves-effect waves-light"><span class="mdi mdi-power"></span></button></a>';
-                                        } 
+                                        }
                                         $detailBtn = '<a href="/admin/dashboard/mitra-bisnis/merchant/detail/'.$data->id.'/'.$data->store_identifier.'"><button title="Lihat detail merchant" type="button" class="btn btn-xs btn-info waves-effect waves-light"><span class="mdi mdi-eye"></span></button></a>';
                                         return $action."&nbsp;".$detailBtn;
                                     })
                                     ->rawColumns(['status', 'status_umi', 'invoice_list_action', 'action'])
                                     ->make(true);
-            
+
         }
         return view('admin.admin_mitra_bisnis_merchant_list');
     }
@@ -2268,7 +2277,7 @@ class AdminController extends Controller {
                                     })
                                     ->latest()
                                     ->get();
-            
+
             if($request->filled('from_date') && $request->filled('to_date')) {
                 $data = $data->where('tanggal_transaksi', '>=', $request->from_date)->where('tanggal_transaksi', '<=', $request->to_date);
             }
@@ -2384,8 +2393,8 @@ class AdminController extends Controller {
                                     ->with([
                                         'tenant' => function($query){
                                             $query->select([
-                                                'tenants.id', 
-                                                'tenants.name', 
+                                                'tenants.id',
+                                                'tenants.name',
                                                 'tenants.email'
                                             ]);
                                         }
@@ -2631,7 +2640,7 @@ class AdminController extends Controller {
                                     $btnAction = '<a href="/admin/dashboard/mitra-tenant/activation/'.$data->id.'"><button title="Non-aktifkan Tenant" type="button" class="btn btn-xs btn-danger waves-effect waves-light"><span class="mdi mdi-power"></span></button></a>';
                                 } else if($data->is_active == 2) {
                                     $btnAction = '<a href="/admin/dashboard/mitra-tenant/activation/'.$data->id.'"><button title="Aktifkan Tenant" type="button" class="btn btn-xs btn-success waves-effect waves-light"><span class="mdi mdi-power"></span></button></a>';
-                                } 
+                                }
                                 $btnDetail = '<a href="/admin/dashboard/mitra-tenant/profile/'.$data->id.'"><button title="Lihat data admin" type="button" class="btn btn-xs btn-info waves-effect waves-light"><span class="mdi mdi-eye"></span></button></a>';
                                 return $btnAction."&nbsp;".$btnDetail;
                             })
@@ -3145,7 +3154,7 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardMitraTenantTransactionList(Request $request){
-        
+
         if ($request->ajax()) {
             $data = Invoice::select([
                                         'invoices.id',
@@ -3283,8 +3292,8 @@ class AdminController extends Controller {
                                     ->with([
                                         'tenant' => function($query){
                                             $query->select([
-                                                'tenants.id', 
-                                                'tenants.name', 
+                                                'tenants.id',
+                                                'tenants.name',
                                                 'tenants.email'
                                             ]);
                                         }
