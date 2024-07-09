@@ -409,22 +409,22 @@ $(function () {
     var table_user_transaction = $('.tenant-transaction-list-qris-pending').DataTable({
         processing: true,
         serverSide: true,
-        // ajax: {
-        //     "url": 'https://visipos.id/tenant/dashboard/transaction/list/pending-payment',
-        //     "type": "GET",
-        //     data : function(data){
-        //         data.from_date = $('#daterange_transaction_list_qris_pending_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
-        //         data.to_date = $('#daterange_transaction_list_qris_pending_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
-        //     }
-        // },
         ajax: {
-            "url": 'http://localhost:8000/tenant/dashboard/transaction/list/pending-payment',
+            "url": 'https://visipos.id/tenant/dashboard/transaction/list/pending-payment',
             "type": "GET",
             data : function(data){
                 data.from_date = $('#daterange_transaction_list_qris_pending_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
                 data.to_date = $('#daterange_transaction_list_qris_pending_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
             }
         },
+        // ajax: {
+        //     "url": 'http://localhost:8000/tenant/dashboard/transaction/list/pending-payment',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_transaction_list_qris_pending_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_transaction_list_qris_pending_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'action', name: 'action', orderable: false, searchable: false},
@@ -466,22 +466,22 @@ $(function () {
     var table_user_transaction = $('.tenant-transaction-list-qris-finish').DataTable({
         processing: true,
         serverSide: true,
-        // ajax: {
-        //     "url": 'https://visipos.id/tenant/dashboard/pemasukan/qris',
-        //     "type": "GET",
-        //     data : function(data){
-        //         data.from_date = $('#daterange_transaction_list_qris_finish_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
-        //         data.to_date = $('#daterange_transaction_list_qris_finish_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
-        //     }
-        // },
         ajax: {
-            "url": 'http://localhost:8000/tenant/dashboard/pemasukan/qris',
+            "url": 'https://visipos.id/tenant/dashboard/pemasukan/qris',
             "type": "GET",
             data : function(data){
                 data.from_date = $('#daterange_transaction_list_qris_finish_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
                 data.to_date = $('#daterange_transaction_list_qris_finish_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
             }
         },
+        // ajax: {
+        //     "url": 'http://localhost:8000/tenant/dashboard/pemasukan/qris',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_transaction_list_qris_finish_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_transaction_list_qris_finish_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'action', name: 'action', orderable: false, searchable: false},
@@ -523,22 +523,22 @@ $(function () {
     var table_user_transaction = $('.tenant-settlement-list').DataTable({
         processing: true,
         serverSide: true,
-        // ajax: {
-        //     "url": 'https://visipos.id/tenant/dashboard/finance/saldo/settlement',
-        //     "type": "GET",
-        //     data : function(data){
-        //         data.from_date = $('#daterange_settlement_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
-        //         data.to_date = $('#daterange_settlement_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
-        //     }
-        // },
         ajax: {
-            "url": 'http://localhost:8000/tenant/dashboard/finance/saldo/settlement',
+            "url": 'https://visipos.id/tenant/dashboard/finance/saldo/settlement',
             "type": "GET",
             data : function(data){
                 data.from_date = $('#daterange_settlement_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
                 data.to_date = $('#daterange_settlement_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
             }
         },
+        // ajax: {
+        //     "url": 'http://localhost:8000/tenant/dashboard/finance/saldo/settlement',
+        //     "type": "GET",
+        //     data : function(data){
+        //         data.from_date = $('#daterange_settlement_tenant').data('daterangepicker').startDate.format('YYYY-MM-DD');
+        //         data.to_date = $('#daterange_settlement_tenant').data('daterangepicker').endDate.format('YYYY-MM-DD');
+        //     }
+        // },
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'nomor_settlement', name: 'nomor_settlement'},
