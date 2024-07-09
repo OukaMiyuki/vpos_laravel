@@ -1140,4 +1140,11 @@ class ProfileController extends Controller {
             return redirect()->route('admin.withdraw')->with($notification);
         }
     }
+
+    public function testingDay(){
+        $today = new Carbon();
+        if($today->dayOfWeek == Carbon::TUESDAY){
+            echo "Walla selasa";
+        }
+    }
 }

@@ -15,6 +15,7 @@ use App\Models\SettlementHstory;
 use App\Models\Settlement;
 use App\Models\SettlementPending;
 use App\Models\HistoryCashbackPending;
+use App\Models\SettlementLog;
 use Exception;
 
 class QrisPendingWalletUpdate extends Command {
@@ -39,21 +40,11 @@ class QrisPendingWalletUpdate extends Command {
         DB::connection()->enableQueryLog();
         $now = date('Y-m-d');
         $now=date('Y-m-d', strtotime($now));
-        $settlementNote = "Settlement ".Carbon::now()->format('d-m-Y');
+        $settlementNote = "Settlement periode ".Carbon::now()->format('d-m-Y');
         $settlementDate = SettlementDateSetting::latest()->get();
         $dateCollection = 0;
         $today = new Carbon();
-        $saturday = false;
-        $sunday = false;
-        if($today->dayOfWeek == Carbon::SATURDAY){
-            echo "Today is Saturday";
-            $saturday = true;
-            $sunday = false;
-        } else if($today->dayOfWeek == Carbon::SUNDAY){
-            echo "Todat is Sunday";
-            $saturday = false;
-            $sunday = true;
-        }
+
         foreach($settlementDate as $settlement){
             $startDate = date('Y-m-d', strtotime($settlement->stat_date));
             $endDate = date('Y-m-d', strtotime($settlement->end_date));
@@ -62,16 +53,16 @@ class QrisPendingWalletUpdate extends Command {
             }
         }
         //echo $dateCollection;
-        if($dateCollection != 0 || $saturday ||  $sunday){
+        if($dateCollection != 0 || ($today->dayOfWeek == Carbon::SATURDAY) ||  ($today->dayOfWeek == Carbon::SUNDAY)){
             $code = "PD-STL";
             $dateCode = $code.Carbon::now()->format('dmY');
             $tenantinvoice = Tenant::with([
                                             'invoice' => function($query){
                                                 $query->where('settlement_status', 0)
-                                                    ->where('jenis_pembayaran', 'Qris')
-                                                    ->where('status_pembayaran', 1)
-                                                    ->whereDate('tanggal_transaksi', '!=', Carbon::now());
-                                            }
+                                                      ->where('jenis_pembayaran', 'Qris')
+                                                      ->where('status_pembayaran', 1)
+                                                      ->whereDate('tanggal_transaksi', '!=', Carbon::now());
+                                                }
                                         ])
                                         ->get();
 
@@ -87,7 +78,8 @@ class QrisPendingWalletUpdate extends Command {
                     $totalCashback+=$insentif_cashbackFloor;
                     HistoryCashbackPending::create([
                         'id_invoice' => $invoice->id,
-                        'nominal_terima_mdr' => $insentif_cashbackFloor
+                        'nominal_terima_mdr' => $insentif_cashbackFloor,
+                        'periode_transaksi' => Carbon::now()
                     ]);
                     Invoice::find($invoice->id)->update([
                         'settlement_status' => 1
@@ -100,9 +92,26 @@ class QrisPendingWalletUpdate extends Command {
                     'settlement_schedule' => Carbon::now(),
                     'nominal_settle' => $totalSumFloor,
                     'nominal_insentif_cashback' => $totalCashback,
+                    'periode_transaksi' => Carbon::yesterday(),
                     'settlement_pending_status' => 1,
                 ]);
             }
+            $action = "";
+            if($dateCollection != 0){
+                $action = "Settlement pending due to Holiday | ".Carbon::now()->format('d-m-Y');
+            }
+            if($today->dayOfWeek == Carbon::SATURDAY){
+                $action = "Settlement pending due to weekend and today is Saturday | ".Carbon::now()->format('d-m-Y');
+            }
+            if($today->dayOfWeek == Carbon::SUNDAY){
+                $action = "Settlement pending due to weekend and today is Sunday | ".Carbon::now()->format('d-m-Y');
+            }
+
+            SettlementLog::create([
+                'settlement_id' => $dateCode,
+                'action' => $action,
+                'log_timestamp' => Carbon::now(),
+            ]);
 
             History::create([
                 'action' => 'Settlement Update : Pending due to holiday!',
@@ -120,10 +129,10 @@ class QrisPendingWalletUpdate extends Command {
                 $tenantinvoice = Tenant::with([
                                                 'invoice' => function($query){
                                                     $query->where('settlement_status', 0)
-                                                        ->where('jenis_pembayaran', 'Qris')
-                                                        ->where('status_pembayaran', 1)
-                                                        ->whereDate('tanggal_transaksi', '!=', Carbon::now());
-                                                }
+                                                          ->where('jenis_pembayaran', 'Qris')
+                                                          ->where('status_pembayaran', 1)
+                                                          ->whereDate('tanggal_transaksi', '!=', Carbon::now());
+                                                    }
                                             ])
                                             ->get();
                 $settlement = Settlement::create([
@@ -153,7 +162,8 @@ class QrisPendingWalletUpdate extends Command {
                             $totalCashback+=$insentif_cashbackFloor;
                             HistoryCashbackAdmin::create([
                                 'id_invoice' => $invoice->id,
-                                'nominal_terima_mdr' => $insentif_cashbackFloor
+                                'nominal_terima_mdr' => $insentif_cashbackFloor,
+                                'periode_transaksi' => Carbon::yesterday()
                             ]);
                             Invoice::find($invoice->id)->update([
                                 'settlement_status' => 1
@@ -167,7 +177,14 @@ class QrisPendingWalletUpdate extends Command {
                             'nominal_settle' => $totalSumFloor,
                             'nominal_insentif_cashback' => $totalCashback,
                             'status' => 1,
-                            'note' => $settlementNote
+                            'note' => $settlementNote,
+                            'periode_transaksi' => Carbon::yesterday()
+                        ]);
+                        $action = "Settlement for today has been settled | ".Carbon::now()->format('d-m-Y');
+                        SettlementLog::create([
+                            'settlement_id' => $code.$dateCode,
+                            'action' => $action,
+                            'log_timestamp' => Carbon::now(),
                         ]);
                     } else {
                         echo "Wallet not found".$sumInvoice->email;
@@ -182,7 +199,7 @@ class QrisPendingWalletUpdate extends Command {
                             $qrisWalletTenant->update([
                                 'saldo' => $saldoQrisTenant+$stlPending->nominal_settle
                             ]);
-                            $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
+                            $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->first();
                             $qrisWalletAdminSaldo = $qrisWalletAdmin->saldo;
                             $qrisWalletAdmin->update([
                                 'saldo' => $qrisWalletAdminSaldo+$stlPending->nominal_insentif_cashback
@@ -195,14 +212,21 @@ class QrisPendingWalletUpdate extends Command {
                                 'nominal_settle' => $stlPending->nominal_settle,
                                 'nominal_insentif_cashback' => $stlPending->nominal_insentif_cashback,
                                 'status' => 1,
-                                'note' => $stlPending->nomor_settlement_pending." | ".Carbon::now()->format('d-m-Y')
+                                'note' => "Settlement Pending : ".$stlPending->nomor_settlement_pending." | Scheduled on date : ".$stlPending->settlement_schedule."| is Settled On : ".Carbon::now()->format('d-m-Y'),
+                                'periode_transaksi' => $stlPending->periode_transaksi
                             ]);
                             $stlPending->update([
                                 'settlement_pending_status' => 1
                             ]);
+                            SettlementLog::create([
+                                'settlement_id' => $stlPending->nomor_settlement_pending,
+                                'action' => "Settlement pending for ".$stlPending->nomor_settlement_pending." | has been settled on".Carbon::now()->format('d-m-Y')." | and today Settlement is ".$code.$dateCode,
+                                'log_timestamp' => Carbon::now(),
+                            ]);
+                        } else {
+                            echo "Wallet not found when trying to update settlement pending and the wallet is ".$stlPending->email;
                         }
                     }
-
                     $historySettleCashback = HistoryCashbackPending::where('settlement_status', 0)->get();
                     foreach($historySettleCashback as $cashbackHistory){
                         HistoryCashbackAdmin::create([

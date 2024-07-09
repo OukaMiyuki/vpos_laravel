@@ -27,6 +27,8 @@ Route::middleware(['guest', 'throttle'])->prefix('/')->group( function () {
 });
 
 Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( function () {
+    // Route::get('tetsingDayCheck', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'testingDay'])->name('admin.testingDa');
+
     Route::get('settings', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'adminSettings'])->name('admin.setting');
     Route::get('settings/profile', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profile'])->name('admin.profile');
     Route::post('settings/profile/account_update', [App\Http\Controllers\Auth\Admin\ProfileController::class, 'profileAccountUpdate'])->name('admin.profile.account.update');
