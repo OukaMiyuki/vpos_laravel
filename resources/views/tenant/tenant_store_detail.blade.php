@@ -35,7 +35,7 @@
                                 <li class="breadcrumb-item active">Store Settings</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Profile</h4>
+                        <h4 class="page-title">Profile this {{$tenantStore->status_umi}}</h4>
                     </div>
                 </div>
             </div>
