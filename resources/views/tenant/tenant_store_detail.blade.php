@@ -2,7 +2,7 @@
     <div class="content">
         @php
             $umi = "";
-            if($tenantStore->status_umi == NULL || $tenantStore->status_umi == "" || empty($tenantStore->status_umi) || is_null($tenantStore->status_umi)){
+            if(empty($tenantStore->status_umi)){
                 $umi = "<span class='badge bg-info'>UMI Belum Terdaftar</span>";
             } else {
                 if($tenantStore->status_umi == 0) {
