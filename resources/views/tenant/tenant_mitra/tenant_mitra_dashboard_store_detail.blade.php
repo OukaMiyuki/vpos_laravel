@@ -208,7 +208,7 @@
                                     </form>
                                 </div>
                                 <div class="tab-pane" id="aboutme">
-                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Pengajuan Qris Merchant ID & UMI</h5>
+                                    <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Pengajuan Qris Merchant ID</h5>
                                     @if ($umiRequest == "Empty")
                                         <p class="sub-header">
                                             <h5 class="mb-4 text-uppercase">Syarat dan Ketentuan pendaftaran QRIS</h5>

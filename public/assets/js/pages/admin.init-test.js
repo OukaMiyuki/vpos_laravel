@@ -345,16 +345,18 @@ $(function () {
         columns: [
             {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'email', name: 'email'},
+            {data: 'pengajuan_atas', name: 'pengajuan_atas'},
             {data: 'store_identifier', name: 'store_identifier'},
             {data: 'tanggal_pengajuan', name: 'tanggal_pengajuan'},
             {data: 'tanggal_approval', name: 'tanggal_approval'},
             {data: 'status', name: 'status'},
             {data: 'file_attach', name: 'file_attach'},
+            {data: 'request_type', name: 'request_type'},
             {data: 'note', name: 'note'},
             {data: 'action', name: 'action', orderable: false, searchable: false},
         ],
         columnDefs: [
-            { className: 'text-center', targets: [3, 4, 5, 6] },
+            { className: 'text-center', targets: [4, 5, 6, 7] },
         ],
     });
 });

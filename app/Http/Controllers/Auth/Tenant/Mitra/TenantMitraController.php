@@ -394,6 +394,18 @@ class TenantMitraController extends Controller {
         return view('tenant.tenant_mitra.tenant_umi_request_list', compact('umiRequest'));
     }
 
+    public function qrisRequestAccount($store_identifier){
+        $tenantQris = TenantQrisAccount::where('store_odentifier', $store_identifier)->first();
+        if(is_null($tenantQris) || empty($tenantQris)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+        return view('tenant.tenant_mitra.tenant_qris_detail', compact('tenantQris')); 
+    }
+
     public function transationDashboard(){
         $all = Invoice::where('id_tenant', auth()->user()->id)
                             ->where('email', auth()->user()->email)

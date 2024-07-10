@@ -561,12 +561,14 @@ class AdminController extends Controller {
                                         'umi_requests.id',
                                         'umi_requests.id_tenant',
                                         'umi_requests.email',
+                                        'umi_requests.pengajuan_atas',
                                         'umi_requests.store_identifier',
                                         'umi_requests.tanggal_pengajuan',
                                         'umi_requests.tanggal_approval',
                                         'umi_requests.is_active',
                                         'umi_requests.file_path',
                                         'umi_requests.note',
+                                        'umi_requests.request_type',
                                         'umi_requests.created_at',
                                         'umi_requests.updated_at'
                                     ])
@@ -581,6 +583,9 @@ class AdminController extends Controller {
                                 ->addIndexColumn()
                                 ->editColumn('email', function($data) {
                                     return $data->email;
+                                })
+                                ->editColumn('pengajuan_atas', function($data) {
+                                    return $data->pengajuan_atas;
                                 })
                                 ->editColumn('store_identifier', function($data) {
                                     return $data->store_identifier;
@@ -613,6 +618,9 @@ class AdminController extends Controller {
                                 ->addColumn('file_attach', function($row){
                                     $actionBtn = '<a title="Download dokumen request UMI" href="/admin/dashboard/user/request-umi/download/'.$row->id.'" class="btn btn-info btn-xs font-16 text-white"><i class="dripicons-download"></i></a>';
                                     return $actionBtn;
+                                })
+                                ->editColumn('request_type', function($data) {
+                                    return $data->request_type;
                                 })
                                 ->editColumn('note', function($data) {
                                     return $data->note;

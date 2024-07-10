@@ -49,11 +49,13 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>User Email</th>
+                                            <th>Diajukan Oleh</th>
                                             <th>Store Identifier</th>
                                             <th class="text-center">Tanggal Pengajuan</th>
                                             <th class="text-center">Tanggal Approval</th>
                                             <th class="text-center">Status</th>
                                             <th class="text-center">File Attachment</th>
+                                            <th>Qris Request Type</th>
                                             <th>Note</th>
                                             <th class="text-center">Action</th>
                                         </tr>

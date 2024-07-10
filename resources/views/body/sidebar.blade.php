@@ -157,7 +157,7 @@
                                     <a href="{{ route('admin.dashboard.menu.mdr') }}">Kategori MDR</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('admin.dashboard.menu.userUmiRequest') }}">Request UMI</a>
+                                    <a href="{{ route('admin.dashboard.menu.userUmiRequest') }}">Request Akun Qris User</a>
                                 </li>
                                 <li>
                                     <a href="{{ route('admin.dashboard.menu.userTenantQris') }}">Tenant Qris Account</a>

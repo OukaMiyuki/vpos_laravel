@@ -10,10 +10,10 @@
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard.toko') }}">Umi</a></li>
-                                <li class="breadcrumb-item active">Umi Request List</li>
+                                <li class="breadcrumb-item active">Qris Account Request List</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Request UMI Qris</h4>
+                        <h4 class="page-title">Data Request Akun Qris</h4>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Store List</h4>
+                            <h4 class="header-title mb-3">Tabel Request List</h4>
                         
                                 <table id="scroll-horizontal-datatable" class="table w-100 nowrap">
                                     <thead>
@@ -51,22 +51,22 @@
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $umi->store_identifier }}</td>
                                                 <td>{{ $umi->storeList->name }}</td>
-                                                <td>{{ $umi->tanggal_pelunasan }}</td>
+                                                <td>{{ $umi->tanggal_pengajuan }}</td>
                                                 <td>{{ $umi->tanggal_approval }}</td>
                                                 <td>
                                                     @if ($umi->is_active == 0)
-                                                        <button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>UMI Belum Disetujui</button>
+                                                        <button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>Permintaan sedang diproses</button>
                                                     @elseif($umi->is_active == 1)
-                                                        <button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar UMI</button>
-                                                    @elseif($umi->is_active == 2)
-                                                        <button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>UMI Ditolak</button>
+                                                        <button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Akun Qris Terdaftar</button>
                                                     @endif
                                                 </td>
                                                 <td>{{ $umi->note }}</td>
-                                                <td>   
-                                                    <a href="">
-                                                        <button title="Lihat Detail Request" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-pencil"></span></button>&nbsp;
-                                                    </a>
+                                                <td>  
+                                                    @if ($umi->is_active == 1)
+                                                        <a href="{{ route('tenant.mitra.dashboard.toko.request.qris.account' , ['store_identifier' => $umi->store_identifier]) }}">
+                                                            <button title="Lihat akun Qris" type="button" class="btn btn-success rounded-pill waves-effect waves-light"><span class="mdi mdi-eye"></span></button>
+                                                        </a>
+                                                    @endif 
                                                 </td>
                                             </tr>
                                         @endforeach

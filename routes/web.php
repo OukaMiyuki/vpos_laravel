@@ -63,7 +63,7 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::post('/dashboard/user/mdr', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuMDRSettingsInsert'])->name('admin.dashboard.menu.mdr.insert');
     Route::post('/dashboard/user/mdr/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuMDRSettingsUpdate'])->name('admin.dashboard.menu.mdr.update');
     Route::get('/dashboard/user/withdrawals/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserWithdrawalDetail'])->name('admin.dashboard.menu.userWithdrawals.detail');
-    Route::get('/dashboard/user/request-umi', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequest'])->name('admin.dashboard.menu.userUmiRequest');
+    Route::get('/dashboard/user/request-qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequest'])->name('admin.dashboard.menu.userUmiRequest');
     Route::post('/dashboard/user/request-umi/approve', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestApprove'])->name('admin.dashboard.menu.userUmiRequest.approve');
     Route::post('/dashboard/user/request-umi/reject', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestReject'])->name('admin.dashboard.menu.userUmiRequest.reject');
     Route::get('/dashboard/user/request-umi/download/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestDownload'])->name('admin.dashboard.menu.userUmiRequest.download');
@@ -276,6 +276,7 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
     Route::get('/dashboard/merchant/invoice/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeInvoiceList'])->name('tenant.mitra.dashboard.toko.invoice');
     Route::post('/dashboard/merchant/request_qris', [App\Http\Controllers\Auth\Tenant\UmiController::class, 'requestUmiMitra'])->name('tenant.mitra.dashboard.toko.request.umi');
     Route::get('/dashboard/merchant/request_qris', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'umiRequestList'])->name('tenant.mitra.dashboard.toko.request.umi.list');
+    Route::get('/dashboard/merchant/request_qris/{store_identifier}', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'qrisRequestAccount'])->name('tenant.mitra.dashboard.toko.request.qris.account');
     Route::get('/dashboard/transaction/', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationDashboard'])->name('tenant.mitra.dashboard.transaction');
     Route::get('/dashboard/transaction/list', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationAll'])->name('tenant.mitra.dashboard.transaction.all_transaction');
     Route::get('/dashboard/transaction/today', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'transationAllToday'])->name('tenant.mitra.dashboard.transaction.all_today_transaction');
