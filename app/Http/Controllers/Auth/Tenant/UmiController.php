@@ -78,6 +78,15 @@ class UmiController extends Controller {
                                 ->where('email', auth()->user()->email)
                                 ->where('store_identifier', $request->store_identifier)
                                 ->first();
+        $request_type = "";
+        $subject = "";
+        if($request->kategori_mdr == 0){
+            $request_type = "Request Qris UMI";
+            $subject = "Formulir Pendaftaran Qris UMI";
+        } else {
+            $request_type = "Request Qris Reguler";
+            $subject = "Formulir Pendaftaran Qris Reguler";
+        }
         if(empty($umiRequest) || is_null($umiRequest) || $umiRequest == ""){
             $tanggal = date("j F Y", strtotime(date('Y-m-d')));
             $store_identifier = $request->store_identifier;
@@ -85,7 +94,7 @@ class UmiController extends Controller {
             $no_ktp = $request->no_ktp;
             $no_hp = $request->no_hp;
             $email = $request->email;
-            $nama_usaha = $request->nama_usaha;
+            $nama_usaha = strtoupper($request->nama_usaha);
             $jenis_usaha = $request->jenis_usaha;
             $alamat = $request->alamat;
             $nama_jalan = $request->nama_jalan;
@@ -192,6 +201,11 @@ class UmiController extends Controller {
                 $sheet2->getCell('P11')->setValue($kode_pos);
                 $sheet2->getCell('Q11')->setValue($kantor_toko_fisik);
                 $sheet2->getCell('R11')->setValue($kategori_usaha_omset);
+                if($request->kategori_mdr == 0){
+                    $sheet2->getCell('T11')->setValue("0.0%");
+                } else {
+                    $sheet2->getCell('T11')->setValue("0.7%");
+                }
                 $sheet2->getCell('V11')->setValue($website);   
 
                 $newFilePath = $fileSave;
@@ -203,10 +217,11 @@ class UmiController extends Controller {
                     'store_identifier' => $store_identifier,
                     'tanggal_pengajuan' => Carbon::now(),
                     'file_path' => $filename,
+                    'request_type' => $request_type
                 ]);
 
                 $mailData = [
-                    'title' => 'Formulir Pendaftaran UMI',
+                    'title' => $subject,
                     'body' => 'This is for testing email using smtp.',
                     'file' => $fileSave,
                     'storeName' => $nama_usaha,
@@ -217,7 +232,8 @@ class UmiController extends Controller {
                 ];
 
                 try{
-                    Mail::to('faydil.hamzah@nobubank.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
+                    // Mail::to('faydil.hamzah@nobubank.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
+                    Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $request->store_identifier));
                 } catch(Exception $e){
                     $action = "Tenant request UMI Fail";
                     $this->createHistoryUser($action, $e, 0);

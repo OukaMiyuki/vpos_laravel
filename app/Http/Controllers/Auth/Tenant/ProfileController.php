@@ -36,6 +36,8 @@ use App\Models\DetailPenarikan;
 use App\Models\AgregateWallet;
 use App\Models\InvitationCode;
 use App\Models\RekeningWithdraw;
+use App\Models\MDR;
+use App\Models\TenantQrisAccount;
 use File;
 use Mail;
 use Exception;
@@ -156,6 +158,11 @@ class ProfileController extends Controller{
             }
             return view('tenant.tenant_help', compact('kontakMarketing', 'marketingPhone'));
         }
+    }
+
+    public function helpUMI(){
+        $mdr = MDR::get();
+        return view('tenant.tenant_help_umi', compact('mdr'));
     }
 
     public function profile(){
@@ -568,6 +575,7 @@ class ProfileController extends Controller{
 
     public function storeProfileSettings(){
         $tenantStore = StoreDetail::where('id_tenant', auth()->user()->id)
+                                ->with(['tenantQrisAccount'])
                                 ->where('email', auth()->user()->email)
                                 ->first();
         return view('tenant.tenant_store_detail', compact('tenantStore'));

@@ -8,6 +8,7 @@ use App\Models\Tenant;
 use App\Models\Invoice;
 use App\Models\TenantQrisAccount;
 use App\Models\UmiRequest;
+use App\Models\MDR;
 
 class StoreList extends Model {
     use HasFactory;
@@ -16,6 +17,10 @@ class StoreList extends Model {
 
     public function tenant(){
         return $this->belongsTo(Tenant::class, 'id_user', 'id');
+    }
+
+    public function jenis_usaha(){
+        return $this->belongsTo(MDR::class, 'kategori_usaha_omset', 'id');
     }
 
     public function invoice(){

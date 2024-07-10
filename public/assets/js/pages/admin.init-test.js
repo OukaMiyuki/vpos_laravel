@@ -65,6 +65,20 @@ $(document).ready(function(){
         $("#show #end_date").val(end_date);
         $("#show #note").val(note);
     });
+    $(document).on("click", "#edit-mdr", function() {
+        var id = $(this).data('id');
+        var jenis = $(this).data('jenis');
+        var min_mdr = $(this).data('min_mdr');
+        var max_mdr = $(this).data('max_mdr');
+        var nominal = $(this).data('nominal');
+        var ketentuan = $(this).data('ketentuan');
+        $("#show #id").val(id);
+        $("#show #jenis").val(jenis);
+        $("#show #presentase_minimal").val(min_mdr);
+        $("#show #presentase_maksimal").val(max_mdr);
+        $("#show #batas_nominal").val(nominal);
+        $("#show #ketentuan").val(ketentuan);
+    });
 });
 $("#saldo-qris-txt").hide();
 $("#saldo-agregate-aplikasi-txt").hide();

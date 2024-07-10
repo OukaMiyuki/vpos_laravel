@@ -3,15 +3,23 @@
         @php
             $umi = "";
             if($tenantStore->status_umi == NULL || $tenantStore->status_umi == "" || empty($tenantStore->status_umi) || is_null($tenantStore->status_umi)){
-                $umi = "<button type='button' class='btn btn-info btn-xs waves-effect mb-2 waves-light'>UMI Belum Terdaftar</button>";
+                $umi = "<span class='badge bg-info'>UMI Belum Terdaftar</span>";
             } else {
                 if($tenantStore->status_umi == 0) {
-                    $umi = "<button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>UMI Belum Disetujui</button>";
+                    $umi = "<span class='badge bg-warning'>UMI Sedang diproses</span>";
                 } else if($tenantStore->status_umi == 1){
-                    $umi = "<button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar UMI</button>";
+                    $umi = "<span class='badge bg-success'>Terdaftar UMI</span>";
                 } else if($tenantStore->status_umi == 2){
-                    $umi = "<button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>UMI Ditolak</button>";
+                    $umi = "<span class='badge bg-succes'>Pendaftaran UMI di Tolak</span>";
                 }
+            }
+            $qris = "";
+            if($tenantStore->status_registrasi_qris == 0){
+                $qris = "<button type='button' class='btn btn-info btn-xs waves-effect mb-2 waves-light'>Toko Anda Belum Memiliki Akun Qris Sendiri</button>";
+            } else if($tenantStore->status_registrasi_qris == 1){
+                $qris = "<button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar Akun Qris</button>";
+            } else {
+                $qris = "<button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>Akun Qris Dalam Proses Pengajuan</button>";
             }
         @endphp
         <!-- Start Content-->
@@ -46,8 +54,13 @@
                                         Toko
                                     </p>
                                     @php
+                                        echo htmlspecialchars_decode($qris);
+                                    @endphp
+                                    <br>
+                                    @php
                                         echo htmlspecialchars_decode($umi);
                                     @endphp
+                                    <br>
                                 </div>
                             </div>
                         </div>
@@ -70,6 +83,11 @@
                                 <li class="nav-item">
                                     <a href="#settings" data-bs-toggle="tab" aria-expanded="true" class="nav-link active">
                                         Informasi Toko
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#qris_detail" data-bs-toggle="tab" aria-expanded="true" class="nav-link">
+                                        Informasi Akun Qris Anda
                                     </a>
                                 </li>
                             </ul>
@@ -200,15 +218,12 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="mb-3">
-                                                        <label for="kategori_usaha_omset" class="form-label">Kategori Usaha Berdasarkan Omzet</label>
+                                                        <label for="kategori_usaha_omset" class="form-label">Kategori Usaha Berdasarkan Omzet &nbsp;&nbsp;&nbsp;<a href="{{route('tenant.help.umi')}}"><button title="Baca ketentuan MDR berdasarkan kategori usaha" type="button" class="btn btn-info btn-xs waves-effect waves-light">Baca Ketentuan MDR</button></a></label>
                                                         <select required class="form-control" name="kategori_usaha_omset" id="jenis-omset" data-width="100%">
                                                             <option value="">- Pilih -</option>
-                                                            <option @if($tenantStore->kategori_usaha_omset == "UMI - Penjualan/Tahun: < 2M") selected @endif value="UMI - Penjualan/Tahun: < 2M">UMI - Penjualan/Tahun: < 2M</option>
-                                                            <option @if($tenantStore->kategori_usaha_omset == "UKE - Penjualan/Tahun: >2M-15M") selected @endif value="UKE - Penjualan/Tahun: >2M-15M">UKE - Penjualan/Tahun: >2M-15M</option>
-                                                            <option @if($tenantStore->kategori_usaha_omset == "UME - Penjualan/Tahun: >15M-50M") selected @endif value="UME - Penjualan/Tahun: >15M-50M">UME - Penjualan/Tahun: >15M-50M</option>
-                                                            <option @if($tenantStore->kategori_usaha_omset == "UBE - Penjualan/Tahun: >50M") selected @endif value="UBE - Penjualan/Tahun: >50M">"UBE - Penjualan/Tahun: >50M</option>
-                                                            <option @if($tenantStore->kategori_usaha_omset == "URE - Donasi, Organisasi Sosial, dsb") selected @endif value="URE - Donasi, Organisasi Sosial, dsb">URE - Donasi, Organisasi Sosial, dsb</option>
-                                                            <option @if($tenantStore->kategori_usaha_omset == "PSO - Pelayanan Sosial/Bantuan Sosial") selected @endif value="PSO - Pelayanan Sosial/Bantuan Sosial">PSO - Pelayanan Sosial/Bantuan Sosial</option>
+                                                            @foreach (App\Models\MDR::get() as $mdr)
+                                                                <option value="{{$mdr->id}}"@if ($tenantStore->kategori_usaha_omset == $mdr->id) selected="selected" @endif>{{$mdr->jenis_usaha}}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                 </div>
@@ -270,6 +285,62 @@
                                                 <button type="submit" class="btn btn-success waves-effect waves-light mt-2"><i class="mdi mdi-content-save"></i> Save</button>
                                             </div>
                                         </form>
+                                    @endif
+                                </div>
+                                <div class="tab-pane show" id="qris_detail">
+                                    @if (empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == "")
+                                        <div class="message">
+                                            <h1 class="acces-denied">Access to this page is restricted</h1>
+                                            <p class="sub-header text-danger"><strong>Lakukan verifikasi nomor Whatsapp sebelum mengupdate data toko anda.</strong></p>
+                                        </div>
+                                    @else
+                                        <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Informasi Akun Qris Anda</h5>
+                                        @if ($tenantStore->status_registrasi_qris == 0)
+                                            <p class="sub-header">Anda belum mengajukan permintaan registrasi Qris dengan nama toko anda, jika anda tidak melakukan registrasi akun Qris maka setiap transaksi otomatis akan menggunakan nama Vsioner untuk setiap transaksi.</p>
+                                            <p class="sub-header">Untuk melakukan registrasi akun Qris harap melengkapi informasi detail toko pada menu informasi toko dan melakukan pengekapan profil pada menu My Account. Selanjutnya masuk ke menu Pengajuan Qris ID & Umi untuk mengajukan akun Qris.</p>
+                                            <p class="sub-header">Untuk info lebih lanjut <a href="{{route('tenant.help.umi')}}">Baca ketentuan kategori MDR qris</a></p>
+                                            <p class="sub-header">Jika anda telah melengkapi profil anda silahkan <a href="{{route('tenant.request.umi')}}">Ajukan Registrasi Akun Qris</a></p>
+                                        @else
+                                            @if(!is_null($tenantStore->tenantQrisAccount) || !empty($tenantStore->tenantQrisAccount))
+                                                <p class="sub-header">
+                                                    Jika akun Qris anda <strong>terdaftar sebagai UMI</strong>, maka <strong>MDR 0%</strong> hanya berlaku jika transaksi dibawah <strong>Rp. 100.000</strong>. Jika transaksi diatas <strong>Rp. 100.000</strong> akan dikenakan biaya MDR 0.3% untuk setiap transaksi menggunakan Qris.
+                                                </p>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered border-primary mb-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Nama Merchant Qris</th>
+                                                                <th>Qris Login User</th>
+                                                                <th>Qris Password</th>
+                                                                <th>Qris Mecrchant ID</th>
+                                                                <th>Qris Store ID</th>
+                                                                <th>MDR (%)</th>
+                                                                <th>Type Qris</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <th scope="row">1</th>
+                                                                <th>{{ $tenantStore->name  }}</th>
+                                                                <td>{{ $tenantStore->tenantQrisAccount->qris_login_user }}</td>
+                                                                <td>{{ $tenantStore->tenantQrisAccount->qris_password }}</td>
+                                                                <td>{{ $tenantStore->tenantQrisAccount->qris_merchant_id }}</td>
+                                                                <td>{{ $tenantStore->tenantQrisAccount->qris_store_id }}</td>
+                                                                <td>{{ $tenantStore->tenantQrisAccount->mdr }}</td>
+                                                                <td>
+                                                                    @if ($tenantStore->tenantQrisAccount->mdr == 0)
+                                                                        Qris UMI
+                                                                    @else
+                                                                        Qris Reguler
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div> 
+                                            @endif
+                                        @endif
                                     @endif
                                 </div>
                             </div>

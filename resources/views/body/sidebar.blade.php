@@ -154,6 +154,9 @@
                                     <a href="{{ route('admin.dashboard.menu.userWithdrawals') }}">User Withdrawals</a>
                                 </li>
                                 <li>
+                                    <a href="{{ route('admin.dashboard.menu.mdr') }}">Kategori MDR</a>
+                                </li>
+                                <li>
                                     <a href="{{ route('admin.dashboard.menu.userUmiRequest') }}">Request UMI</a>
                                 </li>
                                 <li>
@@ -384,10 +387,10 @@
                                     <li>
                                         <a href="{{ route('admin.dashboard.finance.insentif.list') }}">Insentive Setting</a>
                                     </li>
-                                    <li>
-                                        <a href="{{ route('admin.dashboard.finance.settlement.list') }}">Settlement Setting</a>
-                                    </li>
                                 @endif
+                                <li>
+                                    <a href="{{ route('admin.dashboard.finance.settlement.list') }}">Settlement Setting</a>
+                                </li>
                                 <li>
                                     <a href="{{ route('admin.dashboard.finance.settlement.pending') }}">Settlement Pending</a>
                                 </li>

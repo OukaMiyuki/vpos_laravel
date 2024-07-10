@@ -27,6 +27,11 @@
         <link href="{{ asset('assets/libs/selectize/css/selectize.bootstrap3.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ asset('assets/libs/bootstrap-touchspin/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet" type="text/css" />
         
+        {{-- Quill Editor --}}
+        <link href="{{ asset('assets/libs/quill/quill.core.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/quill/quill.bubble.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/libs/quill/quill.snow.css') }}" rel="stylesheet" type="text/css" />
+        {{-- Quill Editor --}}
        
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
         
@@ -117,6 +122,8 @@
         <script src="{{ asset('assets/js/pages/form-advanced.init.js') }}"></script>
 
         {{-- <script src="{{ asset('assets/js/pages/calendar.init.js') }}"></script> --}}
+        <script src="{{asset('assets/libs/quill/quill.min.js')}}"></script>
+        {{-- <script src="{{asset('assets/js/pages/form-quilljs.init.js')}}"></script> --}}
         <script src="{{ asset('assets/js/app.min.js') }}"></script>
         <script src="{{ asset('assets/js/pages/admin.init-test.js') }}"></script>
         <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>

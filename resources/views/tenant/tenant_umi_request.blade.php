@@ -58,6 +58,7 @@
                                             </div>
                                         @else
                                             @if ($umiRequest == "Empty")
+                                                <p class="sub-header text-danger"><strong>Periksa kembali kelengkapan profil anda sebelum mengajukan registrasi!</strong></p>
                                                 <form method="post" action="{{ route('tenant.request.umi.send') }}">
                                                     @csrf
                                                     <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Formulir Pendaftaran Umi</h5>
@@ -167,7 +168,13 @@
                                                         </div>
                                                     </div>
                                                     <div class="row">
-                                                        <div class="col-md-12">
+                                                        <div class="col-md-6">
+                                                            <div class="mb-3">
+                                                                <label for="kantor_toko_fisik" class="form-label">Memiliki Toko Fisik atau Kantor Usaha?</label>
+                                                                <input readonly type="text" class="form-control" name="kantor_toko_fisik" id="kantor_toko_fisik" value="{{ auth()->user()->storeDetail->kantor_toko_fisik }}" placeholder="Masukkan kategori fisik usaha">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
                                                             <div class="mb-3">
                                                                 <label for="kode_pos" class="form-label">Kode Pos Toko</label>
                                                                 <input readonly type="text" class="form-control" name="kode_pos" id="kode_pos" required value="{{ auth()->user()->storeDetail->kode_pos }}" placeholder="Masukkan kode pos">
@@ -185,14 +192,14 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <div class="mb-3">
-                                                                <label for="kantor_toko_fisik" class="form-label">Memiliki Toko Fisik atau Kantor Usaha?</label>
-                                                                <input readonly type="text" class="form-control" name="kantor_toko_fisik" id="kantor_toko_fisik" value="{{ auth()->user()->storeDetail->kantor_toko_fisik }}" placeholder="Masukkan kategori fisik usaha">
+                                                                <label for="kategori_usaha_omset" class="form-label">Kategori Usaha Berdasarkan Omzet</label>
+                                                                <input readonly type="text" class="form-control" name="kategori_usaha_omset" id="kategori_usaha_omset" value="{{ auth()->user()->storeDetail->jenisMDR->jenis_usaha }}" placeholder="Masukkan kategori jenix omzet">
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="mb-3">
-                                                                <label for="kategori_usaha_omset" class="form-label">Kategori Usaha Berdasarkan Omzet</label>
-                                                                <input readonly type="text" class="form-control" name="kategori_usaha_omset" id="kategori_usaha_omset" value="{{ auth()->user()->storeDetail->kategori_usaha_omset }}" placeholder="Masukkan kategori jenix omzet">
+                                                                <label for="kategori_mdr" class="form-label">Ketentuan Persentase MDR (%)</label>
+                                                                <input readonly type="text" class="form-control" name="kategori_mdr" id="kategori_mdr" value="{{ auth()->user()->storeDetail->jenisMDR->presentase_minimal_mdr }}" placeholder="Masukkan kategori fisik usaha">
                                                             </div>
                                                         </div>
                                                     </div>

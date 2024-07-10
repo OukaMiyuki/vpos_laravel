@@ -17,6 +17,7 @@ use App\Models\TenantField;
 use App\Models\Invoice;
 use App\Models\TenantQrisAccount;
 use App\Models\UmiRequest;
+use App\Models\MDR;
 
 class StoreDetail extends Model {
     use HasFactory;
@@ -33,6 +34,7 @@ class StoreDetail extends Model {
         'no_telp_toko',
         'jenis_usaha',
         'status_umi',
+        'status_registrasi_qris',
         'catatan_kaki',
         'photo',
         'ktp_image',
@@ -49,6 +51,10 @@ class StoreDetail extends Model {
 
     public function tenant(){
         return $this->belongsTo(Tenant::class, 'id_tenant', 'id');
+    }
+
+    public function jenisMDR(){
+        return $this->belongsTo(MDR::class, 'kategori_usaha_omset', 'id');
     }
 
     public function batch(){

@@ -42,6 +42,7 @@ use App\Models\SettlementHstory;
 use App\Models\Settlement;
 use App\Models\HistoryCashbackPending;
 use App\Models\SettlementPending;
+use App\Models\MDR;
 use Exception;
 
 class AdminController extends Controller {
@@ -443,6 +444,52 @@ class AdminController extends Controller {
                                     ->make(true);
         }
         return view('admin.admin_menu_dashboard_user_withdrawals');
+    }
+
+    public function adminMenuMDRSettings (){
+        $mdr = MDR::get();
+        return view ('admin.admin_menu_dashboard_mdr_settings', compact('mdr'));
+    }
+
+    public function adminMenuMDRSettingsInsert(Request $request) {
+        MDR::create([
+            'jenis_usaha' => $request->jenis,
+            'presentase_minimal_mdr' => $request->presentase_minimal,
+            'presentase_maksimal_mdr' => $request->presentase_maksimal,
+            'nominal_minimal_mdr' => $request->batas_nominal,
+            'ketentuan' => $request->ketentuan
+        ]);
+
+        $notification = array(
+            'message' => 'Kategori sukses ditambahkan!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
+    public function adminMenuMDRSettingsUpdate(Request $request){
+        $mdr = MDR::find($request->id);
+        if(is_null($mdr) || empty($mdr)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+
+        $mdr->update([
+            'jenis_usaha' => $request->jenis,
+            'presentase_minimal_mdr' => $request->presentase_minimal,
+            'presentase_maksimal_mdr' => $request->presentase_maksimal,
+            'nominal_minimal_mdr' => $request->batas_nominal,
+            'ketentuan' => $request->ketentuan
+        ]);
+
+        $notification = array(
+            'message' => 'Data berhasil diupdate!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
     }
 
     public function adminMenuUserWithdrawalDetail($id){
