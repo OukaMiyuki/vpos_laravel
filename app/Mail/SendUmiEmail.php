@@ -31,7 +31,8 @@ class SendUmiEmail extends Mailable {
      */
     public function envelope(): Envelope {
         return new Envelope(
-            subject: 'Formulir pendaftaran UMI',
+            // subject: 'Formulir pendaftaran UMI',
+            subject: $this->mailData['title'],
         );
     }
 
