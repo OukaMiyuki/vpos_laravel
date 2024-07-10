@@ -39,7 +39,7 @@
                                             <th>Name</th>
                                             <th>No. Telp Merchant</th>
                                             <th>Jenis Usaha</th>
-                                            <th>Status Umi</th>
+                                            <th>Status Registrasi Akun Qris</th>
                                             <th>Banyak Invoice</th>
                                             <th>Daftar Invoice</th>
                                             <th>Action</th>
@@ -55,16 +55,12 @@
                                                 <td>{{ $store->no_telp_toko }}</td>
                                                 <td>{{ $store->jenis_usaha }}</td>
                                                 <td>
-                                                    @if($store->status_umi == NULL || $store->status_umi == "" || empty($store->status_umi) || is_null($store->status_umi))
-                                                        <button type='button' class='btn btn-info btn-xs waves-effect mb-2 waves-light'>UMI Belum Terdaftar</button>
-                                                    @else
-                                                        @if ($store->status_umi == 0)
-                                                            <button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>UMI Belum Disetujui</button>
-                                                        @elseif($store->status_umi == 1)
-                                                            <button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar UMI</button>
-                                                        @elseif($store->status_umi == 2)
-                                                            <button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>UMI Ditolak</button>
-                                                        @endif
+                                                    @if ($store->status_registrasi_qris == 0)
+                                                        <button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>Belum Terdaftar</button>
+                                                    @elseif($store->status_registrasi_qris == 1)
+                                                        <button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar Qris</button>
+                                                    @elseif($store->status_registrasi_qris == 2)
+                                                        <button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>Sedang diproses</button>
                                                     @endif
                                                 </td>
                                                 <td class="text-center">{{ $store->invoice_count }}</td>
