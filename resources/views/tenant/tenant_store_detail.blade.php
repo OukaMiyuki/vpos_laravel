@@ -5,11 +5,11 @@
             // if(empty($tenantStore->status_umi)){
             //     $umi = "<span class='badge bg-info'>UMI Belum Terdaftar</span>";
             // } else {
-                if($tenantStore->status_umi == 0) {
+                if($tenantStore->status_umi == "0") {
                     $umi = "<span class='badge bg-warning'>UMI Sedang diproses</span>";
-                } else if($tenantStore->status_umi == 1){
+                } else if($tenantStore->status_umi == "1"){
                     $umi = "<span class='badge bg-success'>Terdaftar UMI</span>";
-                } else if($tenantStore->status_umi == 2){
+                } else if($tenantStore->status_umi == "3"){
                     $umi = "<span class='badge bg-succes'>Pendaftaran UMI di Tolak</span>";
                 } else {
                     $umi = "<span class='badge bg-info'>UMI Belum Terdaftar</span>";
