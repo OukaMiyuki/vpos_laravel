@@ -56,11 +56,11 @@
                                                 <td>{{ $store->jenis_usaha }}</td>
                                                 <td>
                                                     @if ($store->status_registrasi_qris == 0)
-                                                        <button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>Belum Terdaftar</button>
+                                                        <button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>Qris Belum Terdaftar</button>
                                                     @elseif($store->status_registrasi_qris == 1)
                                                         <button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar Qris</button>
                                                     @elseif($store->status_registrasi_qris == 2)
-                                                        <button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>Sedang diproses</button>
+                                                        <button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>Registrasi Qris sedang diproses</button>
                                                     @endif
                                                 </td>
                                                 <td class="text-center">{{ $store->invoice_count }}</td>
