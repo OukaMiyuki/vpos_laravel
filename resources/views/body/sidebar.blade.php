@@ -505,7 +505,7 @@
                                         <a href="{{ route('tenant.mitra.dashboard.toko.list') }}">Merchant List</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('tenant.mitra.dashboard.toko.request.umi.list') }}">Umi</a>
+                                        <a href="{{ route('tenant.mitra.dashboard.toko.request.umi.list') }}">Request Akun Qris</a>
                                     </li>
                                 @endif
                             </ul>

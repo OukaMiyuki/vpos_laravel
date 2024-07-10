@@ -264,6 +264,7 @@ Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'is
 
 Route::middleware(['auth:tenant', 'auth', 'tenantemailverivied', 'throttle', 'isTenantActive', 'isTenantIsNotMitra'])->prefix('/tenant/mitra')->group( function () {
     Route::get('/dashboard', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'index'])->name('tenant.mitra.dashboard');
+    Route::get('/help/qris-category', [App\Http\Controllers\Auth\Tenant\ProfileController::class, 'helpUMIMitra'])->name('tenant.mitra.help.umi');
 
     Route::get('/dashboard/merchant', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeDashboard'])->name('tenant.mitra.dashboard.toko');
     Route::get('/dashboard/merchant/list', [App\Http\Controllers\Auth\Tenant\Mitra\TenantMitraController::class, 'storeList'])->name('tenant.mitra.dashboard.toko.list');

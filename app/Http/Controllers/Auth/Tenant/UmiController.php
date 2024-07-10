@@ -214,6 +214,7 @@ class UmiController extends Controller {
                 UmiRequest::create([
                     'id_tenant' => auth()->user()->id,
                     'email' => auth()->user()->email,
+                    'pengajuan_atas' => "Pengajuan Qris Mitra Tenant",
                     'store_identifier' => $store_identifier,
                     'tanggal_pengajuan' => Carbon::now(),
                     'file_path' => $filename,
@@ -288,6 +289,8 @@ class UmiController extends Controller {
                                 ->where('email', auth()->user()->email)
                                 ->where('store_identifier', $store_identifier)
                                 ->first();
+        $request_type = "Request Qris Reguler";
+        $subject = "Formulir Pendaftaran Qris Reguler";
         $tenant = Tenant::select(['tenants.id', 'tenants.name', 'tenants.email', 'tenants.phone', 'tenants.is_active', 'tenants.phone_number_verified_at', 'tenants.email_verified_at'])
                                 ->with(['detail' => function($query){
                                     $query->select(['detail_tenants.id',
@@ -309,6 +312,7 @@ class UmiController extends Controller {
         $store = StoreList::where('id_user', auth()->user()->id)
                             ->where('email', auth()->user()->email)
                             ->where('store_identifier',  $store_identifier)
+                            ->with(['jenisMDR'])
                             ->find($store_id);
 
         if(empty($umiRequest) || is_null($umiRequest) || $umiRequest == ""){
@@ -334,7 +338,8 @@ class UmiController extends Controller {
             $kode_pos = $store->kode_pos;
             $no_npwp = $store->no_npwp;
             $kantor_toko_fisik = $store->kantor_toko_fisik;
-            $kategori_usaha_omset = $store->kategori_usaha_omset;
+            $kategori_usaha_omset = $store->jenisMDR->jenis_usaha;
+            $persentaseMDR = $store->jenisMDR->presentase_minimal_mdr;
             $website = $store->website;
 
             if(empty($nama_usaha)
@@ -359,6 +364,7 @@ class UmiController extends Controller {
                 || is_null($kecamatan)
                 || is_null($kantor_toko_fisik)
                 || is_null($kategori_usaha_omset)
+                || is_null($persentaseMDR)
                 || is_null(auth()->user()->detail->ktp_image)
                 || auth()->user()->detail->ktp_image == ""
                 || auth()->user()->detail->ktp_image == NULL
@@ -426,6 +432,7 @@ class UmiController extends Controller {
                 $sheet2->getCell('P11')->setValue($kode_pos);
                 $sheet2->getCell('Q11')->setValue($kantor_toko_fisik);
                 $sheet2->getCell('R11')->setValue($kategori_usaha_omset);
+                $sheet2->getCell('T11')->setValue($persentaseMDR."%");
                 $sheet2->getCell('V11')->setValue($website);   
 
                 $newFilePath = $fileSave;
@@ -435,13 +442,15 @@ class UmiController extends Controller {
                 UmiRequest::create([
                     'id_tenant' => auth()->user()->id,
                     'email' => auth()->user()->email,
+                    'pengajuan_atas' => "Pengajuan Qris Mitra Bisnis",
                     'store_identifier' => $store_identifier,
                     'tanggal_pengajuan' => Carbon::now(),
-                    'file_path' => $filename
+                    'file_path' => $filename,
+                    'request_type' => $request_type
                 ]);
 
                 $mailData = [
-                    'title' => 'Formulir Pendaftaran UMI',
+                    'title' =>  $subject,
                     'body' => 'This is for testing email using smtp.',
                     'file' => $fileSave,
                     'storeName' => $nama_usaha,
@@ -451,7 +460,8 @@ class UmiController extends Controller {
                     'kodePos' => $kode_pos
                 ];
 
-                Mail::to('faydil.hamzah@nobubank.com')->send(new SendUmiEmail($mailData, $store_identifier));
+                // Mail::to('faydil.hamzah@nobubank.com')->send(new SendUmiEmail($mailData, $store_identifier));
+                Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $store_identifier));
 
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 

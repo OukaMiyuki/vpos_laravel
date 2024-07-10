@@ -176,10 +176,16 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-12">
+                                            <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="kategori_usaha_omset" class="form-label">Kategori Usaha Berdasarkan Omzet</label>
-                                                    <input type="text" class="form-control" name="kategori_usaha_omset" id="kategori_usaha_omset" readonly value="{{$store->kategori_usaha_omset}}" placeholder="Masukkan jenis omset">
+                                                    <input readonly type="text" class="form-control" name="kategori_usaha_omset" id="kategori_usaha_omset" value="{{ $store->jenisMDR->jenis_usaha }}" placeholder="Masukkan kategori jenix omzet">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="kategori_mdr" class="form-label">Ketentuan Persentase MDR (%)</label>
+                                                    <input readonly type="text" class="form-control" name="kategori_mdr" id="kategori_mdr" value="{{ $store->jenisMDR->presentase_minimal_mdr }}" placeholder="Masukkan kategori fisik usaha">
                                                 </div>
                                             </div>
                                         </div>
@@ -197,21 +203,21 @@
                                     <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Pengajuan Qris Merchant ID & UMI</h5>
                                     @if ($umiRequest == "Empty")
                                         <p class="sub-header">
-                                            <h5 class="mb-4 text-uppercase"><i class="mdi mdi-account-circle me-1"></i> Syarat dan Ketentuan pendaftaran QRIS</h5>
+                                            <h5 class="mb-4 text-uppercase">Syarat dan Ketentuan pendaftaran QRIS</h5>
                                             <div class="col-xl-12">
                                                 <div class="accordion custom-accordion" id="custom-accordion-one">
                                                     <div class="card mb-0">
                                                         <div class="card-header" id="headingNine">
                                                             <h5 class="m-0 position-relative">
                                                                 <a class="custom-accordion-title text-reset d-block" data-bs-toggle="collapse" href="#collapseNine" aria-expanded="true" aria-controls="collapseNine">
-                                                                    Q. Apa itu pendaftaran QRIS Merchant dan UMI? <i class="mdi mdi-chevron-down accordion-arrow"></i>
+                                                                    Q. Apa itu pendaftaran QRIS Merchant? <i class="mdi mdi-chevron-down accordion-arrow"></i>
                                                                 </a>
                                                             </h5>
                                                         </div>
                 
                                                         <div id="collapseNine" class="collapse show" aria-labelledby="headingFour" data-bs-parent="#custom-accordion-one">
                                                             <div class="card-body">
-                                                                Kami memberikan fasilitas bagi pengguna <strong>Mitra Bisnis untuk dapat memiliki akun Qris</strong> dengan nama merchant yang dimiliki oleh Mitra Bisnis.
+                                                                Kami memberikan fasilitas bagi pengguna <strong>Mitra Bisnis untuk dapat memiliki akun Qris</strong> dengan nama merchant yang dimiliki oleh Mitra Bisnis untuk memudahkan transaksi sehingga bisnis anda dapat dengan mudah dikenali oleh customer atau pelanggan bisnis anda saat akan melakukan pembayaran.
                                                             </div>
                                                         </div>
                                                     </div>

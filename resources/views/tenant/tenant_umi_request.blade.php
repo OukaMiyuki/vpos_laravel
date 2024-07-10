@@ -229,6 +229,7 @@
                                                                 <th>#</th>
                                                                 <th class="text-center">Tanggal Pengajuan</th>
                                                                 <th class="text-center">Tanggal Approval</th>
+                                                                <th class="text-center">Jenis Pengajuan</th>
                                                                 <th class="text-center">Status</th>
                                                                 <th>Note</th>
                                                             </tr>
@@ -238,6 +239,7 @@
                                                                 <th scope="row">1</th>
                                                                 <td class="text-center">{{\Carbon\Carbon::parse($umiRequest->tanggal_pengajuan)->format('d-m-Y')}}</td>
                                                                 <td class="text-center">@if(!is_null($umiRequest->tanggal_approval)){{\Carbon\Carbon::parse($umiRequest->tanggal_approval)->format('d-m-Y')}}@endif</td>
+                                                                <th class="text-center">{{$umiRequest->request_type}}</th>
                                                                 <td class="text-center">
                                                                     @if($umiRequest->is_active == 0)
                                                                         <span class="badge bg-soft-warning text-warning">Sedang Diproses</span>

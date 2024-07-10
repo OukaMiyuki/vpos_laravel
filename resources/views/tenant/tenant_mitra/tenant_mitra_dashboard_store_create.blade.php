@@ -144,15 +144,12 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
-                                                <label for="kategori_usaha_omset" class="form-label">Kategori Usaha Berdasarkan Omzet</label>
+                                                <label for="kategori_usaha_omset" class="form-label">Kategori Usaha Berdasarkan Omzet &nbsp;&nbsp;&nbsp;<a href="{{route('tenant.mitra.help.umi')}}"><button title="Baca ketentuan MDR berdasarkan kategori usaha" type="button" class="btn btn-info btn-xs waves-effect waves-light">Baca Ketentuan MDR</button></a></label>
                                                 <select required class="form-control" name="kategori_usaha_omset" id="jenis-omset" data-width="100%">
                                                     <option value="">- Pilih -</option>
-                                                    <option value="UMI - Penjualan/Tahun: < 2M">UMI - Penjualan/Tahun: < 2M</option>
-                                                    <option value="UKE - Penjualan/Tahun: >2M-15M">UKE - Penjualan/Tahun: >2M-15M</option>
-                                                    <option value="UME - Penjualan/Tahun: >15M-50M">UME - Penjualan/Tahun: >15M-50M</option>
-                                                    <option value="UBE - Penjualan/Tahun: >50M">"UBE - Penjualan/Tahun: >50M</option>
-                                                    <option value="URE - Donasi, Organisasi Sosial, dsb">URE - Donasi, Organisasi Sosial, dsb</option>
-                                                    <option value="PSO - Pelayanan Sosial/Bantuan Sosial">PSO - Pelayanan Sosial/Bantuan Sosial</option>
+                                                    @foreach (App\Models\MDR::where('presentase_minimal_mdr', '!=', 0)->get() as $mdr)
+                                                        <option value="{{$mdr->id}}">{{$mdr->jenis_usaha}}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>

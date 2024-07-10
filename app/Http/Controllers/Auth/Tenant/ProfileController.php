@@ -165,6 +165,11 @@ class ProfileController extends Controller{
         return view('tenant.tenant_help_umi', compact('mdr'));
     }
 
+    public function helpUMIMitra(){
+        $mdr = MDR::where('presentase_minimal_mdr', '!=', 0)->get();
+        return view('tenant.tenant_mitra.tenant_mitra_help_umi', compact('mdr'));
+    }
+
     public function profile(){
         $profilTenant = Tenant::select(['tenants.id', 'tenants.name', 'tenants.email', 'tenants.phone', 'tenants.is_active', 'tenants.phone_number_verified_at', 'tenants.email_verified_at'])
                                 ->with(['detail' => function($query){

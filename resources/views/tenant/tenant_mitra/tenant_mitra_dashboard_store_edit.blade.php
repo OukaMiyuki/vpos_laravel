@@ -149,12 +149,9 @@
                                                 <label for="kategori_usaha_omset" class="form-label">Kategori Usaha Berdasarkan Omzet</label>
                                                 <select required class="form-control" name="kategori_usaha_omset" id="jenis-omset" data-width="100%">
                                                     <option value="">- Pilih -</option>
-                                                    <option @if($store->kategori_usaha_omset == "UMI - Penjualan/Tahun: < 2M") selected @endif value="UMI - Penjualan/Tahun: < 2M">UMI - Penjualan/Tahun: < 2M</option>
-                                                    <option @if($store->kategori_usaha_omset == "UKE - Penjualan/Tahun: >2M-15M") selected @endif value="UKE - Penjualan/Tahun: >2M-15M">UKE - Penjualan/Tahun: >2M-15M</option>
-                                                    <option @if($store->kategori_usaha_omset == "UME - Penjualan/Tahun: >15M-50M") selected @endif value="UME - Penjualan/Tahun: >15M-50M">UME - Penjualan/Tahun: >15M-50M</option>
-                                                    <option @if($store->kategori_usaha_omset == "UBE - Penjualan/Tahun: >50M") selected @endif value="UBE - Penjualan/Tahun: >50M">"UBE - Penjualan/Tahun: >50M</option>
-                                                    <option @if($store->kategori_usaha_omset == "URE - Donasi, Organisasi Sosial, dsb") selected @endif value="URE - Donasi, Organisasi Sosial, dsb">URE - Donasi, Organisasi Sosial, dsb</option>
-                                                    <option @if($store->kategori_usaha_omset == "PSO - Pelayanan Sosial/Bantuan Sosial") selected @endif value="PSO - Pelayanan Sosial/Bantuan Sosial">PSO - Pelayanan Sosial/Bantuan Sosial</option>
+                                                    @foreach (App\Models\MDR::where('presentase_minimal_mdr', '!=', 0)->get() as $mdr)
+                                                        <option value="{{$mdr->id}}"@if ($store->kategori_usaha_omset == $mdr->id) selected="selected" @endif>{{$mdr->jenis_usaha}}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>

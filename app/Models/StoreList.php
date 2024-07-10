@@ -19,7 +19,7 @@ class StoreList extends Model {
         return $this->belongsTo(Tenant::class, 'id_user', 'id');
     }
 
-    public function jenis_usaha(){
+    public function jenisMDR(){
         return $this->belongsTo(MDR::class, 'kategori_usaha_omset', 'id');
     }
 
