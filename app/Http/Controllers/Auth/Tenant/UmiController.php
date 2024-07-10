@@ -469,7 +469,9 @@ class UmiController extends Controller {
 
                 // Mail::to('faydil.hamzah@nobubank.com')->send(new SendUmiEmail($mailData, $store_identifier));
                 Mail::to('ouka.dev@gmail.com')->send(new SendUmiEmail($mailData, $store_identifier));
-
+                $store->update([
+                    'status_registrasi_qris' => 2
+                ]);
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
                 $notification = array(

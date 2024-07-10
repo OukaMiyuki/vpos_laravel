@@ -1,18 +1,26 @@
 <x-tenant-layout>
     <div class="content">
         @php
-            $umi = "";
-            if($store->status_umi == NULL || $store->status_umi == "" || empty($store->status_umi) || is_null($store->status_umi)){
-                $umi = "<button type='button' class='btn btn-info btn-xs waves-effect mb-2 waves-light'>UMI Belum Terdaftar</button>";
-            } else {
-                if($store->status_umi == 0) {
-                    $umi = "<button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>UMI Belum Disetujui</button>";
-                } else if($store->status_umi == 1){
-                    $umi = "<button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar UMI</button>";
-                } else if($store->status_umi == 2){
-                    $umi = "<button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>UMI Ditolak</button>";
-                }
+            $qris = "";
+            if ($store->status_registrasi_qris == 0){
+                $qris = "<button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>Belum Terdaftar</button>";
+            } else if($store->status_registrasi_qris == 1) {
+                $qris = "<button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar Qris</button>";
+            } else if($store->status_registrasi_qris == 2) {
+                $qris = "<button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>Sedang diproses</button>";
             }
+            // $umi = "";
+            // if($store->status_umi == NULL || $store->status_umi == "" || empty($store->status_umi) || is_null($store->status_umi)){
+            //     $umi = "<button type='button' class='btn btn-info btn-xs waves-effect mb-2 waves-light'>UMI Belum Terdaftar</button>";
+            // } else {
+            //     if($store->status_umi == 0) {
+            //         $umi = "<button type='button' class='btn btn-warning btn-xs waves-effect mb-2 waves-light'>UMI Belum Disetujui</button>";
+            //     } else if($store->status_umi == 1){
+            //         $umi = "<button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar UMI</button>";
+            //     } else if($store->status_umi == 2){
+            //         $umi = "<button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>UMI Ditolak</button>";
+            //     }
+            // }
         @endphp
         <!-- Start Content-->
         <div class="container-fluid">
@@ -45,7 +53,7 @@
                                 Merchant
                             </p>
                             @php
-                                echo htmlspecialchars_decode($umi);
+                                echo htmlspecialchars_decode($qris);
                             @endphp
                         </div>
                     </div>
