@@ -11,6 +11,8 @@
                     $umi = "<span class='badge bg-success'>Terdaftar UMI</span>";
                 } else if($tenantStore->status_umi == 2){
                     $umi = "<span class='badge bg-succes'>Pendaftaran UMI di Tolak</span>";
+                } else {
+                    $umi = "<span class='badge bg-info'>UMI Belum Terdaftar</span>";
                 }
             // }
             $qris = "";
