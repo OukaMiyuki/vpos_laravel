@@ -248,7 +248,8 @@ class UmiController extends Controller {
                 if($request->kategori_mdr == 0){
                     $store = StoreDetail::where('email', $email)->first();
                     $store->update([
-                        'status_umi' => 0
+                        'status_umi' => 0,
+                        'status_registrasi_qris' => 2
                     ]);
                 }
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
