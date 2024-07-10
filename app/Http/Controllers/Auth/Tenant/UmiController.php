@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use App\Models\UmiRequest;
 use App\Models\Tenant;
 use App\Models\StoreList;
+use App\Models\StoreDetail;
 use App\Models\History;
 use File;
 use Mail;
@@ -244,7 +245,12 @@ class UmiController extends Controller {
                     );
                     return redirect()->back()->with($notification);
                 }
-
+                if($request->kategori_mdr == 0){
+                    $store = StoreDetail::where('email', $email)->first();
+                    $store->update([
+                        'status_umi' => 0
+                    ]);
+                }
                 $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
                 $notification = array(
