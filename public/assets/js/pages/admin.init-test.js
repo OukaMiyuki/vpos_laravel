@@ -327,7 +327,7 @@ $(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            "url": 'https://visipos.id/admin/dashboard/user/request-umi',
+            "url": 'https://visipos.id/admin/dashboard/user/request-qris',
             "type": "GET",
             data : function(data){
                 data.from_date = $('#daterange_umi_request').data('daterangepicker').startDate.format('YYYY-MM-DD');
@@ -335,7 +335,7 @@ $(function () {
             }
         },
         // ajax: {
-        //     "url": 'http://localhost:8000/admin/dashboard/user/request-umi',
+        //     "url": 'http://localhost:8000/admin/dashboard/user/request-qris',
         //     "type": "GET",
         //     data : function(data){
         //         data.from_date = $('#daterange_umi_request').data('daterangepicker').startDate.format('YYYY-MM-DD');
