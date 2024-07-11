@@ -64,9 +64,10 @@ Route::middleware(['auth:admin', 'auth', 'throttle'])->prefix('admin')->group( f
     Route::post('/dashboard/user/mdr/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuMDRSettingsUpdate'])->name('admin.dashboard.menu.mdr.update');
     Route::get('/dashboard/user/withdrawals/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserWithdrawalDetail'])->name('admin.dashboard.menu.userWithdrawals.detail');
     Route::get('/dashboard/user/request-qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequest'])->name('admin.dashboard.menu.userUmiRequest');
-    Route::post('/dashboard/user/request-umi/approve', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestApprove'])->name('admin.dashboard.menu.userUmiRequest.approve');
-    Route::post('/dashboard/user/request-umi/reject', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestReject'])->name('admin.dashboard.menu.userUmiRequest.reject');
-    Route::get('/dashboard/user/request-umi/download/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestDownload'])->name('admin.dashboard.menu.userUmiRequest.download');
+    Route::post('/dashboard/user/request-qris/approve', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestApprove'])->name('admin.dashboard.menu.userUmiRequest.approve');
+    // Route::post('/dashboard/user/request-umi/reject', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestReject'])->name('admin.dashboard.menu.userUmiRequest.reject');
+    Route::get('/dashboard/user/request-qris/download/{id}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserUmiRequestDownload'])->name('admin.dashboard.menu.userUmiRequest.download');
+    Route::get('/dashboard/user/request-qris/umi/approve/{store_identifier}', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserQrisUmiApprove'])->name('admin.dashboard.menu.userUmiRequest.approved');
     Route::get('/dashboard/user/tenant-qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTenantQris'])->name('admin.dashboard.menu.userTenantQris');
     Route::post('/dashboard/user/tenant-qris', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTenantQrisRegister'])->name('admin.dashboard.menu.userTenantQris.register');
     Route::post('/dashboard/user/tenant-qris/update', [App\Http\Controllers\Auth\Admin\AdminController::class, 'adminMenuUserTenantQrisUpdate'])->name('admin.dashboard.menu.userTenantQris.update');

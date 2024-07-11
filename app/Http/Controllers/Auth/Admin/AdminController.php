@@ -713,6 +713,39 @@ class AdminController extends Controller {
         return redirect()->back()->with($notification);
     }
 
+    public function adminMenuUserQrisUmiApprove($store_identifier){
+        DB::connection()->enableQueryLog();
+        if(auth()->user()->access_level == 0){
+            $action = "Admin Super User : Approve UMI";
+        } else {
+            $action = "Administrator : Approve UMI";
+        }
+        $storeDetail = StoreDetail::where('store_identifier', $store_identifier)->first();
+        if(is_null($storeDetail) || empty($storeDetail)){
+            $notification = array(
+                'message' => 'Data tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+        if($storeDetail->jenisMDR->presentase_minimal_mdr != 0){
+            $notification = array(
+                'message' => 'Merchant ini tidak melakukan request UMI!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->back()->with($notification);
+        }
+        $storeDetail->update([
+            'status_umi' => 1
+        ]);
+        $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+        $notification = array(
+            'message' => 'Umi berhasil diaktifkan!',
+            'alert-type' => 'success',
+        );
+        return redirect()->back()->with($notification);
+    }
+
     public function adminMenuUserUmiRequestReject(Request $request){
         DB::connection()->enableQueryLog();
         $action="";
