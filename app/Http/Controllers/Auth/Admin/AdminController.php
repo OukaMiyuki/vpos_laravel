@@ -607,11 +607,11 @@ class AdminController extends Controller {
                                     }
                                 })
                                 ->editColumn('status', function($data) {
-                                    if($data->is_avtive == "0"){
+                                    if($data->is_active == 0){
                                         return '<span class="badge bg-soft-warning text-warning">Belum Disetujui</span>';
-                                    } else if($data->is_avtive == "1"){
+                                    } else if($data->is_active == 1){
                                         return '<span class="badge bg-soft-success text-success">Disetujui</span>';
-                                    } else if ($data->is_avtive == "2"){
+                                    } else if ($data->is_active == 2){
                                         return '<span class="badge bg-soft-danger text-danger">Ditolak</span>';
                                     }
                                 })
@@ -626,7 +626,7 @@ class AdminController extends Controller {
                                     return $data->note;
                                 })
                                 ->addColumn('action', function($row){
-                                    if($row->is_avtive == 0){
+                                    if($row->is_active == 0){
                                         $actionBtn = '<a href="" title="Approve Qris Request" id="approval-umi" data-id="'.$row->id.'" data-store_identifier="'.$row->store_identifier.'" data-bs-toggle="modal" data-bs-target="#approve-umi-modal" class="btn btn-xs btn-success"><i class="mdi mdi-check-bold"></i></a>';
                                         return $actionBtn;
                                     } else {
