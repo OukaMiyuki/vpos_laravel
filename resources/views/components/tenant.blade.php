@@ -112,6 +112,9 @@
             <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
             <Script type="text/javascript" src="{{ asset('assets/js/pages/posinit.js') }}"></Script>
         @endif
+        @if (auth()->user()->id_inv_code != 0)
+            <Script type="text/javascript" src="{{ asset('assets/js/pages/mitratenantinit.js') }}"></Script>
+        @endif
         <script src="{{ asset('assets/libs/toastr/build/toastr.min.js') }}"></script>
         <script>
             @if(Session::has('message'))

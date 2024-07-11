@@ -26,6 +26,9 @@ class Product extends Model {
         'nomor_gudang',
         'nomor_rak',
         'harga_jual',
+        'tipe_barang',
+        'satuan_barang',
+        'satuan_unit'
     ];
 
     public function store() {

@@ -94,6 +94,46 @@
                                         </div>
                                     </div>
                                     <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="tipe_barang" class="form-label">Tipe Barang</label>
+                                                <select class="form-select" id="tipe_barang" name="tipe_barang" required>
+                                                    <option value="">- Pilih Tipe Barang -</option>
+                                                    <option value="PCS">PCS</option>
+                                                    <option value="Pack">Pack</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="satuan" class="form-label">Satuan Barang</label>
+                                                <select class="form-select" id="satuan" name="satuan" required>
+                                                    <option value="">- Pilih Satuan Barang -</option>
+                                                    {{-- <option value="Qty">Qty</option>
+                                                    <option value="Berat">Berat</option>
+                                                    <option value="Jarak">Jarak</option>
+                                                    <option value="Volume">Volume</option>
+                                                    <option value="Panjang">Panjang</option>
+                                                    <option value="Custom">Custom</option> --}}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="unit" class="form-label">Satuan Unit</label>
+                                                <select class="form-select" id="unit" name="unit" required>
+                                                    <option value="">- Pilih Satuan Unit Barang -</option>
+                                                    {{-- <option value="Qty">Qty</option>
+                                                    <option value="Berat">Berat</option>
+                                                    <option value="Jarak">Jarak</option>
+                                                    <option value="Volume">Volume</option>
+                                                    <option value="Panjang">Panjang</option>
+                                                    <option value="Custom">Custom</option> --}}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="h_jual" class="form-label">Harga jual <strong>(Rp.)</strong></label>
