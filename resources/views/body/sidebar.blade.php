@@ -323,7 +323,7 @@
                                     <a href="{{ route('admin.dashboard.mitraBisnis.merchantList') }}">Merchant List</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('admin.dashboard.mitraBisnis.umi.list') }}">Request UMI</a>
+                                    <a href="{{ route('admin.dashboard.mitraBisnis.umi.list') }}">Request Akun Qris</a>
                                 </li>
                                 <li>
                                     <a href="{{ route('admin.dashboard.mitraBisnis.qris.list') }}">Tenant Qris Account</a>
