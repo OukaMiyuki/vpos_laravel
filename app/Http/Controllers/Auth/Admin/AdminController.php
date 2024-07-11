@@ -556,24 +556,7 @@ class AdminController extends Controller {
     }
 
     public function adminMenuUserUmiRequest(Request $request){
-        $data = UmiRequest::select([
-            'umi_requests.id',
-            'umi_requests.id_tenant',
-            'umi_requests.email',
-            'umi_requests.pengajuan_atas',
-            'umi_requests.store_identifier',
-            'umi_requests.tanggal_pengajuan',
-            'umi_requests.tanggal_approval',
-            'umi_requests.is_active',
-            'umi_requests.file_path',
-            'umi_requests.note',
-            'umi_requests.request_type',
-            'umi_requests.created_at',
-            'umi_requests.updated_at'
-        ])
-        ->latest()
-        ->get();
-        dd($data);
+        dd();
         if ($request->ajax()) {
             $data = UmiRequest::select([
                                         'umi_requests.id',
@@ -625,14 +608,13 @@ class AdminController extends Controller {
                                     }
                                 })
                                 ->editColumn('status', function($data) {
-                                    // if($data->is_avtive == "0"){
-                                    //     return '<span class="badge bg-soft-warning text-warning">Belum Disetujui</span>';
-                                    // } else if($data->is_avtive == "1"){
-                                    //     return '<span class="badge bg-soft-success text-success">Disetujui</span>';
-                                    // } else if ($data->is_avtive == "2"){
-                                    //     return '<span class="badge bg-soft-danger text-danger">Ditolak</span>';
-                                    // }
-                                    return $data->is_avtive;
+                                    if($data->is_avtive == "0"){
+                                        return '<span class="badge bg-soft-warning text-warning">Belum Disetujui</span>';
+                                    } else if($data->is_avtive == "1"){
+                                        return '<span class="badge bg-soft-success text-success">Disetujui</span>';
+                                    } else if ($data->is_avtive == "2"){
+                                        return '<span class="badge bg-soft-danger text-danger">Ditolak</span>';
+                                    }
                                 })
                                 ->addColumn('file_attach', function($row){
                                     $actionBtn = '<a title="Download dokumen request UMI" href="/admin/dashboard/user/request-umi/download/'.$row->id.'" class="btn btn-info btn-xs font-16 text-white"><i class="dripicons-download"></i></a>';
