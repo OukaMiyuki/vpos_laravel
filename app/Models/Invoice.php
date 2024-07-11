@@ -322,7 +322,8 @@ class Invoice extends Model {
     }
 
     public static function hitungMDR($nominal_bayar, $mdr){
-        $nominal_mdr = $nominal_bayar*0.007;
+        $mdrCount = $mdr/100;
+        $nominal_mdr = $nominal_bayar*$mdrCount;
         return $nominal_mdr;
     }
 }
