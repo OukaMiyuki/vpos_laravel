@@ -607,13 +607,14 @@ class AdminController extends Controller {
                                     }
                                 })
                                 ->editColumn('status', function($data) {
-                                    if($data->is_avtive == "0"){
-                                        return '<span class="badge bg-soft-warning text-warning">Belum Disetujui</span>';
-                                    } else if($data->is_avtive == "1"){
-                                        return '<span class="badge bg-soft-success text-success">Disetujui</span>';
-                                    } else if ($data->is_avtive == "2"){
-                                        return '<span class="badge bg-soft-danger text-danger">Ditolak</span>';
-                                    }
+                                    // if($data->is_avtive == "0"){
+                                    //     return '<span class="badge bg-soft-warning text-warning">Belum Disetujui</span>';
+                                    // } else if($data->is_avtive == "1"){
+                                    //     return '<span class="badge bg-soft-success text-success">Disetujui</span>';
+                                    // } else if ($data->is_avtive == "2"){
+                                    //     return '<span class="badge bg-soft-danger text-danger">Ditolak</span>';
+                                    // }
+                                    return $data->is_avtive;
                                 })
                                 ->addColumn('file_attach', function($row){
                                     $actionBtn = '<a title="Download dokumen request UMI" href="/admin/dashboard/user/request-umi/download/'.$row->id.'" class="btn btn-info btn-xs font-16 text-white"><i class="dripicons-download"></i></a>';
