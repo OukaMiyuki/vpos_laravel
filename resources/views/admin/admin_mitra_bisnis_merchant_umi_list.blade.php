@@ -39,10 +39,10 @@
                                             <th>Store Identifier</th>
                                             <th>Mitra Bisnis</th>
                                             <th>Jenis Usaha</th>
+                                            <th class="text-center">Status Pengajuan</th>
                                             <th>Qris Request Type</th>
                                             <th class="text-center">Tanggal Pengajuan</th>
                                             <th class="text-center">Tanggal Approval</th>
-                                            <th class="text-center">Status Pengajuan</th>
                                             <th class="text-center">FIle Attachment</th>
                                             <th class="text-center">Note</th>
                                             <th class="text-center">Action</th>
@@ -58,9 +58,6 @@
                                                     <td>{{$umiReq->storeList->store_identifier}}</td>
                                                     <td>{{$tt->name}}</td>
                                                     <td>{{$umiReq->storeList->jenis_usaha}}</td>
-                                                    <td>{{$umiReq->request_type}}</td>
-                                                    <td class="text-center">{{\Carbon\Carbon::parse($umiReq->tanggal_pengajuan)->format('d-m-Y')}}</td>
-                                                    <td class="text-center">{{\Carbon\Carbon::parse($umiReq->tanggal_approval)->format('d-m-Y')}}</td>
                                                     <td class="text-center">
                                                         @if ($umiReq->is_active == 0)
                                                             <span class="badge bg-soft-warning text-warning">Belum Disetujui</span>
@@ -70,6 +67,9 @@
                                                             <span class="badge bg-soft-danger text-danger">Ditolak</span>
                                                         @endif
                                                     </td>
+                                                    <td>{{$umiReq->request_type}}</td>
+                                                    <td class="text-center">{{\Carbon\Carbon::parse($umiReq->tanggal_pengajuan)->format('d-m-Y')}}</td>
+                                                    <td class="text-center">{{\Carbon\Carbon::parse($umiReq->tanggal_approval)->format('d-m-Y')}}</td>
                                                     <td class="text-center">
                                                         <a title="Download dokumen request UMI" href="{{ route('admin.dashboard.menu.userUmiRequest.download', ['id' => $umiReq->id]) }}" class="btn btn-info btn-xs font-16 text-white">
                                                             <i class="dripicons-download"></i>

@@ -33,12 +33,12 @@
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-table" class="table w-100 nowrap">
                                     <thead>
-                                       <tr>
+                                        <tr>
                                             <th>No.</th>
                                             <th>Merchant Name</th>
-                                            <th>Store Identifier</th>
-                                            <th>Mitra Bisnis</th>
+                                            <th>Mitra Tenant</th>
                                             <th>Jenis Usaha</th>
+                                            <th class="text-center">Status Pengajuan</th>
                                             <th>Qris Request Type</th>
                                             <th class="text-center">Tanggal Pengajuan</th>
                                             <th class="text-center">Tanggal Approval</th>
@@ -53,23 +53,13 @@
                                             @foreach ($tt->storeDetailUMI as $umiReq)
                                                 <td>{{$no+=1}}</td>
                                                 <td>{{$umiReq->storeDetail->name}}</td>
-                                                <td>{{$umiReq->storeDetail->store_identifier}}</td>
                                                 <td>{{$tt->name}}</td>
                                                 <td>{{$umiReq->storeDetail->jenis_usaha}}</td>
                                                 <td class="text-center">
-                                                    @if ($umiReq->storeDetail->status_umi == 0)
-                                                        <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
-                                                    @elseif($umiReq->storeDetail->status_umi == 1)
-                                                        <span class="badge bg-soft-success text-success">Terdaftar</span>
-                                                    @elseif($umiReq->storeDetail->status_umi == 2)
-                                                        <span class="badge bg-soft-danger text-danger">Ditolak</span>
-                                                    @endif
-                                                </td>
-                                                <td class="text-center">
                                                     @if ($umiReq->is_active == 0)
-                                                        <span class="badge bg-soft-warning text-warning">Tidak Terdaftar</span>
+                                                        <span class="badge bg-soft-warning text-warning">Belum Disetujui</span>
                                                     @elseif($umiReq->is_active == 1)
-                                                        <span class="badge bg-soft-success text-success">Terdaftar</span>
+                                                        <span class="badge bg-soft-success text-success">Disetujui</span>
                                                     @elseif($umiReq->is_active == 2)
                                                         <span class="badge bg-soft-danger text-danger">Ditolak</span>
                                                     @endif
@@ -106,7 +96,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Apprve UMI Request</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">Approve Qris Request by Tenant</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form class="px-3" action="{{ route('admin.dashboard.menu.userUmiRequest.approve') }}" method="post">
@@ -114,6 +104,61 @@
                     <div class="modal-body" id="show">
                         <input type="hidden" readonly class="d-none @error('id') is-invalid @enderror" name="id" id="id" required value="{{ old('id') }}">
                         <input type="hidden" readonly class="d-none @error('store_identifier') is-invalid @enderror" name="store_identifier" id="store_identifier" required value="{{ old('store_identifier') }}">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="qris_login" class="form-label">Qris Login</label>
+                                    <input type="text" class="form-control @error('qris_login') is-invalid @enderror" name="qris_login" id="qris_login" required value="{{ old('qris_login') }}" placeholder="Masukkan qris login">
+                                    @error('qris_login')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="qris_password" class="form-label">Qris Password</label>
+                                    <input type="text" class="form-control @error('qris_password') is-invalid @enderror" name="qris_password" id="qris_password" required value="{{ old('qris_password') }}" placeholder="Masukkan qris password">
+                                    @error('qris_password')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="qris_merchant_id" class="form-label">Qris Merchant ID</label>
+                                    <input type="text" class="form-control @error('qris_merchant_id') is-invalid @enderror" name="qris_merchant_id" id="qris_merchant_id" required value="{{ old('qris_merchant_id') }}" placeholder="Masukkan qris merchant id">
+                                    @error('qris_merchant_id')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="qris_store_id" class="form-label">Qris Store ID</label>
+                                    <input type="text" class="form-control @error('qris_store_id') is-invalid @enderror" name="qris_store_id" id="qris_store_id" required value="{{ old('qris_store_id') }}" placeholder="Masukkan qris store id">
+                                    @error('qris_store_id')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        {{-- <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="mdr" class="form-label">MDR (%)</label>
+                                    <input type="text" class="form-control @error('mdr') is-invalid @enderror" name="mdr" id="mdr" required value="{{ old('mdr') }}" placeholder="Masukkan mdr">
+                                    @error('mdr')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div> --}}
                         <div class="row">
                             <div class="mb-3">
                                 <label for="note" class="form-label">Note (Opsional)</label>
