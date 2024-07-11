@@ -65,7 +65,7 @@
                                                     <td class="text-center">{{$qrisacc->mdr}}</td>
                                                     <td class="text-center">
                                                         @if($qrisacc->mdr == 0 && $qrisacc->storeDetail->status_umi == 0)
-                                                            <a href="{{ route('admin.dashboard.menu.userUmiRequest.approved', ['store_identifier' => $qris->store_identifier]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-check-all"></i></a>
+                                                            <a href="{{ route('admin.dashboard.menu.userUmiRequest.approved', ['store_identifier' => $qrisacc->store_identifier]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-check-all"></i></a>
                                                         @endif
                                                     </td>
                                                     <td class="text-center">
