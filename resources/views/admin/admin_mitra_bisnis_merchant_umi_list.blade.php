@@ -57,6 +57,7 @@
                                                     <td>{{$umiReq->storeList->store_identifier}}</td>
                                                     <td>{{$tt->name}}</td>
                                                     <td>{{$umiReq->storeList->jenis_usaha}}</td>
+                                                    <td>{{$umiReq->request_type}}</td>
                                                     <td class="text-center">
                                                         @if ($umiReq->is_active == 0)
                                                             <span class="badge bg-soft-warning text-warning">Belum Disetujui</span>

@@ -358,7 +358,7 @@
                                     <a href="{{ route('admin.dashboard.mitraTenant.kasir.list') }}">Kasir List</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('admin.dashboard.mitraTenant.umi.list') }}">Request UMI</a>
+                                    <a href="{{ route('admin.dashboard.mitraTenant.umi.list') }}">Request Akun Qris</a>
                                 </li>
                                 <li>
                                     <a href="{{ route('admin.dashboard.mitraTenant.qris.list') }}">Tenant Qris Account</a>
