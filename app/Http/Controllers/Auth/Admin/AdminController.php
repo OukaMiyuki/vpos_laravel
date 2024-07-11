@@ -556,7 +556,6 @@ class AdminController extends Controller {
     }
 
     public function adminMenuUserUmiRequest(Request $request){
-        dd();
         if ($request->ajax()) {
             $data = UmiRequest::select([
                                         'umi_requests.id',
