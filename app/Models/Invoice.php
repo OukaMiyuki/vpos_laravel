@@ -229,36 +229,31 @@ class Invoice extends Model {
                     $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $model->store_identifier)->first();
                     if($storeDetail->status_umi == 1){
                         if($model->nominal_bayar <= 100000){
-                            $model->mdr = 0;
-                            $model->nominal_mdr = 0;
+                            $model->mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
+                            $mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
+                            $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr );
+                            $model->nominal_mdr = $nominal_mdr;
                             $model->nominal_terima_bersih = $model->nominal_bayar;
                         } else {
-                            $nominal_mdr = self::hitungMDR($model->nominal_bayar);
+                            $model->mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
+                            $mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
+                            $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr);
                             $model->nominal_mdr = $nominal_mdr;
                             $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
                         }
                     } else {
-                        $nominal_mdr = self::hitungMDR($model->nominal_bayar);
+                        $model->mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
+                        $mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
+                        $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr);
                         $model->nominal_mdr = $nominal_mdr;
                         $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
                     }
                 } else if($tenant->id_inv_code == 0) {
-                    $store = StoreList::select(['status_umi'])->where('store_identifier', $model->store_identifier)->first();
-                    if($store->status_umi == 1) {
-                        if($model->nominal_bayar <= 100000){
-                            $model->mdr = 0;
-                            $model->nominal_mdr = 0;
-                            $model->nominal_terima_bersih = $model->nominal_bayar;
-                        } else {
-                            $nominal_mdr = self::hitungMDR($model->nominal_bayar);
-                            $model->nominal_mdr = $nominal_mdr;
-                            $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
-                        }
-                    } else {
-                        $nominal_mdr = self::hitungMDR($model->nominal_bayar);
-                        $model->nominal_mdr = $nominal_mdr;
-                        $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
-                    }
+                    $store = StoreList::where('store_identifier', $model->store_identifier)->first();
+                    $mdr = $store->jenisMDR->presentase_minimal_mdr;
+                    $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr );
+                    $model->nominal_mdr = $nominal_mdr;
+                    $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
                 }
 
                 if(is_null($model->qris_data) || empty($model->qris_data) || $model->qris_data == NULL){
@@ -289,17 +284,17 @@ class Invoice extends Model {
                             ]);
                         }
                     } else {
-                        $qrisLogin = $qrisAccount->qris_login_user;
-                        $qrisPassword = $qrisAccount->qris_password;
-                        $qrisMerchantID = $qrisAccount->qris_merchant_id;
+                        // $qrisLogin = $qrisAccount->qris_login_user;
+                        // $qrisPassword = $qrisAccount->qris_password;
+                        // $qrisMerchantID = $qrisAccount->qris_merchant_id;
                         $qrisStoreID = $qrisAccount->qris_store_id;
                         try {
                             $postResponse = $client->request('POST',  $url, [
                                 'form_params' => [
-                                    'login' => $qrisLogin,
-                                    'password' => $qrisPassword,
-                                    'merchantID' => $qrisMerchantID,
-                                    'storeID' => $qrisStoreID,
+                                    // 'login' => $qrisLogin,
+                                    // 'password' => $qrisPassword,
+                                    // 'merchantID' => $qrisMerchantID,
+                                    'store_code' => $qrisStoreID,
                                     'amount' => $model->nominal_bayar,
                                     'transactionNo' => $generate_nomor_invoice,
                                     'pos_id' => "VP",
@@ -326,7 +321,7 @@ class Invoice extends Model {
         });
     }
 
-    public static function hitungMDR($nominal_bayar){
+    public static function hitungMDR($nominal_bayar, $mdr){
         $nominal_mdr = $nominal_bayar*0.007;
         return $nominal_mdr;
     }

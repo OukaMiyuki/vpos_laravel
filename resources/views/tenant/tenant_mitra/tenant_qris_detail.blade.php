@@ -11,9 +11,10 @@
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard.toko') }}">Umi</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('tenant.mitra.dashboard.toko.request.umi.list') }}">Qris Account Request List</a></li>
+                                <li class="breadcrumb-item active">Detail</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Request Akun Qris</h4>
+                        <h4 class="page-title">Data Detail Akun Qris</h4>
                     </div>
                 </div>
             </div>
