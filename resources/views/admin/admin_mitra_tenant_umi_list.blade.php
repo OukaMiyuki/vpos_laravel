@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar UMI Request Tenant</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-table" class="table w-100 nowrap">
+                                <table id="basic-table" class="table dt-responsive w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
@@ -64,6 +64,7 @@
                                                         <span class="badge bg-soft-danger text-danger">Ditolak</span>
                                                     @endif
                                                 </td>
+                                                <td>{{$umiReq->request_type}}</td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($umiReq->tanggal_pengajuan)->format('d-m-Y')}}</td>
                                                 <td class="text-center">{{\Carbon\Carbon::parse($umiReq->tanggal_approval)->format('d-m-Y')}}</td>
                                                 <td class="text-center">
