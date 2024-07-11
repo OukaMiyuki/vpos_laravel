@@ -858,7 +858,6 @@ class AdminController extends Controller {
         $qris_password = $request->qris_password;
         $qris_merchant_id = $request->qris_merchant_id;
         $qris_store_id = $request->qris_store_id;
-        $mdr = $request->mdr;
         $qris = TenantQrisAccount::where('store_identifier', $store_identifier)->find($id);
         if(is_null($qris) || empty($qris)){
             $notification = array(
@@ -872,7 +871,7 @@ class AdminController extends Controller {
             'qris_password' => $qris_password,
             'qris_merchant_id' => $qris_merchant_id,
             'qris_store_id' => $qris_store_id,
-            'mdr' => $mdr
+            // 'mdr' => $mdr
         ]);
         $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
@@ -3246,6 +3245,7 @@ class AdminController extends Controller {
                                             'store_details.id',
                                             'store_details.store_identifier',
                                             'store_details.name',
+                                            'store_details.status_umi',
                                         ]);
                                     }
                                 ])

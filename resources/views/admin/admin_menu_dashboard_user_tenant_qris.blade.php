@@ -42,7 +42,6 @@
                                             <th>Qris Merchant ID</th>
                                             <th>Qris Store ID</th>
                                             <th>MDR</th>
-                                            <th>Aktifkan UMI<th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
@@ -58,11 +57,6 @@
                                                 <td>{{ $qris->qris_merchant_id }}</td>
                                                 <td>{{ $qris->qris_store_id }}</td>
                                                 <td>{{ $qris->mdr }}</td>
-                                                <td>
-                                                    @if($qris->mdr == 0)
-                                                        <a href="{{ route('admin.dashboard.menu.userUmiRequest.approved', ['store_identifier' => $qris->store_identifier]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-check-all"></i></a>
-                                                    @endif
-                                                <td>
                                                 <td class="text-center">
                                                     <a href="" id="edit-data-qris" data-id="{{ $qris->id }}" data-store_identifier="{{ $qris->store_identifier }}" data-qris_login="{{ $qris->qris_login_user }}" data-qris_password="{{ $qris->qris_password }}" data-qris_merchant_id="{{ $qris->qris_merchant_id }}" data-qris_store_id="{{ $qris->qris_store_id }}" data-mdr="{{ $qris->mdr }}" data-bs-toggle="modal" data-bs-target="#edit-qris" class="btn btn-xs btn-info"><i class="mdi mdi-pencil"></i></a>
                                                     <a href="{{ route('admin.dashboard.menu.userTenantQris.delete', ['id' => $qris->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-trash-can-outline"></i></a>
@@ -144,7 +138,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        {{-- <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
                                     <label for="mdr" class="form-label">MDR (%)</label>
@@ -154,7 +148,7 @@
                                     @enderror
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

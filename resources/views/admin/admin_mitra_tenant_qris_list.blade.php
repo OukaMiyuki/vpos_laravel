@@ -44,6 +44,7 @@
                                             <th>Qris Merchant ID</th>
                                             <th>Qris Store ID</th>
                                             <th class="text-center">MDR</th>
+                                            <th class="text-center">Aktifkan UMI</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
@@ -62,6 +63,11 @@
                                                     <td>{{ $qrisacc->qris_merchant_id }}</td>
                                                     <td>{{ $qrisacc->qris_store_id }}</td>
                                                     <td class="text-center">{{$qrisacc->mdr}}</td>
+                                                    <td class="text-center">
+                                                        @if($qrisacc->mdr == 0 && $qrisacc->storeDetail->status_umi == 0)
+                                                            <a href="{{ route('admin.dashboard.menu.userUmiRequest.approved', ['store_identifier' => $qris->store_identifier]) }}" class="btn btn-xs btn-success"><i class="mdi mdi-check-all"></i></a>
+                                                        @endif
+                                                    <td>
                                                     <td class="text-center">
                                                         <a href="" id="edit-data-qris" data-id="{{ $qrisacc->id }}" data-store_identifier="{{ $qrisacc->store_identifier }}" data-qris_login="{{ $qrisacc->qris_login_user }}" data-qris_password="{{ $qrisacc->qris_password }}" data-qris_merchant_id="{{ $qrisacc->qris_merchant_id }}" data-qris_store_id="{{ $qrisacc->qris_store_id }}" data-mdr="{{ $qrisacc->mdr }}" data-bs-toggle="modal" data-bs-target="#edit-qris" class="btn btn-xs btn-info"><i class="mdi mdi-pencil"></i></a>
                                                         &nbsp;
