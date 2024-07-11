@@ -226,7 +226,7 @@ class Invoice extends Model {
             $tenant = Tenant::select(['id_inv_code'])->find($model->id_tenant);
             if($model->jenis_pembayaran == "Qris"){
                 if($tenant->id_inv_code != 0){
-                    $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $model->store_identifier)->first();
+                    $storeDetail = StoreDetail::where('store_identifier', $model->store_identifier)->first();
                     if($storeDetail->status_umi == 1){
                         if($model->nominal_bayar <= 100000){
                             $model->mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
