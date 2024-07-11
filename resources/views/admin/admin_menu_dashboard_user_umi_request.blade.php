@@ -189,31 +189,4 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="reject-umi-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Reject UMI Request</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form class="px-3" action="{{ route('admin.dashboard.menu.userUmiRequest.reject') }}" method="post">
-                    @csrf
-                    <div class="modal-body" id="reject">
-                        <input type="hidden" readonly class="d-none @error('id') is-invalid @enderror" name="id" id="id" required value="{{ old('id') }}">
-                        <input type="hidden" readonly class="d-none @error('store_identifier') is-invalid @enderror" name="store_identifier" id="store_identifier" required value="{{ old('store_identifier') }}">
-                        <div class="row">
-                            <div class="mb-3">
-                                <label for="note" class="form-label">Note (Opsional)</label>
-                                <textarea placeholder="Masukkan note approval" class="form-control" id="note" name="note" rows="5" spellcheck="false">{!! old('note') !!}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Register</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </x-admin-layout>
