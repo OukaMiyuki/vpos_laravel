@@ -10,10 +10,10 @@
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard.menu') }}">Admin Menu</a></li>
-                                <li class="breadcrumb-item active">User UMI Request List</li>
+                                <li class="breadcrumb-item active">User Qris Request List</li>
                             </ol>
                         </div>
-                        <h4 class="page-title">Data Request UMI</h4>
+                        <h4 class="page-title">Data Request Qris</h4>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar Request UMI</h4>
+                            <h4 class="header-title mb-3">Tabel Daftar Request Qris</h4>
                             <div class="row">
                                 <div class="col-6">
                                     
