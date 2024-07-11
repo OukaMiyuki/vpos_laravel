@@ -29,7 +29,7 @@
                                     <a href="" class="dropdown-item">Cetak Data</a>
                                 </div>
                             </div>
-                            <h4 class="header-title mb-3">Tabel Daftar Tenant Qris&nbsp;&nbsp;&nbsp;<button data-bs-toggle="modal" data-bs-target="#add-qris" title="Tambah akun baru" type="button" class="btn btn-info waves-effect waves-light"><i class="mdi mdi-plus-box-multiple-outline"></i>&nbsp;Tambahkan Akun Qris</button></h4>
+                            <h4 class="header-title mb-3">Tabel Daftar Tenant Qris</h4>
                             <div class="table-responsive">
                                 <table id="scroll-horizontal-table" class="table w-100 nowrap">
                                     <thead>
@@ -82,91 +82,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="add-qris" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Tambah Akun Qris Tenant</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form class="px-3" action="{{ route('admin.dashboard.menu.userTenantQris.register') }}" method="post">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label for="store_identifier" class="form-label">Store Identifier</label>
-                                    <input type="text" class="form-control @error('store_identifier') is-invalid @enderror" name="store_identifier" id="store_identifier" required value="{{ old('store_identifier') }}" placeholder="Masukkan store identifier">
-                                    @error('store_identifier')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label for="qris_login" class="form-label">Qris Login</label>
-                                    <input type="text" class="form-control @error('qris_login') is-invalid @enderror" name="qris_login" id="qris_login" required value="{{ old('qris_login') }}" placeholder="Masukkan qris login">
-                                    @error('qris_login')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label for="qris_password" class="form-label">Qris Password</label>
-                                    <input type="text" class="form-control @error('qris_password') is-invalid @enderror" name="qris_password" id="qris_password" required value="{{ old('qris_password') }}" placeholder="Masukkan qris password">
-                                    @error('qris_password')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label for="qris_merchant_id" class="form-label">Qris Merchant ID</label>
-                                    <input type="text" class="form-control @error('qris_merchant_id') is-invalid @enderror" name="qris_merchant_id" id="qris_merchant_id" required value="{{ old('qris_merchant_id') }}" placeholder="Masukkan qris merchant id">
-                                    @error('qris_merchant_id')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label for="qris_store_id" class="form-label">Qris Store ID</label>
-                                    <input type="text" class="form-control @error('qris_store_id') is-invalid @enderror" name="qris_store_id" id="qris_store_id" required value="{{ old('qris_store_id') }}" placeholder="Masukkan qris store id">
-                                    @error('qris_store_id')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label for="mdr" class="form-label">MDR (%)</label>
-                                    <input type="text" class="form-control @error('mdr') is-invalid @enderror" name="mdr" id="mdr" required value="{{ old('mdr') }}" placeholder="Masukkan mdr">
-                                    @error('mdr')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Register</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -236,7 +151,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        {{-- <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
                                     <label for="mdr" class="form-label">MDR (%)</label>
@@ -246,7 +161,7 @@
                                     @enderror
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
