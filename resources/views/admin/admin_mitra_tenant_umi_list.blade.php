@@ -76,8 +76,8 @@
                                                 <td class="text-center">
                                                     @if ($umiReq->is_active == 0)
                                                         <a href="" id="approval-umi" data-id="{{$umiReq->id}}" data-store_identifier="{{ $umiReq->store_identifier }}" data-bs-toggle="modal" data-bs-target="#approve-umi-modal" class="btn btn-xs btn-success"><i class="mdi mdi-check-bold"></i></a>
-                                                        &nbsp;
-                                                        <a href="" id="reject-umi" data-id="{{$umiReq->id}}" data-store_identifier="{{ $umiReq->store_identifier }}" class="btn btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#reject-umi-modal"><i class="mdi mdi-close-thick"></i></a>
+                                                        {{-- &nbsp;
+                                                        <a href="" id="reject-umi" data-id="{{$umiReq->id}}" data-store_identifier="{{ $umiReq->store_identifier }}" class="btn btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#reject-umi-modal"><i class="mdi mdi-close-thick"></i></a> --}}
                                                     @endif
                                                 </td>
                                             @endforeach
