@@ -31,7 +31,7 @@
                             </div>
                             <h4 class="header-title mb-3">Tabel Daftar Mitra Bisnis Qris</h4>
                             <div class="table-responsive">
-                                <table id="scroll-horizontal-table" class="table w-100 nowrap">
+                                <table id="scroll-horizontal-table" class="table dt-responsive w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
