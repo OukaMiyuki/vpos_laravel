@@ -395,7 +395,7 @@ class TenantMitraController extends Controller {
     }
 
     public function qrisRequestAccount($store_identifier){
-        $tenantQris = TenantQrisAccount::where('store_odentifier', $store_identifier)->first();
+        $tenantQris = TenantQrisAccount::where('store_identifier', $store_identifier)->first();
         if(is_null($tenantQris) || empty($tenantQris)){
             $notification = array(
                 'message' => 'Data tidak ditemukan!',

@@ -7,7 +7,7 @@
             } else if($store->status_registrasi_qris == 1) {
                 $qris = "<button type='button' class='btn btn-success btn-xs waves-effect mb-2 waves-light'>Terdaftar Qris</button>";
             } else if($store->status_registrasi_qris == 2) {
-                $qris = "<button type='button' class='btn btn-danger btn-xs waves-effect mb-2 waves-light'>Registrasi Qris sedang diproses</button>";
+                $qris = "<button type='button' class='btn btn-`danger btn-xs waves-effect mb-2 waves-light'>Registrasi Qris sedang diproses</button>";
             }
             // $umi = "";
             // if($store->status_umi == NULL || $store->status_umi == "" || empty($store->status_umi) || is_null($store->status_umi)){
@@ -344,30 +344,6 @@
                                         @if($umiRequest->is_active == 1)
                                             @if (!empty($tenantQris) || !is_null($tenantQris))
                                                 <h5 class="mb-4 text-uppercase mt-3"><i class="mdi mdi-account-circle me-1"></i> Detail Informasi Akun Qris</h5>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="mb-3">
-                                                            <label for="name" class="form-label">Qris Login User</label>
-                                                            <input type="text" class="form-control" readonly name="login-user" id="login-user" required value="{{ $tenantQris->qris_login_user }}">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="mb-3">
-                                                            <label for="no_telp" class="form-label">Qris Password</label>
-                                                            <input type="text" class="form-control" readonly name="qpassword" id="qpassword" required value="{{ $tenantQris->qris_password }}">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="mb-3">
-                                                            <label for="jenis" class="form-label">Qris Merchant ID</label>
-                                                            <input type="text" class="form-control" readonly name="mcrid" id="mcrid" required value="{{ $tenantQris->qris_merchant_id }}">
-                                                        </div>
-                                                    </div>
-                                                </div>
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <div class="mb-3">
