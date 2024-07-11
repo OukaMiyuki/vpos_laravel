@@ -627,7 +627,7 @@ class AdminController extends Controller {
                                 })
                                 ->addColumn('action', function($row){
                                     if($row->is_avtive == 0){
-                                        $actionBtn = '<a href="" id="approval-umi" data-id="'.$row->id.'" data-store_identifier="'.$row->store_identifier.'" data-bs-toggle="modal" data-bs-target="#approve-umi-modal" class="btn btn-xs btn-success"><i class="mdi mdi-check-bold"></i></a> <a href="" id="reject-umi" data-id="'.$row->id.'" data-store_identifier="'.$row->store_identifier.'" class="btn btn-xs btn-danger" data-bs-toggle="modal" data-bs-target="#reject-umi-modal"><i class="mdi mdi-close-thick"></i></a>';
+                                        $actionBtn = '<a href="" title="Approve Qris Request" id="approval-umi" data-id="'.$row->id.'" data-store_identifier="'.$row->store_identifier.'" data-bs-toggle="modal" data-bs-target="#approve-umi-modal" class="btn btn-xs btn-success"><i class="mdi mdi-check-bold"></i></a>';
                                         return $actionBtn;
                                     } else {
                                         return "";
@@ -660,9 +660,9 @@ class AdminController extends Controller {
         $umiRequest = UmiRequest::where('store_identifier', $request->store_identifier)->find($request->id);
         DB::connection()->enableQueryLog();
         if(auth()->user()->access_level == 0){
-            $action = "Admin Super User : Approve UMI";
+            $action = "Admin Super User : Approve Qris Request User";
         } else {
-            $action = "Administrator : Approve UMI";
+            $action = "Administrator : Approve Qris Request User";
         }
         if(is_null($umiRequest) || empty($umiRequest)){
             $notification = array(
@@ -677,17 +677,37 @@ class AdminController extends Controller {
             'note' => $request->note
         ]);
         $store = "";
+        $tenantID = "";
+        $mdr = "";
         $store = StoreDetail::where('store_identifier', $request->store_identifier)->first();
         if(is_null($store) || empty($store) || $store == ""){
             $store = StoreList::where('store_identifier', $request->store_identifier)->first();
+            $tenantID = $store->id_user;
+        } else {
+            $tenantID = $store->id_tenant;
         }
-
+        $mdr = $store->jenisMDR->presentase_minimal_mdr;
         $store->update([
-            'status_umi' => 1
+            'status_registrasi_qris' => 1
+        ]);
+        $store_identifier = $request->store_identifier;
+        $qris_login = $request->qris_login;
+        $qris_password = $request->qris_password;
+        $qris_merchant_id = $request->qris_merchant_id;
+        $qris_store_id = $request->qris_store_id;
+        TenantQrisAccount::create([
+            'store_identifier' => $store_identifier,
+            'id_tenant' => $tenantID,
+            'email' => $store->email,
+            'qris_login_user' => $qris_login,
+            'qris_password' => $qris_password,
+            'qris_merchant_id' => $qris_merchant_id,
+            'qris_store_id' => $qris_store_id,
+            'mdr' => $mdr
         ]);
         $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
         $notification = array(
-            'message' => 'Umi berhasil disetujui!',
+            'message' => 'Qris berhasil disetujui!',
             'alert-type' => 'success',
         );
         return redirect()->back()->with($notification);
