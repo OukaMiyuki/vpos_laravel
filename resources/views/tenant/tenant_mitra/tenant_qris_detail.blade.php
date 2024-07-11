@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-xl-12">
+                <div class="col-xl-5">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="mb-4 text-uppercase mt-3"><i class="mdi mdi-account-circle me-1"></i> Detail Informasi Akun Qris</h5>
