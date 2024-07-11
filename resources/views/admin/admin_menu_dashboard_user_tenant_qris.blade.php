@@ -59,7 +59,7 @@
                                                 <td>{{ $qris->mdr }}</td>
                                                 <td class="text-center">
                                                     <a href="" id="edit-data-qris" data-id="{{ $qris->id }}" data-store_identifier="{{ $qris->store_identifier }}" data-qris_login="{{ $qris->qris_login_user }}" data-qris_password="{{ $qris->qris_password }}" data-qris_merchant_id="{{ $qris->qris_merchant_id }}" data-qris_store_id="{{ $qris->qris_store_id }}" data-mdr="{{ $qris->mdr }}" data-bs-toggle="modal" data-bs-target="#edit-qris" class="btn btn-xs btn-info"><i class="mdi mdi-pencil"></i></a>
-                                                    <a href="{{ route('admin.dashboard.menu.userTenantQris.delete', ['id' => $qris->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-trash-can-outline"></i></a>
+                                                    {{-- <a href="{{ route('admin.dashboard.menu.userTenantQris.delete', ['id' => $qris->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-trash-can-outline"></i></a> --}}
                                                 </td>
                                             </tr>
                                         @endforeach

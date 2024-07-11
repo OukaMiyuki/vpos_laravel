@@ -2273,12 +2273,17 @@ class AdminController extends Controller {
                             $query->select([
                                 'umi_requests.id',
                                 'umi_requests.id_tenant',
+                                'umi_requests.email',
+                                'umi_requests.pengajuan_atas',
                                 'umi_requests.store_identifier',
                                 'umi_requests.tanggal_pengajuan',
                                 'umi_requests.tanggal_approval',
                                 'umi_requests.is_active',
                                 'umi_requests.file_path',
                                 'umi_requests.note',
+                                'umi_requests.request_type',
+                                'umi_requests.created_at',
+                                'umi_requests.updated_at'
                             ])
                             ->with([
                                 'storeList' => function($query){

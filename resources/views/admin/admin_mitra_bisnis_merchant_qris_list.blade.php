@@ -64,8 +64,8 @@
                                                     <td class="text-center">{{$qrisacc->mdr}}</td>
                                                     <td class="text-center">
                                                         <a href="" id="edit-data-qris" data-id="{{ $qrisacc->id }}" data-store_identifier="{{ $qrisacc->store_identifier }}" data-qris_login="{{ $qrisacc->qris_login_user }}" data-qris_password="{{ $qrisacc->qris_password }}" data-qris_merchant_id="{{ $qrisacc->qris_merchant_id }}" data-qris_store_id="{{ $qrisacc->qris_store_id }}" data-mdr="{{ $qrisacc->mdr }}" data-bs-toggle="modal" data-bs-target="#edit-qris" class="btn btn-xs btn-info"><i class="mdi mdi-pencil"></i></a>
-                                                        &nbsp;
-                                                        <a href="{{ route('admin.dashboard.menu.userTenantQris.delete', ['id' => $qrisacc->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-trash-can-outline"></i></a>
+                                                        {{-- &nbsp;
+                                                        <a href="{{ route('admin.dashboard.menu.userTenantQris.delete', ['id' => $qrisacc->id]) }}" class="btn btn-xs btn-danger"><i class="mdi mdi-trash-can-outline"></i></a> --}}
                                                     </td>
                                                 </tr>
                                             @endforeach
