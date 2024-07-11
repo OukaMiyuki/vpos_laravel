@@ -603,6 +603,7 @@ class TenantMitraController extends Controller {
     public function qrisAccountList(){
         $qrisAcc = TenantQrisAccount::where('id_tenant', auth()->user()->id)
                                     ->where('email', auth()->user()->email)
+                                    ->with(['storeList'])
                                     ->latest()
                                     ->get();
 

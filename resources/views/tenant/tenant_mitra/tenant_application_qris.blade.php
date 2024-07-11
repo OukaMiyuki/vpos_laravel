@@ -36,9 +36,8 @@
                                         <tr>
                                             <th>No.</th>
                                             <th>Store Identifier</th>
-                                            <th>Qris Login User</th>
-                                            <th>Qris Password</th>
-                                            <th>Qris Merchant ID</th>
+                                            <th>Merchant Name</th>
+                                            <th>Jenis Usaha</th>
                                             <th>Qris Store ID</th>
                                             <th>MDR (%)</th>
                                         </tr>
@@ -49,9 +48,8 @@
                                             <tr>
                                                 <td>{{ $no+=1 }}</td>
                                                 <td>{{ $qris->store_identifier }}</td>
-                                                <td>{{ $qris->qris_login_user }}</td>
-                                                <td>{{ $qris->qris_password }}</td>
-                                                <td>{{ $qris->qris_merchant_id }}</td>
+                                                <td>{{ $qris->storeList->name }}</td>
+                                                <td>{{ $qris->storeList->jenis_usaha }}</td>
                                                 <td>{{ $qris->qris_store_id }}</td>
                                                 <td>{{ $qris->mdr }}</td>
                                             </tr>
