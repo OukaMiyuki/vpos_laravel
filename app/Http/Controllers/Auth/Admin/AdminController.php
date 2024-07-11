@@ -616,7 +616,7 @@ class AdminController extends Controller {
                                     }
                                 })
                                 ->addColumn('file_attach', function($row){
-                                    $actionBtn = '<a title="Download dokumen request UMI" href="/admin/dashboard/user/request-umi/download/'.$row->id.'" class="btn btn-info btn-xs font-16 text-white"><i class="dripicons-download"></i></a>';
+                                    $actionBtn = '<a title="Download dokumen request UMI" href="/admin/dashboard/user/request-qris/download/'.$row->id.'" class="btn btn-info btn-xs font-16 text-white"><i class="dripicons-download"></i></a>';
                                     return $actionBtn;
                                 })
                                 ->editColumn('request_type', function($data) {
