@@ -94,7 +94,7 @@ class QrisPendingWalletUpdate extends Command {
                     'nominal_settle' => $totalSumFloor,
                     'nominal_insentif_cashback' => $totalCashback,
                     'periode_transaksi' => Carbon::yesterday(),
-                    'settlement_pending_status' => 1,
+                    'settlement_pending_status' => 0,
                 ]);
             }
             $action = "";
