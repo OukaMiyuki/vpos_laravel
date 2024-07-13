@@ -3704,7 +3704,7 @@ class AdminController extends Controller {
     }
 
     public function adminDashboardSettlementPending(){
-        $settlemetHistory = SettlementPending::where('settlement_pending_status', 0)->latest()->get();
+        $settlemetHistory = SettlementPending::with('tenant')->where('settlement_pending_status', 0)->latest()->get();
         return view('admin.admin_finance_settlement_pending', compact('settlemetHistory'));
     }
 
