@@ -41,14 +41,14 @@
                                         @endphp
                                         @foreach ($allCart as $cart)
                                             <tr>
-                                                <td><a href="{{ route('tenant.pos.deleteCart', ['id' => $cart->rowId]) }}"><h4><span class="mdi mdi-trash-can-outline"></span></h4></a></td>
+                                                <td><a class="btn btn-danger btn-xs" href="{{ route('tenant.pos.deleteCart', ['id' => $cart->rowId]) }}"><span class="mdi mdi-trash-can-outline"></span></a></td>
                                                 <td class="text-start">{{ $cart->name }}</td>
                                                 <td>
                                                     <form @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif id="qtyform" action="{{ route('tenant.pos.updateCart') }}" method="post">
                                                         @csrf
                                                         <input @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="hidden" name="id" value="{{ $cart->rowId }}">
                                                         <input @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="number" name="qty" class="qty_txt" value="{{ $cart->qty }}" min="1">
-                                                        <button @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="submit" class="btn btn-sm btn-success"><span class="mdi mdi-check-bold"></span></button>
+                                                        <button class="btn btn-success btn-xs" @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="submit" class="btn btn-sm btn-success"><span class="mdi mdi-check-bold"></span></button>
                                                     </form>
                                                 </td>
                                                 <td>{{ $cart->options['size'] }}</td>
@@ -181,15 +181,15 @@
                                                             <input readonly type="hidden" id="price" name="price" value="{{ $stok->product->harga_jual }}">
                                                             <input readonly type="hidden" id="tipe_barang" name="tipe_barang" value="{{ $stok->product->tipe_barang }}">
                                                             @if ($stok->product->tipe_barang == "Custom")
-                                                                <button id="add_custom_product" data-id="{{ $stok->id }}" data-barcode="{{ $stok->barcode }}" data-pd_name="{{ $stok->product->product_name }}" data-tipe_barang="{{ $stok->product->tipe_barang }}" data-bs-toggle="modal" data-bs-target="#modalAddCustomProduct" class="pos-add-button" type="button">
+                                                                <button class="btn btn-info btn-xs" id="add_custom_product" data-id="{{ $stok->id }}" data-barcode="{{ $stok->barcode }}" data-pd_name="{{ $stok->product->product_name }}" data-tipe_barang="{{ $stok->product->tipe_barang }}" data-bs-toggle="modal" data-bs-target="#modalAddCustomProduct" class="pos-add-button" type="button">
                                                                     <span class="mdi mdi-plus-box"></span>
                                                                 </button>
                                                             @elseif($stok->product->tipe_barang == "Pack")
-                                                                <button id="add_pack_product" data-satuan_unit_pack="{{ $stok->product->satuan_unit }}" data-id_pack="{{ $stok->id }}" data-barcode_pack="{{ $stok->barcode }}" data-pd_name_pack="{{ $stok->product->product_name }}" data-price_pack="{{$stok->product->harga_jual}}" data-tipe_barang_pack="{{ $stok->product->tipe_barang }}" data-bs-toggle="modal" data-bs-target="#modalAddPackProduct" class="pos-add-button" type="button">
+                                                                <button class="btn btn-info btn-xs" id="add_pack_product" data-satuan_unit_pack="{{ $stok->product->satuan_unit }}" data-id_pack="{{ $stok->id }}" data-barcode_pack="{{ $stok->barcode }}" data-pd_name_pack="{{ $stok->product->product_name }}" data-price_pack="{{$stok->product->harga_jual}}" data-tipe_barang_pack="{{ $stok->product->tipe_barang }}" data-bs-toggle="modal" data-bs-target="#modalAddPackProduct" class="pos-add-button" type="button">
                                                                     <span class="mdi mdi-plus-box"></span>
                                                                 </button>
                                                             @else
-                                                                <button class="pos-add-button" type="submit">
+                                                                <button class="btn btn-info btn-xs" class="pos-add-button" type="submit">
                                                                     <span class="mdi mdi-plus-box"></span>
                                                                 </button>
                                                             @endif
