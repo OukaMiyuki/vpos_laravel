@@ -78,6 +78,26 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="tipe_barang" class="form-label">Tipe Barang</label>
+                                                <input readonly type="text" class="form-control" name="tipe_barang" id="tipe_barang" value="{{ $product->tipe_barang }}" placeholder="Masukkan tipe barang" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="satuan" class="form-label">Satuan Barang</label>
+                                                <input readonly type="text" class="form-control" name="satuan" id="satuan" value="{{ $product->satuan_barang }}" placeholder="Masukkan satuan barang" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="unit" class="form-label">Satuan Unit</label>
+                                                <input readonly type="text" class="form-control" name="unit" id="unit" value="{{ $product->satuan_unit }}" placeholder="Masukkan satuan unit" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
                                     {{-- <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">

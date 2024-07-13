@@ -81,17 +81,20 @@ class Invoice extends Model {
                 'id_invoice' => $model->id,
                 'id_product' => $cart->id,
                 'product_name' => $cart->name,
-                'qty' =>$cart->qty,
+                'qty' => $cart->qty,
+                'tipe_barang' => $cart->options['size'],
                 'harga' => $cart->price,
                 'sub_total' => $cart->price*$cart->qty,
                 'id_kasir' => $kasir,
                 'id_tenant' => $tenant
             ]);
-            $stock = ProductStock::find($cart->id);
-            $updateStok = (int) $stock->stok - (int) $cart->qty;
-            $stock->update([
-                'stok' => $updateStok
-            ]);
+            if ($cart->options['size'] != "Custom" && $cart->options['size'] != "Pack"){
+                $stock = ProductStock::find($cart->id);
+                $updateStok = (int) $stock->stok - (int) $cart->qty;
+                $stock->update([
+                    'stok' => $updateStok
+                ]);
+            }
         }
     }
 

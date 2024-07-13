@@ -101,6 +101,7 @@
                                                     <option value="">- Pilih Tipe Barang -</option>
                                                     <option value="PCS">PCS</option>
                                                     <option value="Pack">Pack</option>
+                                                    <option value="Custom">Custom</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -136,7 +137,7 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="mb-3">
-                                                <label for="h_jual" class="form-label">Harga jual <strong>(Rp.)</strong></label>
+                                                <label for="h_jual" class="form-label">Satuan Harga jual <strong>(Rp.)</strong></label>
                                                 <input type="number" class="form-control" name="h_jual" id="h_jual" required value="{{ old('h_jual') }}" placeholder="Masukkan nominal harga jual">
                                             </div>
                                         </div>

@@ -84,11 +84,13 @@ class PosController extends Controller {
     }
 
     public function pos() {
+        $product_item_cart = Cart::content();
+        //dd($product_item_cart);
         $identifier = $this->getStoreIdentifier();
         $stock = ProductStock::with('product')
-                        ->where(function ($query) {
-                                $query->where('stok', '!=', 0);
-                        })
+                        // ->where(function ($query) {
+                        //         $query->where('stok', '!=', 0);
+                        // })
                         ->where('store_identifier', $identifier)
                         ->latest()
                         ->get();
@@ -112,14 +114,19 @@ class PosController extends Controller {
         } else {
             Cart::setGlobalTax(0);
         }
+        $banyak = abs($request->qty);
+        $price = $request->price;
+        if($request->tipe_barang == "Pack"){
+            $price = floor($banyak*$request->price);
+        }
 
         Cart::add([
             'id' => $request->id,
             'name' => $request->name,
-            'qty' => $request->qty,
+            'qty' => $banyak,
             'price' => $request->price,
             'weight' => 20,
-            'options' => ['size' => 'large']
+            'options' => ['size' => $request->tipe_barang]
         ]);
 
         $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
@@ -248,7 +255,7 @@ class PosController extends Controller {
                 }
             }
             $action = "Tenant : Create Transaction | ".$invoice->nomor_invoice;
-            $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
+            //$this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
             session()->forget('cart');
 
@@ -420,9 +427,9 @@ class PosController extends Controller {
         }
 
         $stock = ProductStock::with('product')
-                            ->where(function ($query) {
-                                    $query->where('stok', '!=', 0);
-                            })
+                            // ->where(function ($query) {
+                            //         $query->where('stok', '!=', 0);
+                            // })
                             ->where('store_identifier', $identifier)
                             ->latest()
                             ->get();
@@ -477,40 +484,68 @@ class PosController extends Controller {
         $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
                                     ->where('id_invoice', $request->id_invoice)
                                     ->first();
+        // dd($shoppingCart);
+        // $id_product = "";
+        // if($request->tipe_barang == "PCS"){
+        //     $id_product = $request->id_product;
+        // } else if($request->tipe_barang == "Custom"){
+        //     $id_product = $request->id_id;
+        // } else if($request->tipe_barang == "Pack"){
+        //     $id_product = $request->id_id_id;
+        // }
 
-        $stock = ProductStock::where('store_identifier', $identifier)
+        if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+            $stock = ProductStock::where('store_identifier', $identifier)
                             ->find($request->id_product);
 
-        if($stock->stok < $request->qty){
-            $notification = array(
-                'message' => 'Stok tidak mencukupi!',
-                'alert-type' => 'error',
-            );
-            return redirect()->back()->with($notification);
+            if($stock->stok < $request->qty){
+                $notification = array(
+                    'message' => 'Stok tidak mencukupi!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            }
         }
 
         if(empty($shoppingCart) || is_null($shoppingCart) || $shoppingCart->count() == 0 || $shoppingCart == ""){
+
             ShoppingCart::create([
                 'id_invoice' => $request->id_invoice,
                 'id_product' => $request->id_product,
                 'product_name' => $request->name,
                 'qty' => $request->qty,
                 'harga' => $request->price,
+                'tipe_barang' => $request->tipe_barang,
                 'sub_total' => $request->qty*$request->price
             ]);
         } else {
-            $tempQty = $shoppingCart->qty;
-            $totalQty = $tempQty+$request->qty;
-            $shoppingCart->update([
-                'qty' => $totalQty,
-                'sub_total' => $totalQty*$request->price
+            if($request->tipe_barang == "Custom" || $request->tipe_barang == "Pack"){
+                $updateSHoppingCart = ShoppingCart::find($shoppingCart->id);
+                $updateSHoppingCart->update([
+                    'qty' => $request->qty,
+                    'harga' => $request->price,
+                    'sub_total' => $request->qty*$request->sub_total
+                ]);
+                // $shoppingCart->update([
+                //     'qty' => 1,
+                //     'sub_total' => 200
+                // ]);
+                // dd($shoppingCart);
+            } else {
+                $tempQty = $shoppingCart->qty;
+                $totalQty = $tempQty+$request->qty;
+                $shoppingCart->update([
+                    'qty' => $totalQty,
+                    'sub_total' => $totalQty*$request->price
+                ]);
+            }
+        }
+        if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+            $updateStok = (int) $stock->stok - (int) $request->qty;
+            $stock->update([
+                'stok' => $updateStok
             ]);
         }
-
-        $updateStok = (int) $stock->stok - (int) $request->qty;
-        $stock->update([
-            'stok' => $updateStok
-        ]);
 
         $notification = array(
             'message' => 'Successfully Added!',
@@ -740,7 +775,7 @@ class PosController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-        
+
         $path = 'qrcode/';
 
         if(!\File::exists(public_path($path))) {

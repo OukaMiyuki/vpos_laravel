@@ -32,8 +32,9 @@
                                         <div class="col-md-12">
                                             <div class="mb-3">
                                                 <label for="id_batch_product" class="form-label">Product Name</label>
-                                                <input required readonly type="hidden" class="form-control" name="id" id="id" value="{{ $stock->id }}"">
-                                                <input required readonly type="text" class="form-control" name="id_batch_product" id="id_batch_product" value="{{ $stock->product->product_name }}" placeholder="Masukkan batch produk">
+                                                <input required readonly type="hidden" class="form-control" name="id" id="id" value="{{ $stock->id }}">
+                                                <input required readonly type="hidden" class="form-control" name="id_batch_product" id="id_batch_product" value="{{ $stock->product->id }}">
+                                                <input required readonly type="text" class="form-control" name="product_name" id="product_name" value="{{ $stock->product->product_name }}" placeholder="Masukkan batch produk">
                                             </div>
                                         </div>
                                     </div>

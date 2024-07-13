@@ -781,6 +781,11 @@ class TenantController extends Controller {
                 return redirect()->route('tenant.product.batch.list')->with($notification);
             }
 
+            $satuanHargaJual = 0;
+            if($request->tipe_barang != "Custom"){
+                $satuanHargaJual = $request->h_jual;
+            }
+
             Product::create([
                 'store_identifier' => $identifier,
                 'id_batch' => $request->batch,
@@ -792,7 +797,10 @@ class TenantController extends Controller {
                 'nomor_rak' => $request->rak,
                 'tanggal_beli' => $request->t_beli,
                 'tanggal_expired' => $request->t_expired,
-                'harga_jual' => (int) $request->h_jual
+                'harga_jual' => (int) $satuanHargaJual,
+                'tipe_barang' => $request->tipe_barang,
+                'satuan_barang' => $request->satuan,
+                'satuan_unit' => $request->unit,
             ]);
 
             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
@@ -865,6 +873,11 @@ class TenantController extends Controller {
                 return redirect()->back()->with($notification);
             }
 
+            $satuanHargaJual = 0;
+            if($request->tipe_barang != "Custom"){
+                $satuanHargaJual = $request->h_jual;
+            }
+
             if($request->hasFile('photo')){
                 $file = $request->file('photo');
                 $namaFile = $product->p_name;
@@ -896,7 +909,10 @@ class TenantController extends Controller {
                     'photo' => $filename,
                     'nomor_gudang' => $request->gudang,
                     'nomor_rak' => $request->rak,
-                    'harga_jual' => $request->h_jual
+                    'harga_jual' => $satuanHargaJual,
+                    'tipe_barang' => $request->tipe_barang,
+                    'satuan_barang' => $request->satuan,
+                    'satuan_unit' => $request->unit,
                 ]);
             } else {
                 $product->update([
@@ -906,7 +922,10 @@ class TenantController extends Controller {
                     'id_supplier' => $request->supplier,
                     'nomor_gudang' => $request->gudang,
                     'nomor_rak' => $request->rak,
-                    'harga_jual' => $request->h_jual
+                    'harga_jual' => $satuanHargaJual,
+                    'tipe_barang' => $request->tipe_barang,
+                    'satuan_barang' => $request->satuan,
+                    'satuan_unit' => $request->unit,
                 ]);
             }
 
@@ -994,9 +1013,29 @@ class TenantController extends Controller {
 
         $action = "Tenant : Add New Stock";
         DB::connection()->enableQueryLog();
+        $identifier = $this->getStoreIdentifier();
+        $product = Product::where('store_identifier', $identifier)->find($request->id_batch_product);
+        if(is_null($product) || empty($product)){
+            $notification = array(
+                'message' => 'Produk tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('tenant.product.stock.list')->with($notification);
+        }
+
+        $stock = 0;
+        if($product->tipe_barang != "Pack" && $product->tipe_barang != "Custom"){
+            $stock = $request->stok;
+                        if($request->stok == 0){
+                $notification = array(
+                    'message' => 'Untuk tipe produk tersebut, stok barang tidak boleh 0!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification)->withInput(); 
+            }
+        }
 
         try{
-            $identifier = $this->getStoreIdentifier();
             ProductStock::create([
                 'store_identifier' => $identifier,
                 'id_batch_product' => $request->id_batch_product,
@@ -1004,7 +1043,7 @@ class TenantController extends Controller {
                 'tanggal_beli' => $request->t_beli,
                 'tanggal_expired' => $request->t_expired,
                 'harga_beli' => $request->h_beli,
-                'stok' => $request->stok
+                'stok' => $stock
             ]);
 
             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
@@ -1046,9 +1085,29 @@ class TenantController extends Controller {
     public function productStockUpdate(Request $request){
         $action = "Tenant : Stock Update";
         DB::connection()->enableQueryLog();
+        $identifier = $this->getStoreIdentifier();
+        $product = Product::where('store_identifier', $identifier)->find($request->id_batch_product);
+        if(is_null($product) || empty($product)){
+            $notification = array(
+                'message' => 'Produk tidak ditemukan!',
+                'alert-type' => 'warning',
+            );
+            return redirect()->route('tenant.product.stock.list')->with($notification);
+        }
+
+        $stok = 0;
+        if($product->tipe_barang != "Pack" && $product->tipe_barang != "Custom"){
+            $stok = $request->stok;
+            if($request->stok == 0){
+                $notification = array(
+                    'message' => 'Untuk tipe produk tersebut, stok barang tidak boleh 0!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification)->withInput(); 
+            }
+        }
 
         try{
-            $identifier = $this->getStoreIdentifier();
             $stock = ProductStock::where('store_identifier', $identifier)
                                 ->find($request->id);
 
@@ -1066,9 +1125,9 @@ class TenantController extends Controller {
                 'tanggal_beli' => $request->t_beli,
                 'tanggal_expired' => $request->t_expired,
                 'harga_beli' => $request->h_beli,
-                'stok' => $request->stok
+                'stok' => $stok
             ]);
-
+            
             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
 
             $notification = array(

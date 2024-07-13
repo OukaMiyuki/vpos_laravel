@@ -40,7 +40,7 @@
                                                 <select required class="form-control" name="id_batch_product" id="id_batch_product" data-toggle="select2" data-width="100%">
                                                     <option value="">- Pilih Batch Product -</option>
                                                     @foreach (App\Models\Product::where('store_identifier', $store->store_identifier)->latest()->get() as $product)
-                                                        <option value="{{ $product->id }}"@if (old('id_batch_product') == $product->id) selected="selected" @endif>{{ $product->product_code }} - {{ $product->product_name }}</option>
+                                                        <option value="{{ $product->id }}"@if (old('id_batch_product') == $product->id) selected="selected" @endif>{{ $product->product_code }} - {{ $product->product_name }} - {{ $product->tipe_barang }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -53,7 +53,7 @@
                                                 <div class="row">
                                                     <div class="col-6">
                                                         <input required type="text" class="form-control" name="barcode" id="barcode" value="" placeholder="Masukkan barcode" readonly>
-                                                        <small id="emailHelp" class="form-text text-muted">Barcode tidak boleh sama dengan data stok lain</small>
+                                                        <small id="emailHelp" class="form-text text-muted"><strong>Barcode tidak boleh sama dengan data stok lain</strong></small>
                                                     </div>
                                                     <div class="col-6">
                                                         <button type="button" id="enable_manual_batcode" class="btn btn-success waves-effect waves-light w-100">Input Barcode Manual</button>
@@ -64,7 +64,8 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="stok" class="form-label">Stok</label>
-                                                <input required type="number" class="form-control" name="stok" id="stok" value="" placeholder="Masukkan jumlah stok">
+                                                <input required type="number" class="form-control" name="stok" id="stok" value="0" placeholder="Masukkan jumlah stok">
+                                                <small id="emailHelp" class="form-text text-muted"><strong>Untuk barang dengan tipe Pack dan Custom, 0 pada stok barang, selain itu wajib mengisi jumlah stok barang</strong></small>
                                             </div>
                                         </div>
                                     </div>

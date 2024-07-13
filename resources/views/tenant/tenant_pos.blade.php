@@ -21,13 +21,14 @@
                 <div class="col-lg-6 col-xl-6">
                     <div class="card text-center">
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="pos-table" class="table table-bordered border-primary mb-0 w-100">
+                            {{-- <div class="table-responsive"> --}}
+                                <table id="scroll-horizontal-table-pos" class="table table-bordered border-primary w-100 nowrap">
                                     <thead>
                                         <tr>
                                             <th>Action</th>
                                             <th>Nama</th>
                                             <th>QTY</th>
+                                            <th>Tipe</th>
                                             <th>Harga</th>
                                             <th>Sub Total</th>
                                         </tr>
@@ -43,13 +44,14 @@
                                                 <td><a href="{{ route('tenant.pos.deleteCart', ['id' => $cart->rowId]) }}"><h4><span class="mdi mdi-trash-can-outline"></span></h4></a></td>
                                                 <td class="text-start">{{ $cart->name }}</td>
                                                 <td>
-                                                    <form id="qtyform" action="{{ route('tenant.pos.updateCart') }}" method="post">
+                                                    <form @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif id="qtyform" action="{{ route('tenant.pos.updateCart') }}" method="post">
                                                         @csrf
-                                                        <input type="hidden" name="id" value="{{ $cart->rowId }}">
-                                                        <input type="number" name="qty" class="qty_txt" value="{{ $cart->qty }}" min="1">
-                                                        <button type="submit" class="btn btn-sm btn-success"><span class="mdi mdi-check-bold"></span></button>
+                                                        <input @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="hidden" name="id" value="{{ $cart->rowId }}">
+                                                        <input @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="number" name="qty" class="qty_txt" value="{{ $cart->qty }}" min="1">
+                                                        <button @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="submit" class="btn btn-sm btn-success"><span class="mdi mdi-check-bold"></span></button>
                                                     </form>
                                                 </td>
+                                                <td>{{ $cart->options['size'] }}</td>
                                                 <td>{{ $cart->price }}</td>
                                                 <td>{{ $cart->price*$cart->qty }}</td>
                                                 @php
@@ -59,7 +61,8 @@
                                         @endforeach
                                     </tbody>
                                 </table>
-                            </div> <!-- end .table-responsive-->
+                            {{-- </div> --}}
+                            <br>
                             <div class="bg-primary pt-3 pb-2">
                                 @php
                                     $store = App\Models\StoreDetail::select(['store_identifier'])
@@ -159,6 +162,7 @@
                                                 <th>Kode Barang</th>
                                                 <th>Name</th>
                                                 <th>Harga</th>
+                                                <th>Tipe Barang</th>
                                                 <th>Stok</th>
                                             </tr>
                                         </thead>
@@ -175,7 +179,21 @@
                                                             <input readonly type="hidden" id="name" name="name" value="{{ $stok->product->product_name }}">
                                                             <input readonly type="hidden" id="qty" name="qty" value="1">
                                                             <input readonly type="hidden" id="price" name="price" value="{{ $stok->product->harga_jual }}">
-                                                            <button class="pos-add-button" type="submit"><span class="mdi mdi-plus-box"></span></button>
+                                                            <input readonly type="hidden" id="tipe_barang" name="tipe_barang" value="{{ $stok->product->tipe_barang }}">
+                                                            @if ($stok->product->tipe_barang == "Custom")
+                                                                <button id="add_custom_product" data-id="{{ $stok->id }}" data-barcode="{{ $stok->barcode }}" data-pd_name="{{ $stok->product->product_name }}" data-tipe_barang="{{ $stok->product->tipe_barang }}" data-bs-toggle="modal" data-bs-target="#modalAddCustomProduct" class="pos-add-button" type="button">
+                                                                    <span class="mdi mdi-plus-box"></span>
+                                                                </button>
+                                                            @elseif($stok->product->tipe_barang == "Pack")
+                                                                <button id="add_pack_product" data-satuan_unit_pack="{{ $stok->product->satuan_unit }}" data-id_pack="{{ $stok->id }}" data-barcode_pack="{{ $stok->barcode }}" data-pd_name_pack="{{ $stok->product->product_name }}" data-price_pack="{{$stok->product->harga_jual}}" data-tipe_barang_pack="{{ $stok->product->tipe_barang }}" data-bs-toggle="modal" data-bs-target="#modalAddPackProduct" class="pos-add-button" type="button">
+                                                                    <span class="mdi mdi-plus-box"></span>
+                                                                </button>
+                                                            @else
+                                                                <button class="pos-add-button" type="submit">
+                                                                    <span class="mdi mdi-plus-box"></span>
+                                                                </button>
+                                                            @endif
+                                                            {{-- <button class="pos-add-button" type="submit"><span class="mdi mdi-plus-box"></span></button> --}}
                                                         </form>
                                                     </td>
                                                     <td>
@@ -191,6 +209,7 @@
                                                     <td>{{ $stok->product->product_code }}</td>
                                                     <td>{{ $stok->product->product_name }}</td>
                                                     <td>{{ $stok->product->harga_jual }}</td>
+                                                    <td>{{ $stok->product->tipe_barang }}</td>
                                                     <td>{{ $stok->stok }}</td>
                                                 </tr>
                                             @endforeach
@@ -305,10 +324,10 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Masukkan Info Pelanggan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form class="px-3" action="{{ route('tenant.pos.invoice.save') }}" method="post" id="show">
+                    <h5 class="modal-title" id="staticBackdropLabel">Masukkan Info Pelanggan</h5>
                     @csrf
                     <div class="modal-body" id="checkoutProcess">
                         <div class="row">
@@ -342,4 +361,107 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modalAddCustomProduct" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="px-3" action="{{ route('tenant.pos.addcart') }}" method="post" id="show">
+                    <h5 class="modal-title" id="staticBackdropLabel">Masukkan Harga</h5>
+                    @csrf
+                    <div class="modal-body" id="checkoutProcess">
+                        <input readonly type="hidden" id="id_id" name="id" value="">
+                        <input readonly type="hidden" id="barcode_barcode" name="barcode" value="">
+                        <input readonly type="hidden" id="name_name" name="name" value="">
+                        <input readonly type="hidden" id="tipe_tipe" name="tipe_barang" value="">
+                        <input readonly type="hidden" id="qty" name="qty" value="1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="hbarang" class="form-label">Harga</label>
+                                    <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" id="hbarang" value="{{ old('price') }}" placeholder="Masukkan harga barang">
+                                    @error('content1')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Tambah</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalAddPackProduct" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="px-3" action="{{ route('tenant.pos.addcart') }}" method="post" id="show_pack">
+                    <h5 class="modal-title" id="staticBackdropLabel">Masukkan Banyak Beli</p></h5>
+                    @csrf
+                    <div class="modal-body" id="checkoutProcess">
+                        <input readonly type="hidden" id="id_id_id" name="id" value="">
+                        <input readonly type="hidden" id="barcode_barcode_barcode" name="barcode" value="">
+                        <input readonly type="hidden" id="name_name_name" name="name" value="">
+                        <input readonly type="hidden" id="tipe_tipe_tipe" name="tipe_barang" value="">
+                        <input readonly type="hidden" id="price_price" name="price" value="">
+                        {{-- <input readonly type="text" id="qty" name="qty" value="1"> --}}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="qty" class="form-label">Banyak Pembelian</label>
+                                    <p class="sub-header " id="satuan_unit_barang"></p>
+                                    <input type="number" step="0.01" min="1" class="form-control" name="qty" id="qty" value="" placeholder="Masukkan banyak pembelian">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Tambah</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{-- <div class="modal fade" id="modalAddCustomQuantity" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Masukkan Harga</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="px-3" action="{{ route('tenant.pos.addcart') }}" method="post" id="show">
+                    @csrf
+                    <div class="modal-body" id="checkoutProcess">
+                        <input readonly type="hidden" id="id_id" name="id" value="">
+                        <input readonly type="hidden" id="barcode_barcode" name="barcode" value="">
+                        <input readonly type="hidden" id="name_name" name="name" value="">
+                        <input readonly type="hidden" id="qty" name="qty" value="1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="hbarang" class="form-label">Harga</label>
+                                    <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" id="hbarang" value="{{ old('price') }}" placeholder="Masukkan harga barang">
+                                    @error('content1')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Tambah</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> --}}
 </x-tenant-layout>

@@ -112,6 +112,10 @@
             <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
             <Script type="text/javascript" src="{{ asset('assets/js/pages/posinit.js') }}"></Script>
         @endif
+        @if (Route::is('tenant.transaction.list.pending.restore'))
+            <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
+            <Script type="text/javascript" src="{{ asset('assets/js/pages/posinitrestore.js') }}"></Script>
+        @endif
         @if (auth()->user()->id_inv_code != 0)
             <Script type="text/javascript" src="{{ asset('assets/js/pages/mitratenantinit.js') }}"></Script>
         @endif

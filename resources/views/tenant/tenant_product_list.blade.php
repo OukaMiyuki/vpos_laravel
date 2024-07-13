@@ -39,6 +39,9 @@
                                         <th>Product Batch Code</th>
                                         <th>Product Name</th>
                                         <th>Kategori</th>
+                                        <th class="text-center">Tipe Barang</th>
+                                        <th class="text-center">Satuan Barang</th>
+                                        <th class="text-center">Satuan Unit Barang</th>
                                         <th>Harga Jual Per-Piece (Rp.)</th>
                                     </tr>
                                 </thead>
@@ -64,6 +67,9 @@
                                             <td>{{ $product->product_code }}</td>
                                             <td>{{ $product->product_name }}</td>
                                             <td>{{ $product->category->name }}</td>
+                                            <td class="text-center">{{ $product->tipe_barang }}</td>
+                                            <td class="text-center">{{ $product->satuan_barang }}</td>
+                                            <td class="text-center">{{ $product->satuan_unit }}</td>
                                             {{-- <td>{{ $product->stok }}</td> --}}
                                             <td>@money($product->harga_jual)</td>
                                         </tr>
