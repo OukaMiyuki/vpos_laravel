@@ -75,7 +75,7 @@
                 <i class="fe-maximize noti-icon"></i>
                 </a>
             </li>
-            <li class="dropdown notification-list topbar-dropdown">
+            {{-- <li class="dropdown notification-list topbar-dropdown">
                 <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                 <i class="fe-bell noti-icon"></i>
                 <span class="badge bg-danger rounded-circle noti-icon-badge">9</span>
@@ -156,7 +156,7 @@
                     <i class="fe-arrow-right"></i>
                     </a>
                 </div>
-            </li>
+            </li> --}}
             <li class="dropdown notification-list topbar-dropdown">
                 <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                     <img src="{{ !empty(auth()->user()->detail->photo) ? Storage::url('images/profile/'.auth()->user()->detail->photo) : asset('assets/images/blank_profile.png') }}" alt="user-image" class="rounded-circle">
