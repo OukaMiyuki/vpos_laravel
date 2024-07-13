@@ -35,10 +35,10 @@
                             <h4 class="header-title mb-3">Settlement Pending List</h4>
                             <div class="row">
                                 <div class="col-6">
-                                    <h3 class="mb-3"><span>Total Settlement Pending : </span>{{ $settlemetHistory->sum('nominal_settle') }}</h3>
+                                    <h3 class="mb-3"><span>Total Settlement Pending : </span>@currency($settlemetHistory->sum('nominal_settle'))</h3>
                                 </div>
                                 <div class="col-6 text-end">
-                                    <h3 class="mb-3"><span>Total Insentif Cashback Pending : </span>{{ $settlemetHistory->sum('nominal_insentif_cashback') }} </h3>
+                                    <h3 class="mb-3"><span>Total Insentif Cashback Pending : </span>@currency($settlemetHistory->sum('nominal_insentif_cashback'))</h3>
                                 </div>
                             </div>
                             <div class="responsive-table-plugin">
