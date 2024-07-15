@@ -61,8 +61,8 @@
                                                         <button class="btn btn-success btn-xs" @if($cart->tipe_barang == "Custom" || $cart->tipe_barang == "Pack") disabled @endif type="submit" class="btn btn-sm btn-success"><span class="mdi mdi-check-bold"></span></button>
                                                     </form>
                                                 </td>
-                                                <td>{{ $cart->harga }}</td>
                                                 <td>{{ $cart->tipe_barang }}</td>
+                                                <td>{{ $cart->harga }}</td>
                                                 @php
                                                     $subttl = $cart->harga*$cart->qty;
                                                 @endphp
@@ -305,9 +305,9 @@
                         <input type="hidden" class="d-none" name="sub_total_belanja" id="sub_total_belanja" required value="{{ $sub_total_belanja }}" readonly>
                         <input type="hidden" class="d-none" name="nominal_pajak" id="nominal_pajak" required value="{{ $nominalpajak }}" readonly>
                         <input type="hidden" class="d-none" name="nominal_diskon" id="nominal_diskon" required value="{{ $nominaldiskon }}" readonly>
-                        <input type="hidden" class="d-none" type="text" name="jenisPembayaran" id="jenisPembayaran" readonly>
-                        <input type="hidden" class="d-none" type="text" name="nominalText" id="nominalText" readonly>
-                        <input type="hidden" class="d-none" type="text" name="kembalianText" id="kembalianText" readonly>
+                        <input type="hidden" class="d-none" name="jenisPembayaran" id="jenisPembayaran" readonly>
+                        <input type="hidden" class="d-none" name="nominalText" id="nominalText" readonly>
+                        <input type="hidden" class="d-none" name="kembalianText" id="kembalianText" readonly>
                         @switch(true)
                             @case($customField->id != '')
                                 @if (!empty($customField->baris1) && $customField->baris_1_activation != 0)
@@ -397,16 +397,16 @@
                     <h5 class="modal-title" id="staticBackdropLabel">Masukkan Harga</h5>
                     @csrf
                     <div class="modal-body" id="checkoutProcess">
-                        <input readonly type="text" id="id_id_invoice" name="id_invoice" value="">
-                        <input readonly type="text" id="id_id" name="id_product" value="">
-                        <input readonly type="text" id="barcode_barcode" name="barcode" value="">
-                        <input readonly type="text" id="name_name" name="name" value="">
-                        <input readonly type="text" id="tipe_tipe" name="tipe_barang" value="">
-                        <input readonly type="text" id="qty" name="qty" value="1">
+                        <input readonly type="hidden" id="id_id_invoice" name="id_invoice" value="">
+                        <input readonly type="hidden" id="id_id" name="id_product" value="">
+                        <input readonly type="hidden" id="barcode_barcode" name="barcode" value="">
+                        <input readonly type="hidden" id="name_name" name="name" value="">
+                        <input readonly type="hidden" id="tipe_tipe" name="tipe_barang" value="">
+                        <input readonly type="hidden" id="qty" name="qty" value="1">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="hbarang" class="form-label">Harga</label>
+                                    <label for="hbarang" class="form-label">Harga (Rp.)</label>
                                     <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" id="hbarang" value="{{ old('price') }}" placeholder="Masukkan harga barang">
                                     @error('content1')
                                         <span class="text-danger">{{ $message }}</span>
@@ -433,12 +433,12 @@
                     <h5 class="modal-title" id="staticBackdropLabel">Masukkan Banyak Beli</p></h5>
                     @csrf
                     <div class="modal-body" id="checkoutProcess">
-                        <input readonly type="text" id="id_id_id" name="id_product" value="">
-                        <input readonly type="text" id="id_id_id_invoice" name="id_invoice" value="">
-                        <input readonly type="text" id="barcode_barcode_barcode" name="barcode" value="">
-                        <input readonly type="text" id="name_name_name" name="name" value="">
-                        <input readonly type="text" id="tipe_tipe_tipe" name="tipe_barang" value="">
-                        <input readonly type="text" id="price_price" name="price" value="">
+                        <input readonly type="hidden" id="id_id_id" name="id_product" value="">
+                        <input readonly type="hidden" id="id_id_id_invoice" name="id_invoice" value="">
+                        <input readonly type="hidden" id="barcode_barcode_barcode" name="barcode" value="">
+                        <input readonly type="hidden" id="name_name_name" name="name" value="">
+                        <input readonly type="hidden" id="tipe_tipe_tipe" name="tipe_barang" value="">
+                        <input readonly type="hidden" id="price_price" name="price" value="">
                         {{-- <input readonly type="text" id="qty" name="qty" value="1"> --}}
                         <div class="row">
                             <div class="col-md-12">

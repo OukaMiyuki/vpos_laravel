@@ -379,7 +379,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="hbarang" class="form-label">Harga</label>
+                                    <label for="hbarang" class="form-label">Harga (Rp.)</label>
                                     <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" id="hbarang" value="{{ old('price') }}" placeholder="Masukkan harga barang">
                                     @error('content1')
                                         <span class="text-danger">{{ $message }}</span>

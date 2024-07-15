@@ -113,6 +113,11 @@
             <Script type="text/javascript" src="{{ asset('assets/js/pages/posinit.js') }}"></Script>
         @endif
 
+        @if (Route::is('kasir.transaction.pending.restore'))
+            <script src="{{ asset('assets/js/pages/onscan.js') }}"></script>
+            <Script type="text/javascript" src="{{ asset('assets/js/pages/posinitrestore.js') }}"></Script>
+        @endif
+
 
         {{-- Custom FOrm JS --}}
 

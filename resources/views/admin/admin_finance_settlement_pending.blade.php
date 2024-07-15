@@ -68,8 +68,8 @@
                                                         <td>{{$stlpending->tenant->email}}</td>
                                                         <td>{{$stlpending->nomor_settlement_pending}}</td>
                                                         <td class="text-center">{{\Carbon\Carbon::parse($stlpending->settlement_schedule)->format('d-m-Y')}}</td>
-                                                        <td>{{$stlpending->nominal_settle}}</td>
-                                                        <td>{{$stlpending->nominal_insentif_cashback}}</td>
+                                                        <td>@currency($stlpending->nominal_settle)</td>
+                                                        <td>@currency($stlpending->nominal_insentif_cashback)</td>
                                                         <td>
                                                             @if ($stlpending->status == 0)
                                                                 <span class="badge bg-soft-warning text-danger">Settlement Gagal</span>

@@ -484,20 +484,9 @@ class PosController extends Controller {
         $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
                                     ->where('id_invoice', $request->id_invoice)
                                     ->first();
-        // dd($shoppingCart);
-        // $id_product = "";
-        // if($request->tipe_barang == "PCS"){
-        //     $id_product = $request->id_product;
-        // } else if($request->tipe_barang == "Custom"){
-        //     $id_product = $request->id_id;
-        // } else if($request->tipe_barang == "Pack"){
-        //     $id_product = $request->id_id_id;
-        // }
 
         if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
-            $stock = ProductStock::where('store_identifier', $identifier)
-                            ->find($request->id_product);
-
+            $stock = ProductStock::where('store_identifier', $identifier)->find($request->id_product);
             if($stock->stok < $request->qty){
                 $notification = array(
                     'message' => 'Stok tidak mencukupi!',
@@ -621,13 +610,13 @@ class PosController extends Controller {
                                     ->where('id_invoice', $request->id_invoice)
                                     ->first();
 
-        $stock = ProductStock::where('store_identifier', $identifier)
-                                    ->find($request->id_product);
-
-        $updateStok = (int) $stock->stok+$shoppingCart->qty;
-        $stock->update([
-            'stok' => $updateStok
-        ]);
+        if($shoppingCart->tipe_barang != "Custom" && $shoppingCart->tipe_barang != "Pack"){
+            $stock = ProductStock::where('store_identifier', $identifier)->find($request->id_product);
+            $updateStok = (int) $stock->stok+$shoppingCart->qty;
+            $stock->update([
+                'stok' => $updateStok
+            ]);
+        }
         $shoppingCart->delete();
         $notification = array(
             'message' => 'Successfully Updated!',

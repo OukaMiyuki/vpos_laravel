@@ -34,12 +34,12 @@
                                 <table id="scroll-horizontal-datatable" class="table nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th>No.</th>
-                                            <th>Invoice</th>
-                                            <th>Customer Info</th>
+                                            <th width="5">No.</th>
+                                            <th width="5" class="text-center">Action</th>
+                                            <th width="40">Customer Info</th>
+                                            <th width="30">Invoice</th>
                                             <th class="text-center">Tanggal Transaksi</th>
                                             <th class="text-center">Status</th>
-                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -47,18 +47,18 @@
                                         @foreach($invoice as $invoice)
                                             <tr>
                                                 <td>{{$no+=1}}</td>
-                                                <td>{{$invoice->nomor_invoice}}</td>
-                                                <td>{{$invoice->customer->customer_info}}</td>
-                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}}</td>
-                                                <td class="text-center"><span class="badge bg-soft-danger text-danger">Belum Diproses</span></td>
                                                 <td class="text-center">
                                                     <a href="{{ route('kasir.transaction.pending.restore', ['id' => $invoice->id ]) }}">
-                                                        <button title="Restore transaction" type="button" class="btn btn-success btn-xs waves-effect waves-light"><span class="mdi mdi-history"></span></button>&nbsp;
+                                                        <button title="Restore transaction" type="button" class="btn btn-info btn-xs waves-effect waves-light"><span class="mdi mdi-history"></span></button>&nbsp;
                                                     </a>
                                                     <a href="{{ route('kasir.transaction.pending.delete', ['id' => $invoice->id ]) }}">
                                                         <button title="Hapus transaksi pending" type="button" class="btn btn-danger btn-xs waves-effect waves-light"><span class="mdi mdi-trash-can"></span></button>
                                                     </a>
                                                 </td>
+                                                <td>{{$invoice->customer->customer_info}}</td>
+                                                <td>{{$invoice->nomor_invoice}}</td>
+                                                <td class="text-center">{{\Carbon\Carbon::parse($invoice->tanggal_transaksi)->format('d-m-Y')}} {{\Carbon\Carbon::parse($invoice->created_at)->format('H:i:s')}}</td>
+                                                <td class="text-center"><span class="badge bg-soft-danger text-danger">Belum Diproses</span></td>
                                             </tr>
                                         @endforeach
                                     </tbody>

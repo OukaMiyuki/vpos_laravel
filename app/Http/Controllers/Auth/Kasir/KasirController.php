@@ -130,10 +130,7 @@ class KasirController extends Controller {
     }
 
     public function kasirPos(){
-        $stock = ProductStock::with('product')
-                        ->where(function ($query) {
-                                $query->where('stok', '!=', 0);
-                        })->where('store_identifier', auth()->user()->id_store)->latest()->get();
+        $stock = ProductStock::with('product')->where('store_identifier', auth()->user()->id_store)->latest()->get();
         $customField = TenantField::where('store_identifier', auth()->user()->id_store)->first();
         return view('kasir.kasir_pos', compact('stock', 'customField'));
     }
@@ -157,7 +154,7 @@ class KasirController extends Controller {
             'qty' => $request->qty,
             'price' => $request->price,
             'weight' => 20,
-            'options' => ['size' => 'large']
+            'options' => ['size' => $request->tipe_barang]
         ]);
         $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
         if(!empty($diskon)){
@@ -418,10 +415,7 @@ class KasirController extends Controller {
             );
             return redirect()->route('kasir.transaction.pending')->with($notification);
         }
-        $stock = ProductStock::with('product')
-                            ->where(function ($query) {
-                                    $query->where('stok', '!=', 0);
-                            })->where('store_identifier', auth()->user()->id_store)->latest()->get();
+        $stock = ProductStock::with('product')->where('store_identifier', auth()->user()->id_store)->latest()->get();
         $customField = TenantField::where('store_identifier', auth()->user()->id_store)->first();
         $shoppingCart = $invoice->shoppingCart;
         $notification = array(
@@ -435,15 +429,15 @@ class KasirController extends Controller {
         $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
                                     ->where('id_invoice', $request->id_invoice)
                                     ->first();
-
-        $stock = ProductStock::find($request->id_product);
-
-        if($stock->stok < $request->qty){
-            $notification = array(
-                'message' => 'Stok tidak mencukupi!',
-                'alert-type' => 'error',
-            );
-            return redirect()->back()->with($notification);
+        if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+            $stock = ProductStock::find($request->id_product);
+            if($stock->stok < $request->qty){
+                $notification = array(
+                    'message' => 'Stok tidak mencukupi!',
+                    'alert-type' => 'error',
+                );
+                return redirect()->back()->with($notification);
+            }
         }
 
         if(empty($shoppingCart) || $shoppingCart->count() == 0 || $shoppingCart == ""){
@@ -453,21 +447,33 @@ class KasirController extends Controller {
                 'product_name' => $request->name,
                 'qty' => $request->qty,
                 'harga' => $request->price,
+                'tipe_barang' => $request->tipe_barang,
                 'sub_total' => $request->qty*$request->price
             ]);
         } else {
-            $tempQty = $shoppingCart->qty;
-            $totalQty = $tempQty+$request->qty;
-            $shoppingCart->update([
-                'qty' => $totalQty,
-                'sub_total' => $totalQty*$request->price
-            ]);
+            if($request->tipe_barang == "Custom" || $request->tipe_barang == "Pack"){
+                $updateSHoppingCart = ShoppingCart::find($shoppingCart->id);
+                $updateSHoppingCart->update([
+                    'qty' => $request->qty,
+                    'harga' => $request->price,
+                    'sub_total' => $request->qty*$request->sub_total
+                ]);
+            } else {
+                $tempQty = $shoppingCart->qty;
+                $totalQty = $tempQty+$request->qty;
+                $shoppingCart->update([
+                    'qty' => $totalQty,
+                    'sub_total' => $totalQty*$request->price
+                ]);
+            }
         }
 
-        $updateStok = (int) $stock->stok - (int) $request->qty;
-        $stock->update([
-            'stok' => $updateStok
-        ]);
+        if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+            $updateStok = (int) $stock->stok - (int) $request->qty;
+            $stock->update([
+                'stok' => $updateStok
+            ]);
+        }
 
         $notification = array(
             'message' => 'Successfully Added!',
@@ -538,13 +544,15 @@ class KasirController extends Controller {
         $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
                                     ->where('id_invoice', $request->id_invoice)
                                     ->first();
-        $stock = ProductStock::find($request->id_product);
-        $updateStok = (int) $stock->stok+$shoppingCart->qty;
-        $stock->update([
-            'stok' => $updateStok
-        ]);
+
+        if($shoppingCart->tipe_barang != "Custom" && $shoppingCart->tipe_barang != "Pack"){
+            $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($request->id_product);
+            $updateStok = (int) $stock->stok+$shoppingCart->qty;
+            $stock->update([
+                'stok' => $updateStok
+            ]);
+        }
         $shoppingCart->delete();
-        //dd($updateqty);
         $notification = array(
             'message' => 'Successfully Updated!',
             'alert-type' => 'success',
