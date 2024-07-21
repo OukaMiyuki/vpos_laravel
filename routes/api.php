@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('payment-qris-success', [\App\Http\Controllers\Api\PaymentQrisConfirm::class, 'qrisConfirmPayment']);
 Route::post('request-invoice-number', [\App\Http\Controllers\Api\PaymentQrisConfirm::class, 'requestInvoiceNumber']);
 Route::post('request-qris', [\App\Http\Controllers\Api\PaymentQrisConfirm::class, 'requestQris']);
+Route::post('inquiry-payment', [\App\Http\Controllers\Api\PaymentQrisConfirm::class, 'inquiryQris']);
 
 Route::middleware(['guest:tenant', 'guest:kasir', 'throttle:100,1', 'custom.restrict'])->group( function () {
     Route::post('register', [\App\Http\Controllers\Auth\Api\RegisterController::class, 'registerTenant']);
