@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth\Tenant\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Stevebauman\Location\Facades\Location;
@@ -26,6 +27,8 @@ use App\Models\Discount;
 use App\Models\Withdrawal;
 use App\Models\AppVersion;
 use App\Models\History;
+use App\Models\Supplier;
+use App\Models\Batch;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -455,6 +458,249 @@ class TenantController extends Controller {
         }
     }
 
+    public function productType() : JsonResponse{
+        $typeBarang = array(
+            'PCS' => array(
+                'Qty' => array(
+                    'PCS'
+                ),
+                'Jumlah' => array(
+                    'Lusin',
+                    'Gross',
+                    'Kodi',
+                    'Rim'
+                )
+            ),
+            'Pack' => array(
+                'Berat' => array(
+                    'Kg - (Kilogram)',
+                    'g - (gram)',
+                    'Ons',
+                    'Mg - (Miligram)',
+                    'Ton',
+                    'Kw - (Kuintal)'
+                ),
+                'Jarak' => array(
+                    'km - (Kilometer)'
+                ),
+                'Volume' => array(
+                    'kl - (Kiloliter)',
+                    'hl - (Hektaliter)',
+                    'dal - (Dekaliter)',
+                    'l - (Liter)',
+                    'dl - (Desiliter)',
+                    'cl - (Centiliter)',
+                    'ml - (Mililiter)'
+                ),
+                'Panjang' => array(
+                    'km - (Kilometer)',
+                    'hm - (Hektometer)',
+                    'dam - (Dekameter)',
+                    'm - (Meter)',
+                    'dm - (Desimeter)',
+                    'cm - (Centimeter)',
+                    'mm - (Milimeter)',
+                    'inch - (Inchi)'
+                )
+            ),
+            'Custom' => array(
+                'Custom' => array(
+                    'Custom'
+                )
+            )
+        );
+
+        return response()->json([
+            'message' => 'Fetch Success!',
+            'status' => 200,
+            'tipe-barang' => $typeBarang,
+            'app-version' => $this->getAppversion()
+        ]);
+    }
+
+    public function productInsert(Request $request) : JsonResponse {
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            return response()->json([
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'status' => 401,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            try{
+                $identifier = $this->getStoreIdentifier();
+                $file = $request->file('photo');
+                $namaFile = $request->p_name;
+                $storagePath = Storage::path('public/images/product');
+                $ext = $file->getClientOriginalExtension();
+                $filename = $namaFile.'-'.time().'.'.$ext;
+    
+                try {
+                    $file->move($storagePath, $filename);
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'message' => 'Gagal upload gambar!',
+                        'status' => 500,
+                        'app-version' => $this->getAppversion()
+                    ]);
+                }
+    
+                $satuanHargaJual = 0;
+                if($request->tipe_barang != "Custom"){
+                    $satuanHargaJual = $request->harga_jual;
+                }
+    
+                $product = Product::create([
+                    'store_identifier' => $identifier,
+                    'id_batch' => $request->id_batch,
+                    'id_category' => $request->id_category,
+                    'product_name' => $request->product_name,
+                    'id_supplier' => $request->id_supplier,
+                    'photo' => $filename,
+                    'nomor_gudang' => $request->nomor_gudang,
+                    'nomor_rak' => $request->nomor_rak,
+                    // 'tanggal_beli' => $request->t_beli,
+                    // 'tanggal_expired' => $request->t_expired,
+                    'harga_jual' => (int) $satuanHargaJual,
+                    'tipe_barang' => $request->tipe_barang,
+                    'satuan_barang' => $request->satuan_barang,
+                    'satuan_unit' => $request->satuan_unit,
+                ]);
+                
+                return response()->json([
+                    'message' => 'Data product berhasil diinput!',
+                    'status' => 200,
+                    'product' => $product,
+                    'app-version' => $this->getAppversion()
+                ]);
+            } catch(Exception $e){
+                // return $e;
+                return response()->json([
+                    'message' => 'Gagal menginput barang!',
+                    'status' => 500,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
+        }
+    }
+
+    public function productUdate (Request $request)  : JsonResponse {
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $product = Product::where('store_identifier', $identifier)->find($request->id_product);
+
+            if(empty($product) || is_null($product)){
+                return response()->json([
+                    'message' => 'Data tidak ditemukan!',
+                    'status' => 404,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
+
+            $satuanHargaJual = 0;
+            if($request->tipe_barang != "Custom"){
+                $satuanHargaJual = $request->harga_jual;
+            }
+
+            if($request->hasFile('photo')){
+                $file = $request->file('photo');
+                $namaFile = $product->product_name;
+                $storagePath = Storage::path('public/images/product');
+                $ext = $file->getClientOriginalExtension();
+                $filename = $namaFile.'-'.time().'.'.$ext;
+
+                if(empty($product->photo)){
+                    try {
+                        $file->move($storagePath, $filename);
+                    } catch (\Exception $e) {
+                        return response()->json([
+                            'message' => 'Gagal upload gambar!',
+                            'status' => 500,
+                            'app-version' => $this->getAppversion()
+                        ]);
+                    }
+                } else {
+                    Storage::delete('public/images/product/'.$product->photo);
+                    $file->move($storagePath, $filename);
+                }
+
+                $product->update([
+                    'id_batch' => $request->id_batch,
+                    'id_category' => $request->id_category,
+                    'product_name' => $request->product_name,
+                    'id_supplier' => $request->id_supplier,
+                    'photo' => $filename,
+                    'nomor_gudang' => $request->nomor_gudang,
+                    'nomor_rak' => $request->nomor_rak,
+                    'harga_jual' => $satuanHargaJual,
+                    'tipe_barang' => $request->tipe_barang,
+                    'satuan_barang' => $request->satuan_barang,
+                    'satuan_unit' => $request->satuan_unit,
+                ]);
+            } else {
+                $product->update([
+                    'id_batch' => $request->id_batch,
+                    'id_category' => $request->id_category,
+                    'product_name' => $request->product_name,
+                    'id_supplier' => $request->id_supplier,
+                    'nomor_gudang' => $request->nomor_gudang,
+                    'nomor_rak' => $request->nomor_rak,
+                    'harga_jual' => $satuanHargaJual,
+                    'tipe_barang' => $request->tipe_barang,
+                    'satuan_barang' => $request->satuan_barang,
+                    'satuan_unit' => $request->satuan_unit,
+                ]);
+            }
+            return response()->json([
+                'message' => 'Data product berhasil diupdate!',
+                'status' => 200,
+                'product' => $product,
+                'app-version' => $this->getAppversion()
+            ]);
+        } catch(Exception $e){
+            return response()->json([
+                'message' => 'Gagal mengupdate data barang!',
+                'status' => 500,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+    }
+
+    public function productDelete($id_product)  : JsonResponse {
+        try{
+            $identifier = $this->getStoreIdentifier();
+            $product = Product::where('store_identifier', $identifier)
+                                ->find($id_product);
+
+            if(empty($product) || is_null($product)){
+                return response()->json([
+                    'message' => 'Data tidak ditemukan!',
+                    'status' => 404,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
+
+            $stok = ProductStock::where('id_batch_product', $product->id)
+                                ->where('store_identifier', $identifier)
+                                ->get();
+            foreach($stok as $stock){
+                $stock->delete();
+            }
+            Storage::delete('public/images/product/'.$product->photo);
+            $product->delete();
+            return response()->json([
+                'message' => 'Data product berhasil dihapus!',
+                'status' => 200,
+                'app-version' => $this->getAppversion()
+            ]);
+        } catch(Exception $e){
+            return response()->json([
+                'message' => 'Gagal menghapus data barang!',
+                'status' => 500,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+    }
+
     public function productDetail(Request $request) : JsonResponse {
         $identifier = $this->getStoreIdentifier();
         $stock = "";
@@ -482,6 +728,257 @@ class TenantController extends Controller {
             'status' => 200,
             'app-version' => $this->getAppversion()
         ]);
+    }
+
+    public function supplierList() : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $supplierList = "";
+
+        try {
+            $supplierList = Supplier::select([
+                                                'id',
+                                                'nama_supplier', 
+                                                'email_supplier', 
+                                                'phone_supplier', 
+                                                'alamat_supplier', 
+                                                'keterangan'
+                                            ])
+                                            ->where('store_identifier', $identifier)
+                                            ->latest()
+                                            ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+        if($supplierList->count() == 0 || $supplierList == ""){
+            return response()->json([
+                'message' => 'Fetch Success',
+                'data-status' => 'No data found in this collection!',
+                'productCategory' => $supplierList,
+                'status' => 200,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success',
+                'productCategory' => $supplierList,
+                'status' => 200,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+    }
+
+    public function supplierInsert(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            return response()->json([
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'status' => 401,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            $supplier = Supplier::create([
+                'store_identifier' => $identifier,
+                'nama_supplier' => $request->nama_supplier,
+                'email_supplier' => $request->email,
+                'phone_supplier' => $request->phone,
+                'alamat_supplier' => $request->alamat,
+                'keterangan' => $request->keterangan
+            ]);
+
+            return response()->json([
+                'message' => 'Input Data berhasil!',
+                'status' => 200,
+                'supplier' => $supplier,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+    }
+
+    public function supplierUpdate(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            return response()->json([
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'status' => 401,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            $supplier = Supplier::where('store_identifier', $identifier)->find($request->id);
+            if(is_null($supplier) || empty($supplier)){
+                return response()->json([
+                    'message' => 'Data tidak ditemukan!',
+                    'status' => 404,
+                    'app-version' => $this->getAppversion()
+                ]);
+            } else {
+                $supplier->update([
+                    'nama_supplier' => $request->nama_supplier,
+                    'email_supplier' => $request->email,
+                    'phone_supplier' => $request->phone,
+                    'alamat_supplier' => $request->alamat,
+                    'keterangan' => $request->keterangan
+                ]);
+
+                return response()->json([
+                    'message' => 'Update Data berhasil!',
+                    'status' => 200,
+                    'supplier' => $supplier,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
+        }
+    }
+
+    public function supplierDelete($id) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            return response()->json([
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'status' => 401,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            $supplier = Supplier::where('store_identifier', $identifier)->find($id);
+            if(is_null($supplier) || empty($supplier)){
+                return response()->json([
+                    'message' => 'Data tidak ditemukan!',
+                    'status' => 404,
+                    'app-version' => $this->getAppversion()
+                ]);
+            } else {
+                $supplier->delete();
+
+                return response()->json([
+                    'message' => 'Data berhasil dihapus!',
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
+        }
+    }
+
+    public function batchList() : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $batchList = "";
+
+        try {
+            $batchList = Batch::select([
+                                        'id',
+                                        'batch_code', 
+                                        'keterangan', 
+                                    ])
+                                    ->where('store_identifier', $identifier)
+                                    ->latest()
+                                    ->get();
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch data!',
+                'error-message' => $e->getMessage(),
+                'status' => 500,
+            ]);
+            exit;
+        }
+        if($batchList->count() == 0 || $batchList == ""){
+            return response()->json([
+                'message' => 'Fetch Success',
+                'data-status' => 'No data found in this collection!',
+                'productCategory' => $batchList,
+                'status' => 200,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Fetch Success',
+                'productCategory' => $batchList,
+                'status' => 200,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+    }
+
+    public function batchInsert(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            return response()->json([
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'status' => 401,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            $batch = Batch::create([
+                'store_identifier' => $identifier,
+                'batch_code' => $request->name,
+                'keterangan' => $request->keterangan
+            ]);
+
+            return response()->json([
+                'message' => 'Input Data berhasil!',
+                'status' => 200,
+                'supplier' => $batch,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+    }
+
+    public function batchUpdate(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            return response()->json([
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'status' => 401,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            $batch = Batch::where('store_identifier', $identifier)->find($request->id);
+            $batch->update([
+                'batch_code' => $request->name,
+                'keterangan' => $request->keterangan
+            ]);
+
+            return response()->json([
+                'message' => 'Update Data berhasil!',
+                'status' => 200,
+                'supplier' => $batch,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+    }
+
+    public function batchDelete($id) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            return response()->json([
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'status' => 401,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            $batch = Batch::where('store_identifier', $identifier)->find($id);
+            if(is_null($batch) || empty($batch)){
+                return response()->json([
+                    'message' => 'Data tidak ditemukan!',
+                    'status' => 404,
+                    'app-version' => $this->getAppversion()
+                ]);
+            } else {
+                $batch->delete();
+
+                return response()->json([
+                    'message' => 'Data berhasil dihapus!',
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
+        }
     }
 
     public function productCategory() : JsonResponse {
@@ -512,6 +1009,82 @@ class TenantController extends Controller {
                 'status' => 200,
                 'app-version' => $this->getAppversion()
             ]);
+        }
+    }
+
+    public function categoryInsert(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            return response()->json([
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'status' => 401,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            $category = ProductCategory::create([
+                'store_identifier' => $identifier,
+                'name' => $request->category
+            ]);
+
+            return response()->json([
+                'message' => 'Input Data berhasil!',
+                'status' => 200,
+                'supplier' => $category,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+    }
+
+    public function categoryUpdate(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            return response()->json([
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'status' => 401,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            $category = ProductCategory::where('store_identifier', $identifier)->find($request->id);
+
+            $category->update([
+                'name'  => $request->category
+            ]);
+
+            return response()->json([
+                'message' => 'Update Data berhasil!',
+                'status' => 200,
+                'supplier' => $category,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+    }
+
+    public function categoryDelete($id) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+
+        if(empty(auth()->user()->phone_number_verified_at) || is_null(auth()->user()->phone_number_verified_at) || auth()->user()->phone_number_verified_at == NULL || auth()->user()->phone_number_verified_at == ""){
+            return response()->json([
+                'message' => 'Harap lakukan verifikasi nomor Whatsapp terlebih dahulu!',
+                'status' => 401,
+                'app-version' => $this->getAppversion()
+            ]);
+        } else {
+            $category = ProductCategory::where('store_identifier', $identifier)->find($id);
+            if(is_null($category) || empty($category)){
+                return response()->json([
+                    'message' => 'Data tidak ditemukan!',
+                    'status' => 404,
+                    'app-version' => $this->getAppversion()
+                ]);
+            } else {
+                $category->delete();
+
+                return response()->json([
+                    'message' => 'Data berhasil dihapus!',
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
         }
     }
 
@@ -639,15 +1212,14 @@ class TenantController extends Controller {
     }
 
     public function addCart(Request $request) : JsonResponse {
+        DB::beginTransaction();
         $identifier = $this->getStoreIdentifier();
         $cartCheckup = "";
         $stock = "";
         $stoktemp = "";
         $cart = "";
         try {
-            $cartCheckup = ShoppingCart::where('id_tenant', auth()->user()->id)
-                                    ->whereNull('id_invoice')
-                                    ->get();
+            $cartCheckup = ShoppingCart::where('id_tenant', auth()->user()->id)->whereNull('id_invoice')->get();
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Data chekup fail, please check the server or query!',
@@ -658,7 +1230,7 @@ class TenantController extends Controller {
         }
 
         try {
-            $stock = ProductStock::where('store_identifier', $identifier)->where('stok', '!=', 0)->findOrFail($request->id_stok);
+            $stock = ProductStock::where('store_identifier', $identifier)->findOrFail($request->id_stok);
             $stoktemp = $stock->stok;
         } catch (Exception $e) {
             return response()->json([
@@ -668,55 +1240,98 @@ class TenantController extends Controller {
             ]);
             exit;
         }
-
-        if($stoktemp == 0 || $stoktemp<$request->qty){
-            return response()->json([
-                'message' => 'Stok barang tidak cukup!',
-                'status' => 200,
-                'app-version' => $this->getAppversion()
-            ]);
-        } else {
-            if($cartCheckup->count() == 0 || $cartCheckup == "" || is_null($cartCheckup) || empty($cartCheckup)){
-                try {
+        if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+            if($stoktemp == 0 || $stoktemp<$request->qty){
+                return response()->json([
+                    'message' => 'Stok barang tidak cukup!',
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
+        }
+        if($cartCheckup->count() == 0 || $cartCheckup == "" || is_null($cartCheckup) || empty($cartCheckup)){
+            try {
+                if($request->tipe_barang == "Custom"){
+                    $cart = ShoppingCart::create([
+                        'id_tenant' => auth()->user()->id,
+                        'id_product' => $request->id_stok,
+                        'product_name' => $request->product_name,
+                        'qty' => 1,
+                        'harga' => $request->harga,
+                        'tipe_barang' => $request->tipe_barang,
+                        'sub_total' => $request->harga
+                    ]);
+                } else if($request->tipe_barang == "Pack" || $request->tipe_barang == "PCS"){
                     $cart = ShoppingCart::create([
                         'id_tenant' => auth()->user()->id,
                         'id_product' => $request->id_stok,
                         'product_name' => $request->product_name,
                         'qty' => $request->qty,
                         'harga' => $request->harga,
+                        'tipe_barang' => $request->tipe_barang,
                         'sub_total' => $request->qty*$request->harga
                     ]);
-                    $stock->update([
-                        'stok' => (int) $stoktemp-$cart->qty
-                    ]);
-                    return response()->json([
-                        'message' => 'Added Success',
-                        'cart' => $cart,
-                        'data' => 'Add new cart',
-                        'status' => 200,
-                        'app-version' => $this->getAppversion()
-                    ]);
-                } catch (Exception $e) {
-                    return response()->json([
-                        'message' => 'Failed to insert data!',
-                        'error-message' => $e->getMessage(),
-                        'status' => 500,
-                    ]);
-                    exit;
                 }
-            } else {
-                try {
-                    $cart = $cartCheckup->where('id_product' ,$request->id_stok)->first();
-                    if(empty($cart)){
+                if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+                    if($request->tipe_barang == "PCS"){
+                        try{
+                            $stock = ProductStock::where('store_identifier', $identifier)->findOrFail($request->id_stok)->lockForUpdate();
+                            $stock->update([
+                                'stok' => (int) $stoktemp-$cart->qty
+                            ]);
+                            DB::commit();
+                        } catch(Exception $e){
+                            DB::rollback();
+                            return response()->json([
+                                'message' => 'Duplicate add data, wait for the first process is done',
+                                'status' => 200,
+                                'app-version' => $this->getAppversion()
+                            ]);
+                        }
+                    }
+                } 
+                return response()->json([
+                    'message' => 'Added Success',
+                    'cart' => $cart,
+                    'data' => 'Add new cart',
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
+                ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to insert data!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
+            }
+        } else {
+            try {
+                $cart = $cartCheckup->where('id_product' ,$request->id_stok)->first();
+                if(empty($cart)){
+                    if($request->tipe_barang == "Custom"){
+                        $cart = ShoppingCart::create([
+                            'id_tenant' => auth()->user()->id,
+                            'id_product' => $request->id_stok,
+                            'product_name' => $request->product_name,
+                            'qty' => 1,
+                            'harga' => $request->harga,
+                            'tipe_barang' => $request->tipe_barang,
+                            'sub_total' => $request->harga
+                        ]);
+                    } else if($request->tipe_barang == "Pack" || $request->tipe_barang == "PCS"){
                         $cart = ShoppingCart::create([
                             'id_tenant' => auth()->user()->id,
                             'id_product' => $request->id_stok,
                             'product_name' => $request->product_name,
                             'qty' => $request->qty,
                             'harga' => $request->harga,
+                            'tipe_barang' => $request->tipe_barang,
                             'sub_total' => $request->qty*$request->harga
                         ]);
-                    } else {
+                    }
+                } else {
+                    if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
                         $tempqty = $cart->qty;
                         if($stoktemp == 0 || $stoktemp<($request->qty+$tempqty)){
                             return response()->json([
@@ -729,22 +1344,38 @@ class TenantController extends Controller {
                             'qty' => $tempqty+$request->qty,
                             'sub_total' => ($tempqty+$request->qty)*$cart->harga
                         ]);
+                    } else {
+                        if($request->tipe_barang == "Custom"){
+                            $cart->update([
+                                'qty' => 1,
+                                'harga' => $request->harga,
+                                'sub_total' => $request->harga
+                            ]);
+                        } else if($request->tipe_barang == "Pack"){
+                            $cart->update([
+                                'qty' => $request->qty,
+                                'harga' => $request->harga,
+                                'sub_total' => $request->qty*$request->harga
+                            ]);
+                        }
                     }
-                } catch (Exception $e) {
-                    return response()->json([
-                        'message' => 'Failed to find data stock. make sure the id is correct! | '.$request->id_stok.' | '.$request->product_name.' | '.$request->qty.' | '.$request->harga,
-                        'id_stock' => $request->id_stok,
-                        'product_name' => $request->product_name,
-                        'qty' => $request->qty,
-                        'harga' => $request->harga,
-                        'error-message' => $e->getMessage(),
-                        'status' => 500,
-                    ]);
-                    exit;
                 }
-                $stock->update([
-                    'stok' => (int) $stoktemp-$request->qty
-                ]);
+                if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+                    try{
+                        $stock = ProductStock::where('store_identifier', $identifier)->findOrFail($request->id_stok)->lockForUpdate();
+                        $stock->update([
+                            'stok' => (int) $stoktemp-$request->qty
+                        ]);
+                        DB::commit();
+                    } catch(Exception $e){
+                        DB::rollback();
+                        return response()->json([
+                            'message' => 'Duplicate add data, wait for the first process is done',
+                            'status' => 200,
+                            'app-version' => $this->getAppversion()
+                        ]);
+                    }
+                }
                 return response()->json([
                     'message' => 'Added Success',
                     'cart' => $cart,
@@ -752,12 +1383,24 @@ class TenantController extends Controller {
                     'status' => 200,
                     'app-version' => $this->getAppversion()
                 ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to find data stock. make sure the id is correct! | '.$request->id_stok.' | '.$request->product_name.' | '.$request->qty.' | '.$request->harga,
+                    'id_stock' => $request->id_stok,
+                    'product_name' => $request->product_name,
+                    'qty' => $request->qty,
+                    'harga' => $request->harga,
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
             }
         }
     }
 
     public function deleteCart(Request $request) : JsonResponse {
         $identifier = $this->getStoreIdentifier();
+        DB::beginTransaction();
         $id_cart = $request->id_cart;
         try {
             $cart = ShoppingCart::where('id_tenant', auth()->user()->id)->find($id_cart);
@@ -767,12 +1410,24 @@ class TenantController extends Controller {
                     'status' => 404
                 ]);
             }
-            $qty = $cart->qty;
-            $stock = ProductStock::where('store_identifier', $identifier)->findOrFail($cart->id_product);
-            $stoktemp = $stock->stok;
-            $stock->update([
-                'stok' => (int) $stoktemp+$qty
-            ]);
+            if($cart->tipe_barang == "PCS"){
+                try{
+                    $qty = $cart->qty;
+                    $stock = ProductStock::where('store_identifier', $identifier)->findOrFail($cart->id_product)->lockForUpdate();
+                    $stoktemp = $stock->stok;
+                    $stock->update([
+                        'stok' => (int) $stoktemp+$qty
+                    ]);
+                    DB::commit();
+                } catch(Exception $e){
+                    DB::rollback();
+                    return response()->json([
+                        'message' => 'Duplicate add data, wait for the first process is done',
+                        'status' => 200,
+                        'app-version' => $this->getAppversion()
+                    ]);
+                }
+            }
             $cart->delete();
         } catch (Exception $e) {
             return response()->json([
@@ -920,14 +1575,25 @@ class TenantController extends Controller {
                 'tanggal_transaksi' => Carbon::now(),
             ]);
 
-            foreach($cartContent as $cart){
-                $cart->update([
-                    'id_invoice' => $invoice->id
-                ]);
-            }
-
             if(!is_null($invoice)) {
-                $invoice->fieldSave($invoice, $identifier, NULL);
+                if($invoice->qris_response == 211000 || $invoice->qris_response == "211000"){
+                    $invoice->fieldSave($invoice, $identifier, NULL);
+                    foreach($cartContent as $cart){
+                        $cart->update([
+                            'id_invoice' => $invoice->id
+                        ]);
+                    }
+                } else {
+                    $action = "Tenant API : Create Transaction | Error";
+                    $this->createHistoryUser($action, $invoice->qris_response, 0);
+                    $invoiceCreated = Invoice::find($invoice->id);
+                    $invoiceCreated->delete();
+                    return response()->json([
+                        'message' => 'Create Transaction failed, http server error',
+                        'status' => 500,
+                        'app-version' => $this->getAppversion()
+                    ]);
+                }
             }
             $action = "Tenant API : Proses Cart Invoice Success";
             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
@@ -1333,28 +1999,79 @@ class TenantController extends Controller {
         }
 
         if(empty($cart) || $cart->count() == 0 || $cart == "" || is_null($cart)){
-            $cart = ShoppingCart::create([
-                'id_tenant' => auth()->user()->id,
-                'id_invoice' =>  $request->id_invoice,
-                'id_product' => $request->id_stok,
-                'product_name' => $request->product_name,
-                'qty' => $request->qty,
-                'harga' => $request->harga,
-                'sub_total' => $request->qty*$request->harga
-            ]);
+            $stock = ProductStock::where('store_identifier', $identifier)->find($request->id_stok);
+            if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+                if($stock->stok == 0 || $stock->stok<$request->qty){
+                    return response()->json([
+                        'message' => 'Stok barang tidak cukup!',
+                        'status' => 200,
+                        'app-version' => $this->getAppversion()
+                    ]);
+                }
+            }
+            if($request->tipe_barang == "Custom"){
+                $cart = ShoppingCart::create([
+                    'id_tenant' => auth()->user()->id,
+                    'id_invoice' =>  $request->id_invoice,
+                    'id_product' => $request->id_stok,
+                    'product_name' => $request->product_name,
+                    'tipe_barang' => $request->tipe_barang,
+                    'qty' => 1,
+                    'harga' => $request->harga,
+                    'sub_total' => $request->harga
+                ]);
+            } else if($request->tipe_barang == "Pack" || $request->tipe_barang == "PCS"){
+                $cart = ShoppingCart::create([
+                    'id_tenant' => auth()->user()->id,
+                    'id_invoice' =>  $request->id_invoice,
+                    'id_product' => $request->id_stok,
+                    'product_name' => $request->product_name,
+                    'tipe_barang' => $request->tipe_barang,
+                    'qty' => $request->qty,
+                    'harga' => $request->harga,
+                    'sub_total' => $request->qty*$request->harga
+                ]);
+            }
         } else {
-            $tempqty = $cart->qty;
-            $cart->update([
-                'qty' => $tempqty+$request->qty,
-                'sub_total' => ($tempqty+$request->qty)*$cart->harga
-            ]);
+            if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+                $tempqty = $cart->qty;
+                $cart->update([
+                    'qty' => $tempqty+$request->qty,
+                    'sub_total' => ($tempqty+$request->qty)*$cart->harga
+                ]);
+            } else {
+                if($request->tipe_barang == "Custom"){
+                    $cart->update([
+                        'qty' => 1,
+                        'harga' => $request->harga,
+                        'sub_total' => $request->harga
+                    ]);
+                } else if($request->tipe_barang == "Pack"){
+                    $cart->update([
+                        'qty' => $request->qty,
+                        'sub_total' => $request->qty*$cart->harga
+                    ]);
+                }
+            }
         }
 
-        $stock = ProductStock::where('store_identifier', $identifier)->find($request->id_stok);
-        $stoktemp = $stock->stok;
-        $stock->update([
-            'stok' => (int) $stoktemp-$request->qty
-        ]);
+        if($request->tipe_barang == "PCS"){
+            try{
+                $stock = ProductStock::where('store_identifier', $identifier)->find($request->id_stok)->lockForUpdate();
+                $stoktemp = $stock->stok;
+                $stock->update([
+                    'stok' => (int) $stoktemp-$request->qty
+                ]);
+                DB::commit();
+            } catch(Exception $e){
+                DB::rollback();
+                return response()->json([
+                    'message' => 'Duplicate add data, wait for the first process is done',
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
+        }
 
         return response()->json([
             'message' => 'Added Success',
@@ -1373,12 +2090,24 @@ class TenantController extends Controller {
                                 ->where('id_tenant', auth()->user()->id)
                                 ->find($request->id_invoice);
             $cart = $invoice->shoppingCart->find($request->id_cart);
-            $qty = $cart->qty;
-            $stock = ProductStock::where('store_identifier', $identifier)->find($cart->id_product);
-            $stoktemp = $stock->stok;
-            $stock->update([
-                'stok' => (int) $stoktemp+$qty
-            ]);
+            if($cart->tipe_barang == "PCS"){
+                try{
+                    $qty = $cart->qty;
+                    $stock = ProductStock::where('store_identifier', $identifier)->find($cart->id_product)->lockForUpdate();
+                    $stoktemp = $stock->stok;
+                    $stock->update([
+                        'stok' => (int) $stoktemp+$qty
+                    ]);
+                    DB::commit();
+                } catch(Exception $e){
+                    DB::rollback();
+                    return response()->json([
+                        'message' => 'Duplicate add data, wait for the first process is done',
+                        'status' => 200,
+                        'app-version' => $this->getAppversion()
+                    ]);
+                }
+            }
             $cart->delete();
         } catch (Exception $e) {
             return response()->json([
@@ -1438,10 +2167,11 @@ class TenantController extends Controller {
             $nominalpajak = ($pajak/100)*$temptotal;
             $total = $temptotal+$nominalpajak;
 
-            $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
+            $storeDetail = StoreDetail::with(['jenisMDR'])->where('store_identifier', $invoice->store_identifier)->first();
             $qrisAccount = TenantQrisAccount::where('store_identifier', $invoice->store_identifier)->first();
 
             $data = "";
+            $postResponse = "";
             $client = new Client();
             $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
             if(is_null($qrisAccount) || empty($qrisAccount)){
@@ -1453,14 +2183,11 @@ class TenantController extends Controller {
                         'secret_key' => "Vpos71237577"
                     ]
                 ]);
-                $responseCode = $postResponse->getStatusCode();
-                $data = json_decode($postResponse->getBody());
             } else {
                 $qrisLogin = $qrisAccount->qris_login_user;
                 $qrisPassword = $qrisAccount->qris_password;
                 $qrisMerchantID = $qrisAccount->qris_merchant_id;
                 $qrisStoreID = $qrisAccount->qris_store_id;
-
                 $postResponse = $client->request('POST',  $url, [
                     'form_params' => [
                         'login' => $qrisLogin,
@@ -1473,13 +2200,30 @@ class TenantController extends Controller {
                         'secret_key' => "Vpos71237577"
                     ]
                 ]);
-
-                $responseCode = $postResponse->getStatusCode();
-                $data = json_decode($postResponse->getBody());
             }
-
+            $qris_data = "";
+            $data = json_decode($postResponse->getBody());
+            if(!is_null($data) || !empty($data)){
+                if($data->data->responseCode == 211000 || $data->data->responseCode == "211000"){
+                    $qris_data = $data->data->data->qrisData;
+                    $invoice->update([
+                        'qris_response' => $data->data->responseCode
+                    ]);
+                } else {
+                    $invoice->update([
+                        'qris_response' => $data->data->responseCode
+                    ]);
+                    $action = "Tenant : Transaction Pending Process Error | ".$invoice->nomor_invoice;
+                    $this->createHistoryUser($action, $data->data->responseCode, 0);
+                    $notification = array(
+                        'message' => 'Gagal memproses transaksi, harap hubungi Admin!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+            }
             $invoice->update([
-                'qris_data' => $data->data->data->qrisData,
+                'qris_data' => $qris_data,
                 'sub_total' => $temptotal,
                 'pajak' => $nominalpajak,
                 'diskon' => $nominaldiskon,
@@ -1488,23 +2232,32 @@ class TenantController extends Controller {
 
             if($storeDetail->status_umi == 1){
                 if($invoice->nominal_bayar <= 100000){
+                    $mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
+                    $mdrCount = $mdr/100;
+                    $nominal_mdr = $invoice->nominal_baya*$mdrCount;
                     $invoice->update([
-                        'mdr' => 0,
-                        'nominal_mdr' => 0,
-                        'nominal_terima_bersih' => $invoice->nominal_bayar
+                        'mdr' => $mdr,
+                        'nominal_mdr' => $nominal_mdr,
+                        'nominal_terima_bersih' => $invoice->nominal_bayar-$nominal_mdr
                     ]);
                 } else {
-                    $nominal_mdr = $total*0.007;
+                    $mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
+                    $mdrCount = $mdr/100;
+                    $nominal_mdr = $invoice->nominal_bayar*$mdrCount;
                     $invoice->update([
+                        'mdr' => $mdr,
                         'nominal_mdr' => $nominal_mdr,
-                        'nominal_terima_bersih' => $total-$nominal_mdr
+                        'nominal_terima_bersih' => $invoice->nominal_bayar-$nominal_mdr
                     ]);
                 }
             } else {
-                $nominal_mdr = $total*0.007;
+                $mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
+                $mdrCount = $mdr/100;
+                $nominal_mdr = $invoice->nominal_bayar*$mdrCount;
                 $invoice->update([
+                    'mdr' => $mdr,
                     'nominal_mdr' => $nominal_mdr,
-                    'nominal_terima_bersih' => $total-$nominal_mdr
+                    'nominal_terima_bersih' => $invoice->nominal_bayar-$nominal_mdr
                 ]);
             }
             $action = "Tenant API : Update Transaction Invoice Success";
@@ -1537,11 +2290,13 @@ class TenantController extends Controller {
                                 ->find($request->id_invoice);
             $cartContent = ShoppingCart::with('stock')->where('id_invoice', $request->id_invoice)->get();
             foreach($cartContent as $cart){
-                $productStock = ProductStock::find($cart->id_product);
-                $stok = $cart->qty + $productStock->stok;
-                $productStock->update([
-                    'stok' => $stok
-                ]);
+                if($cart->tipe_barang == "PCS"){
+                    $productStock = ProductStock::find($cart->id_product);
+                    $stok = $cart->qty + $productStock->stok;
+                    $productStock->update([
+                        'stok' => $stok
+                    ]);
+                }
                 $cart->delete();
             }
             $invoice->delete();

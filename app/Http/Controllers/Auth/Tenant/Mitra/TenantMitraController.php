@@ -690,15 +690,15 @@ class TenantMitraController extends Controller {
                     'id_tenant' => auth()->user()->id,
                     'email' => auth()->user()->email,
                     'callback' => $request->callback,
-                    'parameter' => $request->parameter,
-                    'secret_key_parameter' => $request->secret_key_parameter,
+                    'login' => $request->login,
+                    'password' => $request->password,
                     'secret_key' => $request->secret_key
                 ]);
             } else {
                 $callback->update([
                     'callback' => $request->callback,
-                    'parameter' => $request->parameter,
-                    'secret_key_parameter' => $request->secret_key_parameter,
+                    'login' => $request->login,
+                    'password' => $request->password,
                     'secret_key' => $request->secret_key
                 ]);
             }

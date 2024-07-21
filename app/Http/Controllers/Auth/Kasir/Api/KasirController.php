@@ -292,6 +292,7 @@ class KasirController extends Controller {
     }
 
     public function addCart(Request $request) : JsonResponse {
+        DB::beginTransaction();
         $cartCheckup = "";
         $stock = "";
         $stoktemp = "";
@@ -320,55 +321,98 @@ class KasirController extends Controller {
             ]);
             exit;
         }
-
-        if($stoktemp == 0 || $stoktemp<$request->qty){
-            return response()->json([
-                'message' => 'Stok barang tidak cukup!',
-                'status' => 200,
-                'app-version' => $this->getAppversion()
-            ]);
-        } else {
-            if($cartCheckup->count() == 0 || $cartCheckup == "" || is_null($cartCheckup) || empty($cartCheckup)){
-                try {
+        if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+            if($stoktemp == 0 || $stoktemp<$request->qty){
+                return response()->json([
+                    'message' => 'Stok barang tidak cukup!',
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
+        }
+        if($cartCheckup->count() == 0 || $cartCheckup == "" || is_null($cartCheckup) || empty($cartCheckup)){
+            try {
+                if($request->tipe_barang == "Custom"){
+                    $cart = ShoppingCart::create([
+                        'id_kasir' => auth()->user()->id,
+                        'id_product' => $request->id_stok,
+                        'product_name' => $request->product_name,
+                        'qty' => 1,
+                        'harga' => $request->harga,
+                        'tipe_barang' => $request->tipe_barang,
+                        'sub_total' => $request->harga
+                    ]);
+                } else if($request->tipe_barang == "Pack" || $request->tipe_barang == "PCS"){
                     $cart = ShoppingCart::create([
                         'id_kasir' => auth()->user()->id,
                         'id_product' => $request->id_stok,
                         'product_name' => $request->product_name,
                         'qty' => $request->qty,
                         'harga' => $request->harga,
+                        'tipe_barang' => $request->tipe_barang,
                         'sub_total' => $request->qty*$request->harga
                     ]);
-                    $stock->update([
-                        'stok' => (int) $stoktemp-$cart->qty
-                    ]);
-                    return response()->json([
-                        'message' => 'Added Success',
-                        'cart' => $cart,
-                        'data' => 'Add new cart',
-                        'status' => 200,
-                        'app-version' => $this->getAppversion()
-                    ]);
-                } catch (Exception $e) {
-                    return response()->json([
-                        'message' => 'Failed to insert data!',
-                        'error-message' => $e->getMessage(),
-                        'status' => 500,
-                    ]);
-                    exit;
                 }
-            } else {
-                try {
-                    $cart = $cartCheckup->where('id_product' ,$request->id_stok)->first();
-                    if(empty($cart)){
+                if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+                    if($request->tipe_barang == "PCS"){
+                        try{
+                            $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->where('stok', '!=', 0)->findOrFail($request->id_stok)->lockForUpdate();
+                            $stock->update([
+                                'stok' => (int) $stoktemp-$cart->qty
+                            ]);
+                            DB::commit();
+                        } catch(Exception $e){
+                            DB::rollback();
+                            return response()->json([
+                                'message' => 'Duplicate add data, wait for the first process is done',
+                                'status' => 200,
+                                'app-version' => $this->getAppversion()
+                            ]);
+                        }
+                    }
+                }
+                return response()->json([
+                    'message' => 'Added Success',
+                    'cart' => $cart,
+                    'data' => 'Add new cart',
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
+                ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to insert data!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
+            }
+        } else {
+            try {
+                $cart = $cartCheckup->where('id_product' ,$request->id_stok)->first();
+                if(empty($cart)){
+                    if($request->tipe_barang == "Custom"){
+                        $cart = ShoppingCart::create([
+                            'id_kasir' => auth()->user()->id,
+                            'id_product' => $request->id_stok,
+                            'product_name' => $request->product_name,
+                            'qty' => 1,
+                            'harga' => $request->harga,
+                            'tipe_barang' => $request->tipe_barang,
+                            'sub_total' => $request->harga
+                        ]);
+                    } else if($request->tipe_barang == "Pack" || $request->tipe_barang == "PCS"){
                         $cart = ShoppingCart::create([
                             'id_kasir' => auth()->user()->id,
                             'id_product' => $request->id_stok,
                             'product_name' => $request->product_name,
                             'qty' => $request->qty,
                             'harga' => $request->harga,
+                            'tipe_barang' => $request->tipe_barang,
                             'sub_total' => $request->qty*$request->harga
                         ]);
-                    } else {
+                    }
+                } else {
+                    if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
                         $tempqty = $cart->qty;
                         if($stoktemp == 0 || $stoktemp<($request->qty+$tempqty)){
                             return response()->json([
@@ -381,18 +425,38 @@ class KasirController extends Controller {
                             'qty' => $tempqty+$request->qty,
                             'sub_total' => ($tempqty+$request->qty)*$cart->harga
                         ]);
+                    } else {
+                        if($request->tipe_barang == "Custom"){
+                            $cart->update([
+                                'qty' => 1,
+                                'harga' => $request->harga,
+                                'sub_total' => $request->harga
+                            ]);
+                        } else if($request->tipe_barang == "Pack"){
+                            $cart->update([
+                                'qty' => $request->qty,
+                                'harga' => $request->harga,
+                                'sub_total' => $request->qty*$request->harga
+                            ]);
+                        }
                     }
-                } catch (Exception $e) {
-                    return response()->json([
-                        'message' => 'Failed to find data stock. make sure the id is correct!',
-                        'error-message' => $e->getMessage(),
-                        'status' => 500,
-                    ]);
-                    exit;
                 }
-                $stock->update([
-                    'stok' => (int) $stoktemp-$request->qty
-                ]);
+                if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+                    try{
+                        $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->where('stok', '!=', 0)->findOrFail($request->id_stok)->lockForUpdate();
+                        $stock->update([
+                            'stok' => (int) $stoktemp-$request->qty
+                        ]); 
+                        DB::commit();
+                    } catch(Exception $e){
+                        DB::rollback();
+                        return response()->json([
+                            'message' => 'Duplicate add data, wait for the first process is done',
+                            'status' => 200,
+                            'app-version' => $this->getAppversion()
+                        ]);
+                    }
+                }
                 return response()->json([
                     'message' => 'Added Success',
                     'cart' => $cart,
@@ -400,6 +464,13 @@ class KasirController extends Controller {
                     'status' => 200,
                     'app-version' => $this->getAppversion()
                 ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Failed to find data stock. make sure the id is correct!',
+                    'error-message' => $e->getMessage(),
+                    'status' => 500,
+                ]);
+                exit;
             }
         }
     }
@@ -414,12 +485,24 @@ class KasirController extends Controller {
                     'status' => 404
                 ]);
             }
-            $qty = $cart->qty;
-            $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->findOrFail($cart->id_product);
-            $stoktemp = $stock->stok;
-            $stock->update([
-                'stok' => (int) $stoktemp+$qty
-            ]);
+            if($cart->tipe_barang == "PCS"){
+                try{
+                    $qty = $cart->qty;
+                    $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->findOrFail($cart->id_product)->lockForUpdate();
+                    $stoktemp = $stock->stok;
+                    $stock->update([
+                        'stok' => (int) $stoktemp+$qty
+                    ]);
+                    DB::commit();
+                } catch(Exception $e){
+                    DB::rollback();
+                    return response()->json([
+                        'message' => 'Duplicate add data, wait for the first process is done',
+                        'status' => 200,
+                        'app-version' => $this->getAppversion()
+                    ]);
+                }
+            }
             $cart->delete();
         } catch (Exception $e) {
             return response()->json([
@@ -659,14 +742,25 @@ class KasirController extends Controller {
                 'tanggal_transaksi' => Carbon::now(),
             ]);
 
-            foreach($cartContent as $cart){
-                $cart->update([
-                    'id_invoice' => $invoice->id
-                ]);
-            }
-
             if(!is_null($invoice)) {
-                $invoice->fieldSave($invoice, auth()->user()->id_store, auth()->user()->id);
+                if($invoice->qris_response == 211000 || $invoice->qris_response == "211000"){
+                    $invoice->fieldSave($invoice, auth()->user()->id_store, auth()->user()->id);
+                    foreach($cartContent as $cart){
+                        $cart->update([
+                            'id_invoice' => $invoice->id
+                        ]);
+                    } 
+                } else {
+                    $action = "Kasir API : Proses Cart Invoice Failed";
+                    $this->createHistoryUser($action, $invoice->qris_response, 0);
+                    $invoiceCreated = Invoice::find($invoice->id);
+                    $invoiceCreated->delete();
+                    return response()->json([
+                        'message' => 'Create Transaction failed, http server error',
+                        'status' => 500,
+                        'app-version' => $this->getAppversion()
+                    ]);
+                }
             }
             $action = "Kasir API : Proses Cart Invoice Success";
             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
@@ -989,28 +1083,79 @@ class KasirController extends Controller {
         }
 
         if(empty($cart) || $cart->count() == 0 || $cart == "" || is_null($cart)){
-            $cart = ShoppingCart::create([
-                'id_kasir' => auth()->user()->id,
-                'id_invoice' =>  $request->id_invoice,
-                'id_product' => $request->id_stok,
-                'product_name' => $request->product_name,
-                'qty' => $request->qty,
-                'harga' => $request->harga,
-                'sub_total' => $request->qty*$request->harga
-            ]);
+            $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($request->id_stok);
+            if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+                if($stock->stok == 0 || $stock->stok<$request->qty){
+                    return response()->json([
+                        'message' => 'Stok barang tidak cukup!',
+                        'status' => 200,
+                        'app-version' => $this->getAppversion()
+                    ]);
+                }
+            }
+            if($request->tipe_barang == "Custom"){
+                $cart = ShoppingCart::create([
+                    'id_kasir' => auth()->user()->id,
+                    'id_invoice' =>  $request->id_invoice,
+                    'id_product' => $request->id_stok,
+                    'product_name' => $request->product_name,
+                    'tipe_barang' => $request->tipe_barang,
+                    'qty' => 1,
+                    'harga' => $request->harga,
+                    'sub_total' => $request->harga
+                ]);
+            } else if($request->tipe_barang == "Pack" || $request->tipe_barang == "PCS"){
+                $cart = ShoppingCart::create([
+                    'id_kasir' => auth()->user()->id,
+                    'id_invoice' =>  $request->id_invoice,
+                    'id_product' => $request->id_stok,
+                    'product_name' => $request->product_name,
+                    'tipe_barang' => $request->tipe_barang,
+                    'qty' => $request->qty,
+                    'harga' => $request->harga,
+                    'sub_total' => $request->qty*$request->harga
+                ]);
+            }
         } else {
-            $tempqty = $cart->qty;
-            $cart->update([
-                'qty' => $tempqty+$request->qty,
-                'sub_total' => ($tempqty+$request->qty)*$cart->harga
-            ]);
+            if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+                $tempqty = $cart->qty;
+                $cart->update([
+                    'qty' => $tempqty+$request->qty,
+                    'sub_total' => ($tempqty+$request->qty)*$cart->harga
+                ]);
+            } else {
+                if($request->tipe_barang == "Custom"){
+                    $cart->update([
+                        'qty' => 1,
+                        'harga' => $request->harga,
+                        'sub_total' => $request->harga
+                    ]);
+                } else if($request->tipe_barang == "Pack"){
+                    $cart->update([
+                        'qty' => $request->qty,
+                        'sub_total' => $request->qty*$cart->harga
+                    ]);
+                }
+            }
         }
 
-        $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($request->id_stok);
-        $stoktemp = $stock->stok;
-        $stock->update([
-            'stok' => (int) $stoktemp-$request->qty
-        ]);
+        if($request->tipe_barang == "PCS"){
+            try{
+                $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($request->id_stok)->lockForUpdate();
+                $stoktemp = $stock->stok;
+                $stock->update([
+                    'stok' => (int) $stoktemp-$request->qty
+                ]);
+                DB::commit();
+            } catch(EXception $e){
+                DB::rollback();
+                return response()->json([
+                    'message' => 'Duplicate add data, wait for the first process is done',
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
+                ]);
+            }
+        }
 
         return response()->json([
             'message' => 'Added Success',
@@ -1065,6 +1210,7 @@ class KasirController extends Controller {
             $qrisAccount = TenantQrisAccount::where('store_identifier', $invoice->store_identifier)->first();
 
             $data = "";
+            $postResponse = "";
             $client = new Client();
             $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
             if(is_null($qrisAccount) || empty($qrisAccount)){
@@ -1076,14 +1222,11 @@ class KasirController extends Controller {
                         'secret_key' => "Vpos71237577"
                     ]
                 ]);
-                $responseCode = $postResponse->getStatusCode();
-                $data = json_decode($postResponse->getBody());
             } else {
                 $qrisLogin = $qrisAccount->qris_login_user;
                 $qrisPassword = $qrisAccount->qris_password;
                 $qrisMerchantID = $qrisAccount->qris_merchant_id;
                 $qrisStoreID = $qrisAccount->qris_store_id;
-
                 $postResponse = $client->request('POST',  $url, [
                     'form_params' => [
                         'login' => $qrisLogin,
@@ -1096,13 +1239,30 @@ class KasirController extends Controller {
                         'secret_key' => "Vpos71237577"
                     ]
                 ]);
-
-                $responseCode = $postResponse->getStatusCode();
-                $data = json_decode($postResponse->getBody());
             }
-
+            $qris_data = "";
+            $data = json_decode($postResponse->getBody());
+            if(!is_null($data) || !empty($data)){
+                if($data->data->responseCode == 211000 || $data->data->responseCode == "211000"){
+                    $qris_data = $data->data->data->qrisData;
+                    $invoice->update([
+                        'qris_response' => $data->data->responseCode
+                    ]);
+                } else {
+                    $invoice->update([
+                        'qris_response' => $data->data->responseCode
+                    ]);
+                    $action = "Tenant : Transaction Pending Process Error | ".$invoice->nomor_invoice;
+                    $this->createHistoryUser($action, $data->data->responseCode, 0);
+                    $notification = array(
+                        'message' => 'Gagal memproses transaksi, harap hubungi Admin!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+            }
             $invoice->update([
-                'qris_data' => $data->data->data->qrisData,
+                'qris_data' => $qris_data,
                 'sub_total' => $temptotal,
                 'pajak' => $nominalpajak,
                 'diskon' => $nominaldiskon,
@@ -1157,12 +1317,24 @@ class KasirController extends Controller {
                                 ->where('id_kasir', auth()->user()->id)
                                 ->find($request->id_invoice);
             $cart = $invoice->shoppingCart->find($request->id_cart);
-            $qty = $cart->qty;
-            $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($cart->id_product);
-            $stoktemp = $stock->stok;
-            $stock->update([
-                'stok' => (int) $stoktemp+$qty
-            ]);
+            if($cart->tipe_barang == "PCS"){
+                try{
+                    $qty = $cart->qty;
+                    $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($cart->id_product)->lockForUpdate();
+                    $stoktemp = $stock->stok;
+                    $stock->update([
+                        'stok' => (int) $stoktemp+$qty
+                    ]);
+                    DB::commit();
+                } catch(Exception $e){
+                    DB::rollback();
+                    return response()->json([
+                        'message' => 'Duplicate add data, wait for the first process is done',
+                        'status' => 200,
+                        'app-version' => $this->getAppversion()
+                    ]);
+                }
+            }
             $cart->delete();
         } catch (Exception $e) {
             return response()->json([
@@ -1186,11 +1358,13 @@ class KasirController extends Controller {
             $invoice = Invoice::where('status_pembayaran', 0)->find($request->id_invoice);
             $cartContent = ShoppingCart::with('stock')->where('id_invoice', $request->id_invoice)->get();
             foreach($cartContent as $cart){
-                $productStock = ProductStock::find($cart->id_product);
-                $stok = $cart->qty + $productStock->stok;
-                $productStock->update([
-                    'stok' => $stok
-                ]);
+                if($cart->tipe_barang == "PCS"){
+                    $productStock = ProductStock::find($cart->id_product);
+                    $stok = $cart->qty + $productStock->stok;
+                    $productStock->update([
+                        'stok' => $stok
+                    ]);
+                }
                 $cart->delete();
             }
             $invoice->delete();

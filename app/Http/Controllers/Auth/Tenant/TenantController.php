@@ -795,8 +795,8 @@ class TenantController extends Controller {
                 'photo' => $filename,
                 'nomor_gudang' => $request->gudang,
                 'nomor_rak' => $request->rak,
-                'tanggal_beli' => $request->t_beli,
-                'tanggal_expired' => $request->t_expired,
+                // 'tanggal_beli' => $request->t_beli,
+                // 'tanggal_expired' => $request->t_expired,
                 'harga_jual' => (int) $satuanHargaJual,
                 'tipe_barang' => $request->tipe_barang,
                 'satuan_barang' => $request->satuan,
@@ -971,6 +971,7 @@ class TenantController extends Controller {
             foreach($stok as $stock){
                 $stock->delete();
             }
+            Storage::delete('public/images/product/'.$product->photo);
             $product->delete();
             $this->createHistoryUser($action, str_replace("'", "\'", json_encode(DB::getQueryLog())), 1);
             $notification = array(

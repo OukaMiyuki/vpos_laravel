@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use App\Models\ShoppingCart;
 use App\Models\Kasir;
@@ -62,6 +63,7 @@ class Invoice extends Model {
 
 
     public function storeCart($model){
+        DB::beginTransaction();
         $cartContent = Cart::content();
         $kasir = "";
         $tenant = "";
@@ -89,11 +91,16 @@ class Invoice extends Model {
                 'id_tenant' => $tenant
             ]);
             if ($cart->options['size'] != "Custom" && $cart->options['size'] != "Pack"){
-                $stock = ProductStock::find($cart->id);
-                $updateStok = (int) $stock->stok - (int) $cart->qty;
-                $stock->update([
-                    'stok' => $updateStok
-                ]);
+                try {
+                    $stock = ProductStock::find($cart->id)->lockForUpdate();
+                    $updateStok = (int) $stock->stok - (int) $cart->qty;
+                    $stock->update([
+                        'stok' => $updateStok
+                    ]);
+                    DB::commit();
+                } catch(Exception $e) {
+                    DB::rollback();
+                }
             }
         }
     }
@@ -229,14 +236,14 @@ class Invoice extends Model {
             $tenant = Tenant::select(['id_inv_code'])->find($model->id_tenant);
             if($model->jenis_pembayaran == "Qris"){
                 if($tenant->id_inv_code != 0){
-                    $storeDetail = StoreDetail::where('store_identifier', $model->store_identifier)->first();
+                    $storeDetail = StoreDetail::with('jenisMDR')->where('store_identifier', $model->store_identifier)->first();
                     if($storeDetail->status_umi == 1){
                         if($model->nominal_bayar <= 100000){
                             $model->mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
                             $mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
                             $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr );
                             $model->nominal_mdr = $nominal_mdr;
-                            $model->nominal_terima_bersih = $model->nominal_bayar;
+                            $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
                         } else {
                             $model->mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
                             $mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
@@ -252,7 +259,7 @@ class Invoice extends Model {
                         $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
                     }
                 } else if($tenant->id_inv_code == 0) {
-                    $store = StoreList::where('store_identifier', $model->store_identifier)->first();
+                    $store = StoreList::with('jenisMDR')->where('store_identifier', $model->store_identifier)->first();
                     $mdr = $store->jenisMDR->presentase_minimal_mdr;
                     $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr );
                     $model->nominal_mdr = $nominal_mdr;
@@ -272,9 +279,16 @@ class Invoice extends Model {
                                     'secret_key' => "Vpos71237577"
                                 ]
                             ]);
-                            $responseCode = $postResponse->getStatusCode();
+                            //$responseCode = $postResponse->getStatusCode();
                             $data = json_decode($postResponse->getBody());
-                            $model->qris_data = $data->data->data->qrisData;
+                            if(!is_null($data) || !empty($data)){
+                                $qris_data = $data->data->data->qrisData;
+                                if(!is_null($qris_data) || !empty($qris_data)){
+                                    $model->qris_data = $data->data->data->qrisData;
+                                }
+                                $responseCode = $data->data->responseCode;
+                                $model->qris_response = $responseCode;
+                            }
                         } catch (Exception $e) {
                             History::create([
                                 'id_user' => auth()->user()->id,
@@ -304,9 +318,16 @@ class Invoice extends Model {
                                     'secret_key' => "Vpos71237577"
                                 ]
                             ]);
-                            $responseCode = $postResponse->getStatusCode();
+                            //$responseCode = $postResponse->getStatusCode();
                             $data = json_decode($postResponse->getBody());
-                            $model->qris_data = $data->data->data->qrisData;
+                            if(!is_null($data) || !empty($data)){
+                                $qris_data = $data->data->data->qrisData;
+                                if(!is_null($qris_data) || !empty($qris_data)){
+                                    $model->qris_data = $data->data->data->qrisData;
+                                }
+                                $responseCode = $data->data->responseCode;
+                                $model->qris_response = $responseCode;
+                            }
                         } catch (Exception $e) {
                             History::create([
                                 'id_user' => auth()->user()->id,

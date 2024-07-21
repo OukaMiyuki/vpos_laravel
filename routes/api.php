@@ -56,8 +56,23 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:200,1', 'custom
     Route::post('/setting/alias/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'aliasUpdate']);
 
     Route::get('/product', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productList']);
+    Route::get('/product-type-list', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productType']);
+    Route::post('/product/insert', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productInsert']);
+    Route::post('/product/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productUdate']);
+    Route::get('/product/delete/{id_product}', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productDelete']);
     Route::post('/product/detail', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productDetail']);
+    Route::get('/supplier', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'supplierList']);
+    Route::post('/supplier/insert', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'supplierInsert']);
+    Route::post('/supplier/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'supplierUpdate']);
+    Route::get('/supplier/delete/{id}', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'supplierDelete']);
+    Route::get('/batch-code', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'batchList']);
+    Route::post('/batch-code/insert', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'batchInsert']);
+    Route::post('/batch-code/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'batchUpdate']);
+    Route::get('/batch-code/delete/{id}', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'batchDelete']);
     Route::get('/category', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productCategory']);
+    Route::post('/category/insert', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'categoryInsert']);
+    Route::post('/category/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'categoryUpdate']);
+    Route::post('/category/delete/{id}', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'categoryDelete']);
     Route::post('/filter-category', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'filterCategory']);
     Route::post('/search-product', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'searchProduct']);
     Route::post('/search-barcode', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'searchBarcode']);

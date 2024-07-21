@@ -318,8 +318,20 @@ class KasirController extends Controller {
                 ]);
 
                 if(!is_null($invoice)) {
-                    $invoice->storeCart($invoice);
-                    $invoice->fieldSave($invoice, auth()->user()->id_store, auth()->user()->id);
+                    if($invoice->qris_response == 211000 || $invoice->qris_response == "211000"){
+                        $invoice->storeCart($invoice);
+                        $invoice->fieldSave($invoice, auth()->user()->id_store, auth()->user()->id);
+                    } else {
+                        $action = "Tenant : Create Transaction | Error";
+                        $this->createHistoryUser($action, $invoice->qris_response, 0);
+                        $invoiceCreated = Invoice::find($invoice->id);
+                        $invoiceCreated->delete();
+                        $notification = array(
+                            'message' => 'Gagal membuat transaksi, harap hubungi Admin!',
+                            'alert-type' => 'warning',
+                        );
+                        return redirect()->back()->with($notification);
+                    }
                 }
             }
             $action = "Kasir : Create Transaction | ".$invoice->nomor_invoice;
@@ -333,7 +345,7 @@ class KasirController extends Controller {
         } catch(Exception $e){
             $this->createHistoryUser($action, $e, 0);
             $notification = array(
-                'message' => 'Transaksi Gagal di proses!',
+                'message' => 'Gagal membuat transaksi, harap hubungi Admin!',
                 'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
@@ -426,6 +438,7 @@ class KasirController extends Controller {
     }
 
     public function transactionPendingAddCart(Request $request){
+        DB::beginTransaction();
         $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
                                     ->where('id_invoice', $request->id_invoice)
                                     ->first();
@@ -456,7 +469,7 @@ class KasirController extends Controller {
                 $updateSHoppingCart->update([
                     'qty' => $request->qty,
                     'harga' => $request->price,
-                    'sub_total' => $request->qty*$request->sub_total
+                    'sub_total' => $request->qty*$request->price
                 ]);
             } else {
                 $tempQty = $shoppingCart->qty;
@@ -469,10 +482,16 @@ class KasirController extends Controller {
         }
 
         if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
-            $updateStok = (int) $stock->stok - (int) $request->qty;
-            $stock->update([
-                'stok' => $updateStok
-            ]);
+            try {
+                $stock = ProductStock::find($request->id_product)->lockForUpdate();
+                $updateStok = (int) $stock->stok - (int) $request->qty;
+                $stock->update([
+                    'stok' => $updateStok
+                ]);
+                DB::commit();
+            } catch(Exception $e){
+                DB::rollback();
+            }
         }
 
         $notification = array(
@@ -483,60 +502,66 @@ class KasirController extends Controller {
     }
 
     public function transactionPendingUpdateCart(Request $request){
-        $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
-                                    ->where('id_invoice', $request->id_invoice)
-                                    ->first();
-        $stock = ProductStock::find($request->id_product);
-        if($shoppingCart->qty<$request->qty){
-            $penambahan=(int) $request->qty-$shoppingCart->qty;
-            $updateqty=$penambahan+$shoppingCart->qty;
-            $harga=$shoppingCart->harga;
-            if($stock->stok<$penambahan){
-                $notification = array(
-                    'message' => 'Stok tidak mencukupi untuk jumlah tersebut!',
-                    'alert-type' => 'error',
-                );
-                return redirect()->back()->with($notification);
-            } else {
+        DB::beginTransaction();
+        try{
+            $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
+                                        ->where('id_invoice', $request->id_invoice)
+                                        ->first();
+            $stock = ProductStock::find($request->id_product)->lockForUpdate();
+            if($shoppingCart->qty<$request->qty){
+                $penambahan=(int) $request->qty-$shoppingCart->qty;
+                $updateqty=$penambahan+$shoppingCart->qty;
+                $harga=$shoppingCart->harga;
+                if($stock->stok<$penambahan){
+                    $notification = array(
+                        'message' => 'Stok tidak mencukupi untuk jumlah tersebut!',
+                        'alert-type' => 'error',
+                    );
+                    return redirect()->back()->with($notification);
+                } else {
+                    $shoppingCart->update([
+                        'qty' => $updateqty,
+                        'sub_total' => $updateqty*$harga
+                    ]);
+                    $updateStok = (int) $stock->stok - (int) $penambahan;
+                    $stock->update([
+                        'stok' => $updateStok
+                    ]);
+                    DB::commit();
+                    $notification = array(
+                        'message' => 'Successfully Updated!',
+                        'alert-type' => 'success',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+            } else if($shoppingCart->qty>$request->qty){
+                $pengurangan=(int) $shoppingCart->qty-$request->qty;
+                //$updateqty=$pengurangan-$request->qty;
+                $harga=$shoppingCart->harga;
+
                 $shoppingCart->update([
-                    'qty' => $updateqty,
-                    'sub_total' => $updateqty*$harga
+                    'qty' => $request->qty,
+                    'sub_total' => $request->qty*$harga
                 ]);
-                $updateStok = (int) $stock->stok - (int) $penambahan;
+                $updateStok = (int) $stock->stok + (int) $pengurangan;
                 $stock->update([
                     'stok' => $updateStok
                 ]);
-                //dd($updateqty);
                 $notification = array(
-                    'message' => 'Successfully Updated!',
+                    'message' => 'Successfully Updated! dua',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
+            } else {
+                $notification = array(
+                    'message' => 'Successfully Added!',
                     'alert-type' => 'success',
                 );
                 return redirect()->back()->with($notification);
             }
-        } else if($shoppingCart->qty>$request->qty){
-            $pengurangan=(int) $shoppingCart->qty-$request->qty;
-            //$updateqty=$pengurangan-$request->qty;
-            $harga=$shoppingCart->harga;
-
-            $shoppingCart->update([
-                'qty' => $request->qty,
-                'sub_total' => $request->qty*$harga
-            ]);
-            $updateStok = (int) $stock->stok + (int) $pengurangan;
-            $stock->update([
-                'stok' => $updateStok
-            ]);
-            $notification = array(
-                'message' => 'Successfully Updated! dua',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
-        } else {
-            $notification = array(
-                'message' => 'Successfully Added!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            DB::rollback();
+            return redirect()->back();
         }
     }
 
@@ -633,11 +658,12 @@ class KasirController extends Controller {
             } else if($request->jenisPembayaran == "Qris"){
                 $total = (int) $request->nominal_pajak+$request->sub_total_belanja;
                 // Ga perlu id_tenant dan ngecek apa invitation codenya 0
-                $storeDetail = StoreDetail::select(['status_umi'])->where('store_identifier', $invoice->store_identifier)->first();
+                $storeDetail = StoreDetail::with(['jenisMDR'])->where('store_identifier', $invoice->store_identifier)->first();
                 $qrisAccount = TenantQrisAccount::where('store_identifier', $invoice->store_identifier)->first();
                 // this first
                 $client = new Client();
                 $data = "";
+                $postResponse = "";
                 $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
                 if(is_null($qrisAccount) || empty($qrisAccount)){
                     $postResponse = $client->request('POST',  $url, [
@@ -648,8 +674,6 @@ class KasirController extends Controller {
                             'secret_key' => "Vpos71237577"
                         ]
                     ]);
-                    $responseCode = $postResponse->getStatusCode();
-                    $data = json_decode($postResponse->getBody());
                 } else {
                     $qrisLogin = $qrisAccount->qris_login_user;
                     $qrisPassword = $qrisAccount->qris_password;
@@ -668,16 +692,33 @@ class KasirController extends Controller {
                             'secret_key' => "Vpos71237577"
                         ]
                     ]);
-                    // dd($postResponse);
-                    $responseCode = $postResponse->getStatusCode();
-                    $data = json_decode($postResponse->getBody());
                 }
-
+                $qris_data = "";
+                $data = json_decode($postResponse->getBody());
+                if(!is_null($data) || !empty($data)){
+                    if($data->data->responseCode == 211000 || $data->data->responseCode == "211000"){
+                        $qris_data = $data->data->data->qrisData;
+                        $invoice->update([
+                            'qris_response' => $data->data->responseCode
+                        ]);
+                    } else {
+                        $invoice->update([
+                            'qris_response' => $data->data->responseCode
+                        ]);
+                        $action = "Tenant : Transaction Pending Process Error | ".$invoice->nomor_invoice;
+                        $this->createHistoryUser($action, $data->data->responseCode, 0);
+                        $notification = array(
+                            'message' => 'Gagal memproses transaksi, harap hubungi Admin!',
+                            'alert-type' => 'warning',
+                        );
+                        return redirect()->back()->with($notification);
+                    }
+                }
                 $invoice->update([
                     'jenis_pembayaran' => $request->jenisPembayaran,
-                    'tanggal_pelunasan' => Carbon::now(),
+                    // 'tanggal_pelunasan' => Carbon::now(),
                     'status_pembayaran' => 0,
-                    'qris_data' => $data->data->data->qrisData,
+                    'qris_data' => $qris_data,
                     'sub_total' => $request->sub_total_belanja,
                     'pajak' => $request->nominal_pajak,
                     'diskon' => $request->nominal_diskon,
@@ -690,23 +731,32 @@ class KasirController extends Controller {
 
                 if($storeDetail->status_umi == 1){
                     if($invoice->nominal_bayar <= 100000){
+                        $mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
+                        $mdrCount = $mdr/100;
+                        $nominal_mdr = $invoice->nominal_baya*$mdrCount;
                         $invoice->update([
-                            'mdr' => 0,
-                            'nominal_mdr' => 0,
-                            'nominal_terima_bersih' => $invoice->nominal_bayar
+                            'mdr' => $mdr,
+                            'nominal_mdr' => $nominal_mdr,
+                            'nominal_terima_bersih' => $invoice->nominal_bayar-$nominal_mdr
                         ]);
                     } else {
-                        $nominal_mdr = $total*0.007;
+                        $mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
+                        $mdrCount = $mdr/100;
+                        $nominal_mdr = $invoice->nominal_bayar*$mdrCount;
                         $invoice->update([
+                            'mdr' => $mdr,
                             'nominal_mdr' => $nominal_mdr,
-                            'nominal_terima_bersih' => $total-$nominal_mdr
+                            'nominal_terima_bersih' => $invoice->nominal_bayar-$nominal_mdr
                         ]);
                     }
                 } else {
-                    $nominal_mdr = $total*0.007;
+                    $mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
+                    $mdrCount = $mdr/100;
+                    $nominal_mdr = $invoice->nominal_bayar*$mdrCount;
                     $invoice->update([
+                        'mdr' => $mdr,
                         'nominal_mdr' => $nominal_mdr,
-                        'nominal_terima_bersih' => $total-$nominal_mdr
+                        'nominal_terima_bersih' => $invoice->nominal_bayar-$nominal_mdr
                     ]);
                 }
                 // this end
@@ -723,7 +773,7 @@ class KasirController extends Controller {
             $action = "Kasir : Transaction Pending Process | Error";
             $this->createHistoryUser($action, $e, 0);
             $notification = array(
-                'message' => 'Transaksi gagal diproses!',
+                'message' => 'Gagal memproses transaksi, harap hubungi Admin!',
                 'alert-type' => 'error',
             );
             return redirect()->back()->with($notification);
