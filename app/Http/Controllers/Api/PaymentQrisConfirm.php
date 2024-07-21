@@ -555,13 +555,13 @@ class PaymentQrisConfirm extends Controller {
                 }
 
                 $data = json_decode($postResponse->getBody());
+                
                 if(!is_null($data) || !empty($data)){
                     if($data->data->responseStatus == "Failed" 
                         || $data->data->messageDetail == "The transaction is invalid or has not been paid." 
                         || $data->data->responseDescription == "Data Not Found" 
                         || $data->data->responseCode == "921009" 
-                        || $data->data->responseCode == 921009
-                        || $data->data->data->paymentStatus == "UNPAID") {
+                        || $data->data->responseCode == 921009) {
                         $paymentStatusServer = 0;
                     }
 
@@ -569,8 +569,7 @@ class PaymentQrisConfirm extends Controller {
                         || $data->data->messageDetail == "The transaction has been paid." 
                         || $data->data->responseDescription == "Success" 
                         || $data->data->responseCode == "921000" 
-                        || $data->data->responseCode == 921000
-                        || $data->data->data->paymentStatus == "PAID") {
+                        || $data->data->responseCode == 921000) {
                         $paymentStatusServer = 1;
                     }
 
