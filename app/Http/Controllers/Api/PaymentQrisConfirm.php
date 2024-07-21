@@ -586,10 +586,10 @@ class PaymentQrisConfirm extends Controller {
                         'mdrPaymentAmount'      =>  $invoiceCheck->nominal_terima_bersih,
                     );
 
-                    return response()->json([
-                        'data'           =>  $data,
-                        'transactionData'   => $invoice,
-                    ]);
+                    // return response()->json([
+                    //     'data'           =>  $data,
+                    //     'transactionData'   => $invoice,
+                    // ]);
 
                     if($invoiceCheck->status_pembayaran == 0 && $paymentStatusServer == 0){
                         return response()->json([
