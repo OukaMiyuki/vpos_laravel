@@ -514,7 +514,7 @@ class PaymentQrisConfirm extends Controller {
                 ]);
             } else {
                 $client = new GuzzleHttpClient();
-                $url = 'https://erp.pt-best.com/api/dynamic_qris_wt_new';
+                $url = 'https://erp.pt-best.com/api/inquiry_payment';
                 $data = "";
                 $postResponse = "";
                 $paymentStatusServer = 0;
