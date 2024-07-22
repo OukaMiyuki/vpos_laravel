@@ -483,14 +483,24 @@ class KasirController extends Controller {
 
         if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
             try {
-                $stock = ProductStock::find($request->id_product)->lockForUpdate();
-                $updateStok = (int) $stock->stok - (int) $request->qty;
-                $stock->update([
-                    'stok' => $updateStok
-                ]);
-                DB::commit();
+                $id = $request->id_product;
+                $qty = $request->qty;
+                DB::transaction(function () use ($id, $qty) {
+                    $stock = ProductStock::find($id)->lockForUpdate();
+                    $updateStok = (int) $stock->stok - (int) $qty;
+                    $stock->update([
+                        'stok' => $updateStok
+                    ]);
+                    DB::commit();
+                });
+                $notification = array(
+                    'message' => 'Successfully Added!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
             } catch(Exception $e){
                 DB::rollback();
+                return redirect()->back();
             }
         }
 
@@ -503,27 +513,53 @@ class KasirController extends Controller {
 
     public function transactionPendingUpdateCart(Request $request){
         DB::beginTransaction();
+        $id_invoice = $request->id_invoice;
+        $id_product = $request->id_product;
+        $qty        = $request->qty;
         try{
-            $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
-                                        ->where('id_invoice', $request->id_invoice)
-                                        ->first();
-            $stock = ProductStock::find($request->id_product)->lockForUpdate();
-            if($shoppingCart->qty<$request->qty){
-                $penambahan=(int) $request->qty-$shoppingCart->qty;
-                $updateqty=$penambahan+$shoppingCart->qty;
-                $harga=$shoppingCart->harga;
-                if($stock->stok<$penambahan){
-                    $notification = array(
-                        'message' => 'Stok tidak mencukupi untuk jumlah tersebut!',
-                        'alert-type' => 'error',
-                    );
-                    return redirect()->back()->with($notification);
-                } else {
+            DB::transaction(function () use ($id_invoice, $id_product, $qty) {
+                $shoppingCart = ShoppingCart::where('id_product', $id_product)
+                                            ->where('id_invoice', $id_invoice)
+                                            ->lockForUpdate()
+                                            ->first();
+                $stock = ProductStock::find($id_product)->lockForUpdate();
+                if($shoppingCart->qty<$qty){
+                    $penambahan=(int) $qty-$shoppingCart->qty;
+                    $updateqty=$penambahan+$shoppingCart->qty;
+                    $harga=$shoppingCart->harga;
+                    if($stock->stok<$penambahan){
+                        $notification = array(
+                            'message' => 'Stok tidak mencukupi untuk jumlah tersebut!',
+                            'alert-type' => 'error',
+                        );
+                        DB::commit();
+                        return redirect()->back()->with($notification);
+                    } else {
+                        $shoppingCart->update([
+                            'qty' => $updateqty,
+                            'sub_total' => $updateqty*$harga
+                        ]);
+                        $updateStok = (int) $stock->stok - (int) $penambahan;
+                        $stock->update([
+                            'stok' => $updateStok
+                        ]);
+                        DB::commit();
+                        $notification = array(
+                            'message' => 'Successfully Updated!',
+                            'alert-type' => 'success',
+                        );
+                        return redirect()->back()->with($notification);
+                    }
+                } else if($shoppingCart->qty>$qty){
+                    $pengurangan=(int) $shoppingCart->qty-$qty;
+                    //$updateqty=$pengurangan-$request->qty;
+                    $harga=$shoppingCart->harga;
+
                     $shoppingCart->update([
-                        'qty' => $updateqty,
-                        'sub_total' => $updateqty*$harga
+                        'qty' => $qty,
+                        'sub_total' => $qty*$harga
                     ]);
-                    $updateStok = (int) $stock->stok - (int) $penambahan;
+                    $updateStok = (int) $stock->stok + (int) $pengurangan;
                     $stock->update([
                         'stok' => $updateStok
                     ]);
@@ -533,32 +569,20 @@ class KasirController extends Controller {
                         'alert-type' => 'success',
                     );
                     return redirect()->back()->with($notification);
+                } else {
+                    $notification = array(
+                        'message' => 'Successfully Added!',
+                        'alert-type' => 'success',
+                    );
+                    DB::commit();
+                    return redirect()->back()->with($notification);
                 }
-            } else if($shoppingCart->qty>$request->qty){
-                $pengurangan=(int) $shoppingCart->qty-$request->qty;
-                //$updateqty=$pengurangan-$request->qty;
-                $harga=$shoppingCart->harga;
-
-                $shoppingCart->update([
-                    'qty' => $request->qty,
-                    'sub_total' => $request->qty*$harga
-                ]);
-                $updateStok = (int) $stock->stok + (int) $pengurangan;
-                $stock->update([
-                    'stok' => $updateStok
-                ]);
-                $notification = array(
-                    'message' => 'Successfully Updated! dua',
-                    'alert-type' => 'success',
-                );
-                return redirect()->back()->with($notification);
-            } else {
-                $notification = array(
-                    'message' => 'Successfully Added!',
-                    'alert-type' => 'success',
-                );
-                return redirect()->back()->with($notification);
-            }
+            });
+            $notification = array(
+                'message' => 'Successfully Updated!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
         } catch(Exception $e){
             DB::rollback();
             return redirect()->back();

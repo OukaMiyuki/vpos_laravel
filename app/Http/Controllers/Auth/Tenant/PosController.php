@@ -558,6 +558,7 @@ class PosController extends Controller {
                 return redirect()->back()->with($notification);
             } catch(Exception $e){
                 DB::rollback();
+                return redirect()->back();
             }
         }
 
@@ -626,7 +627,7 @@ class PosController extends Controller {
                     ]);
                     DB::commit();
                     $notification = array(
-                        'message' => 'Successfully Updated! dua',
+                        'message' => 'Successfully Updated!',
                         'alert-type' => 'success',
                     );
                     return redirect()->back()->with($notification);
@@ -640,7 +641,7 @@ class PosController extends Controller {
                 }
             });
             $notification = array(
-                'message' => 'Successfully Added!',
+                'message' => 'Successfully Updated!',
                 'alert-type' => 'success',
             );
             return redirect()->back()->with($notification);
