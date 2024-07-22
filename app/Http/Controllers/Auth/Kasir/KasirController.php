@@ -442,8 +442,9 @@ class KasirController extends Controller {
         $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
                                     ->where('id_invoice', $request->id_invoice)
                                     ->first();
+
         if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
-            $stock = ProductStock::find($request->id_product);
+            $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($request->id_product);
             if($stock->stok < $request->qty){
                 $notification = array(
                     'message' => 'Stok tidak mencukupi!',
@@ -453,8 +454,9 @@ class KasirController extends Controller {
             }
         }
 
-        if(empty($shoppingCart) || $shoppingCart->count() == 0 || $shoppingCart == ""){
+        if(empty($shoppingCart) || is_null($shoppingCart) || $shoppingCart->count() == 0 || $shoppingCart == ""){
             ShoppingCart::create([
+                'id_kasir' => auth()->user()->id,
                 'id_invoice' => $request->id_invoice,
                 'id_product' => $request->id_product,
                 'product_name' => $request->name,
@@ -480,13 +482,13 @@ class KasirController extends Controller {
                 ]);
             }
         }
-
         if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
             try {
                 $id = $request->id_product;
                 $qty = $request->qty;
-                DB::transaction(function () use ($id, $qty) {
-                    $stock = ProductStock::find($id)->lockForUpdate();
+                $store_identifier = auth()->user()->id_store;
+                DB::transaction(function () use ($id, $qty, $store_identifier) {
+                    $stock = ProductStock::where('store_identifier', $store_identifier)->lockForUpdate()->find($id);
                     $updateStok = (int) $stock->stok - (int) $qty;
                     $stock->update([
                         'stok' => $updateStok
@@ -510,6 +512,80 @@ class KasirController extends Controller {
         );
         return redirect()->back()->with($notification);
     }
+
+    // public function transactionPendingAddCart(Request $request){
+    //     DB::beginTransaction();
+    //     $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
+    //                                 ->where('id_invoice', $request->id_invoice)
+    //                                 ->first();
+    //     if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+    //         $stock = ProductStock::find($request->id_product);
+    //         if($stock->stok < $request->qty){
+    //             $notification = array(
+    //                 'message' => 'Stok tidak mencukupi!',
+    //                 'alert-type' => 'error',
+    //             );
+    //             return redirect()->back()->with($notification);
+    //         }
+    //     }
+
+    //     if(empty($shoppingCart) || $shoppingCart->count() == 0 || $shoppingCart == ""){
+    //         ShoppingCart::create([
+    //             'id_invoice' => $request->id_invoice,
+    //             'id_product' => $request->id_product,
+    //             'product_name' => $request->name,
+    //             'qty' => $request->qty,
+    //             'harga' => $request->price,
+    //             'tipe_barang' => $request->tipe_barang,
+    //             'sub_total' => $request->qty*$request->price
+    //         ]);
+    //     } else {
+    //         if($request->tipe_barang == "Custom" || $request->tipe_barang == "Pack"){
+    //             $updateSHoppingCart = ShoppingCart::find($shoppingCart->id);
+    //             $updateSHoppingCart->update([
+    //                 'qty' => $request->qty,
+    //                 'harga' => $request->price,
+    //                 'sub_total' => $request->qty*$request->price
+    //             ]);
+    //         } else {
+    //             $tempQty = $shoppingCart->qty;
+    //             $totalQty = $tempQty+$request->qty;
+    //             $shoppingCart->update([
+    //                 'qty' => $totalQty,
+    //                 'sub_total' => $totalQty*$request->price
+    //             ]);
+    //         }
+    //     }
+
+    //     if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
+    //         try {
+    //             $id = $request->id_product;
+    //             $qty = $request->qty;
+    //             DB::transaction(function () use ($id, $qty) {
+    //                 $stock = ProductStock::find($id)->lockForUpdate();
+    //                 $updateStok = (int) $stock->stok - (int) $qty;
+    //                 $stock->update([
+    //                     'stok' => $updateStok
+    //                 ]);
+    //                 DB::commit();
+    //             });
+    //             $notification = array(
+    //                 'message' => 'Successfully Added!',
+    //                 'alert-type' => 'success',
+    //             );
+    //             return redirect()->back()->with($notification);
+    //         } catch(Exception $e){
+    //             DB::rollback();
+    //             return redirect()->back();
+    //         }
+    //     }
+
+    //     $notification = array(
+    //         'message' => 'Successfully Added!',
+    //         'alert-type' => 'success',
+    //     );
+    //     return redirect()->back()->with($notification);
+    // }
 
     public function transactionPendingUpdateCart(Request $request){
         DB::beginTransaction();
