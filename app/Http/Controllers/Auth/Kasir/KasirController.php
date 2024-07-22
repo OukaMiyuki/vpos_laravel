@@ -513,6 +513,88 @@ class KasirController extends Controller {
         return redirect()->back()->with($notification);
     }
 
+    public function transactionPendingUpdateCart(Request $request){
+        DB::beginTransaction();
+        $identifier = auth()->user()->id_store;
+        $id_invoice = $request->id_invoice;
+        $id_product = $request->id_product;
+        $qty        = $request->qty;
+        try {
+            DB::transaction(function () use ($id_invoice, $id_product, $identifier, $qty) {
+                $shoppingCart = ShoppingCart::where('id_product', $id_product)
+                                            ->where('id_invoice', $id_invoice)
+                                            ->lockForUpdate()
+                                            ->first();
+
+                $stock = ProductStock::where('store_identifier', $identifier)
+                                    ->lockForUpdate()
+                                    ->find($id_product);
+
+                if($shoppingCart->qty<$qty){
+                    $penambahan=(int) $qty-$shoppingCart->qty;
+                    $updateqty=$penambahan+$shoppingCart->qty;
+                    $harga=$shoppingCart->harga;
+                    if($stock->stok<$penambahan){
+                        $notification = array(
+                            'message' => 'Stok tidak mencukupi untuk jumlah tersebut!',
+                            'alert-type' => 'error',
+                        );
+                        DB::commit();
+                        return redirect()->back()->with($notification);
+                    } else {
+                        $shoppingCart->update([
+                            'qty' => $updateqty,
+                            'sub_total' => $updateqty*$harga
+                        ]);
+                        $updateStok = (int) $stock->stok - (int) $penambahan;
+                        $stock->update([
+                            'stok' => $updateStok
+                        ]);
+                        DB::commit();
+                        $notification = array(
+                            'message' => 'Successfully Updated!',
+                            'alert-type' => 'success',
+                        );
+                        return redirect()->back()->with($notification);
+                    }
+                } else if($shoppingCart->qty>$qty){
+                    $pengurangan=(int) $shoppingCart->qty-$qty;
+                    $harga=$shoppingCart->harga;
+
+                    $shoppingCart->update([
+                        'qty' => $qty,
+                        'sub_total' => $qty*$harga
+                    ]);
+                    $updateStok = (int) $stock->stok + (int) $pengurangan;
+                    $stock->update([
+                        'stok' => $updateStok
+                    ]);
+                    DB::commit();
+                    $notification = array(
+                        'message' => 'Successfully Updated!',
+                        'alert-type' => 'success',
+                    );
+                    return redirect()->back()->with($notification);
+                } else {
+                    DB::commit();
+                    $notification = array(
+                        'message' => 'Successfully Added!',
+                        'alert-type' => 'success',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+            });
+            $notification = array(
+                'message' => 'Successfully Updated!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
+        } catch(Exception $e){
+            DB::rollback();
+            return redirect()->back();
+        }
+    }
+
     // public function transactionPendingAddCart(Request $request){
     //     DB::beginTransaction();
     //     $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
@@ -587,83 +669,83 @@ class KasirController extends Controller {
     //     return redirect()->back()->with($notification);
     // }
 
-    public function transactionPendingUpdateCart(Request $request){
-        DB::beginTransaction();
-        $id_invoice = $request->id_invoice;
-        $id_product = $request->id_product;
-        $qty        = $request->qty;
-        try{
-            DB::transaction(function () use ($id_invoice, $id_product, $qty) {
-                $shoppingCart = ShoppingCart::where('id_product', $id_product)
-                                            ->where('id_invoice', $id_invoice)
-                                            ->lockForUpdate()
-                                            ->first();
-                $stock = ProductStock::find($id_product)->lockForUpdate();
-                if($shoppingCart->qty<$qty){
-                    $penambahan=(int) $qty-$shoppingCart->qty;
-                    $updateqty=$penambahan+$shoppingCart->qty;
-                    $harga=$shoppingCart->harga;
-                    if($stock->stok<$penambahan){
-                        $notification = array(
-                            'message' => 'Stok tidak mencukupi untuk jumlah tersebut!',
-                            'alert-type' => 'error',
-                        );
-                        DB::commit();
-                        return redirect()->back()->with($notification);
-                    } else {
-                        $shoppingCart->update([
-                            'qty' => $updateqty,
-                            'sub_total' => $updateqty*$harga
-                        ]);
-                        $updateStok = (int) $stock->stok - (int) $penambahan;
-                        $stock->update([
-                            'stok' => $updateStok
-                        ]);
-                        DB::commit();
-                        $notification = array(
-                            'message' => 'Successfully Updated!',
-                            'alert-type' => 'success',
-                        );
-                        return redirect()->back()->with($notification);
-                    }
-                } else if($shoppingCart->qty>$qty){
-                    $pengurangan=(int) $shoppingCart->qty-$qty;
-                    //$updateqty=$pengurangan-$request->qty;
-                    $harga=$shoppingCart->harga;
+    // public function transactionPendingUpdateCart(Request $request){
+    //     DB::beginTransaction();
+    //     $id_invoice = $request->id_invoice;
+    //     $id_product = $request->id_product;
+    //     $qty        = $request->qty;
+    //     try{
+    //         DB::transaction(function () use ($id_invoice, $id_product, $qty) {
+    //             $shoppingCart = ShoppingCart::where('id_product', $id_product)
+    //                                         ->where('id_invoice', $id_invoice)
+    //                                         ->lockForUpdate()
+    //                                         ->first();
+    //             $stock = ProductStock::find($id_product)->lockForUpdate();
+    //             if($shoppingCart->qty<$qty){
+    //                 $penambahan=(int) $qty-$shoppingCart->qty;
+    //                 $updateqty=$penambahan+$shoppingCart->qty;
+    //                 $harga=$shoppingCart->harga;
+    //                 if($stock->stok<$penambahan){
+    //                     $notification = array(
+    //                         'message' => 'Stok tidak mencukupi untuk jumlah tersebut!',
+    //                         'alert-type' => 'error',
+    //                     );
+    //                     DB::commit();
+    //                     return redirect()->back()->with($notification);
+    //                 } else {
+    //                     $shoppingCart->update([
+    //                         'qty' => $updateqty,
+    //                         'sub_total' => $updateqty*$harga
+    //                     ]);
+    //                     $updateStok = (int) $stock->stok - (int) $penambahan;
+    //                     $stock->update([
+    //                         'stok' => $updateStok
+    //                     ]);
+    //                     DB::commit();
+    //                     $notification = array(
+    //                         'message' => 'Successfully Updated!',
+    //                         'alert-type' => 'success',
+    //                     );
+    //                     return redirect()->back()->with($notification);
+    //                 }
+    //             } else if($shoppingCart->qty>$qty){
+    //                 $pengurangan=(int) $shoppingCart->qty-$qty;
+    //                 //$updateqty=$pengurangan-$request->qty;
+    //                 $harga=$shoppingCart->harga;
 
-                    $shoppingCart->update([
-                        'qty' => $qty,
-                        'sub_total' => $qty*$harga
-                    ]);
-                    $updateStok = (int) $stock->stok + (int) $pengurangan;
-                    $stock->update([
-                        'stok' => $updateStok
-                    ]);
-                    DB::commit();
-                    $notification = array(
-                        'message' => 'Successfully Updated!',
-                        'alert-type' => 'success',
-                    );
-                    return redirect()->back()->with($notification);
-                } else {
-                    $notification = array(
-                        'message' => 'Successfully Added!',
-                        'alert-type' => 'success',
-                    );
-                    DB::commit();
-                    return redirect()->back()->with($notification);
-                }
-            });
-            $notification = array(
-                'message' => 'Successfully Updated!',
-                'alert-type' => 'success',
-            );
-            return redirect()->back()->with($notification);
-        } catch(Exception $e){
-            DB::rollback();
-            return redirect()->back();
-        }
-    }
+    //                 $shoppingCart->update([
+    //                     'qty' => $qty,
+    //                     'sub_total' => $qty*$harga
+    //                 ]);
+    //                 $updateStok = (int) $stock->stok + (int) $pengurangan;
+    //                 $stock->update([
+    //                     'stok' => $updateStok
+    //                 ]);
+    //                 DB::commit();
+    //                 $notification = array(
+    //                     'message' => 'Successfully Updated!',
+    //                     'alert-type' => 'success',
+    //                 );
+    //                 return redirect()->back()->with($notification);
+    //             } else {
+    //                 $notification = array(
+    //                     'message' => 'Successfully Added!',
+    //                     'alert-type' => 'success',
+    //                 );
+    //                 DB::commit();
+    //                 return redirect()->back()->with($notification);
+    //             }
+    //         });
+    //         $notification = array(
+    //             'message' => 'Successfully Updated!',
+    //             'alert-type' => 'success',
+    //         );
+    //         return redirect()->back()->with($notification);
+    //     } catch(Exception $e){
+    //         DB::rollback();
+    //         return redirect()->back();
+    //     }
+    // }
 
     public function transactionPendingDeleteCart(Request $request){
         $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
