@@ -545,12 +545,17 @@ class PosController extends Controller {
         }
         if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
             try {
-                $stock = ProductStock::where('store_identifier', $identifier)->lockForUpdate()->find($request->id_product);
-                $updateStok = (int) $stock->stok - (int) $request->qty;
-                $stock->update([
-                    'stok' => $updateStok
-                ]);
-                DB::commit();
+                $id = $request->id_product;
+                $qty = $request->qty;
+                $store_identifier = $identifier;
+                DB::transaction(function () use ($id, $qty, $store_identifier) {
+                    $stock = ProductStock::where('store_identifier', $store_identifier)->lockForUpdate()->find($id);
+                    $updateStok = (int) $stock->stok - (int) $qty;
+                    $stock->update([
+                        'stok' => $updateStok
+                    ]);
+                    DB::commit();
+                });
             } catch(Exception $e){
                 DB::rollback();
             }
@@ -566,66 +571,74 @@ class PosController extends Controller {
     public function transactionPendingUpdateCart(Request $request){
         DB::beginTransaction();
         $identifier = $this->getStoreIdentifier();
+        $id_invoice = $request->id_invoice;
+        $id_product = $request->id_product;
+        $qty        = $request->qty;
         try {
-            $shoppingCart = ShoppingCart::where('id_product', $request->id_product)
-                                        ->where('id_invoice', $request->id_invoice)
-                                        ->first();
+            DB::transaction(function () use ($id_invoice, $id_product, $identifier, $qty) {
+                $shoppingCart = ShoppingCart::where('id_product', $id_product)
+                                            ->where('id_invoice', $id_invoice)
+                                            ->lockForUpdate()
+                                            ->first();
 
-            $stock = ProductStock::where('store_identifier', $identifier)
-                                 ->lockForUpdate()
-                                 ->find($request->id_product);
+                $stock = ProductStock::where('store_identifier', $identifier)
+                                    ->lockForUpdate()
+                                    ->find($id_product);
 
-            if($shoppingCart->qty<$request->qty){
-                $penambahan=(int) $request->qty-$shoppingCart->qty;
-                $updateqty=$penambahan+$shoppingCart->qty;
-                $harga=$shoppingCart->harga;
-                if($stock->stok<$penambahan){
-                    $notification = array(
-                        'message' => 'Stok tidak mencukupi untuk jumlah tersebut!',
-                        'alert-type' => 'error',
-                    );
-                    return redirect()->back()->with($notification);
-                } else {
+                if($shoppingCart->qty<$qty){
+                    $penambahan=(int) $qty-$shoppingCart->qty;
+                    $updateqty=$penambahan+$shoppingCart->qty;
+                    $harga=$shoppingCart->harga;
+                    if($stock->stok<$penambahan){
+                        $notification = array(
+                            'message' => 'Stok tidak mencukupi untuk jumlah tersebut!',
+                            'alert-type' => 'error',
+                        );
+                        DB::commit();
+                        return redirect()->back()->with($notification);
+                    } else {
+                        $shoppingCart->update([
+                            'qty' => $updateqty,
+                            'sub_total' => $updateqty*$harga
+                        ]);
+                        $updateStok = (int) $stock->stok - (int) $penambahan;
+                        $stock->update([
+                            'stok' => $updateStok
+                        ]);
+                        DB::commit();
+                        $notification = array(
+                            'message' => 'Successfully Updated!',
+                            'alert-type' => 'success',
+                        );
+                        return redirect()->back()->with($notification);
+                    }
+                } else if($shoppingCart->qty>$qty){
+                    $pengurangan=(int) $shoppingCart->qty-$qty;
+                    $harga=$shoppingCart->harga;
+
                     $shoppingCart->update([
-                        'qty' => $updateqty,
-                        'sub_total' => $updateqty*$harga
+                        'qty' => $qty,
+                        'sub_total' => $qty*$harga
                     ]);
-                    $updateStok = (int) $stock->stok - (int) $penambahan;
+                    $updateStok = (int) $stock->stok + (int) $pengurangan;
                     $stock->update([
                         'stok' => $updateStok
                     ]);
                     DB::commit();
                     $notification = array(
-                        'message' => 'Successfully Updated!',
+                        'message' => 'Successfully Updated! dua',
+                        'alert-type' => 'success',
+                    );
+                    return redirect()->back()->with($notification);
+                } else {
+                    DB::commit();
+                    $notification = array(
+                        'message' => 'Successfully Added!',
                         'alert-type' => 'success',
                     );
                     return redirect()->back()->with($notification);
                 }
-            } else if($shoppingCart->qty>$request->qty){
-                $pengurangan=(int) $shoppingCart->qty-$request->qty;
-                $harga=$shoppingCart->harga;
-
-                $shoppingCart->update([
-                    'qty' => $request->qty,
-                    'sub_total' => $request->qty*$harga
-                ]);
-                $updateStok = (int) $stock->stok + (int) $pengurangan;
-                $stock->update([
-                    'stok' => $updateStok
-                ]);
-                DB::commit();
-                $notification = array(
-                    'message' => 'Successfully Updated! dua',
-                    'alert-type' => 'success',
-                );
-                return redirect()->back()->with($notification);
-            } else {
-                $notification = array(
-                    'message' => 'Successfully Added!',
-                    'alert-type' => 'success',
-                );
-                return redirect()->back()->with($notification);
-            }
+            });
         } catch(Exception $e){
             DB::rollback();
             return redirect()->back();
