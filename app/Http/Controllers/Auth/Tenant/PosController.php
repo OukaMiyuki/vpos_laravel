@@ -529,11 +529,6 @@ class PosController extends Controller {
                     'harga' => $request->price,
                     'sub_total' => $request->qty*$request->price
                 ]);
-                // $shoppingCart->update([
-                //     'qty' => 1,
-                //     'sub_total' => 200
-                // ]);
-                // dd($shoppingCart);
             } else {
                 $tempQty = $shoppingCart->qty;
                 $totalQty = $tempQty+$request->qty;
@@ -555,14 +550,9 @@ class PosController extends Controller {
                         'stok' => $updateStok
                     ]);
                     DB::commit();
-                    $notification = array(
-                        'message' => 'Successfully Addedggggg!',
-                        'alert-type' => 'success',
-                    );
-                    return redirect()->back()->with($notification);
                 });
                 $notification = array(
-                    'message' => 'Successfully Addedffffff!',
+                    'message' => 'Successfully Added!',
                     'alert-type' => 'success',
                 );
                 return redirect()->back()->with($notification);
@@ -649,6 +639,11 @@ class PosController extends Controller {
                     return redirect()->back()->with($notification);
                 }
             });
+            $notification = array(
+                'message' => 'Successfully Added!',
+                'alert-type' => 'success',
+            );
+            return redirect()->back()->with($notification);
         } catch(Exception $e){
             DB::rollback();
             return redirect()->back();
