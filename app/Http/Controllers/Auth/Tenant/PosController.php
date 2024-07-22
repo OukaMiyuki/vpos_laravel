@@ -555,7 +555,17 @@ class PosController extends Controller {
                         'stok' => $updateStok
                     ]);
                     DB::commit();
+                    $notification = array(
+                        'message' => 'Successfully Addedggggg!',
+                        'alert-type' => 'success',
+                    );
+                    return redirect()->back()->with($notification);
                 });
+                $notification = array(
+                    'message' => 'Successfully Addedffffff!',
+                    'alert-type' => 'success',
+                );
+                return redirect()->back()->with($notification);
             } catch(Exception $e){
                 DB::rollback();
             }
