@@ -62,6 +62,7 @@ Route::middleware(['auth:sanctum', 'abilities:tenant', 'throttle:200,1', 'custom
     Route::post('/product/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productUdate']);
     Route::get('/product/delete/{id_product}', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productDelete']);
     Route::post('/product/detail', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'productDetail']);
+    Route::post('/product/stock/insert', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'producStockInsert']);
     Route::get('/supplier', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'supplierList']);
     Route::post('/supplier/insert', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'supplierInsert']);
     Route::post('/supplier/update', [\App\Http\Controllers\Auth\Tenant\Api\TenantController::class, 'supplierUpdate']);

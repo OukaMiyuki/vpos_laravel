@@ -92,12 +92,16 @@ class Invoice extends Model {
             ]);
             if ($cart->options['size'] != "Custom" && $cart->options['size'] != "Pack"){
                 try {
-                    $stock = ProductStock::find($cart->id)->lockForUpdate();
-                    $updateStok = (int) $stock->stok - (int) $cart->qty;
-                    $stock->update([
-                        'stok' => $updateStok
-                    ]);
-                    DB::commit();
+                    $id = $cart->id;
+                    $qty = $cart->qty;
+                    DB::transaction(function () use ($id, $qty) {
+                        $stock = ProductStock::lockForUpdate()->find($id);
+                        $updateStok = (int) $stock->stok - (int) $qty;
+                        $stock->update([
+                            'stok' => $updateStok
+                        ]);
+                        DB::commit();
+                    });
                 } catch(Exception $e) {
                     DB::rollback();
                 }

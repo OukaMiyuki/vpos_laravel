@@ -730,6 +730,102 @@ class TenantController extends Controller {
         ]);
     }
 
+    public function producStockInsert(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $id_batch_product = $request->id_batch_product;
+        $barcode = $request->barcode;
+        $tanggal_beli = $request->t_beli;
+        $tanggal_expired = $request->t_expired;
+        $harga_beli = $request->h_beli;
+        $stok = $request->stok;
+
+        $productCheck = Product::where('store_identifier', $identifier)->find($id_batch_product);
+
+        if(is_null($productCheck) || empty($productCheck)){
+            return response()->json([
+                'message' => 'Data tidak ditemukan!',
+                'status' => 404,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+        if($productCheck->tipe_barang == "Pack" || $productCheck->tipe_barang == "Custom"){
+            $stok = 0;
+        }
+
+        $stock = ProductStock::create([
+            'store_identifier' => $identifier,
+            'id_batch_product' => $id_batch_product,
+            'barcode' => $barcode,
+            'tanggal_beli' => $tanggal_beli,
+            'tanggal_expired' => $tanggal_expired,
+            'harga_beli' => $harga_beli,
+            'stok' => $stok
+        ]);
+
+        return response()->json([
+            'message' => 'Data product stock berhasil diinput!',
+            'status' => 200,
+            'data-stock' => $stock,
+            'app-version' => $this->getAppversion()
+        ]);
+    }
+
+    public function producStockUpdate(Request $request) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $id = $request->id_stok;
+        $barcode = $request->barcode;
+        $tanggal_beli = $request->t_beli;
+        $tanggal_expired = $request->t_expired;
+        $harga_beli = $request->h_beli;
+        $stok = $request->stok;
+
+        $productStockCheck = ProductStock::with(['product'])->where('store_identifier', $identifier)->find($id);
+
+        if(is_null($productStockCheck) || empty($productStockCheck)){
+            return response()->json([
+                'message' => 'Data tidak ditemukan!',
+                'status' => 404,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+        if($productStockCheck->product->tipe_barang == "Pack" || $productStockCheck->product->tipe_barang == "Custom"){
+            $stok = 0;
+        }
+
+        $productStockCheck->find($id)->update([
+            'barcode' => $barcode,
+            'tanggal_beli' => $tanggal_beli,
+            'tanggal_expired' => $tanggal_expired,
+            'harga_beli' => $harga_beli,
+            'stok' => $stok 
+        ]);
+
+        return response()->json([
+            'message' => 'Data product stock berhasil diupdate!',
+            'status' => 200,
+            'data-stock' => $productStockCheck,
+            'app-version' => $this->getAppversion()
+        ]);
+    }
+
+    public function producStockDelete($id) : JsonResponse {
+        $identifier = $this->getStoreIdentifier();
+        $productStockCheck = ProductStock::where('store_identifier', $identifier)->find($id);
+        if(is_null($productStockCheck) || empty($productStockCheck)){
+            return response()->json([
+                'message' => 'Data tidak ditemukan!',
+                'status' => 404,
+                'app-version' => $this->getAppversion()
+            ]);
+        }
+        $productStockCheck->delete();
+        return response()->json([
+            'message' => 'Data product stock berhasil dihapus!',
+            'status' => 200,
+            'app-version' => $this->getAppversion()
+        ]);
+    }
+
     public function supplierList() : JsonResponse {
         $identifier = $this->getStoreIdentifier();
         $supplierList = "";
