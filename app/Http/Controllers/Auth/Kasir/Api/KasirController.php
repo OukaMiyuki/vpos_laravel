@@ -356,11 +356,23 @@ class KasirController extends Controller {
                 if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
                     if($request->tipe_barang == "PCS"){
                         try{
-                            $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->where('stok', '!=', 0)->findOrFail($request->id_stok)->lockForUpdate();
-                            $stock->update([
-                                'stok' => (int) $stoktemp-$cart->qty
+                            $store_identifier = auth()->user()->id_store;
+                            $qty = $cart->qty;
+                            $id_stok = $request->id_stok;
+                            DB::transaction(function () use ($qty, $stoktemp, $store_identifier, $id_stok) {
+                                $stock = ProductStock::where('store_identifier', $store_identifier)->where('stok', '!=', 0)->findOrFail($id_stok)->lockForUpdate();
+                                $stock->update([
+                                    'stok' => (int) $stoktemp-$qty
+                                ]);
+                                DB::commit();
+                            });
+                            return response()->json([
+                                'message' => 'Added Success',
+                                'cart' => $cart,
+                                'data' => 'Add new cart',
+                                'status' => 200,
+                                'app-version' => $this->getAppversion()
                             ]);
-                            DB::commit();
                         } catch(Exception $e){
                             DB::rollback();
                             return response()->json([
@@ -443,11 +455,23 @@ class KasirController extends Controller {
                 }
                 if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
                     try{
-                        $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->where('stok', '!=', 0)->findOrFail($request->id_stok)->lockForUpdate();
-                        $stock->update([
-                            'stok' => (int) $stoktemp-$request->qty
-                        ]); 
-                        DB::commit();
+                        $store_identifier = auth()->user()->id_store;
+                        $id_stok = $request->id_stok;
+                        $qty = $request->qty;
+                        DB::transaction(function () use ($id_stok, $stoktemp, $qty, $store_identifier) {
+                            $stock = ProductStock::where('store_identifier', $store_identifier)->where('stok', '!=', 0)->findOrFail($id_stok)->lockForUpdate();
+                            $stock->update([
+                                'stok' => (int) $stoktemp-$qty
+                            ]); 
+                            DB::commit();
+                        });
+                        return response()->json([
+                            'message' => 'Added Success',
+                            'cart' => $cart,
+                            'data' => 'Uodate cart',
+                            'status' => 200,
+                            'app-version' => $this->getAppversion()
+                        ]);
                     } catch(Exception $e){
                         DB::rollback();
                         return response()->json([
@@ -488,12 +512,16 @@ class KasirController extends Controller {
             if($cart->tipe_barang == "PCS"){
                 try{
                     $qty = $cart->qty;
-                    $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->findOrFail($cart->id_product)->lockForUpdate();
-                    $stoktemp = $stock->stok;
-                    $stock->update([
-                        'stok' => (int) $stoktemp+$qty
-                    ]);
-                    DB::commit();
+                    $store_identifier = auth()->user()->id_store;
+                    $id_product = $cart->id_product;
+                    DB::transaction(function () use ($id_product, $qty, $store_identifier) {
+                        $stock = ProductStock::where('store_identifier', $store_identifier)->findOrFail($id_product)->lockForUpdate();
+                        $stoktemp = $stock->stok;
+                        $stock->update([
+                            'stok' => (int) $stoktemp+$qty
+                        ]);
+                        DB::commit();
+                    });
                 } catch(Exception $e){
                     DB::rollback();
                     return response()->json([
@@ -1140,13 +1168,18 @@ class KasirController extends Controller {
         }
 
         if($request->tipe_barang == "PCS"){
+            $store_identifier = auth()->user()->id_store;
+            $id_stok = $request->id_stok;
+            $qty = $request->qty;
             try{
-                $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($request->id_stok)->lockForUpdate();
-                $stoktemp = $stock->stok;
-                $stock->update([
-                    'stok' => (int) $stoktemp-$request->qty
-                ]);
-                DB::commit();
+                DB::transaction(function () use ($id_stok, $qty, $store_identifier) {
+                    $stock = ProductStock::where('store_identifier', $store_identifier)->find($id_stok)->lockForUpdate();
+                    $stoktemp = $stock->stok;
+                    $stock->update([
+                        'stok' => (int) $stoktemp-$qty
+                    ]);
+                    DB::commit();
+                });
             } catch(EXception $e){
                 DB::rollback();
                 return response()->json([
@@ -1320,12 +1353,16 @@ class KasirController extends Controller {
             if($cart->tipe_barang == "PCS"){
                 try{
                     $qty = $cart->qty;
-                    $stock = ProductStock::where('store_identifier', auth()->user()->id_store)->find($cart->id_product)->lockForUpdate();
-                    $stoktemp = $stock->stok;
-                    $stock->update([
-                        'stok' => (int) $stoktemp+$qty
-                    ]);
-                    DB::commit();
+                    $store_identifier = auth()->user()->id_store;
+                    $id_product = $cart->id_product;
+                    DB::transaction(function () use ($id_product, $qty, $store_identifier) {
+                        $stock = ProductStock::where('store_identifier', $store_identifier)->find($id_product)->lockForUpdate();
+                        $stoktemp = $stock->stok;
+                        $stock->update([
+                            'stok' => (int) $stoktemp+$qty
+                        ]);
+                        DB::commit();
+                    });
                 } catch(Exception $e){
                     DB::rollback();
                     return response()->json([

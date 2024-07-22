@@ -1371,11 +1371,23 @@ class TenantController extends Controller {
                 if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
                     if($request->tipe_barang == "PCS"){
                         try{
-                            $stock = ProductStock::where('store_identifier', $identifier)->findOrFail($request->id_stok)->lockForUpdate();
-                            $stock->update([
-                                'stok' => (int) $stoktemp-$cart->qty
+                            $store_identifier = $identifier;
+                            $id_stok = $request->id_stok;
+                            $qty = $cart->qty;
+                            DB::transaction(function () use ($qty , $stoktemp, $id_stok, $store_identifier) {
+                                $stock = ProductStock::where('store_identifier', $store_identifier)->findOrFail($id_stok)->lockForUpdate();
+                                $stock->update([
+                                    'stok' => (int) $stoktemp-$qty
+                                ]);
+                                DB::commit();
+                            });
+                            return response()->json([
+                                'message' => 'Added Success',
+                                'cart' => $cart,
+                                'data' => 'Add new cart',
+                                'status' => 200,
+                                'app-version' => $this->getAppversion()
                             ]);
-                            DB::commit();
                         } catch(Exception $e){
                             DB::rollback();
                             return response()->json([
@@ -1458,11 +1470,23 @@ class TenantController extends Controller {
                 }
                 if($request->tipe_barang != "Custom" && $request->tipe_barang != "Pack"){
                     try{
-                        $stock = ProductStock::where('store_identifier', $identifier)->findOrFail($request->id_stok)->lockForUpdate();
-                        $stock->update([
-                            'stok' => (int) $stoktemp-$request->qty
+                        $qty = $request->qty;
+                        $store_identifier = $identifier;
+                        $id_stok = $request->id_stok;
+                        DB::transaction(function () use ($id_stok, $stoktemp, $qty, $store_identifier) {
+                            $stock = ProductStock::where('store_identifier', $store_identifier)->findOrFail($id_stok)->lockForUpdate();
+                            $stock->update([
+                                'stok' => (int) $stoktemp-$qty
+                            ]);
+                            DB::commit();
+                        });
+                        return response()->json([
+                            'message' => 'Added Success',
+                            'cart' => $cart,
+                            'data' => 'Uodate cart',
+                            'status' => 200,
+                            'app-version' => $this->getAppversion()
                         ]);
-                        DB::commit();
                     } catch(Exception $e){
                         DB::rollback();
                         return response()->json([
@@ -1509,12 +1533,21 @@ class TenantController extends Controller {
             if($cart->tipe_barang == "PCS"){
                 try{
                     $qty = $cart->qty;
-                    $stock = ProductStock::where('store_identifier', $identifier)->findOrFail($cart->id_product)->lockForUpdate();
-                    $stoktemp = $stock->stok;
-                    $stock->update([
-                        'stok' => (int) $stoktemp+$qty
+                    $id_product = $cart->id_product;
+                    $store_identifier = $identifier;
+                    DB::transaction(function () use ($id_product, $qty, $store_identifier) {
+                        $stock = ProductStock::where('store_identifier', $store_identifier)->findOrFail($id_product)->lockForUpdate();
+                        $stoktemp = $stock->stok;
+                        $stock->update([
+                            'stok' => (int) $stoktemp+$qty
+                        ]);
+                        DB::commit();
+                    });
+                    return response()->json([
+                        'message' => 'Success Deleted',
+                        'status' => 200,
+                        'app-version' => $this->getAppversion()
                     ]);
-                    DB::commit();
                 } catch(Exception $e){
                     DB::rollback();
                     return response()->json([
@@ -1534,11 +1567,11 @@ class TenantController extends Controller {
             exit;
         }
 
-        return response()->json([
-            'message' => 'Success Deleted',
-            'status' => 200,
-            'app-version' => $this->getAppversion()
-        ]);
+        // return response()->json([
+        //     'message' => 'Success Deleted',
+        //     'status' => 200,
+        //     'app-version' => $this->getAppversion()
+        // ]);
     }
 
     public function listCart() : JsonResponse {
@@ -2153,12 +2186,23 @@ class TenantController extends Controller {
 
         if($request->tipe_barang == "PCS"){
             try{
-                $stock = ProductStock::where('store_identifier', $identifier)->find($request->id_stok)->lockForUpdate();
-                $stoktemp = $stock->stok;
-                $stock->update([
-                    'stok' => (int) $stoktemp-$request->qty
+                $store_identifier = $identifier;
+                $id_stok = $request->id_stok;
+                $qty = $request->qty;
+                DB::transaction(function () use ($id_stok, $qty, $store_identifier) {
+                    $stock = ProductStock::where('store_identifier', $store_identifier)->find($id_stok)->lockForUpdate();
+                    $stoktemp = $stock->stok;
+                    $stock->update([
+                        'stok' => (int) $stoktemp-$qty
+                    ]);
+                    DB::commit();
+                });
+                return response()->json([
+                    'message' => 'Added Success',
+                    'cart' => $cart,
+                    'status' => 200,
+                    'app-version' => $this->getAppversion()
                 ]);
-                DB::commit();
             } catch(Exception $e){
                 DB::rollback();
                 return response()->json([
@@ -2189,12 +2233,16 @@ class TenantController extends Controller {
             if($cart->tipe_barang == "PCS"){
                 try{
                     $qty = $cart->qty;
-                    $stock = ProductStock::where('store_identifier', $identifier)->find($cart->id_product)->lockForUpdate();
-                    $stoktemp = $stock->stok;
-                    $stock->update([
-                        'stok' => (int) $stoktemp+$qty
-                    ]);
-                    DB::commit();
+                    $store_identifier = $identifier;
+                    $id_product = $cart->id_product;
+                    DB::transaction(function () use ($id_product, $qty, $store_identifier) {
+                        $stock = ProductStock::where('store_identifier', $store_identifier)->find($id_product)->lockForUpdate();
+                        $stoktemp = $stock->stok;
+                        $stock->update([
+                            'stok' => (int) $stoktemp+$qty
+                        ]);
+                        DB::commit();
+                    });
                 } catch(Exception $e){
                     DB::rollback();
                     return response()->json([
