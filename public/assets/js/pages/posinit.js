@@ -95,6 +95,7 @@ $(document).ready(function(){
         "info":     false,
         "searching": false,
         "paging" : false,
+        "autoWidth": false,
         drawCallback: function() {
             $(".dataTables_paginate > .pagination").addClass("pagination-rounded")
         }
