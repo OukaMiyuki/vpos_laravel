@@ -122,6 +122,15 @@ class PaymentQrisConfirm extends Controller {
                         ]);
                         $contents = $response->getBody()->getContents();
                         $contentEncode = json_decode($contents);
+                        History::create([
+                            'action' => 'ngetes hasil callback',
+                            'id_user' => $invoice->id_tenant,
+                            'email' => $invoice->email,
+                            'lokasi_anda' => 'System Report',
+                            'deteksi_ip' => 'System Report',
+                            'log' => $contentEncode,
+                            'status' => 1
+                        ]);
                         $callbackDetail = "";
                         $callbackResponseStatus = "";
                         $callbackLog = "";
@@ -311,7 +320,7 @@ class PaymentQrisConfirm extends Controller {
             'amount'                =>  'required|numeric',
             'partnerTransactionNo'  =>  'required|string'
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'message'   =>  "Invalid Value or NULL",
@@ -386,7 +395,7 @@ class PaymentQrisConfirm extends Controller {
                         'status'    =>  20021
                     ]);
                 }
-    
+
                 if($store->is_active == 0){
                     return response()->json([
                         'message' => 'Your merchant is deactivated by admin, please contact the admin for further information',
@@ -426,7 +435,7 @@ class PaymentQrisConfirm extends Controller {
                             ]);
                             $id_user = $store->id_user;
                             $user_email = $store->email;
-                            
+
                             if($invoice->qris_response == 211000 || $invoice->qris_response == "211000"){
                                 if(!is_null($invoice) && !is_null($invoice->id)){
                                     $action = "Request Invoice Qris by Merchant : ".$store->store_identifier." Creation Success | ".$invoice->nomor_invoice;
@@ -494,7 +503,7 @@ class PaymentQrisConfirm extends Controller {
             'partnerTransactionNo'  =>  'required|string',
             'invoice_number'        =>  'required|string',
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'message'   =>  "Invalid Value or NULL",
@@ -582,7 +591,7 @@ class PaymentQrisConfirm extends Controller {
                             'status'    =>  20026
                         ]);
                     }
-                        
+
                 } else {
                     try{
                         $postResponse = $client->request('POST',  $url, [
@@ -602,20 +611,20 @@ class PaymentQrisConfirm extends Controller {
                 }
 
                 $data = json_decode($postResponse->getBody());
-                
+
                 if(!is_null($data) || !empty($data)){
-                    if($data->data->responseStatus == "Failed" 
-                        || $data->data->messageDetail == "The transaction is invalid or has not been paid." 
-                        || $data->data->responseDescription == "Data Not Found" 
-                        || $data->data->responseCode == "921009" 
+                    if($data->data->responseStatus == "Failed"
+                        || $data->data->messageDetail == "The transaction is invalid or has not been paid."
+                        || $data->data->responseDescription == "Data Not Found"
+                        || $data->data->responseCode == "921009"
                         || $data->data->responseCode == 921009) {
                         $paymentStatusServer = 0;
                     }
 
-                    if($data->data->responseStatus == "Success" 
-                        || $data->data->messageDetail == "The transaction has been paid." 
-                        || $data->data->responseDescription == "Success" 
-                        || $data->data->responseCode == "921000" 
+                    if($data->data->responseStatus == "Success"
+                        || $data->data->messageDetail == "The transaction has been paid."
+                        || $data->data->responseDescription == "Success"
+                        || $data->data->responseCode == "921000"
                         || $data->data->responseCode == 921000) {
                         $paymentStatusServer = 1;
                     }
