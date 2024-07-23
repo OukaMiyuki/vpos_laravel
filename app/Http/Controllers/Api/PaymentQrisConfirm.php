@@ -114,7 +114,7 @@ class PaymentQrisConfirm extends Controller {
                         'responseStatus'        =>  "SUCCESS",
                         'status'                =>  20011,
                     ];
-
+                    $contentEncode = "";
                     try {
                         $response = $client->post($url, [
                             'headers' => $headers,
@@ -200,7 +200,8 @@ class PaymentQrisConfirm extends Controller {
                             'email' => $invoice->email,
                             'lokasi_anda' => 'System Report',
                             'deteksi_ip' => 'System Report',
-                            'log' => $ex,
+                            // 'log' => $ex,
+                            'log' => $contentEncode,
                             'status' => 1
                         ]);
                     }
