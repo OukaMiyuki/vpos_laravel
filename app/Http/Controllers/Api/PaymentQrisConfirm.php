@@ -115,95 +115,104 @@ class PaymentQrisConfirm extends Controller {
                         'status'                =>  20011,
                     ];
                     $contentEncode = "";
-                    try {
-                        $response = $client->post($url, [
-                            'headers' => $headers,
-                            'json' => $data,
-                        ]);
-                        $contents = $response->getBody()->getContents();
-                        $contentEncode = json_decode($contents);
-                        $callbackDetail = "";
-                        $callbackResponseStatus = "";
-                        $callbackLog = "";
-                        if(!is_null($contentEncode) || !empty($contentEncode)){
-                            if(!is_null($contentEncode->responseStatus)
-                                && !is_null($contentEncode->responseCode)
-                                && !is_null($contentEncode->responseDescription)
-                                && !is_null($contentEncode->partnerTransactionNo)
-                                && !is_null($contentEncode->partnerReferenceNo)
-                                && !is_null($contentEncode->partnerCallbackReference)
-                                && !is_null($contentEncode->partnerTransactionStatus)
-                                && !is_null($contentEncode->partnerPaymentStatus)
-                                && !is_null($contentEncode->partnerPaymentTimeStamp)
-                            ){
-                                $callbackDetail = CallbackHistory::create([
-                                    'nomor_callback'            =>  date('YmdHisU'),
-                                    'nomor_invoice'             =>  $invoice->nomor_invoice,
-                                    'responseStatus'            =>  $contentEncode->responseStatus,
-                                    'responseCode'              =>  $contentEncode->responseCode,
-                                    'responseDescription'       =>  $contentEncode->responseDescription,
-                                    'partnerTransactionNo'      =>  $contentEncode->partnerTransactionNo,
-                                    'partnerReferenceNo'        =>  $contentEncode->partnerReferenceNo,
-                                    'partnerCallbackReference'  =>  $contentEncode->partnerCallbackReference,
-                                    'partnerTransactionStatus'  =>  $contentEncode->partnerTransactionStatus,
-                                    'partnerPaymentStatus'      =>  $contentEncode->partnerPaymentStatus,
-                                    'partnerPaymentTimeStamp'   =>  $contentEncode->partnerPaymentTimeStamp,
-                                ]);
-                                $callbackResponseStatus = "true";
-                            } else {
-                                $callbackDetail = CallbackHistory::create([
-                                    'nomor_callback'            =>  date('YmdHisU'),
-                                    'nomor_invoice'             =>  $invoice->nomor_invoice,
-                                    'responseStatus'            =>  NULL,
-                                    'responseCode'              =>  NULL,
-                                    'responseDescription'       =>  NULL,
-                                    'partnerTransactionNo'      =>  NULL,
-                                    'partnerReferenceNo'        =>  NULL,
-                                    'partnerCallbackReference'  =>  NULL,
-                                    'partnerTransactionStatus'  =>  NULL,
-                                    'partnerPaymentStatus'      =>  NULL,
-                                    'partnerPaymentTimeStamp'   =>  NULL,
-                                ]);
-                                $callbackResponseStatus = "false";
-                            }
+                    History::create([
+                        'action' => 'Url',
+                        'id_user' => $invoice->id_tenant,
+                        'email' => $invoice->email,
+                        'lokasi_anda' => 'System Report',
+                        'deteksi_ip' => 'System Report',
+                        'log' => $url,
+                        'status' => 1
+                    ]);
+                    // try {
+                    //     $response = $client->post($url, [
+                    //         'headers' => $headers,
+                    //         'json' => $data,
+                    //     ]);
+                    //     $contents = $response->getBody()->getContents();
+                    //     $contentEncode = json_decode($contents);
+                    //     $callbackDetail = "";
+                    //     $callbackResponseStatus = "";
+                    //     $callbackLog = "";
+                    //     if(!is_null($contentEncode) || !empty($contentEncode)){
+                    //         if(!is_null($contentEncode->responseStatus)
+                    //             && !is_null($contentEncode->responseCode)
+                    //             && !is_null($contentEncode->responseDescription)
+                    //             && !is_null($contentEncode->partnerTransactionNo)
+                    //             && !is_null($contentEncode->partnerReferenceNo)
+                    //             && !is_null($contentEncode->partnerCallbackReference)
+                    //             && !is_null($contentEncode->partnerTransactionStatus)
+                    //             && !is_null($contentEncode->partnerPaymentStatus)
+                    //             && !is_null($contentEncode->partnerPaymentTimeStamp)
+                    //         ){
+                    //             $callbackDetail = CallbackHistory::create([
+                    //                 'nomor_callback'            =>  date('YmdHisU'),
+                    //                 'nomor_invoice'             =>  $invoice->nomor_invoice,
+                    //                 'responseStatus'            =>  $contentEncode->responseStatus,
+                    //                 'responseCode'              =>  $contentEncode->responseCode,
+                    //                 'responseDescription'       =>  $contentEncode->responseDescription,
+                    //                 'partnerTransactionNo'      =>  $contentEncode->partnerTransactionNo,
+                    //                 'partnerReferenceNo'        =>  $contentEncode->partnerReferenceNo,
+                    //                 'partnerCallbackReference'  =>  $contentEncode->partnerCallbackReference,
+                    //                 'partnerTransactionStatus'  =>  $contentEncode->partnerTransactionStatus,
+                    //                 'partnerPaymentStatus'      =>  $contentEncode->partnerPaymentStatus,
+                    //                 'partnerPaymentTimeStamp'   =>  $contentEncode->partnerPaymentTimeStamp,
+                    //             ]);
+                    //             $callbackResponseStatus = "true";
+                    //         } else {
+                    //             $callbackDetail = CallbackHistory::create([
+                    //                 'nomor_callback'            =>  date('YmdHisU'),
+                    //                 'nomor_invoice'             =>  $invoice->nomor_invoice,
+                    //                 'responseStatus'            =>  NULL,
+                    //                 'responseCode'              =>  NULL,
+                    //                 'responseDescription'       =>  NULL,
+                    //                 'partnerTransactionNo'      =>  NULL,
+                    //                 'partnerReferenceNo'        =>  NULL,
+                    //                 'partnerCallbackReference'  =>  NULL,
+                    //                 'partnerTransactionStatus'  =>  NULL,
+                    //                 'partnerPaymentStatus'      =>  NULL,
+                    //                 'partnerPaymentTimeStamp'   =>  NULL,
+                    //             ]);
+                    //             $callbackResponseStatus = "false";
+                    //         }
 
-                            if($callbackResponseStatus == "true"){
-                                $callbackLog = "Callack user response valid";
-                            } else {
-                                $callbackLog = "Callack user response not valid";
-                            }
+                    //         if($callbackResponseStatus == "true"){
+                    //             $callbackLog = "Callack user response valid";
+                    //         } else {
+                    //             $callbackLog = "Callack user response not valid";
+                    //         }
 
-                            History::create([
-                                'action' => 'User Payment Callback : Success | '.$invoice->nomor_invoice,
-                                'id_user' => $invoice->id_tenant,
-                                'email' => $invoice->email,
-                                'lokasi_anda' => 'System Report',
-                                'deteksi_ip' => 'System Report',
-                                'log' => $callbackLog.' | Callback ID : '.$callbackDetail->nomor_callback,
-                                'status' => 1
-                            ]);
-                        } else {
-                            History::create([
-                                'action' => 'User Payment Callback : NULL Response From Client | '.$invoice->nomor_invoice,
-                                'id_user' => $invoice->id_tenant,
-                                'email' => $invoice->email,
-                                'lokasi_anda' => 'System Report',
-                                'deteksi_ip' => 'System Report',
-                                'log' => "Null response from client API",
-                                'status' => 1
-                            ]);
-                        }
-                    } catch(Exception $ex){
-                        History::create([
-                            'action' => 'User Payment Callback : Fail | '.$invoice->nomor_invoice,
-                            'id_user' => $invoice->id_tenant,
-                            'email' => $invoice->email,
-                            'lokasi_anda' => 'System Report',
-                            'deteksi_ip' => 'System Report',
-                            'log' => $contentEncode,
-                            'status' => 1
-                        ]);
-                    }
+                    //         History::create([
+                    //             'action' => 'User Payment Callback : Success | '.$invoice->nomor_invoice,
+                    //             'id_user' => $invoice->id_tenant,
+                    //             'email' => $invoice->email,
+                    //             'lokasi_anda' => 'System Report',
+                    //             'deteksi_ip' => 'System Report',
+                    //             'log' => $callbackLog.' | Callback ID : '.$callbackDetail->nomor_callback,
+                    //             'status' => 1
+                    //         ]);
+                    //     } else {
+                    //         History::create([
+                    //             'action' => 'User Payment Callback : NULL Response From Client | '.$invoice->nomor_invoice,
+                    //             'id_user' => $invoice->id_tenant,
+                    //             'email' => $invoice->email,
+                    //             'lokasi_anda' => 'System Report',
+                    //             'deteksi_ip' => 'System Report',
+                    //             'log' => "Null response from client API",
+                    //             'status' => 1
+                    //         ]);
+                    //     }
+                    // } catch(Exception $ex){
+                    //     History::create([
+                    //         'action' => 'User Payment Callback : Fail | '.$invoice->nomor_invoice,
+                    //         'id_user' => $invoice->id_tenant,
+                    //         'email' => $invoice->email,
+                    //         'lokasi_anda' => 'System Report',
+                    //         'deteksi_ip' => 'System Report',
+                    //         'log' => $contentEncode,
+                    //         'status' => 1
+                    //     ]);
+                    // }
                 } else {
                     History::create([
                         'action' => 'User Payment Callback : No Callback provided from the user',
