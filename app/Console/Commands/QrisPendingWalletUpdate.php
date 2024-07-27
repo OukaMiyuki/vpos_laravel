@@ -73,8 +73,8 @@ class QrisPendingWalletUpdate extends Command {
                 $totalCashback = 0;
                 foreach($sumInvoice->invoice as $invoice){
                     $nominal_mdr = $invoice->nominal_mdr;
-                    $persensetengah = 50/100;
-                    $persentaseInsentif = 45/100;
+                    $persensetengah = 0.50;
+                    $persentaseInsentif = 0.45;
                     $insentif_cashback = ($nominal_mdr*$persentaseInsentif)/$persensetengah;
                     $insentif_cashbackFloor = floor($insentif_cashback);
                     $totalCashback+=$insentif_cashbackFloor;
@@ -157,8 +157,8 @@ class QrisPendingWalletUpdate extends Command {
                         $totalCashback = 0;
                         foreach($sumInvoice->invoice as $invoice){
                             $nominal_mdr = $invoice->nominal_mdr;
-                            $persensetengah = 50/100;
-                            $persentaseInsentif = 45/100;
+                            $persensetengah = 0.50;
+                            $persentaseInsentif = 0.45;
                             $insentif_cashback = ($nominal_mdr*$persentaseInsentif)/$persensetengah;
                             $insentif_cashbackFloor = floor($insentif_cashback);
                             $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
