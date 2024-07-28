@@ -72,15 +72,16 @@ class QrisPendingWalletUpdate extends Command {
                 echo "Pending Settlement Insert - Nama : ".$sumInvoice->name." | ".$totalSumFloor." | Periode : ".Carbon::now()."\n";
                 $totalCashback = 0;
                 foreach($sumInvoice->invoice as $invoice){
-                    $nominal_mdr = $invoice->nominal_mdr;
-                    $persensetengah = 0.50;
+                    $nominal_mdr = floatval($invoice->nominal_mdr);
+                    $persensetengah =  0.50;
                     $persentaseInsentif = 0.45;
-                    $insentif_cashback = ($nominal_mdr*$persentaseInsentif)/$persensetengah;
-                    $insentif_cashbackFloor = floor($insentif_cashback);
-                    $totalCashback+=$insentif_cashbackFloor;
+                    $persentaseawal = (float) ($nominal_mdr*$persentaseInsentif);
+                    $insentif_cashback = (float) ($persentaseawal*$persensetengah);
+                    $totalCashback+=$insentif_cashback;
+                    //$insentif_cashbackFloor = floor($insentif_cashback);
                     HistoryCashbackPending::create([
                         'id_invoice' => $invoice->id,
-                        'nominal_terima_mdr' => $insentif_cashbackFloor,
+                        'nominal_terima_mdr' => floor($insentif_cashback),
                         'periode_transaksi' => Carbon::yesterday()
                     ]);
                     Invoice::find($invoice->id)->update([
@@ -93,7 +94,7 @@ class QrisPendingWalletUpdate extends Command {
                     'nomor_settlement_pending' => $dateCode,
                     'settlement_schedule' => Carbon::now(),
                     'nominal_settle' => $totalSumFloor,
-                    'nominal_insentif_cashback' => $totalCashback,
+                    'nominal_insentif_cashback' => floor($totalCashback),
                     'periode_transaksi' => Carbon::yesterday(),
                     'settlement_pending_status' => 0,
                 ]);
@@ -159,30 +160,32 @@ class QrisPendingWalletUpdate extends Command {
                             $nominal_mdr = $invoice->nominal_mdr;
                             $persensetengah = 0.50;
                             $persentaseInsentif = 0.45;
-                            $insentif_cashback = ($nominal_mdr*$persentaseInsentif)/$persensetengah;
-                            $insentif_cashbackFloor = floor($insentif_cashback);
-                            $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
-                            $qrisWalletAdminSaldo = $qrisWalletAdmin->saldo;
-                            $qrisWalletAdmin->update([
-                                'saldo' => $qrisWalletAdminSaldo+$insentif_cashbackFloor
-                            ]);
-                            $totalCashback+=$insentif_cashbackFloor;
+                            $persentaseawal = (float) ($nominal_mdr*$persentaseInsentif);
+                            $insentif_cashback = (float) ($persentaseawal*$persensetengah);
+                            // $insentif_cashback = ($nominal_mdr*$persentaseInsentif)/$persensetengah;
+                            // $insentif_cashbackFloor = floor($insentif_cashback);
+                            $totalCashback+=$insentif_cashback;
                             HistoryCashbackAdmin::create([
                                 'id_invoice' => $invoice->id,
-                                'nominal_terima_mdr' => $insentif_cashbackFloor,
+                                'nominal_terima_mdr' => floor($insentif_cashback),
                                 'periode_transaksi' => Carbon::yesterday()
                             ]);
                             Invoice::find($invoice->id)->update([
                                 'settlement_status' => 1
                             ]);
                         }
+                        $qrisWalletAdmin =  QrisWallet::where('id_user', 1)->where('email', 'adminsu@visipos.id')->find(1);
+                        $qrisWalletAdminSaldo = $qrisWalletAdmin->saldo;
+                        $qrisWalletAdmin->update([
+                            'saldo' => $qrisWalletAdminSaldo+floor($totalCashback)
+                        ]);
                         SettlementHstory::create([
                             'id_user' => $sumInvoice->id,
                             'id_settlement' => $settlement->id,
                             'email' => $sumInvoice->email,
                             'settlement_time_stamp' => Carbon::now(),
                             'nominal_settle' => $totalSumFloor,
-                            'nominal_insentif_cashback' => $totalCashback,
+                            'nominal_insentif_cashback' => floor($totalCashback),
                             'status' => 1,
                             'note' => $settlementNote,
                             'periode_transaksi' => Carbon::yesterday()
