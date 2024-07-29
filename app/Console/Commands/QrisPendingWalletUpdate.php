@@ -72,7 +72,7 @@ class QrisPendingWalletUpdate extends Command {
                 echo "Pending Settlement Insert - Nama : ".$sumInvoice->name." | ".$totalSumFloor." | Periode : ".Carbon::now()."\n";
                 $totalCashback = 0;
                 foreach($sumInvoice->invoice as $invoice){
-                    $nominal_mdr = floatval($invoice->nominal_mdr);
+                    $nominal_mdr = (float) $invoice->nominal_mdr;
                     $persensetengah =  0.50;
                     $persentaseInsentif = 0.45;
                     $persentaseawal = (float) ($nominal_mdr*$persentaseInsentif);
@@ -157,7 +157,7 @@ class QrisPendingWalletUpdate extends Command {
                         echo "Nama : ".$sumInvoice->name." | ".$totalSumFloor." | Periode : ".Carbon::now()."\n";
                         $totalCashback = 0;
                         foreach($sumInvoice->invoice as $invoice){
-                            $nominal_mdr = $invoice->nominal_mdr;
+                            $nominal_mdr = (float) $invoice->nominal_mdr;
                             $persensetengah = 0.50;
                             $persentaseInsentif = 0.45;
                             $persentaseawal = (float) ($nominal_mdr*$persentaseInsentif);
