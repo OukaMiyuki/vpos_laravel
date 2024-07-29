@@ -39,7 +39,7 @@ class QrisPendingWalletUpdate extends Command {
     public function handle() {
         $settlementPending = SettlementPending::where('settlement_pending_status', 0)->get();
         foreach($settlementPending as $stlPending){
-            return $stlPending->email;
+            echo $stlPending->email;
         }
         // DB::connection()->enableQueryLog();
         // $now = date('Y-m-d');
