@@ -78,9 +78,6 @@ class KasirController extends Controller {
         $stock = "";
         try {
             $stock = ProductStock::with(['product'])
-                                ->where(function ($query) {
-                                    $query->where('stok', '!=', 0);
-                                })
                                 ->where('store_identifier', auth()->user()->id_store)
                                 ->latest()
                                 ->get();

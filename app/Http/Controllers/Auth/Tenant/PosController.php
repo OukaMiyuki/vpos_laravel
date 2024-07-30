@@ -104,21 +104,38 @@ class PosController extends Controller {
         $diskon = Discount::where('store_identifier', $identifier)
                             ->where('is_active', 1)
                             ->first();
-
         $tax = Tax::where('store_identifier', $identifier)
-                    ->where('is_active', 1)
-                    ->first();
-
+                            ->where('is_active', 1)
+                            ->first();
+        $banyak = abs($request->qty);
+        if($request->tipe_barang == "PCS"){
+            $stockCheck = ProductStock::find($request->id)->where('store_identifier', $identifier);
+            if(!is_null($stockCheck) || !empty($stockCheck)){
+                $stok = $stockCheck->stok;
+                if($banyak>$stok){
+                    $notification = array(
+                        'message' => 'Stok tidak mencukupi!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+            } else {
+                $notification = array(
+                    'message' => 'Product Stock tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+        }
         if(!empty($tax)){
             Cart::setGlobalTax($tax->pajak);
         } else {
             Cart::setGlobalTax(0);
         }
-        $banyak = abs($request->qty);
-        $price = $request->price;
-        if($request->tipe_barang == "Pack"){
-            $price = floor($banyak*$request->price);
-        }
+        // $price = $request->price;
+        // if($request->tipe_barang == "Pack"){
+        //     $price = floor($banyak*$request->price);
+        // }
 
         Cart::add([
             'id' => $request->id,

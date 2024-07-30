@@ -137,11 +137,32 @@ class KasirController extends Controller {
 
     public function addCart(Request $request){
         $diskon = Discount::where('store_identifier', auth()->user()->id_store)
-                    ->where('is_active', 1)->first();
+                    ->where('is_active', 1)
+                    ->first();
 
         $tax = Tax::where('store_identifier', auth()->user()->id_store)
-                    ->where('is_active', 1)->first();
-
+                    ->where('is_active', 1)
+                    ->first();
+        $banyak = abs($request->qty);
+        if($request->tipe_barang == "PCS"){
+            $stockCheck = ProductStock::find($request->id)->where('store_identifier', auth()->user()->id_store);
+            if(!is_null($stockCheck) || !empty($stockCheck)){
+                $stok = $stockCheck->stok;
+                if($banyak>$stok){
+                    $notification = array(
+                        'message' => 'Stok tidak mencukupi!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+            } else {
+                $notification = array(
+                    'message' => 'Product Stock tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+        }
         if(!empty($tax)){
             Cart::setGlobalTax($tax->pajak);
         } else {
@@ -151,7 +172,7 @@ class KasirController extends Controller {
         Cart::add([
             'id' => $request->id,
             'name' => $request->name,
-            'qty' => $request->qty,
+            'qty' => $banyak,
             'price' => $request->price,
             'weight' => 20,
             'options' => ['size' => $request->tipe_barang]
@@ -1063,7 +1084,7 @@ class KasirController extends Controller {
             );
             return redirect()->back()->with($notification);
         }
-        
+
         $path = 'qrcode/';
 
         if(!\File::exists(public_path($path))) {

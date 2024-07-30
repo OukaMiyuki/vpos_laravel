@@ -422,9 +422,6 @@ class TenantController extends Controller {
         $product = "";
         try {
             $product = ProductStock::with(['product'])
-                                    ->where(function ($query) {
-                                            $query->where('stok', '!=', 0);
-                                    })
                                     ->where('store_identifier', $identifier)
                                     ->latest()
                                     ->get();
