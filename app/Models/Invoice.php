@@ -22,6 +22,7 @@ use App\Models\CustomerIdentifier;
 use App\Models\TenantQrisAccount;
 use App\Models\HistoryCashbackAdmin;
 use App\Models\History;
+use App\Models\MDR;
 use Exception;
 
 class Invoice extends Model {
@@ -241,26 +242,41 @@ class Invoice extends Model {
             if($model->jenis_pembayaran == "Qris"){
                 if($tenant->id_inv_code != 0){
                     $storeDetail = StoreDetail::with('jenisMDR')->where('store_identifier', $model->store_identifier)->first();
-                    if($storeDetail->status_umi == 1){
-                        if($model->nominal_bayar <= 100000){
-                            $model->mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
-                            $mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
-                            $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr );
-                            $model->nominal_mdr = $nominal_mdr;
-                            $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                    if(!is_null($storeDetail) || !empty($storeDetail)){
+                        if(!is_null($storeDetail->kategori_usaha_omset)
+                            || !empty($storeDetail->kategori_usaha_omset)
+                            || $storeDetail->kategori_usaha_omset != ""
+                            || $storeDetail->kategori_usaha_omset != NULL
+                        ){
+                            if($storeDetail->status_umi == 1){
+                                if($model->nominal_bayar <= 100000){
+                                    $model->mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
+                                    $mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
+                                    $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr );
+                                    $model->nominal_mdr = $nominal_mdr;
+                                    $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                                } else {
+                                    $model->mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
+                                    $mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
+                                    $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr);
+                                    $model->nominal_mdr = $nominal_mdr;
+                                    $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                                }
+                            } else {
+                                $model->mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
+                                $mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
+                                $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr);
+                                $model->nominal_mdr = $nominal_mdr;
+                                $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
+                            }
                         } else {
-                            $model->mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
-                            $mdr = $storeDetail->jenisMDR->presentase_maksimal_mdr;
+                            $mdr = MDR::find(8);
+                            $model->mdr = $mdr->presentase_maksimal_mdr;
+                            $mdr = $mdr->presentase_maksimal_mdr;
                             $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr);
                             $model->nominal_mdr = $nominal_mdr;
                             $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
                         }
-                    } else {
-                        $model->mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
-                        $mdr = $storeDetail->jenisMDR->presentase_minimal_mdr;
-                        $nominal_mdr = self::hitungMDR($model->nominal_bayar, $mdr);
-                        $model->nominal_mdr = $nominal_mdr;
-                        $model->nominal_terima_bersih = $model->nominal_bayar-$nominal_mdr;
                     }
                 } else if($tenant->id_inv_code == 0) {
                     $store = StoreList::with('jenisMDR')->where('store_identifier', $model->store_identifier)->first();
@@ -350,8 +366,8 @@ class Invoice extends Model {
     }
 
     public static function hitungMDR($nominal_bayar, $mdr){
-        $mdrCount = $mdr/100;
-        $nominal_mdr = $nominal_bayar*$mdrCount;
+        $mdrCount = (float) $mdr/100;
+        $nominal_mdr = (float) $nominal_bayar*$mdrCount;
         return $nominal_mdr;
     }
 }

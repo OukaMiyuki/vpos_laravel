@@ -77,12 +77,9 @@ class KasirController extends Controller {
     public function productList() : JsonResponse{
         $stock = "";
         try {
-            $stock = ProductStock::with(['product' => function ($query) {
-                                        $query->where('harga_jual', '!=',0);
-                                }])
+            $stock = ProductStock::with(['product'])
                                 ->where(function ($query) {
-                                        $query->where('stok', '!=', 0)
-                                              ->where('harga_beli', '!=', 0);
+                                    $query->where('stok', '!=', 0);
                                 })
                                 ->where('store_identifier', auth()->user()->id_store)
                                 ->latest()
@@ -462,7 +459,7 @@ class KasirController extends Controller {
                             $stock = ProductStock::where('store_identifier', $store_identifier)->where('stok', '!=', 0)->findOrFail($id_stok)->lockForUpdate();
                             $stock->update([
                                 'stok' => (int) $stoktemp-$qty
-                            ]); 
+                            ]);
                             DB::commit();
                         });
                         return response()->json([
@@ -777,7 +774,7 @@ class KasirController extends Controller {
                         $cart->update([
                             'id_invoice' => $invoice->id
                         ]);
-                    } 
+                    }
                 } else {
                     $action = "Kasir API : Proses Cart Invoice Failed";
                     $this->createHistoryUser($action, $invoice->qris_response, 0);

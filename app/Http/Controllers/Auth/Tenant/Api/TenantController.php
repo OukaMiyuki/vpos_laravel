@@ -366,7 +366,7 @@ class TenantController extends Controller {
                 'status' => 200,
                 'app-version' => $this->getAppversion()
             ]);
-        } catch (Exception $e) { 
+        } catch (Exception $e) {
             $this->createHistoryUser($action, $e, 0);
             return response()->json([
                 'message' => 'Failed to add data!',
@@ -421,12 +421,9 @@ class TenantController extends Controller {
         $identifier = $this->getStoreIdentifier();
         $product = "";
         try {
-            $product = ProductStock::with(['product' => function ($query) {
-                                            $query->where('harga_jual', '!=',0);
-                                    }])
+            $product = ProductStock::with(['product'])
                                     ->where(function ($query) {
                                             $query->where('stok', '!=', 0);
-                                                // ->where('harga_beli', '!=', 0);
                                     })
                                     ->where('store_identifier', $identifier)
                                     ->latest()
@@ -533,7 +530,7 @@ class TenantController extends Controller {
                 $storagePath = Storage::path('public/images/product');
                 $ext = $file->getClientOriginalExtension();
                 $filename = $namaFile.'-'.time().'.'.$ext;
-    
+
                 try {
                     $file->move($storagePath, $filename);
                 } catch (\Exception $e) {
@@ -543,12 +540,12 @@ class TenantController extends Controller {
                         'app-version' => $this->getAppversion()
                     ]);
                 }
-    
+
                 $satuanHargaJual = 0;
                 if($request->tipe_barang != "Custom"){
                     $satuanHargaJual = $request->harga_jual;
                 }
-    
+
                 $product = Product::create([
                     'store_identifier' => $identifier,
                     'id_batch' => $request->id_batch,
@@ -565,7 +562,7 @@ class TenantController extends Controller {
                     'satuan_barang' => $request->satuan_barang,
                     'satuan_unit' => $request->satuan_unit,
                 ]);
-                
+
                 return response()->json([
                     'message' => 'Data product berhasil diinput!',
                     'status' => 200,
@@ -797,7 +794,7 @@ class TenantController extends Controller {
             'tanggal_beli' => $tanggal_beli,
             'tanggal_expired' => $tanggal_expired,
             'harga_beli' => $harga_beli,
-            'stok' => $stok 
+            'stok' => $stok
         ]);
 
         return response()->json([
@@ -833,10 +830,10 @@ class TenantController extends Controller {
         try {
             $supplierList = Supplier::select([
                                                 'id',
-                                                'nama_supplier', 
-                                                'email_supplier', 
-                                                'phone_supplier', 
-                                                'alamat_supplier', 
+                                                'nama_supplier',
+                                                'email_supplier',
+                                                'phone_supplier',
+                                                'alamat_supplier',
                                                 'keterangan'
                                             ])
                                             ->where('store_identifier', $identifier)
@@ -968,8 +965,8 @@ class TenantController extends Controller {
         try {
             $batchList = Batch::select([
                                         'id',
-                                        'batch_code', 
-                                        'keterangan', 
+                                        'batch_code',
+                                        'keterangan',
                                     ])
                                     ->where('store_identifier', $identifier)
                                     ->latest()
@@ -1397,7 +1394,7 @@ class TenantController extends Controller {
                             ]);
                         }
                     }
-                } 
+                }
                 return response()->json([
                     'message' => 'Added Success',
                     'cart' => $cart,
