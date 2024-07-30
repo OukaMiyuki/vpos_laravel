@@ -145,7 +145,7 @@ class KasirController extends Controller {
                     ->first();
         $banyak = abs($request->qty);
         if($request->tipe_barang == "PCS"){
-            $stockCheck = ProductStock::find($request->id)->where('store_identifier', auth()->user()->id_store);
+            $stockCheck = ProductStock::where('store_identifier', auth()->user()->id_store)->find($request->id);
             if(!is_null($stockCheck) || !empty($stockCheck)){
                 $stok = $stockCheck->stok;
                 if($banyak>$stok){
@@ -201,6 +201,25 @@ class KasirController extends Controller {
     public function updateCart(Request $request){
         $rowId = $request->id;
         $qty = $request->qty;
+        if($request->tipe_barang == "PCS"){
+            $stockCheck = ProductStock::where('store_identifier', auth()->user()->id_store)->find($request->id_stok);
+            if(!is_null($stockCheck) || !empty($stockCheck)){
+                $stok = $stockCheck->stok;
+                if($qty>$stok){
+                    $notification = array(
+                        'message' => 'Stok tidak mencukupi!',
+                        'alert-type' => 'warning',
+                    );
+                    return redirect()->back()->with($notification);
+                }
+            } else {
+                $notification = array(
+                    'message' => 'Product Stock tidak ditemukan!',
+                    'alert-type' => 'warning',
+                );
+                return redirect()->back()->with($notification);
+            }
+        }
         $subtotal = (int) substr(str_replace([',', '.'], '', Cart::subtotal()), 0, -2);
         if(!empty($diskon)){
             if($subtotal >= $diskon->min_harga){

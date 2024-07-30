@@ -46,6 +46,8 @@
                                                 <td>
                                                     <form @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif id="qtyform" action="{{ route('kasir.pos.updateCart') }}" method="post">
                                                         @csrf
+                                                        <input @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="hidden" name="tipe_barang" value="{{ $cart->options['size'] }}">
+                                                        <input @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="hidden" name="id_stok" value="{{ $cart->id }}">
                                                         <input @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="hidden" name="id" value="{{ $cart->rowId }}">
                                                         <input @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="number" name="qty" class="qty_txt" value="{{ $cart->qty }}" min="1">
                                                         <button class="btn btn-success btn-xs" @if ($cart->options['size'] == "Custom" || $cart->options['size'] == "Pack") disabled @endif type="submit" class="btn btn-sm btn-success"><span class="mdi mdi-check-bold"></span></button>
