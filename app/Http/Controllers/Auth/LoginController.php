@@ -248,7 +248,8 @@ class LoginController extends Controller {
                                 'tenants.id',
                                 'tenants.phone',
                                 'tenants.name',
-                                'tenants.is_active'
+                                'tenants.is_active',
+                                'tenants.id_inv_code'
                             ])
                             ->with([
                                 'detail' => function($query){
