@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\App;
 use App\Models\Admin;
 use App\Models\Marketing;
 use App\Models\Tenant;
@@ -47,12 +48,29 @@ class RegisterController extends Controller {
     }
 
     private function createHistoryUser($action, $user_id,  $user_email, $log, $status){
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($ip);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
-        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+        $environment = App::environment();
+        $isDebug = config('app.debug');
+        $ip_testing = "125.164.244.223";
+        $ip_production = $this->get_client_ip();
+        $PublicIP = "";
+        $lat = "";
+        $long = "";
+        $user_location = "";
+
+        if ($environment === 'production' && !$isDebug) {
+            $PublicIP = $ip_production;
+        } else if ($environment === 'local' && $isDebug) {
+            $PublicIP = $ip_testing;
+        }
+
+        if(!is_null($PublicIP) || !empty($PublicIP)){
+            $getLoc = Location::get($PublicIP);
+            if(!is_null($getLoc->latitude) && !is_null($getLoc->longitude)){
+                $lat = $getLoc->latitude;
+                $long = $getLoc->longitude;
+                $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+            }
+        }
 
         $history = History::create([
             'id_user' => $user_id,
@@ -60,7 +78,7 @@ class RegisterController extends Controller {
         ]);
 
         if(!is_null($history) || !empty($history)) {
-            $history->createHistory($history, $action, $user_location, $ip, $log, $status);
+            $history->createHistory($history, $action, $user_location, $PublicIP, $log, $status);
         }
     }
 

@@ -14,6 +14,7 @@ use App\Models\AppVersion;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
 use App\Models\APKLink;
+use Illuminate\Support\Facades\App;
 
 class AccessController extends Controller {
     public function adminDashboardAppVersion(){

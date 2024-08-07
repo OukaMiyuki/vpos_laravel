@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\App;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use Stevebauman\Location\Facades\Location;
 use Illuminate\Support\Facades\DB;
@@ -53,14 +54,30 @@ class ProfileController extends Controller {
     }
 
     private function createHistoryUser($action, $log, $status){
+        $environment = App::environment();
+        $isDebug = config('app.debug');
         $user_id = auth()->user()->id;
         $user_email = auth()->user()->email;
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($PublicIP);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
-        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+        $ip_testing = "125.164.244.223";
+        $ip_production = $this->get_client_ip();
+        $PublicIP = "";
+        $lat = "";
+        $long = "";
+        $user_location = "";
+        if ($environment === 'production' && !$isDebug) {
+            $PublicIP = $ip_production;
+        } else if ($environment === 'local' && $isDebug) {
+            $PublicIP = $ip_testing;
+        }
+
+        if(!is_null($PublicIP) || !empty($PublicIP)){
+            $getLoc = Location::get($PublicIP);
+            if(!is_null($getLoc->latitude) && !is_null($getLoc->longitude)){
+                $lat = $getLoc->latitude;
+                $long = $getLoc->longitude;
+                $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+            }
+        }
 
         $history = History::create([
             'id_user' => $user_id,
@@ -558,11 +575,26 @@ class ProfileController extends Controller {
                 return redirect()->back()->with($notification);
             } else {
                 if(!is_null($request->swift_code) && !is_null($request->no_rekening)){
-                    $ip = "36.84.106.3";
-                    $PublicIP = $this->get_client_ip();
-                    $getLoc = Location::get($PublicIP);
-                    $lat = $getLoc->latitude;
-                    $long = $getLoc->longitude;
+                    $environment = App::environment();
+                    $isDebug = config('app.debug');
+                    $PublicIP = "";
+                    $lat = "";
+                    $long = "";
+                    $ip_testing = "125.164.244.223";
+                    $ip_production = $this->get_client_ip();
+                    if ($environment === 'production' && !$isDebug) {
+                        $PublicIP = $ip_production;
+                    } else if ($environment === 'local' && $isDebug) {
+                        $PublicIP = $ip_testing;
+                    }
+            
+                    if(!is_null($PublicIP) || !empty($PublicIP)){
+                        $getLoc = Location::get($PublicIP);
+                        if(!is_null($getLoc->latitude) && !is_null($getLoc->longitude)){
+                            $lat = $getLoc->latitude;
+                            $long = $getLoc->longitude;
+                        }
+                    }
                     $rekClient = new GuzzleHttpClient();
                     $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
                     try {
@@ -644,11 +676,26 @@ class ProfileController extends Controller {
             return redirect()->route('admin.rekening.setting')->with($notification);
         }
 
-        $ip = "36.84.106.3";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($PublicIP);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $environment = App::environment();
+        $isDebug = config('app.debug');
+        $PublicIP = "";
+        $lat = "";
+        $long = "";
+        $ip_testing = "125.164.244.223";
+        $ip_production = $this->get_client_ip();
+        if ($environment === 'production' && !$isDebug) {
+            $PublicIP = $ip_production;
+        } else if ($environment === 'local' && $isDebug) {
+            $PublicIP = $ip_testing;
+        }
+
+        if(!is_null($PublicIP) || !empty($PublicIP)){
+            $getLoc = Location::get($PublicIP);
+            if(!is_null($getLoc->latitude) && !is_null($getLoc->longitude)){
+                $lat = $getLoc->latitude;
+                $long = $getLoc->longitude;
+            }
+        }
         $dataBankList = "";
 
         $rekClient = new GuzzleHttpClient();
@@ -716,11 +763,26 @@ class ProfileController extends Controller {
                     return redirect()->route('admin.rekening.setting')->with($notification);
                 }
                 if(!is_null($swift_code) && !is_null($rekening)){
-                    $ip = "36.84.106.3";
-                    $PublicIP = $this->get_client_ip();
-                    $getLoc = Location::get($PublicIP);
-                    $lat = $getLoc->latitude;
-                    $long = $getLoc->longitude;
+                    $environment = App::environment();
+                    $isDebug = config('app.debug');
+                    $PublicIP = "";
+                    $lat = "";
+                    $long = "";
+                    $ip_testing = "125.164.244.223";
+                    $ip_production = $this->get_client_ip();
+                    if ($environment === 'production' && !$isDebug) {
+                        $PublicIP = $ip_production;
+                    } else if ($environment === 'local' && $isDebug) {
+                        $PublicIP = $ip_testing;
+                    }
+            
+                    if(!is_null($PublicIP) || !empty($PublicIP)){
+                        $getLoc = Location::get($PublicIP);
+                        if(!is_null($getLoc->latitude) && !is_null($getLoc->longitude)){
+                            $lat = $getLoc->latitude;
+                            $long = $getLoc->longitude;
+                        }
+                    }
                     $rekClient = new GuzzleHttpClient();
                     $urlRek = "https://erp.pt-best.com/api/rek_inquiry";
                     try {
@@ -798,11 +860,26 @@ class ProfileController extends Controller {
 
     public function adminWithdrawTarik(Request $request){
         DB::connection()->enableQueryLog();
-        $ip = "125.164.243.227";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($PublicIP);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+        $environment = App::environment();
+        $isDebug = config('app.debug');
+        $PublicIP = "";
+        $lat = "";
+        $long = "";
+        $ip_testing = "125.164.244.223";
+        $ip_production = $this->get_client_ip();
+        if ($environment === 'production' && !$isDebug) {
+            $PublicIP = $ip_production;
+        } else if ($environment === 'local' && $isDebug) {
+            $PublicIP = $ip_testing;
+        }
+
+        if(!is_null($PublicIP) || !empty($PublicIP)){
+            $getLoc = Location::get($PublicIP);
+            if(!is_null($getLoc->latitude) && !is_null($getLoc->longitude)){
+                $lat = $getLoc->latitude;
+                $long = $getLoc->longitude;
+            }
+        }
         $wallet = "";
         $action = "";
         $biayaTransfer = 0;
@@ -918,11 +995,28 @@ class ProfileController extends Controller {
     public function adminWithdrawTarikProcess(Request $request){
         $url = 'https://erp.pt-best.com/api/rek_transfer';
         $client = new GuzzleHttpClient();
-        $ip = "125.164.243.227";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($PublicIP);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
+
+        $environment = App::environment();
+        $isDebug = config('app.debug');
+        $PublicIP = "";
+        $lat = "";
+        $long = "";
+        $ip_testing = "125.164.244.223";
+        $ip_production = $this->get_client_ip();
+        if ($environment === 'production' && !$isDebug) {
+            $PublicIP = $ip_production;
+        } else if ($environment === 'local' && $isDebug) {
+            $PublicIP = $ip_testing;
+        }
+
+        if(!is_null($PublicIP) || !empty($PublicIP)){
+            $getLoc = Location::get($PublicIP);
+            if(!is_null($getLoc->latitude) && !is_null($getLoc->longitude)){
+                $lat = $getLoc->latitude;
+                $long = $getLoc->longitude;
+            }
+        }
+
         $wallet = "";
         $action = "";
         DB::connection()->enableQueryLog();

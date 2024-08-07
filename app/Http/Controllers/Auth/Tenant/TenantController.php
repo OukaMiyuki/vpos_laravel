@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth\Tenant;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\App;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\File;
@@ -58,14 +59,30 @@ class TenantController extends Controller {
     }
 
     private function createHistoryUser($action, $log, $status){
+        $environment = App::environment();
+        $isDebug = config('app.debug');
         $user_id = auth()->user()->id;
         $user_email = auth()->user()->email;
-        $ip = "125.164.244.223";
-        $PublicIP = $this->get_client_ip();
-        $getLoc = Location::get($PublicIP);
-        $lat = $getLoc->latitude;
-        $long = $getLoc->longitude;
-        $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+        $ip_testing = "125.164.244.223";
+        $ip_production = $this->get_client_ip();
+        $PublicIP = "";
+        $lat = "";
+        $long = "";
+        $user_location = "";
+        if ($environment === 'production' && !$isDebug) {
+            $PublicIP = $ip_production;
+        } else if ($environment === 'local' && $isDebug) {
+            $PublicIP = $ip_testing;
+        }
+
+        if(!is_null($PublicIP) || !empty($PublicIP)){
+            $getLoc = Location::get($PublicIP);
+            if(!is_null($getLoc->latitude) && !is_null($getLoc->longitude)){
+                $lat = $getLoc->latitude;
+                $long = $getLoc->longitude;
+                $user_location = "Lokasi : (Lat : ".$lat.", "."Long : ".$long.")";
+            }
+        }
 
         $history = History::create([
             'id_user' => $user_id,
